@@ -10,7 +10,7 @@ html, body {
 /* Set the background image to cover the entire screen */
 body {
     background-image: url('bgi.jpeg'); /* Replace 'bgi.jpeg' with your actual background image file */
-    background-size: 100% 150%; /* Width: 100%, Height: 150% (লম্বা করতে) */
+    background-size: 50% 100%; /* Width: 100%, Height: 150% (লম্বা করতে) */
     background-repeat: no-repeat; /* Prevents the image from repeating */
     background-position: center top; /* Adjust position as needed */
 }
