@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>টেলিগ্রাম বট ওয়েবহুক সেটআপ</title>
+</head>
+<body>
+    <h1>টেলিগ্রাম বট ওয়েবহুক সেটআপ</h1>
+    <p>এই পেজটি টেলিগ্রাম বটের ওয়েবহুক সেটআপ করার জন্য ব্যবহার করা যেতে পারে।</p>
+
+    <?php
+    // টেলিগ্রামের ডেটা গ্রহণ করা
+    $content = file_get_contents("html://input");
+    $update = json_decode($content, true);
+
+    // টেলিগ্রাম বট টোকেন (শুধু মেসেজ পাঠানোর জন্য দরকার)
+    $default_bot_token = "7768584349:AAGYEmwHVSzYGFQW_lrqDqw0njbzCBxkUuA";
+
+    // চ্যাট আইডি এবং মেসেজ
+    $chat_id = $update['message']['chat']['id'] ?? null;
+    $message = $update['message']['text'] ?? null;
+
+    // স্টেট ম্যানেজমেন্ট ফাইল (স্টেপ ট্র্যাক করার জন্য)
+    $state_file = 'state.json';
+    $state_data = file_exists($state_file) ? json_decode(file_get_contents($state_file), true) : [];
+
+    // মেসেজ প্রসেসিং
+    if ($message) {
+        if ($message === '/webhook') {
+            // নতুন শুরু হলে বট টোকেন চাইবে
+            $state_data[$chat_id] = [
+                'step' => 'bot_token',
+            ];
+            sendMessage($chat_id, "আপনার বট টোকেন দিন:");
+        } elseif (isset($state_data[$chat_id]['step']) && $state_data[$chat_id]['step'] === 'bot_token') {
+            // বট টোকেন গ্রহণ
+            $state_data[$chat_id]['bot_token'] = $message;
+            $state_data[$chat_id]['step'] = 'folder_name';
+            sendMessage($chat_id, "Folder Name দিন:");
+        } elseif ($state_data[$chat_id]['step'] === 'folder_name') {
+            // ফোল্ডারের নাম গ্রহণ
+            $state_data[$chat_id]['folder_name'] = $message;
+            $state_data[$chat_id]['step'] = 'file_name';
+            sendMessage($chat_id, "File Name দিন:");
+        } elseif ($state_data[$chat_id]['step'] === 'file_name') {
+            // ফাইলের নাম গ্রহণ এবং Webhook URL তৈরি
+            $state_data[$chat_id]['file_name'] = $message;
+            $state_data[$chat_id]['step'] = 'done';
+
+            sendMessage($chat_id, "Wait... Webhook তৈরি হচ্ছে...");
+
+            // Webhook URL তৈরি
+            $bot_token = $state_data[$chat_id]['bot_token'];
+            $folder_name = $state_data[$chat_id]['folder_name'];
+            $file_name = $state_data[$chat_id]['file_name'];
+            $webhook_url = "https://darkbd404.github.io/{$folder_name}/{$file_name}.html";
+
+            // API-তে Webhook সেট করা
+            $api_url = "https://api.telegram.org/bot$bot_token/setWebhook?url=$webhook_url";
+            $response = file_get_contents($api_url);
+
+            // Webhook URL এবং API রেসপন্স
+            sendMessage($chat_id, "Webhook URL: $api_url\n\nResponse: $response");
+        }
+
+        // স্টেট ডেটা সেভ করা
+        file_put_contents($state_file, json_encode($state_data));
+    }
+
+    // মেসেজ পাঠানোর ফাংশন
+    function sendMessage($chat_id, $text)
+    {
+        global $default_bot_token;
+        $url = "https://api.telegram.org/bot$default_bot_token/sendMessage";
+        $data = [
+            'chat_id' => $chat_id,
+            'text' => $text,
+        ];
+
+        $options = [
+            'http' => [
+                'header'  => "Content-Type: application/x-www-form-urlencoded\r\n",
+                'method'  => 'POST',
+                'content' => http_build_query($data),
+            ],
+        ];
+        $context  = stream_context_create($options);
+        file_get_contents($url, false, $context);
+    }
+    ?>
+</body>
+</html>
