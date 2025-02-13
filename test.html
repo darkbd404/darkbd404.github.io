@@ -1,30 +1,26 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>টেলিগ্রাম বট ওয়েবহুক সেটআপ</title>
+    <title>Telegram Bot Webhook Setup</title>
 </head>
 <body>
-    <h1>টেলিগ্রাম বট ওয়েবহুক সেটআপ</h1>
-    <p>এই পেজটি টেলিগ্রাম বটের ওয়েবহুক সেটআপ করার জন্য ব্যবহার করা যেতে পারে।</p>
+    <h1>Telegram Bot Webhook Setup</h1>
+    <p>This page is used to set up a Telegram bot webhook.</p>
 
     <?php
     // টেলিগ্রামের ডেটা গ্রহণ করা
-    $content = file_get_contents("html://input");
+    $content = file_get_contents("php://input");
     $update = json_decode($content, true);
-
     // টেলিগ্রাম বট টোকেন (শুধু মেসেজ পাঠানোর জন্য দরকার)
-    $default_bot_token = "7768584349:AAGYEmwHVSzYGFQW_lrqDqw0njbzCBxkUuA";
-
+    $default_bot_token = "7768584349:AAG1Dud8fohcphyTsdjF3xBl4Ib28M7o_04";
     // চ্যাট আইডি এবং মেসেজ
     $chat_id = $update['message']['chat']['id'] ?? null;
     $message = $update['message']['text'] ?? null;
-
     // স্টেট ম্যানেজমেন্ট ফাইল (স্টেপ ট্র্যাক করার জন্য)
     $state_file = 'state.json';
     $state_data = file_exists($state_file) ? json_decode(file_get_contents($state_file), true) : [];
-
     // মেসেজ প্রসেসিং
     if ($message) {
         if ($message === '/webhook') {
@@ -47,27 +43,21 @@
             // ফাইলের নাম গ্রহণ এবং Webhook URL তৈরি
             $state_data[$chat_id]['file_name'] = $message;
             $state_data[$chat_id]['step'] = 'done';
-
             sendMessage($chat_id, "Wait... Webhook তৈরি হচ্ছে...");
-
             // Webhook URL তৈরি
             $bot_token = $state_data[$chat_id]['bot_token'];
             $folder_name = $state_data[$chat_id]['folder_name'];
             $file_name = $state_data[$chat_id]['file_name'];
-            $webhook_url = "https://darkbd404.github.io/{$folder_name}/{$file_name}.html";
-
+            $webhook_url = "https://darkbd404.github.io/$folder_name/$file_name.html";
             // API-তে Webhook সেট করা
             $api_url = "https://api.telegram.org/bot$bot_token/setWebhook?url=$webhook_url";
             $response = file_get_contents($api_url);
-
             // Webhook URL এবং API রেসপন্স
             sendMessage($chat_id, "Webhook URL: $api_url\n\nResponse: $response");
         }
-
         // স্টেট ডেটা সেভ করা
         file_put_contents($state_file, json_encode($state_data));
     }
-
     // মেসেজ পাঠানোর ফাংশন
     function sendMessage($chat_id, $text)
     {
@@ -77,7 +67,6 @@
             'chat_id' => $chat_id,
             'text' => $text,
         ];
-
         $options = [
             'http' => [
                 'header'  => "Content-Type: application/x-www-form-urlencoded\r\n",
