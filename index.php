@@ -1,9 +1,12 @@
 <?php
+file_put_contents('php://stderr', 'Received Webhook' . "\n");
 $token = '7828394833:AAGWXAKToC37qL_Ebh_huR2CA1bzK9H-zzU';
 $update = file_get_contents('php://input');
 $update = json_decode($update, TRUE);
 $chatId = $update['message']['chat']['id'];
 $message = $update['message']['text'];
+
+file_put_contents('php://stderr', 'Chat ID: ' . $chatId . "\n");
 
 switch($message) {
     case '/start':
@@ -18,5 +21,6 @@ function sendMessage($chatId, $message) {
     global $token;
     $url = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chatId&text=$message";
     file_get_contents($url);
+    file_put_contents('php://stderr', 'Message sent: ' . $message . "\n");
 }
 ?>
