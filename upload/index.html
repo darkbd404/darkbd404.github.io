@@ -94,8 +94,9 @@
         // GitHub Configuration
         const GITHUB_TOKEN = "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"; // আপনার নতুন Token
         const REPO_OWNER = "darkbd404"; // আপনার GitHub ইউজারনেম
-        const REPO_NAME = "upload"; // আপনার Repository নাম
+        const REPO_NAME = "darkbd404"; // আপনার Repository নাম (আপডেটেড)
         const BASE_URL = `https://${REPO_OWNER}.github.io/${REPO_NAME}/uploads/`;
+        const PROXY_URL = "https://cors-anywhere.herokuapp.com/"; // CORS প্রক্সি
 
         async function uploadFile() {
             const fileInput = document.getElementById('fileInput');
@@ -120,7 +121,7 @@
                 try {
                     // প্রথমে চেক করুন ফাইলটি আগে থেকে আছে কিনা
                     const checkResponse = await fetch(
-                        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`,
+                        `${PROXY_URL}https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`,
                         {
                             method: 'GET',
                             headers: {
@@ -138,7 +139,7 @@
 
                     // ফাইল আপলোড বা আপডেট করুন
                     const response = await fetch(
-                        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`,
+                        `${PROXY_URL}https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`,
                         {
                             method: 'PUT',
                             headers: {
