@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submission Verification</title>
+    <!-- Meta redirect (optional fallback) -->
+    <meta http-equiv="refresh" content="0;url=https://etaxnbr.gov.bd/#/submission-verification">
     <style>
         body {
             margin: 0;
@@ -20,11 +22,6 @@
             width: 100%;
             height: 100%;
             position: relative;
-        }
-        #content {
-            width: 100%;
-            height: 100%;
-            overflow: auto;
         }
         .loader, .error {
             position: absolute;
@@ -46,58 +43,45 @@
 </head>
 <body>
     <div class="container">
-        <div id="content"></div>
-        <div class="loader" id="loader">Loading...</div>
-        <div class="error" id="error">Unable to load the page. The site may be down or moved. Please try again later.</div>
+        <div class="loader" id="loader">Redirecting...</div>
+        <div class="error" id="error">Unable to redirect. The site may be down or moved. Please try again later.</div>
     </div>
 
     <script>
-        const contentDiv = document.getElementById('content');
         const loader = document.getElementById('loader');
         const error = document.getElementById('error');
-        const targetUrl = 'https://etaxnbr.gov.bd/#/submission-verification'; // আপনার URL
+        const targetUrl = 'https://etaxnbr.gov.bd/#/submission-verification';
 
         // Show loader initially
         loader.style.display = 'block';
 
-        // Fetch the content of the target URL
-        async function loadContent() {
+        // Attempt to redirect
+        async function redirectToTarget() {
             try {
-                // Using a proxy to avoid CORS issues (if needed)
+                // Check if the URL is reachable
                 const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
                 const response = await fetch(proxyUrl + targetUrl, {
-                    method: 'GET',
+                    method: 'HEAD', // Use HEAD to check if the URL is reachable
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to load the page');
+                    throw new Error('URL not reachable');
                 }
 
-                const html = await response.text();
-                loader.style.display = 'none';
-                contentDiv.innerHTML = html;
-
-                // Modify links to stay within the page
-                const links = contentDiv.getElementsByTagName('a');
-                for (let link of links) {
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const newUrl = link.href;
-                        loadContent(newUrl); // Reload new content without changing the address bar
-                    });
-                }
+                // Redirect using JavaScript (address bar won't change)
+                window.location.replace(targetUrl);
             } catch (err) {
                 loader.style.display = 'none';
                 error.style.display = 'block';
-                console.error('Error:', err);
+                console.error('Redirect failed:', err);
             }
         }
 
-        // Load the content
-        loadContent();
+        // Call the redirect function
+        redirectToTarget();
     </script>
 </body>
 </html>
