@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eReturn - National Board of Revenue</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4f8, #d9e4f5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+
+        .header {
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header img {
+            width: 180px;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            font-size: 16px;
+            color: #333;
+            font-weight: 400;
+        }
+
+        .form-container {
+            padding: 20px;
+        }
+
+        .back-btn {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group label span {
+            color: #e63946;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+            background: #fafafa;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #007bff;
+            outline: none;
+            background: #fff;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .buttons button:hover {
+            transform: translateY(-2px);
+        }
+
+        .verify-btn {
+            background: #28a745;
+            color: #fff;
+        }
+
+        .verify-btn:hover {
+            background: #218838;
+        }
+
+        .reset-btn {
+            background: #ced4da;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .reset-btn:hover {
+            background: #adb5bd;
+        }
+
+        .reset-btn img {
+            width: 16px;
+            height: 16px;
+        }
+
+        #webview1 {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+            background: #f9f9f9;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) inset;
+        }
+
+        #progressbar {
+            display: none;
+            width: 100%;
+            height: 5px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        #progressbar::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 100%;
+            background: #28a745;
+            animation: progress 2s ease-in-out forwards;
+        }
+
+        @keyframes progress {
+            to { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://etaxnbr.gov.bd/assets/img/logo/eReturn_logo_png.png" alt="eReturn Logo">
+            <h2>National Board of Revenue</h2>
+        </div>
+        <div class="form-container">
+            <button class="back-btn">←</button>
+            <form id="tinForm">
+                <div class="form-group">
+                    <label for="edittext3">TIN No <span>*</span></label>
+                    <input type="text" id="edittext3" placeholder="Enter your TIN" required>
+                </div>
+                <div class="buttons">
+                    <button type="button" class="verify-btn" id="loadButton">Verify</button>
+                    <button type="reset" class="reset-btn">
+                        Reset
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'><path d='M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z'/></svg>" alt="Reset">
+                    </button>
+                </div>
+            </form>
+            <div id="progressbar"></div>
+            <iframe id="webview1" style="display: none; width: 100%; height: 400px;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loadButton').addEventListener('click', function() {
+            const edittext3 = document.getElementById('edittext3').value;
+            const webview1 = document.getElementById('webview1');
+            const progressbar = document.getElementById('progressbar');
+
+            if (!edittext3) return;
+
+            // Show progress bar
+            progressbar.style.display = 'block';
+
+            // Construct the URL
+            const fullUrl = `https://zerotools.appbd.xyz/freenetui.php?tin=${encodeURIComponent(edittext3)}`;
+            webview1.src = fullUrl;
+            webview1.style.display = 'block';
+
+            // Hide progress bar after 2 seconds (adjust based on API response time)
+            setTimeout(() => {
+                progressbar.style.display = 'none';
+            }, 2000);
+
+            // Optional: Fetch and log for debugging
+            fetch(fullUrl)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('API Response:', data);
+                })
+                .catch(error => {
+                    console.error('Fetch Error:', error);
+                });
+        });
+
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+    </script>
+</body>
+</html>
