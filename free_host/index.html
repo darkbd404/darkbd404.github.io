@@ -44,7 +44,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>Upload HTML to GitHub</h2>
+        <h2>Upload HTML to GitHub.</h2>
         <input type="file" id="fileInput" accept=".html">
         <br>
         <button onclick="uploadFile()">Submit</button>
@@ -74,11 +74,12 @@
             const folderPath = 'free_host';
             const fullPath = `${folderPath}/${fileName}`;
             const githubUrl = `https://darkbd404.github.io/free_host/${fileName}`;
-            const token = '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'; // আপনার টোকেন
+            const token = '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'; // আপনার টোকেন
 
             resultDiv.innerHTML = "Uploading...";
 
-            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${fullPath}`;
+            // CORS বাইপাসের জন্য প্রক্সি ব্যবহার
+            const apiUrl = `https://cors-anywhere.herokuapp.com/https://api.github.com/repos/${repoOwner}/${repoName}/contents/${fullPath}`;
             const contentBase64 = btoa(unescape(encodeURIComponent(fileContent))); // UTF-8 সাপোর্ট
 
             try {
@@ -102,7 +103,7 @@
                     resultDiv.innerHTML = `Upload failed! Error: ${errorData.message}`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `Error: ${error.message}. CORS issue might be blocking this. Use a proxy or backend.`;
+                resultDiv.innerHTML = `Error: ${error.message}. CORS issue might be blocking this.`;
             }
         }
     </script>
