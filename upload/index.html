@@ -28,6 +28,18 @@
             font-size: 2.5em;
             color: #ff0080;
         }
+        input[type="file"] {
+            margin: 20px 0;
+        }
+        button {
+            background: #ff0080;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+        }
         .info {
             margin-top: 20px;
             font-size: 1.2em;
@@ -89,18 +101,57 @@
 
     <div class="container">
         <h1>Free Web Hosting</h1>
-        <div class="info">
-            <p>Uploaded Files:</p>
-            <ul style="list-style: none; padding: 0;">
-                <!-- নিচে আপনার ফাইলের লিঙ্ক যোগ করুন -->
-                <li><a href="./uploads/example.html" target="_blank">example.html</a></li>
-            </ul>
-            <p>Owner By Rajvir</p>
-        </div>
+        <input type="file" id="fileInput" accept=".html">
+        <button onclick="uploadFile()">UPLOAD</button>
+        <div id="uploadInfo" class="info"></div>
         <a class="join-now" href="https://t.me/Darknet_Team410" target="_blank">Join our Channel</a>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
     <script>
+        // Your Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0blMiFr_2T4FXqyRbzbjz0sai5YXARGw",
+            authDomain: "darknet-tools-officials.firebaseapp.com",
+            databaseURL: "https://darknet-tools-officials-default-rtdb.firebaseio.com",
+            projectId: "darknet-tools-officials",
+            storageBucket: "darknet-tools-officials.appspot.com", // Corrected to use .appspot.com
+            messagingSenderId: "778891698888",
+            appId: "1:778891698888:web:d9dd917dde51a29fe77bfd",
+            measurementId: "G-DTVJXW8GQR"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const uploadInfo = document.getElementById('uploadInfo');
+
+            if (file) {
+                const fileName = file.name;
+                const storageRef = storage.ref('uploads/' + fileName);
+
+                storageRef.put(file).then((snapshot) => {
+                    snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        uploadInfo.innerHTML = `
+                            <p>File Uploaded: <a href="${downloadURL}" target="_blank">${fileName}</a></p>
+                            <p>Owner By Rajvir</p>
+                        `;
+                    });
+                }).catch((error) => {
+                    uploadInfo.innerHTML = `<p style="color: red;">ফাইল আপলোড ব্যর্থ হয়েছে। ${error.message}</p>`;
+                });
+            } else {
+                uploadInfo.innerHTML = `<p style="color: red;">অনুগ্রহ করে একটি HTML ফাইল সিলেক্ট করুন।</p>`;
+            }
+        }
+
+        // Raindrop animation
         const rainContainer = document.querySelector('.rain');
         const rainCount = 100;
 
