@@ -16,7 +16,6 @@
             width: 100vw;
             height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
         }
@@ -24,7 +23,6 @@
             width: 100%;
             height: 100%;
             border: none;
-            overflow: hidden;
         }
         .loader {
             position: absolute;
@@ -33,45 +31,24 @@
             transform: translate(-50%, -50%);
             font-size: 20px;
             color: #333;
-            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <iframe class="webview" id="webview" src="https://etaxnbr.gov.bd/#/submission-verification"></iframe>
+        <iframe class="webview" id="webview" src="https://etaxnbr.gov.bd/#/submission-verification" allowfullscreen></iframe>
         <div class="loader" id="loader">Loading...</div>
     </div>
 
     <script>
-        // Loader functionality
         const iframe = document.getElementById('webview');
         const loader = document.getElementById('loader');
 
-        // Show loader when iframe starts loading
         iframe.onload = function() {
-            loader.style.display = 'none'; // Hide loader when iframe is fully loaded
+            loader.style.display = 'none';
         };
 
-        // Initially show loader until iframe loads
         loader.style.display = 'block';
-
-        // Prevent navigation outside the specified URL
-        window.onbeforeunload = function() {
-            return "You cannot navigate away from this page.";
-        };
-
-        // Block right-click context menu (optional security)
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
-        // Block F12, Ctrl+Shift+I (Developer Tools) - Optional
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
-                e.preventDefault();
-            }
-        });
     </script>
 </body>
 </html>
