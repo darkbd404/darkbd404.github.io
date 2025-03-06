@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submission Verification</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .webview {
+            width: 100%;
+            height: 100%;
+            border: none;
+            overflow: hidden;
+        }
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            color: #333;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <iframe class="webview" id="webview" src="https://etaxnbr.gov.bd/#/submission-verification"></iframe>
+        <div class="loader" id="loader">Loading...</div>
+    </div>
+
+    <script>
+        // Loader functionality
+        const iframe = document.getElementById('webview');
+        const loader = document.getElementById('loader');
+
+        // Show loader when iframe starts loading
+        iframe.onload = function() {
+            loader.style.display = 'none'; // Hide loader when iframe is fully loaded
+        };
+
+        // Initially show loader until iframe loads
+        loader.style.display = 'block';
+
+        // Prevent navigation outside the specified URL
+        window.onbeforeunload = function() {
+            return "You cannot navigate away from this page.";
+        };
+
+        // Block right-click context menu (optional security)
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Block F12, Ctrl+Shift+I (Developer Tools) - Optional
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
