@@ -11,44 +11,69 @@
             overflow: hidden;
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
-        }
-        .container {
-            width: 100vw;
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            text-align: center;
         }
         .webview {
             width: 100%;
             height: 100%;
             border: none;
+            display: block;
         }
-        .loader {
+        .loader, .error {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 20px;
+            font-size: 24px;
             color: #333;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        .error {
+            color: #d32f2f;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <iframe class="webview" id="webview" src="https://etaxnbr.gov.bd/#/submission-verification" allowfullscreen></iframe>
+        <iframe class="webview" id="webview" src="https://etaxnbr.gov.bd/#/submission-verification" sandbox="allow-same-origin allow-scripts" allowfullscreen></iframe>
         <div class="loader" id="loader">Loading...</div>
+        <div class="error" id="error">Unable to load the page. The site may be down or moved. Please try again later.</div>
     </div>
 
     <script>
         const iframe = document.getElementById('webview');
         const loader = document.getElementById('loader');
+        const error = document.getElementById('error');
 
+        // Show loader initially
+        loader.style.display = 'block';
+
+        // Check if iframe loads successfully
         iframe.onload = function() {
             loader.style.display = 'none';
+            error.style.display = 'none';
         };
 
-        loader.style.display = 'block';
+        // Check for errors (timeout after 10 seconds)
+        setTimeout(() => {
+            if (iframe.contentDocument && iframe.contentDocument.body.innerHTML.includes('This site can’t be reached')) {
+                loader.style.display = 'none';
+                error.style.display = 'block';
+            }
+        }, 10000); // 10 seconds timeout
     </script>
 </body>
 </html>
