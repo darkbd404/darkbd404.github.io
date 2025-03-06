@@ -92,11 +92,21 @@
 
     <script>
         // GitHub Configuration
-        const GITHUB_TOKEN = "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"; // আপনার নতুন Token
+        const GITHUB_TOKEN = "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"; // আপনার নতুন Token
         const REPO_OWNER = "darkbd404"; // আপনার GitHub ইউজারনেম
         const REPO_NAME = "darkbd404"; // আপনার Repository নাম
         const BASE_URL = `https://${REPO_OWNER}.github.io/${REPO_NAME}/uploads/`;
-        const PROXY_URL = "https://api.allorigins.win/get?url="; // নতুন CORS প্রক্সি
+        const PROXY_URL = "https://cors-anywhere.herokuapp.com/"; // CORS প্রক্সি
+
+        // CORS প্রক্সির জন্য প্রথমবার অ্যাক্সেস অনুরোধ
+        fetch(`${PROXY_URL}https://api.github.com`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`
+            }
+        }).catch(() => {
+            console.log("CORS proxy access requested. Please wait and try again.");
+        });
 
         async function uploadFile() {
             const fileInput = document.getElementById('fileInput');
@@ -120,8 +130,8 @@
                 // GitHub API-এর মাধ্যমে ফাইল আপলোড
                 try {
                     // প্রথমে চেক করুন ফাইলটি আগে থেকে আছে কিনা
-                    const checkUrl = encodeURIComponent(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`);
-                    const checkResponse = await fetch(`${PROXY_URL}${checkUrl}`, {
+                    const checkUrl = `${PROXY_URL}https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`;
+                    const checkResponse = await fetch(checkUrl, {
                         method: 'GET',
                         headers: {
                             'Authorization': `token ${GITHUB_TOKEN}`,
@@ -132,14 +142,14 @@
                     let sha = null;
                     if (checkResponse.ok) {
                         const checkData = await checkResponse.json();
-                        if (checkData.contents) {
-                            sha = JSON.parse(checkData.contents).sha; // প্রক্সি থেকে ডেটা পার্স করা
-                        }
+                        sha = checkData.sha; // ফাইল আগে থাকলে SHA পান
+                    } else {
+                        console.log("Check Response Status:", checkResponse.status, await checkResponse.text());
                     }
 
                     // ফাইল আপলোড বা আপডেট করুন
-                    const uploadUrl = encodeURIComponent(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`);
-                    const response = await fetch(`${PROXY_URL}${uploadUrl}`, {
+                    const uploadUrl = `${PROXY_URL}https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`;
+                    const response = await fetch(uploadUrl, {
                         method: 'PUT',
                         headers: {
                             'Authorization': `token ${GITHUB_TOKEN}`,
@@ -153,18 +163,17 @@
                     });
 
                     if (response.ok) {
-                        const result = await response.json();
-                        if (result.contents) {
-                            uploadInfo.innerHTML = `
-                                <p>File Uploaded: <a href="${url}" target="_blank">${fileName}</a></p>
-                                <p>Owner By Rajvir</p>
-                            `;
-                        }
+                        uploadInfo.innerHTML = `
+                            <p>File Uploaded: <a href="${url}" target="_blank">${fileName}</a></p>
+                            <p>Owner By Rajvir</p>
+                        `;
                     } else {
-                        const errorData = await response.text(); // JSON ছাড়া টেক্সট পাওয়া যেতে পারে
-                        uploadInfo.innerHTML = `<p style="color: red;">ফাইল আপলোড ব্যর্থ হয়েছে। ${errorData}</p>`;
+                        const errorText = await response.text();
+                        console.log("Upload Response Status:", response.status, errorText);
+                        uploadInfo.innerHTML = `<p style="color: red;">ফাইল আপলোড ব্যর্থ হয়েছে। ${errorText}</p>`;
                     }
                 } catch (error) {
+                    console.log("Error Details:", error);
                     uploadInfo.innerHTML = `<p style="color: red;">ফাইল আপলোড ব্যর্থ হয়েছে। ${error.message}</p>`;
                 }
             };
