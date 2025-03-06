@@ -94,9 +94,9 @@
         // GitHub Configuration
         const GITHUB_TOKEN = "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"; // আপনার নতুন Token
         const REPO_OWNER = "darkbd404"; // আপনার GitHub ইউজারনেম
-        const REPO_NAME = "darkbd404"; // আপনার Repository নাম (আপডেটেড)
+        const REPO_NAME = "darkbd404"; // আপনার Repository নাম
         const BASE_URL = `https://${REPO_OWNER}.github.io/${REPO_NAME}/uploads/`;
-        const PROXY_URL = "https://cors-anywhere.herokuapp.com/"; // CORS প্রক্সি
+        const PROXY_URL = "https://api.allorigins.win/get?url="; // নতুন CORS প্রক্সি
 
         async function uploadFile() {
             const fileInput = document.getElementById('fileInput');
@@ -120,48 +120,49 @@
                 // GitHub API-এর মাধ্যমে ফাইল আপলোড
                 try {
                     // প্রথমে চেক করুন ফাইলটি আগে থেকে আছে কিনা
-                    const checkResponse = await fetch(
-                        `${PROXY_URL}https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`,
-                        {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `token ${GITHUB_TOKEN}`,
-                                'Accept': 'application/vnd.github.v3+json'
-                            }
+                    const checkUrl = encodeURIComponent(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`);
+                    const checkResponse = await fetch(`${PROXY_URL}${checkUrl}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Accept': 'application/vnd.github.v3+json'
                         }
-                    );
+                    });
 
                     let sha = null;
                     if (checkResponse.ok) {
                         const checkData = await checkResponse.json();
-                        sha = checkData.sha; // ফাইল আগে থাকলে SHA পান
+                        if (checkData.contents) {
+                            sha = JSON.parse(checkData.contents).sha; // প্রক্সি থেকে ডেটা পার্স করা
+                        }
                     }
 
                     // ফাইল আপলোড বা আপডেট করুন
-                    const response = await fetch(
-                        `${PROXY_URL}https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`,
-                        {
-                            method: 'PUT',
-                            headers: {
-                                'Authorization': `token ${GITHUB_TOKEN}`,
-                                'Accept': 'application/vnd.github.v3+json'
-                            },
-                            body: JSON.stringify({
-                                message: `Upload ${fileName}`,
-                                content: fileContent,
-                                sha: sha // যদি ফাইল আগে থাকে তবে SHA দিন
-                            })
-                        }
-                    );
+                    const uploadUrl = encodeURIComponent(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`);
+                    const response = await fetch(`${PROXY_URL}${uploadUrl}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        },
+                        body: JSON.stringify({
+                            message: `Upload ${fileName}`,
+                            content: fileContent,
+                            sha: sha // যদি ফাইল আগে থাকে তবে SHA দিন
+                        })
+                    });
 
                     if (response.ok) {
-                        uploadInfo.innerHTML = `
-                            <p>File Uploaded: <a href="${url}" target="_blank">${fileName}</a></p>
-                            <p>Owner By Rajvir</p>
-                        `;
+                        const result = await response.json();
+                        if (result.contents) {
+                            uploadInfo.innerHTML = `
+                                <p>File Uploaded: <a href="${url}" target="_blank">${fileName}</a></p>
+                                <p>Owner By Rajvir</p>
+                            `;
+                        }
                     } else {
-                        const errorData = await response.json();
-                        uploadInfo.innerHTML = `<p style="color: red;">ফাইল আপলোড ব্যর্থ হয়েছে। ${errorData.message}</p>`;
+                        const errorData = await response.text(); // JSON ছাড়া টেক্সট পাওয়া যেতে পারে
+                        uploadInfo.innerHTML = `<p style="color: red;">ফাইল আপলোড ব্যর্থ হয়েছে। ${errorData}</p>`;
                     }
                 } catch (error) {
                     uploadInfo.innerHTML = `<p style="color: red;">ফাইল আপলোড ব্যর্থ হয়েছে। ${error.message}</p>`;
