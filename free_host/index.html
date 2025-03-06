@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload HTML to GitHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            color: #333;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Upload HTML File</h2>
+        <input type="file" id="fileInput" accept=".html">
+        <br>
+        <button onclick="uploadFile()">Submit</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                resultDiv.innerHTML = "Please select an HTML file!";
+                return;
+            }
+
+            if (!file.name.endsWith('.html')) {
+                resultDiv.innerHTML = "Only HTML files are allowed!";
+                return;
+            }
+
+            // Simulate GitHub API interaction (you need a token and backend in reality)
+            const fileName = file.name;
+            const fileContent = await file.text();
+            const repoOwner = 'darkbd404';
+            const repoName = 'darkbd404.github.io';
+            const folderPath = 'free_host';
+            const fullPath = `${folderPath}/${fileName}`;
+            const githubUrl = `https://darkbd404.github.io/free_host/${fileName}`;
+
+            // For demo purposes, we'll just simulate the upload success
+            resultDiv.innerHTML = "Uploading...";
+
+            // In a real scenario, you'd use the GitHub API like this (commented out):
+            /*
+            const token = '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'; // Securely store this!
+            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${fullPath}`;
+            const contentBase64 = btoa(fileContent); // Convert to Base64
+
+            const response = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Upload ${fileName}`,
+                    content: contentBase64
+                })
+            });
+
+            if (response.ok) {
+                resultDiv.innerHTML = `File uploaded! URL: <a href="${githubUrl}" target="_blank">${githubUrl}</a>`;
+            } else {
+                resultDiv.innerHTML = "Upload failed! Check your setup.";
+            }
+            */
+
+            // Simulated success for this example
+            setTimeout(() => {
+                resultDiv.innerHTML = `File uploaded! URL: <a href="${githubUrl}" target="_blank">${githubUrl}</a>`;
+            }, 1000); // Simulate a delay
+        }
+    </script>
+</body>
+</html>
