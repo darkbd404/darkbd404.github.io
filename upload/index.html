@@ -51,22 +51,6 @@
         a:hover {
             color: #ff0080;
         }
-        .join-now {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 1.2em;
-            color: #fff;
-            background: #0080ff;
-            text-decoration: none;
-            border-radius: 5px;
-            box-shadow: 0 0 10px #0080ff;
-            transition: all 0.3s ease;
-        }
-        .join-now:hover {
-            background: #0056b3;
-            box-shadow: 0 0 20px #0056b3;
-        }
         .rain {
             position: fixed;
             top: 0;
@@ -104,51 +88,85 @@
         <input type="file" id="fileInput" accept=".html">
         <button onclick="uploadFile()">UPLOAD</button>
         <div id="uploadInfo" class="info"></div>
-        <a class="join-now" href="https://t.me/Darknet_Team410" target="_blank">Join our Channel</a>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
     <script>
-        // Your Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyC0blMiFr_2T4FXqyRbzbjz0sai5YXARGw",
-            authDomain: "darknet-tools-officials.firebaseapp.com",
-            databaseURL: "https://darknet-tools-officials-default-rtdb.firebaseio.com",
-            projectId: "darknet-tools-officials",
-            storageBucket: "darknet-tools-officials.appspot.com", // Corrected to use .appspot.com
-            messagingSenderId: "778891698888",
-            appId: "1:778891698888:web:d9dd917dde51a29fe77bfd",
-            measurementId: "G-DTVJXW8GQR"
-        };
+        // GitHub Configuration
+        const GITHUB_TOKEN = "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"; // আপনার দেওয়া Token
+        const REPO_OWNER = "darkbd404"; // আপনার GitHub ইউজারনেম
+        const REPO_NAME = "upload"; // আপনার Repository নাম
+        const BASE_URL = `https://${REPO_OWNER}.github.io/${REPO_NAME}/uploads/`;
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const storage = firebase.storage();
-
-        function uploadFile() {
+        async function uploadFile() {
             const fileInput = document.getElementById('fileInput');
             const file = fileInput.files[0];
             const uploadInfo = document.getElementById('uploadInfo');
 
-            if (file) {
-                const fileName = file.name;
-                const storageRef = storage.ref('uploads/' + fileName);
+            if (!file) {
+                uploadInfo.innerHTML = `<p style="color: red;">অনুগ্রহ করে একটি HTML ফাইল সিলেক্ট করুন।</p>`;
+                return;
+            }
 
-                storageRef.put(file).then((snapshot) => {
-                    snapshot.ref.getDownloadURL().then((downloadURL) => {
+            const fileName = file.name;
+            const filePath = `uploads/${fileName}`;
+            const url = `${BASE_URL}${fileName}`;
+
+            // ফাইলের কনটেন্ট Base64 এনকোডিং-এ রূপান্তর
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const fileContent = e.target.result.split(',')[1]; // Base64 ডেটা
+
+                // GitHub API-এর মাধ্যমে ফাইল আপলোড
+                try {
+                    // প্রথমে চেক করুন ফাইলটি আগে থেকে আছে কিনা
+                    const checkResponse = await fetch(
+                        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`,
+                        {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `token ${GITHUB_TOKEN}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+
+                    let sha = null;
+                    if (checkResponse.ok) {
+                        const checkData = await checkResponse.json();
+                        sha = checkData.sha; // ফাইল আগে থাকলে SHA পান
+                    }
+
+                    // ফাইল আপলোড বা আপডেট করুন
+                    const response = await fetch(
+                        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${filePath}`,
+                        {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${GITHUB_TOKEN}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            },
+                            body: JSON.stringify({
+                                message: `Upload ${fileName}`,
+                                content: fileContent,
+                                sha: sha // যদি ফাইল আগে থাকে তবে SHA দিন
+                            })
+                        }
+                    );
+
+                    if (response.ok) {
                         uploadInfo.innerHTML = `
-                            <p>File Uploaded: <a href="${downloadURL}" target="_blank">${fileName}</a></p>
+                            <p>File Uploaded: <a href="${url}" target="_blank">${fileName}</a></p>
                             <p>Owner By Rajvir</p>
                         `;
-                    });
-                }).catch((error) => {
+                    } else {
+                        const errorData = await response.json();
+                        uploadInfo.innerHTML = `<p style="color: red;">ফাইল আপলোড ব্যর্থ হয়েছে। ${errorData.message}</p>`;
+                    }
+                } catch (error) {
                     uploadInfo.innerHTML = `<p style="color: red;">ফাইল আপলোড ব্যর্থ হয়েছে। ${error.message}</p>`;
-                });
-            } else {
-                uploadInfo.innerHTML = `<p style="color: red;">অনুগ্রহ করে একটি HTML ফাইল সিলেক্ট করুন।</p>`;
-            }
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
         // Raindrop animation
