@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Facebook Hacking Simulation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        body {
+            height: 100vh;
+            width: 100vw;
+            background: #000;
+            overflow: hidden;
+            color: #00ff00;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        .hack-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #000, #001a00), radial-gradient(circle at center, rgba(0, 40, 0, 0.8), rgba(0, 10, 0, 0.9));
+            z-index: 1;
+            animation: bgPulse 10s infinite alternate;
+        }
+        @keyframes bgPulse {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        .matrix-overlay {
+            position: absolute;
+            width: 120%;
+            height: 120%;
+            background: repeating-linear-gradient(45deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px, transparent 50px),
+                        repeating-linear-gradient(-45deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px, transparent 50px);
+            animation: matrixShift 15s infinite linear;
+            z-index: 2;
+            opacity: 0.6;
+        }
+        @keyframes matrixShift {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
+        .digital-rain {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            color: rgba(0, 255, 0, 0.3);
+            font-size: 12px;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            z-index: 3;
+        }
+        .digital-rain span {
+            position: absolute;
+            animation: rainDrop 5s infinite;
+        }
+        @keyframes rainDrop {
+            0% { top: -100%; opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .glitch {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 255, 0, 0.2);
+            animation: glitchEffect 0.3s infinite;
+            z-index: 4;
+            opacity: 0.4;
+        }
+        @keyframes glitchEffect {
+            0% { transform: translate(0); }
+            20% { transform: translate(-6px, 6px); }
+            40% { transform: translate(6px, -6px); }
+            60% { transform: translate(-4px, 4px); }
+            80% { transform: translate(4px, -4px); }
+            100% { transform: translate(0); }
+        }
+        .neon-border {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 0 20px #00ff00, 0 0 40px #00cc00;
+            z-index: 5;
+            animation: neonPulse 4s infinite alternate;
+        }
+        @keyframes neonPulse {
+            0% { box-shadow: 0 0 10px #00ff00, 0 0 20px #00cc00; }
+            100% { box-shadow: 0 0 30px #00ff00, 0 0 60px #00cc00; }
+        }
+        .scan-beam {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #00ff00, transparent);
+            animation: scan 2s infinite;
+            z-index: 6;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        .container {
+            position: relative;
+            z-index: 7;
+            width: 500px;
+            height: auto;
+            max-height: 80vh;
+            background: rgba(0, 0, 50, 0.9);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .fb-logo {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #fff;
+            background: #3b5998;
+            padding: 5px 15px;
+            border-radius: 5px;
+            text-shadow: 0 0 5px #fff;
+        }
+        .input-group {
+            margin-top: 60px;
+            text-align: center;
+        }
+        .input-group label {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #00ff00;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .input-group input:focus {
+        }
+        .input-group .help-btn {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .input-group .help-btn:hover {
+            background: #00cc00;
+            box-shadow: 0 0 15px #00cc00;
+        }
+        .hack-btn {
+            width: 100%;
+            padding: 12px;
+            background: #3b5998;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 0;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        .hack-btn:hover {
+            background: #2b4088;
+            box-shadow: 0 0 15px #3b5998;
+        }
+        .hack-btn.hacking {
+            background: #3b5998;
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .result {
+            display: none;
+            width: 100%;
+            margin-top: 0;
+            text-align: center;
+            color: #fff;
+        }
+        .result .info {
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            border-radius: 5px;
+        }
+        .result .info span {
+            display: block;
+            margin: 5px 0;
+        }
+        .result .info .green {
+            color: #00ff00;
+        }
+        .result .info .red {
+            color: #ff0000;
+        }
+        .progress {
+            width: 100%;
+            height: 10px;
+            background: rgba(0, 255, 0, 0.2);
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #00ff00;
+            width: 0;
+            transition: width 0.1s linear;
+        }
+        .terminal {
+            display: none;
+            width: 100%;
+            margin-top: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            height: 80px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        .terminal span {
+            display: block;
+            opacity: 0;
+            animation: typeEffect 0.1s forwards;
+        }
+        @keyframes typeEffect {
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hack-bg"></div>
+    <div class="matrix-overlay"></div>
+    <div class="digital-rain">
+        <span>010101</span><span>110011</span><span>001100</span><span>101010</span>
+        <span>011001</span><span>100110</span><span>010101</span><span>110011</span>
+    </div>
+    <div class="glitch"></div>
+    <div class="neon-border"></div>
+    <div class="scan-beam"></div>
+    <div class="container">
+        <div class="fb-logo"><f></div>
+        <div class="input-group">
+            <label>Insert the Facebook profile URL:</label>
+            <input type="text" id="fbUrl" placeholder="https://www.facebook.com/username">
+            <a href="https://m.me/dark.king45" target="_blank" class="help-btn">? I need help!</a>
+            <button class="hack-btn" onclick="startHack()">HACK</button>
+        </div>
+        <div class="result" id="result">
+            <div class="info" id="info"></div>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+        <div class="terminal" id="terminal"></div>
+    </div>
+
+    <script>
+        function startHack() {
+            const fbUrl = document.getElementById('fbUrl').value.trim();
+            const hackBtn = document.querySelector('.hack-btn');
+            const result = document.getElementById('result');
+            const info = document.getElementById('info');
+            const terminal = document.getElementById('terminal');
+            const progressBar = document.getElementById('progressBar');
+
+            if (!fbUrl) {
+                alert('Please enter a Facebook profile URL!');
+                return;
+            }
+
+            hackBtn.textContent = 'HACKING...';
+            hackBtn.classList.add('hacking');
+            result.style.display = 'block';
+            terminal.style.display = 'block';
+
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                if (progress <= 100) {
+                    progressBar.style.width = `${progress}%`;
+                    progress++;
+                } else {
+                    clearInterval(progressInterval);
+                    simulateHack(fbUrl, info, terminal);
+                    hackBtn.textContent = 'HACK';
+                    hackBtn.classList.remove('hacking');
+                }
+            }, 50);
+
+            const commands = [
+                'root@termux:~/hack# apt update -y',
+                'root@termux:~/hack# apt install fb-exploit -y',
+                `root@termux:~/hack# fbhack --target ${fbUrl} --init`,
+                'root@termux:~/hack# initializing payload injection...',
+                'root@termux:~/hack# cracking encryption protocols...',
+                'root@termux:~/hack# scanning live IP address...',
+                'root@termux:~/hack# fetching real-time data...',
+                'root@termux:~/hack# exploit completed successfully!'
+            ];
+            let cmdIndex = 0;
+            const cmdInterval = setInterval(() => {
+                if (cmdIndex < commands.length) {
+                    const span = document.createElement('span');
+                    span.textContent = commands[cmdIndex];
+                    span.style.animationDelay = `${cmdIndex * 0.2}s`;
+                    terminal.appendChild(span);
+                    terminal.scrollTop = terminal.scrollHeight;
+                    cmdIndex++;
+                } else {
+                    clearInterval(cmdInterval);
+                }
+            }, 1000);
+        }
+
+        function simulateHack(fbUrl, info, terminal) {
+            const usernameMatch = fbUrl.match(/facebook\.com\/([a-zA-Z0-9._]+)/);
+            const username = usernameMatch ? usernameMatch[1] : 'UnknownUser';
+            let profileId = '10000' + Math.floor(Math.random() * 1000000000);
+            const idMatch = fbUrl.match(/id=(\d+)/);
+            if (idMatch) {
+                profileId = idMatch[1];
+            }
+
+            // Real-time BD timezone (Bangladesh Standard Time, UTC+6)
+            const now = new Date().toLocaleString("en-US", { timeZone: 'Asia/Dhaka' });
+            const lastConnection = `${Math.floor(Math.random() * 24)} hours ago, ${Math.floor(Math.random() * 60)} minutes ago`;
+            const randomGmail = `${username.toLowerCase().slice(0, 1)}***${Math.floor(Math.random() * 100)}@gmail.com`;
+            const phonePrefixes = ['+88017', '+88019', '+88018', '+88016', '+88015'];
+            const randomPhone = `${phonePrefixes[Math.floor(Math.random() * phonePrefixes.length)]}*******${Math.floor(10 + Math.random() * 90)}`;
+            const accountCreationDate = `201${Math.floor(Math.random() * 5)}-0${Math.floor(Math.random() * 9) + 1}-${Math.floor(Math.random() * 28) + 1}`;
+            const lastLoginDate = new Date().toLocaleString("en-US", { timeZone: 'Asia/Dhaka' });
+            const friendsCount = Math.floor(Math.random() * 5000);
+            const postsCount = Math.floor(Math.random() * 10000);
+            const photosCount = Math.floor(Math.random() * 2000);
+            const videosCount = Math.floor(Math.random() * 500);
+            const location = ['Dhaka, Bangladesh', 'Chittagong, Bangladesh', 'Sylhet, Bangladesh'][Math.floor(Math.random() * 3)];
+            const device = ['Android', 'iPhone', 'Windows PC'][Math.floor(Math.random() * 3)];
+            const securityStatus = Math.random() > 0.5 ? '2FA Enabled' : 'No 2FA';
+            const browser = ['Chrome', 'Firefox', 'Safari'][Math.floor(Math.random() * 3)];
+
+            // Live IP address (simulated)
+            const liveIp = `${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}`;
+
+            info.innerHTML = `
+                <span>Target URL: ${fbUrl}</span>
+                <span>Username: ${username}</span>
+                <span>ID: ${profileId}</span>
+                <span>Last connection: ${lastConnection}</span>
+                <span class="green">Profile is being hacked in private mode</span>
+                <span>Username: ${username}</span>
+                <span>ID: ${profileId}</span>
+                <span>Email: ${randomGmail}</span>
+                <span>Phone: ${randomPhone}</span>
+                <span class="red">Password: ******** [ENCRYPTED]</span>
+                <span>Account Creation: ${accountCreationDate} [RECORDED]</span>
+                <span>Last Login: ${lastLoginDate} [RECORDED]</span>
+                <span>Current Time (BD): ${now} [LIVE]</span>
+                <span>Live IP Address: ${liveIp} [GEOLOCATED]</span>
+                <span>Friends: ${friendsCount} [ARCHIVED]</span>
+                <span>Posts: ${postsCount} [ARCHIVED]</span>
+                <span>Photos: ${photosCount} [EXTRACTED]</span>
+                <span>Videos: ${videosCount} [EXTRACTED]</span>
+                <span>Location: ${location} [GEOTAGGED]</span>
+                <span>Device: ${device} [DETECTED]</span>
+                <span>Browser: ${browser} [IDENTIFIED]</span>
+                <span>Security Status: ${securityStatus} [CHECKED]</span>
+                <span>Active Sessions: ${Math.floor(Math.random() * 50)} [INTERCEPTED]</span>
+                <span class="green">Status: FULL ACCESS ESTABLISHED</span>
+                <span class="red">WARNING: Simulated hack only!</span>
+            `;
+
+            const terminalOutput = [
+                `> Success: Target ${fbUrl} identified`,
+                `> Username: ${username} extracted`,
+                `> Profile ID: ${profileId} retrieved`,
+                `> Email: ${randomGmail} [DECRYPTED]`,
+                `> Phone: ${randomPhone} [PARTIAL DATA]`,
+                `> Password: ******** [ENCRYPTED]`,
+                `> Live IP: ${liveIp} [GEOLOCATED]`,
+                `> Account Creation: ${accountCreationDate} [VERIFIED]`,
+                `> Last Login: ${lastLoginDate} [RECORDED]`,
+                `> Current Time (BD): ${now} [LIVE]`,
+                `> Friends: ${friendsCount} [MAPPED]`,
+                `> Posts: ${postsCount} [ARCHIVED]`,
+                `> Photos: ${photosCount} [EXTRACTED]`,
+                `> Videos: ${videosCount} [EXTRACTED]`,
+                `> Location: ${location} [GEOTAGGED]`,
+                `> Device: ${device} [DETECTED]`,
+                `> Browser: ${browser} [IDENTIFIED]`,
+                `> Security Status: ${securityStatus} [CHECKED]`,
+                `> Active Sessions: ${Math.floor(Math.random() * 50)} [INTERCEPTED]`,
+                `> Status: FULL ACCESS ESTABLISHED`,
+                `> WARNING: This is a SIMULATED hack for entertainment only!`
+            ];
+            let outputIndex = 0;
+            const outputInterval = setInterval(() => {
+                if (outputIndex < terminalOutput.length) {
+                    const span = document.createElement('span');
+                    span.textContent = terminalOutput[outputIndex];
+                    span.style.animationDelay = `${outputIndex * 0.3}s`;
+                    terminal.appendChild(span);
+                    terminal.scrollTop = terminal.scrollHeight;
+                    outputIndex++;
+                } else {
+                    clearInterval(outputInterval);
+                }
+            }, 1500);
+        }
+
+        document.getElementById('fbUrl').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') startHack();
+        });
+
+        // Generate digital rain effect
+        const rain = document.querySelector('.digital-rain');
+        for (let i = 0; i < 50; i++) {
+            const span = document.createElement('span');
+            span.textContent = Math.random().toString(2).slice(2, 6);
+            span.style.left = `${Math.random() * 100}vw`;
+            span.style.animationDelay = `${Math.random() * 5}s`;
+            rain.appendChild(span);
+        }
+    </script>
+</body>
+</html>
