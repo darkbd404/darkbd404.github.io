@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Boombing Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <pre id="logo">
+            ███████╗███╗   ███╗███████╗    ██████╗  ██████╗  ██████╗ ███╗   ███╗██████╗ ██╗███╗   ██╗ ██████╗ 
+            ██╔════╝████╗ ████║██╔════╝    ██╔══██╗██╔═══██╗██╔════╝ ████╗ ████║██╔══██╗██║████╗  ██║██╔════╝ 
+            ███████╗██╔████╔██║███████╗    ██████╔╝██║   ██║██║  ███╗██╔████╔██║██████╔╝██║██╔██╗ ██║██║  ███╗
+            ╚════██║██║╚██╔╝██║╚════██║    ██╔══██╗██║   ██║██║   ██║██║╚██╔╝██║██╔══██╗██║██║╚██╗██║██║   ██║
+            ███████║██║ ╚═╝ ██║███████║    ██████╔╝╚██████╔╝╚██████╔╝██║ ╚═╝ ██║██████╔╝██║██║ ╚████║╚██████╔╝
+            ╚══════╝╚═╝     ╚═╝╚══════╝    ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝     ╚═╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+            
+            <span class="welcome">WELCOME TO SMS BOOMBING TOOLS</span>
+            [-] TOOLS TYPE: FREE
+            [-] AUTHOR    : Abu Raihan
+            [-] GITHUB    : falto4437
+            [-] FACEBOOK  : ABU RAIHAN
+        </pre>
+
+        <div class="login">
+            <input type="text" id="username" placeholder="USERNAME (INBOX ME)">
+            <input type="password" id="password" placeholder="PASSWORD (INBOX ME)">
+            <button onclick="checkLogin()">Login</button>
+        </div>
+
+        <div class="bombing" style="display: none;">
+            <input type="text" id="number" placeholder="Victim Number (+880)">
+            <input type="number" id="amount" placeholder="Amount">
+            <button onclick="startBombing()">Start Bombing</button>
+            <div id="output"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
