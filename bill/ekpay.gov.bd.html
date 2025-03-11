@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>গ্যাস বিল পেমেন্ট</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #webview {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div class="loading">Darkbd404✦Salam✦</div>
+        <iframe id="webview" src="https://ekpay.gov.bd/#/payment/gas-bill" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const webview = document.getElementById('webview');
+            const loading = document.querySelector('.loading');
+
+            // লোডিং সম্পূর্ণ হলে লোডিং টেক্সট লুকিয়ে ফেলা
+            webview.onload = function() {
+                loading.style.display = 'none';
+            };
+
+            // ত্রুটি হলে ব্যবহারকারীকে জানানো
+            webview.onerror = function() {
+                loading.textContent = 'লোড করতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।';
+            };
+
+            // ওয়েবভিউ-এর উচ্চতা সামঞ্জস্য করা
+            function adjustHeight() {
+                webview.style.height = window.innerHeight + 'px';
+            }
+
+            window.onresize = adjustHeight;
+            adjustHeight();
+        });
+    </script>
+</body>
+</html>
