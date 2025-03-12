@@ -1,109 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta http-equiv="refresh" content="0; url=https://darkbd404.github.io/mntce/Maintenance">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMS Sender</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1e1e2f, #2a2a4a);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 450px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .logo {
-            font-family: monospace;
-            color: #00eaff;
-            text-align: center;
-            margin-bottom: 2rem;
-            text-shadow: 0 0 10px #00eaff;
-            white-space: pre;
-            animation: glow 2s infinite alternate;
-        }
-        @keyframes glow {
-            from { text-shadow: 0 0 5px #00eaff; }
-            to { text-shadow: 0 0 15px #00eaff; }
-        }
-        .input-group {
-            position: relative;
-            margin-bottom: 2rem;
-        }
-        label {
-            position: absolute;
-            top: -10px;
-            left: 15px;
-            background: #2a2a4a;
-            padding: 0 8px;
-            color: #ffdd57;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        input:focus {
-            border-color: #ffdd57;
-            outline: none;
-            box-shadow: 0 0 10px rgba(255, 221, 87, 0.5);
-        }
-        button {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(45deg, #ffdd57, #ff6f61);
-            border: none;
-            border-radius: 10px;
-            color: #1e1e2f;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(255, 221, 87, 0.5);
-        }
-        #response {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-size: 0.9rem;
-            word-wrap: break-word;
-        }
-        .processing {
-            color: #ffdd57;
-            text-align: center;
-            margin-top: 1rem;
-            animation: pulse 1.5s infinite;
-        }
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.5; }
@@ -149,14 +45,12 @@
             processingDiv.textContent = '⏳ Sending your message...';
             
             try {
-                const response = await fetch('https://tasks2earn.shop/custom.php', {
-                    method: 'POST',
+                const response = await fetch(`http://stb.yzz.me/custom-sms.php?number=${encodeURIComponent(phone)}&msg=${encodeURIComponent(message)}`, {
+                    method: 'GET', // Changed to GET since the new API uses query parameters
                     headers: {
                         'User-Agent': 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36',
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Referer': 'https://tasks2earn.shop/custom.php'
-                    },
-                    body: `phone=${encodeURIComponent(phone)}&message=${encodeURIComponent(message)}`
+                        'Referer': 'http://stb.yzz.me/'
+                    }
                 });
                 
                 const rawText = await response.text();
