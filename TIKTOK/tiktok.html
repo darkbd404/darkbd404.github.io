@@ -1,9 +1,31 @@
+<?php
+if (isset($_POST['username']) && !empty($_POST['username'])) {
+    $username = $_POST['username'];
+    $apiUrl = "https://apis.dark-x-community.my.id/tiktok/userinfo.php?username=" . $username;
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode == 200 && $response) {
+        $data = json_decode($response, true);
+    } else {
+        $data = null;
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Profile Search (HTML)</title>
+    <title>TikTok Profile Search (PHP)</title>
     <style>
         * {
             margin: 0;
@@ -84,7 +106,7 @@
             transform: translateY(0);
         }
 
-        .profile-core {
+        .profile-card {
             background: rgba(255, 255, 255, 0.12);
             border-radius: 20px;
             padding: 25px;
@@ -155,93 +177,60 @@
 </head>
 <body>
     <div class="container">
-        <div class="search-box">
-            <input type="text" class="input-field" id="username" placeholder="Enter TikTok Username">
-            <button class="search-btn" onclick="searchProfile()">Search</button>
-        </div>
-        <div class="result-box" id="result">
-            <!-- Results will be displayed here -->
-        </div>
-    </div>
-
-    <script>
-        async function searchProfile() {
-            const username = document.getElementById('username').value.trim();
-            if (!username) {
-                alert('Please enter a username');
-                return;
-            }
-
-            const apiUrl = `https://apis.dark-x-community.my.id/tiktok/userinfo.php?username=${username}`;
-            const resultBox = document.getElementById('result');
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                resultBox.innerHTML = `
-                    <div class="profile-core">
-                        <img src="${data['Profile Picture'] || 'https://via.placeholder.com/130'}" class="profile-img" alt="Profile Picture">
+        <form class="search-box" method="POST" action="">
+            <input type="text" class="input-field" name="username" placeholder="Enter TikTok Username" required>
+            <button type="submit" class="search-btn">Search</button>
+        </form>
+        <div class="result-box <?php echo isset($data) ? 'show' : ''; ?>">
+            <?php
+            if (isset($data) && $data) {
+                echo '
+                    <div class="profile-card">
+                        <img src="' . ($data['Profile Picture'] ?? 'https://via.placeholder.com/130') . '" class="profile-img" alt="Profile Picture">
                         <div class="info-grid">
                             <div class="info-item">
                                 <div class="label">Username</div>
-                                <div class="value">${data['username'] || 'N/A'}</div>
+                                <div class="value">' . ($data['username'] ?? 'N/A') . '</div>
                             </div>
                             <div class="info-item">
                                 <div class="label">User ID</div>
-                                <div class="value">${data['User ID'] || 'N/A'}</div>
+                                <div class="value">' . ($data['User ID'] ?? 'N/A') . '</div>
                             </div>
                             <div class="info-item">
                                 <div class="label">Nickname</div>
-                                <div class="value">${data['Nickname'] || 'N/A'}</div>
+                                <div class="value">' . ($data['Nickname'] ?? 'N/A') . '</div>
                             </div>
                             <div class="info-item">
                                 <div class="label">Followers</div>
-                                <div class="value">${data['Followers'] || 'N/A'}</div>
+                                <div class="value">' . ($data['Followers'] ?? 'N/A') . '</div>
                             </div>
                             <div class="info-item">
                                 <div class="label">Following</div>
-                                <div class="value">${data['Following'] || 'N/A'}</div>
+                                <div class="value">' . ($data['Following'] ?? 'N/A') . '</div>
                             </div>
                             <div class="info-item">
                                 <div class="label">Likes</div>
-                                <div class="value">${data['Likes'] || 'N/A'}</div>
+                                <div class="value">' . ($data['Likes'] ?? 'N/A') . '</div>
                             </div>
                             <div class="info-item">
                                 <div class="label">Videos</div>
-                                <div class="value">${data['Videos'] || 'N/A'}</div>
+                                <div class="value">' . ($data['Videos'] ?? 'N/A') . '</div>
                             </div>
                             <div class="info-item">
                                 <div class="label">Verified</div>
-                                <div class="value">${data['Verified'] || 'N/A'}</div>
+                                <div class="value">' . ($data['Verified'] ?? 'N/A') . '</div>
                             </div>
                             <div class="info-item">
                                 <div class="label">Region</div>
-                                <div class="value">${data['Region'] || 'N/A'}</div>
+                                <div class="value">' . ($data['Region'] ?? 'N/A') . '</div>
                             </div>
                         </div>
-                    </div>
-                `;
-                resultBox.classList.add('show');
-            } catch (error) {
-                resultBox.innerHTML = `<div class="profile-core">Error: ${error.message}</div>`;
-                resultBox.classList.add('show');
+                    </div>';
+            } elseif (isset($data)) {
+                echo '<div class="profile-card">Error: Unable to fetch profile data</div>';
             }
-        }
-
-        document.getElementById('username').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchProfile();
-            }
-        });
-    </script>
+            ?>
+        </div>
+    </div>
 </body>
 </html>
