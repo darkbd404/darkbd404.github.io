@@ -3,39 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Darkbd404 Result</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: #f0f0f0;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <title>জাতীয় পরিচয়পত্র রেজাল্ট</title>
 </head>
 <body>
-    <img id="resultImage" alt="NID Result">
-
     <script>
-        // Get the API URL from the query parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const apiUrl = urlParams.get('url');
-
-        // Set the image source to the API URL
-        if (apiUrl) {
-            document.getElementById('resultImage').src = decodeURIComponent(apiUrl);
-        } else {
-            document.body.innerHTML = '<h2 style="color: red;">কোনো রেজাল্ট পাওয়া যায়নি!</h2>';
-        }
+        const url = new URLSearchParams(window.location.search).get('url');
+        document.write(url ? `<img src="${decodeURIComponent(url)}" alt="NID Result">` : '<h2>কোনো রেজাল্ট পাওয়া যায়নি!</h2>');
     </script>
 </body>
 </html>
