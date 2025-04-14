@@ -4,9 +4,12 @@ const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
     try {
-        console.log('Received request:', req.method, req.body);
+        console.log('Received request:', req.method, req.query);
+
+        // Set JSON header
         res.setHeader('Content-Type', 'application/json');
 
+        // Function to load names from username.txt
         async function load_names_from_file(filename = 'public/username.txt') {
             try {
                 const content = await fs.readFile(filename, 'utf-8');
@@ -39,6 +42,7 @@ module.exports = async (req, res) => {
             }
         }
 
+        // Generate random string
         function generate_random_string(length) {
             const letters_and_digits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let result = '';
@@ -48,6 +52,7 @@ module.exports = async (req, res) => {
             return result;
         }
 
+        // Generate random password
         function generate_password() {
             const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
             let password = '';
@@ -57,6 +62,7 @@ module.exports = async (req, res) => {
             return password;
         }
 
+        // Generate random birthday
         function generate_birthday() {
             const min_age = 18;
             const max_age = 45;
@@ -67,6 +73,7 @@ module.exports = async (req, res) => {
             return `${year}-${month}-${day}`;
         }
 
+        // Get mail domains
         async function get_mail_domains() {
             const url = "https://api.mail.tm/domains";
             try {
@@ -86,8 +93,8 @@ module.exports = async (req, res) => {
             }
         }
 
-        async function create_mail_tm_account(gender) {
-            const names = await load_names_from_file();
+        // Create mail.tm account
+        async function create_mail_tm_account(gender, names) {
             const male_names = names.male;
             const female_names = names.female;
 
@@ -156,6 +163,7 @@ module.exports = async (req, res) => {
             }
         }
 
+        // Register Facebook account
         async function register_facebook_account(email, password, first_name, last_name, birthday, gender) {
             const api_key = '882a8490361da98702bf97a021ddc14d';
             const secret = '62f8ce9f74b12f84c123cc23437a4a32';
@@ -187,22 +195,22 @@ module.exports = async (req, res) => {
             const api_url = 'https://b-api.facebook.com/method/user.register';
             const reg = await _call(api_url, req);
             if (reg && reg.new_user_id && reg.session_info && reg.session_info.access_token) {
-                const id = reg.new_user_id;
-                const token = reg.session_info.access_token;
-                let output = "<p class=\"success\">✅ Account Created Successfully</p>";
-                output += `<p><strong>Facebook Account Name:</strong> ${first_name} ${last_name}</p>`;
-                output += `<p><strong>Email Address:</strong> ${email}</p>`;
-                output += `<p><strong>Url /ID:</strong> <a href="https://www.facebook.com/profile.php?id=${id}">https://www.facebook.com/profile.php?id=${id}</a></p>`;
-                output += `<p><strong>Password:</strong> ${password}</p>`;
-                output += `<p><strong>Date of Birth:</strong> ${birthday}</p>`;
-                output += `<p><strong>Gender:</strong> ${gender}</p>`;
-                output += `<p><strong>Token:</strong> ${token}</p>`;
-                return { success: true, output: output };
+                return {
+                    success: true,
+                    name: `${first_name} ${last_name}`,
+                    email: email,
+                    id: reg.new_user_id,
+                    password: password,
+                    birthday: birthday,
+                    gender: gender,
+                    token: reg.session_info.access_token
+                };
             }
             console.error('Facebook API failed:', reg);
-            return { success: false, output: "Account creation failed" };
+            return { success: false, error: "Account creation failed" };
         }
 
+        // Make API call
         async function _call(url, params, post = true) {
             const headers = {
                 'User-Agent': '[FBAN/FB4A;FBAV/35.0.0.48.273;FBDM/{density=1.33125,width=800,height=1205};FBLC/en_US;FBCR/;FBPN/com.facebook.katana;FBDV/Nexus 7;FBSV/4.1.1;FBBK/0;]'
@@ -222,33 +230,35 @@ module.exports = async (req, res) => {
             }
         }
 
-        let body = {};
-        if (req.method === 'POST') {
-            if (typeof req.body === 'string') {
-                try {
-                    body = Object.fromEntries(new URLSearchParams(req.body));
-                } catch (err) {
-                    console.error('Body parse error:', err.message);
+        // Handle GET request with amount parameter
+        if (req.method === 'GET' && req.query.amount) {
+            const amount = parseInt(req.query.amount, 10);
+            if (isNaN(amount) || amount < 1 || amount > 50) {
+                return res.status(400).json({ error: 'Invalid amount. Must be between 1 and 50.' });
+            }
+
+            const names = await load_names_from_file();
+            const results = [];
+
+            for (let i = 0; i < amount; i++) {
+                const gender = Math.random() < 0.5 ? 'M' : 'F';
+                const [email, password, first_name, last_name, birthday, mail_error] = await create_mail_tm_account(gender, names);
+                
+                if (mail_error) {
+                    results.push({ success: false, error: mail_error });
+                    continue;
                 }
-            } else {
-                body = req.body;
-            }
-        }
 
-        if (req.method === 'POST' && body.action === 'create') {
-            const gender = Math.random() < 0.5 ? 'M' : 'F';
-            const [email, password, first_name, last_name, birthday, mail_output] = await create_mail_tm_account(gender);
-            if (email && password && first_name && last_name && birthday) {
                 const result = await register_facebook_account(email, password, first_name, last_name, birthday, gender);
-                return res.status(200).json(result);
-            } else {
-                return res.status(200).json({ success: false, output: mail_output });
+                results.push(result);
             }
+
+            return res.status(200).json(results);
         }
 
-        return res.status(400).json({ success: false, output: 'Invalid request' });
+        return res.status(400).json({ error: 'Invalid request. Use ?amount=<number>' });
     } catch (err) {
         console.error('Server error:', err.message);
-        return res.status(500).json({ success: false, output: 'Server error' });
+        return res.status(500).json({ error: 'Server error' });
     }
 };
