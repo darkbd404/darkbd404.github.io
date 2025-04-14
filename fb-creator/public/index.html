@@ -2,338 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Darkbd404 Account Creator</title>
+    <title>Facebook Account Creator</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-        body {
-            background: linear-gradient(135deg, #0a0a25, #15153f);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-            overflow: hidden;
-        }
-        .container {
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(145deg, rgba(10, 10, 30, 0.92), rgba(20, 20, 50, 0.88));
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(12px);
-            animation: fadeIn 0.5s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.96); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .logo img {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 12px #00f2ff);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            object-fit: cover;
-            animation: logoSpin 4s ease-in-out infinite;
-        }
-        @keyframes logoSpin {
-            0%, 100% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(3deg) scale(1.03); }
-        }
-        h1 {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #ffd700;
-            text-shadow: 0 0 8px #ffd700;
-            animation: glow 1.6s ease-in-out infinite;
-        }
-        @keyframes glow {
-            0%, 100% { text-shadow: 0 0 8px #ffd700; }
-            50% { text-shadow: 0 0 16px #ffd700; }
-        }
-        .form-group {
-            width: 100%;
-            max-width: 360px;
-            margin-bottom: 20px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        label {
-            position: absolute;
-            top: -18px;
-            left: 10px;
-            font-size: 13px;
-            color: #00f2ff;
-            text-shadow: 0 0 4px #00f2ff;
-            transition: all 0.2s ease;
-        }
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: none;
-            border-radius: 6px;
-            background: linear-gradient(45deg, #0e0e2c, #1a1a4a);
-            color: #fff;
-            font-size: 14px;
-            box-shadow: 0 2px 8px rgba(0, 242, 255, 0.25);
-            transition: all 0.2s ease;
-        }
-        input[type="number"]:focus {
-            outline: none;
-            box-shadow: 0 2px 15px #00f2ff;
-            transform: scale(1.02);
-            background: linear-gradient(45deg, #1a1a4a, #262686);
-        }
-        input[type="number"]::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-            font-style: italic;
-            font-size: 12px;
-        }
-        input[type="number"]:focus + label {
-            transform: translateY(-2px);
-            text-shadow: 0 0 6px #00f2ff;
-        }
-        button {
-            background: linear-gradient(45deg, #ff6b6b, #00f2ff);
-            border: none;
-            padding: 8px 30px;
-            border-radius: 25px;
-            color: #1e1e2f;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.5);
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-            margin: 10px auto 0;
-            display: block;
-        }
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: 0.3s;
-        }
-        button:hover::before { left: 100%; }
-        button:hover {
-            transform: translateY(-1px) scale(1.03);
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.7);
-        }
-        button:disabled {
-            background: linear-gradient(45deg, #353555, #505070);
-            color: #888;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        #status {
-            margin: 10px 0;
-            font-size: 14px;
-            color: #ffd700;
-            text-shadow: 0 0 6px #ffd700;
-        }
-        #counter {
-            font-size: 13px;
-            color: #00f2ff;
-            margin-bottom: 10px;
-            text-shadow: 0 0 5px #00f2ff;
-            animation: counterGlow 1.8s ease-in-out infinite;
-        }
-        @keyframes counterGlow {
-            0%, 100% { text-shadow: 0 0 5px #00f2ff; }
-            50% { text-shadow: 0 0 10px #00f2ff; }
-        }
-        .progress-container {
-            width: 100%;
-            max-width: 360px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            position: relative;
-        }
-        #progress {
-            height: 100%;
-            background: linear-gradient(45deg, #00f2ff, #ff6b6b);
-            width: 0;
-            transition: width 0.5s ease;
-            box-shadow: 0 0 12px #00f2ff;
-            position: relative;
-            overflow: hidden;
-        }
-        #progress::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 200%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            animation: progressShine 1.5s linear infinite;
-        }
-        @keyframes progressShine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        .result-container {
-            width: 100%;
-            max-width: 360px;
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 8px;
-            background: none;
-            border: none;
-        }
-        .result-item {
-            margin-bottom: 8px;
-            padding: 6px;
-            background: none;
-            border: none;
-            animation: resultFade 0.3s ease-in;
-        }
-        @keyframes resultFade {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .result-item p {
-            font-size: 12px;
-            color: #fff;
-            margin: 4px 0;
-            word-wrap: break-word;
-            max-width: 100%;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-        }
-        .result-item p.success {
-            color: #00f2ff;
-            font-weight: 600;
-        }
-        .result-item p strong {
-            color: #ffd700;
-        }
-        .result-item p a {
-            color: #00f2ff;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-        .result-item p a:hover {
-            color: #ffd700;
-            text-decoration: underline;
-        }
-        .result-item p.serial {
-            color: #ffd700;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        #result { margin-top: 20px; }
+        .success { color: green; }
+        p { margin: 5px 0; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <img src="https://cdn.qwenlm.ai/output/99bdf3c1-440a-4314-a526-1b2ce0d9faca/t2i/89e963f8-bdfb-49a3-82a2-a52fb424f33e/7d3a2dfd-4de5-44fa-b15f-f02b95419562.png?key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNvdXJjZV91c2VyX2lkIjoiOTliZGYzYzEtNDQwYS00MzE0LWE1MjYtMWIyY2UwZDlmYWNhIiwicmVzb3VyY2VfaWQiOiI3ZDNhMmRmZC00ZGU1LTQ0ZmEtYjE1Zi1mMDJiOTU0MTk1NjIiLCJyZXNvdXJjZV9jaGF0X2lkIjpudWxsfQ.8S60h8fEUyxLLyvGYlo85ko020Tik8_f-eaxYMol6X0" alt="Facebook Account Create">
-        </div>
-        <h1>Darkbd404 Auto FB-Account Create</h1>
-        <form id="accountForm" class="form-group">
-            <label for="account_count">How Many Accounts?</label>
-            <input type="number" id="account_count" name="account_count" min="1" placeholder="Enter number" required>
-            <button type="submit" id="submitBtn">Create Now!</button>
-        </form>
-        <div id="counter">Accounts Created👥: 0/0 / Fail❌ 0/0 / Success✅ 0/0</div>
-        <div id="status"></div>
-        <div class="progress-container">
-            <div id="progress"></div>
-        </div>
-        <div class="result-container">
-            <div id="results"></div>
-        </div>
-    </div>
+    <h2>Create Facebook Account</h2>
+    <button onclick="createAccount()">Create Account</button>
+    <div id="result"></div>
     <script>
-        const link = document.createElement('link');
-        link.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap';
-        link.rel = 'stylesheet';
-        document.head.appendChild(link);
-
-        const form = document.getElementById('accountForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const counter = document.getElementById('counter');
-        const status = document.getElementById('status');
-        const progress = document.getElementById('progress');
-        const results = document.getElementById('results');
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const count = parseInt(document.getElementById('account_count').value);
-            submitBtn.disabled = true;
-            results.innerHTML = '';
-            counter.textContent = `Accounts Created👥: 0/${count} / Fail❌ 0/${count} / Success✅ 0/${count}`;
-            status.textContent = 'Initializing...';
-            progress.style.width = '0%';
-            let processed = 0;
-            let failed = 0;
-            let succeeded = 0;
-            let serial = 1;
-
-            function createAccount() {
-                if (processed >= count) {
-                    status.textContent = 'All Accounts Processed! 🎉';
-                    submitBtn.disabled = false;
-                    progress.style.width = '100%';
-                    return;
-                }
-
-                fetch('/fb-creator/api/progress', {
+        async function createAccount() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Creating...';
+            try {
+                const response = await fetch('https://darkbd404.vercel.app/fb-creator/api/progress', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'action=create'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    processed++;
-                    const percentage = (processed / count) * 100;
-                    progress.style.width = percentage + '%';
-                    status.textContent = `Processing Account ${processed} of ${count}...`;
-
-                    if (data.success) {
-                        succeeded++;
-                        const item = document.createElement('div');
-                        item.className = 'result-item';
-                        item.innerHTML = `<p class="serial">${serial}/</p>` + data.output;
-                        results.prepend(item);
-                        serial++;
-                    } else {
-                        failed++;
-                    }
-
-                    counter.textContent = `Accounts Created👥: ${processed}/${count} / Fail❌ ${failed}/${count} / Success✅ ${succeeded}/${count}`;
-                    setTimeout(createAccount, 100);
-                })
-                .catch(error => {
-                    processed++;
-                    failed++;
-                    const percentage = (processed / count) * 100;
-                    progress.style.width = percentage + '%';
-                    status.textContent = `Processing Account ${processed} of ${count}...`;
-                    counter.textContent = `Accounts Created👥: ${processed}/${count} / Fail❌ ${failed}/${count} / Success✅ ${succeeded}/${count}`;
-                    setTimeout(createAccount, 100);
                 });
+                const data = await response.json();
+                resultDiv.innerHTML = data.output || data.error || 'Unknown error';
+            } catch (error) {
+                resultDiv.innerHTML = `Request Failed: ${error.message}`;
             }
-
-            createAccount();
-        });
+        }
     </script>
 </body>
 </html>
