@@ -1,17 +1,15 @@
 <?php
 header('Content-Type: application/json');
 
-// Function to generate random string
 function generate_random_string($length) {
-    $letters_and_digits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     $result = '';
     for ($i = 0; $i < $length; $i++) {
-        $result .= $letters_and_digits[rand(0, strlen($letters_and_digits) - 1)];
+        $result .= $chars[rand(0, strlen($chars) - 1)];
     }
     return $result;
 }
 
-// Generate random password
 function generate_password() {
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
     $password = '';
@@ -21,7 +19,6 @@ function generate_password() {
     return $password;
 }
 
-// Generate random birthday
 function generate_birthday() {
     $min_age = 18;
     $max_age = 45;
@@ -32,7 +29,6 @@ function generate_birthday() {
     return "$year-$month-$day";
 }
 
-// Get mail domains from mail.tm
 function get_mail_domains() {
     $url = "https://api.mail.tm/domains";
     $response = @file_get_contents($url);
@@ -46,9 +42,7 @@ function get_mail_domains() {
     return ["error" => "Invalid email domain response"];
 }
 
-// Create mail.tm account
 function create_mail_tm_account($gender) {
-    // সিম্পল নাম হার্ডকোড করছি, কারণ username.txt Vercel-এ রাখা যাবে না
     $male_names = ['John', 'Michael', 'David'];
     $female_names = ['Sarah', 'Emily', 'Jessica'];
 
@@ -104,7 +98,6 @@ function create_mail_tm_account($gender) {
     return [null, null, null, null, null, "Email creation failed"];
 }
 
-// Register Facebook account
 function register_facebook_account($email, $password, $first_name, $last_name, $birthday, $gender) {
     $api_key = '882a8490361da98702bf97a021ddc14d';
     $secret = '62f8ce9f74b12f84c123cc23437a4a32';
@@ -151,7 +144,6 @@ function register_facebook_account($email, $password, $first_name, $last_name, $
     return ['success' => false, 'output' => "Account creation failed"];
 }
 
-// Make API call
 function _call($url, $params, $post = true) {
     $headers = [
         'User-Agent: [FBAN/FB4A;FBAV/35.0.0.48.273;FBDM/{density=1.33125,width=800,height=1205};FBLC/en_US;FBCR/;FBPN/com.facebook.katana;FBDV/Nexus 7;FBSV/4.1.1;FBBK/0;]'
@@ -168,7 +160,6 @@ function _call($url, $params, $post = true) {
     return json_decode($response, true);
 }
 
-// Handle API request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create') {
     $gender = rand(0, 1) ? 'M' : 'F';
     list($email, $password, $first_name, $last_name, $birthday, $mail_output) = create_mail_tm_account($gender);
