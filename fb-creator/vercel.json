@@ -1,7 +1,7 @@
 {
     "rewrites": [
         {
-            "source": "/api/progress",
+            "source": "/fb-creator/api/progress",
             "destination": "/api/progress.js"
         }
     ],
