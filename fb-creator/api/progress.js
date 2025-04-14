@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
         // Set JSON header
         res.setHeader('Content-Type', 'application/json');
 
-        // Function to load names from username.txt
+        // Load names from username.txt
         async function load_names_from_file(filename = 'public/username.txt') {
             try {
                 const content = await fs.readFile(filename, 'utf-8');
@@ -44,15 +44,15 @@ module.exports = async (req, res) => {
 
         // Generate random string
         function generate_random_string(length) {
-            const letters_and_digits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let result = '';
             for (let i = 0; i < length; i++) {
-                result += letters_and_digits[Math.floor(Math.random() * letters_and_digits.length)];
+                result += chars[Math.floor(Math.random() * chars.length)];
             }
             return result;
         }
 
-        // Generate random password
+        // Generate password
         function generate_password() {
             const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
             let password = '';
@@ -62,7 +62,7 @@ module.exports = async (req, res) => {
             return password;
         }
 
-        // Generate random birthday
+        // Generate birthday
         function generate_birthday() {
             const min_age = 18;
             const max_age = 45;
@@ -73,23 +73,23 @@ module.exports = async (req, res) => {
             return `${year}-${month}-${day}`;
         }
 
-        // Get mail domains
+        // Get mail.tm domains
         async function get_mail_domains() {
-            const url = "https://api.mail.tm/domains";
+            const url = 'https://api.mail.tm/domains';
             try {
                 const response = await fetch(url, { timeout: 10000 });
                 if (!response.ok) {
                     console.error('mail.tm domains failed:', response.status);
-                    return { error: "Unable to fetch email domains" };
+                    return { error: 'Unable to fetch email domains' };
                 }
                 const data = await response.json();
                 if (data['hydra:member']) {
                     return data['hydra:member'];
                 }
-                return { error: "Invalid email domain response" };
+                return { error: 'Invalid email domain response' };
             } catch (err) {
                 console.error('mail.tm error:', err.message);
-                return { error: "Unable to fetch email domains" };
+                return { error: 'Unable to fetch email domains' };
             }
         }
 
@@ -99,10 +99,10 @@ module.exports = async (req, res) => {
             const female_names = names.female;
 
             if (gender === 'M' && male_names.length === 0) {
-                return [null, null, null, null, null, "No male names found in username.txt"];
+                return [null, null, null, null, null, 'No male names found in username.txt'];
             }
             if (gender === 'F' && female_names.length === 0) {
-                return [null, null, null, null, null, "No female names found in username.txt"];
+                return [null, null, null, null, null, 'No female names found in username.txt'];
             }
 
             const mail_domains = await get_mail_domains();
@@ -118,7 +118,7 @@ module.exports = async (req, res) => {
             if (gender === 'M') {
                 const available_names = male_names.filter(name => name);
                 if (available_names.length < 2) {
-                    return [null, null, null, null, null, "Insufficient male names"];
+                    return [null, null, null, null, null, 'Insufficient male names'];
                 }
                 const first_index = Math.floor(Math.random() * available_names.length);
                 first_name = available_names[first_index];
@@ -127,18 +127,18 @@ module.exports = async (req, res) => {
             } else if (gender === 'F') {
                 const available_names = female_names.filter(name => name);
                 if (available_names.length < 2) {
-                    return [null, null, null, null, null, "Insufficient female names"];
+                    return [null, null, null, null, null, 'Insufficient female names'];
                 }
                 const first_index = Math.floor(Math.random() * available_names.length);
                 first_name = available_names[first_index];
                 available_names.splice(first_index, 1);
                 last_name = available_names[Math.floor(Math.random() * available_names.length)];
             } else {
-                return [null, null, null, null, null, "Invalid gender specified"];
+                return [null, null, null, null, null, 'Invalid gender specified'];
             }
 
-            const url = "https://api.mail.tm/accounts";
-            const headers = { "Content-Type": "application/json" };
+            const url = 'https://api.mail.tm/accounts';
+            const headers = { 'Content-Type': 'application/json' };
             const data = {
                 address: `${username}@${domain}`,
                 password: password
@@ -150,16 +150,15 @@ module.exports = async (req, res) => {
                     body: JSON.stringify(data),
                     timeout: 10000
                 });
-                const status = response.status;
-                if (status === 201) {
-                    return [`${username}@${domain}`, password, first_name, last_name, birthday, ""];
+                if (response.status === 201) {
+                    return [`${username}@${domain}`, password, first_name, last_name, birthday, ''];
                 }
                 const errorText = await response.text();
                 console.error('mail.tm account creation failed:', errorText);
                 return [null, null, null, null, null, `Email creation failed: ${errorText}`];
             } catch (err) {
                 console.error('mail.tm POST error:', err.message);
-                return [null, null, null, null, null, "Email creation failed"];
+                return [null, null, null, null, null, 'Email creation failed'];
             }
         }
 
@@ -207,7 +206,7 @@ module.exports = async (req, res) => {
                 };
             }
             console.error('Facebook API failed:', reg);
-            return { success: false, error: "Account creation failed" };
+            return { success: false, error: 'Account creation failed' };
         }
 
         // Make API call
