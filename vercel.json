@@ -2,8 +2,8 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
+      "src": "api/**/*.php",
+      "use": "@vercel/php"
     }
   ],
   "routes": [
