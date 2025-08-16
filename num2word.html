@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Al-Arafah Islami Bank PLC - Number to Words</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans Bengali',sans-serif;background:#f9f9f9;color:#333;padding:20px;display:flex;flex-direction:column;align-items:center;min-height:100vh;}
+.header{width:100%;max-width:700px;text-align:center;padding:20px 0;margin-bottom:20px;position:relative;}
+.logo-container{display:inline-flex;align-items:center;gap:15px;animation:zoomInOut 3s infinite;}
+@keyframes zoomInOut{0%{transform:scale(1);}50%{transform:scale(1.05);}100%{transform:scale(1);}}
+.logo-container img{width:70px;height:70px;border-radius:50%;object-fit:contain;border:3px solid #4CAF50;background:white;padding:5px;}
+.bank-name{font-size:24px;font-weight:bold;color:#000;}
+.branch{font-size:16px;color:#555;margin-top:5px;}
+.main-container{width:100%;max-width:700px;background:#fff;border-radius:20px;padding:30px;box-shadow:0 8px 30px rgba(0,0,0,0.1);border:4px solid #4CAF50;}
+.input-container{display:flex;flex-direction:column;align-items:center;margin-bottom:25px;}
+.input-box{width:100%;max-width:400px;padding:18px 25px;font-size:20px;border:2px solid #4CAF50;border-radius:30px;margin-bottom:20px;text-align:center;outline:none;background:#fff;color:#333;transition:all 0.3s ease;box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+.input-box:focus{border-color:#2E7D32;box-shadow:0 0 0 3px rgba(76,175,80,0.3);}
+.input-box::placeholder{color:#666;}
+.response-section{margin:20px 0;border:2px solid #4CAF50;border-radius:20px;padding:20px;text-align:center;background:#f5f5f5;}
+.response-title{font-size:18px;color:#333;margin:0;padding:8px 15px;border-bottom:2px solid #4CAF50;border-radius:15px;display:inline-block;background:rgba(76,175,80,0.1);}
+.response-content{font-size:22px;margin-top:15px;min-height:60px;padding:15px;border:1px solid #ddd;border-radius:15px;background:#fff;font-weight:500;line-height:1.5;}
+.footer{margin-top:30px;text-align:center;color:#666;font-size:14px;}
+.footer-logo{margin:20px auto;width:90px;height:90px;border:4px solid #4CAF50;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.footer-logo img{width:70px;height:70px;object-fit:contain;}
+@media(max-width:768px){.main-container{padding:20px;}.input-box{padding:15px 20px;font-size:18px;}.response-content{font-size:18px;}}
+@media(max-width:480px){.header{padding:15px 0;}.logo-container img{width:60px;height:60px;}.bank-name{font-size:20px;}.branch{font-size:14px;}.response-content{font-size:16px;}}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="logo-container">
+<img src="https://www.aibl.com.bd/wp-content/themes/aiblTheme/images/aibplc-logo2.png" alt="Al-Arafah Islami Bank Logo">
+<div>
+<div class="bank-name">Al-Arafah Islami Bank PLC.</div>
+<div class="branch">Amratalli Sub Brunch-410 / Barura Comilla</div>
+</div>
+</div>
+</div>
+
+<div class="main-container">
+<div class="input-container">
+<input type="number" id="inputBox" class="input-box" placeholder="টাকার পরিমাণ লিখুন">
+</div>
+
+<div class="response-section">
+<h3 class="response-title">English Response</h3>
+<div class="response-content" id="englishResponse">Enter an amount to see the English conversion</div>
+</div>
+
+<div class="response-section">
+<h3 class="response-title">বাংলা রেসপন্স</h3>
+<div class="response-content" id="banglaResponse">টাকার পরিমাণ লিখুন বাংলা কথায় প্রদর্শন পেতে</div>
+</div>
+</div>
+
+<div class="footer-logo">
+<img src="https://i.postimg.cc/fTLBDj0C/images.jpg" alt="Footer Logo">
+</div>
+
+<div class="footer">
+<p>© 2025 Darkbd404. All Rights Reserved.</p>
+</div>
+
+<script>
+// English conversion
+function toEnglishWords(num){
+    if(num===0) return "Zero Taka Only";
+    const ones=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+    const tens=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+    const thousands=["","Thousand","Million","Billion"];
+    let words=[],i=0;
+    while(num>0){
+        let chunk=num%1000;
+        if(chunk){
+            let chunkWords=[];
+            if(chunk%100<20){chunkWords.push(ones[chunk%100]);chunk=Math.floor(chunk/100);}
+            else{if(chunk%10) chunkWords.push(ones[chunk%10]);chunk=Math.floor(chunk/10);chunkWords.push(tens[chunk%10]);chunk=Math.floor(chunk/10);}
+            if(chunk) chunkWords.push(ones[chunk]+" Hundred");
+            words.push(chunkWords.reverse().join(" ")+" "+thousands[i]);
+        }
+        num=Math.floor(num/1000);i++;
+    }
+    return words.reverse().join(" ").trim()+" Taka Only";
+}
+
+// Modern Bangla conversion (Num2Word style)
+function toBanglaWordsModern(num){
+    if(num===0) return "শূন্য টাকা মাত্র";
+
+    const ones=["","এক","দুই","তিন","চার","পাঁচ","ছয়","সাত","আট","নয়"];
+    const tens=["","","বিশ","ত্রিশ","চল্লিশ","পঞ্চাশ","ষাট","সত্তর","আশি","নব্বই"];
+    const teens=["দশ","এগারো","বারো","তেরো","চৌদ্দ","পনেরো","ষোল","সতেরো","আঠারো","ঊনিশ"];
+    const hundreds=["","একশো","দুইশো","তিনশো","চারশো","পাঁচশো","ছয়শো","সাতশো","আটশো","নয়শো"];
+    const scales=["","হাজার","লক্ষ","কোটি","শত কোটি","হাজার কোটি"];
+
+    let numStr=num.toString();
+    let parts=[];
+    while(numStr.length>0){
+        if(parts.length===0){
+            parts.push(numStr.slice(-3));
+            numStr=numStr.slice(0,-3);
+        }else{
+            parts.push(numStr.slice(-2));
+            numStr=numStr.slice(0,-2);
+        }
+    }
+    parts=parts.reverse();
+
+    let words=[];
+    for(let i=0;i<parts.length;i++){
+        let n=parseInt(parts[i]);
+        if(n===0) continue;
+        let chunkWords=[];
+
+        if(parts[i].length===3){
+            let h=Math.floor(n/100);
+            if(h) chunkWords.push(hundreds[h]);
+            n=n%100;
+        }
+
+        if(n>0){
+            if(n<10) chunkWords.push(ones[n]);
+            else if(n<20) chunkWords.push(teens[n-10]);
+            else{
+                let t=Math.floor(n/10);
+                let o=n%10;
+                chunkWords.push(o===0?tens[t]:tens[t]+" "+ones[o]);
+            }
+        }
+
+        if(scales[parts.length-1-i]) chunkWords.push(scales[parts.length-1-i]);
+
+        words.push(chunkWords.join(" "));
+    }
+
+    return words.join(" ").replace(/\s+/g," ").trim()+" টাকা মাত্র";
+}
+
+document.getElementById('inputBox').addEventListener('input',function(){
+    const amount=parseInt(this.value)||0;
+    document.getElementById('englishResponse').textContent=toEnglishWords(amount);
+    document.getElementById('banglaResponse').textContent=toBanglaWordsModern(amount);
+});
+
+window.onload=function(){document.getElementById('inputBox').focus();}
+</script>
+</body>
+</html>
