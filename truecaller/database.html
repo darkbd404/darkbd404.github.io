@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Number Lookup - Pro</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .header-icon { font-size: 40px; margin-bottom: 10px; }
+
+        .input-box {
+            display: flex;
+            margin: 20px 0;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .input-box:focus-within { border-color: var(--primary-color); }
+
+        input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 0 25px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #displayArea {
+            margin-top: 20px;
+            display: none;
+            text-align: left;
+            animation: fadeIn 0.5s;
+        }
+
+        .info-item {
+            background: #f1f3f5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .label { font-size: 12px; color: #666; display: block; }
+        .value { font-size: 16px; font-weight: 600; color: #333; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header-icon">📱</div>
+    <h2 style="margin:0; color:#333;">Number Lookup</h2>
+    <p style="color:#777;">১১ ডিজিটের মোবাইল নম্বর দিন</p>
+
+    <div class="input-box">
+        <input type="text" id="phone" placeholder="01XXXXXXXXX" maxlength="11">
+        <button onclick="fetchData()">Search</button>
+    </div>
+
+    <div id="loader" class="loader"></div>
+
+    <div id="displayArea">
+        </div>
+</div>
+
+<script>
+    async function fetchData() {
+        const num = document.getElementById('phone').value;
+        const display = document.getElementById('displayArea');
+        const loader = document.getElementById('loader');
+
+        if(num.length < 11) {
+            alert("সঠিক নম্বর দিন!");
+            return;
+        }
+
+        loader.style.display = 'block';
+        display.style.display = 'none';
+
+        try {
+            // অনেক সময় ব্রাউজার সরাসরি কল ব্লক করে, তাই প্রক্সি ব্যবহার করা নিরাপদ
+            const proxy = "https://cors-anywhere.herokuapp.com/"; 
+            const url = `https://turecaller.pikaapis0.workers.dev/?number=+88${num}`;
+
+            // আমরা সরাসরি চেষ্টা করছি, যদি কাজ না করে তবে প্রক্সি লাগবে
+            const response = await fetch(url);
+            const data = await response.json();
+
+            loader.style.display = 'none';
+            display.style.display = 'block';
+
+            // এপিআই রেজাল্ট প্রসেসিং
+            let name = data.Truecaller !== "No name found" ? data.Truecaller : (data.Unknown || "নাম পাওয়া যায়নি");
+            
+            display.innerHTML = `
+                <div class="info-item" style="border-color: ${data.error ? 'red' : 'var(--success-color)'}">
+                    <span class="label">নাম / রেজাল্ট:</span>
+                    <span class="value">${name}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">স্ট্যাটাস:</span>
+                    <span class="value">${data.error ? "ত্রুটি: " + data.error : "সফলভাবে তথ্য পাওয়া গেছে"}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">ডেভেলপার:</span>
+                    <span class="value">${data.developer || "N/A"}</span>
+                </div>
+            `;
+
+        } catch (err) {
+            loader.style.display = 'none';
+            display.style.display = 'block';
+            display.innerHTML = `
+                <div class="info-item" style="border-left-color: red;">
+                    <span class="value" style="color:red;">API সংযোগ ত্রুটি!</span>
+                    <p style="font-size:12px; color:#666;">আপনার ব্রাউজার বা নেটওয়ার্ক এপিআই কলটি ব্লক করছে। ভিপিএন বা অন্য ব্রাউজার ট্রাই করুন।</p>
+                </div>
+            `;
+        }
+    }
+</script>
+
+</body>
+</html>
