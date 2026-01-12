@@ -3,171 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile Number Lookup - Pro</title>
+    <title>Advanced Number Lookup Pro</title>
     <style>
         :root {
-            --primary-color: #007bff;
-            --success-color: #28a745;
-            --error-color: #dc3545;
-            --bg-color: #f8f9fa;
+            --primary: #0084ff;
+            --bg: #f0f4f8;
+            --card: #ffffff;
         }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 15px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
         }
 
-        .card {
-            background: white;
-            padding: 30px;
+        .main-card {
+            background: var(--card);
+            width: 100%;
+            max-width: 500px;
+            padding: 25px;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
         }
 
-        .header-icon { font-size: 40px; margin-bottom: 10px; }
+        .header h2 { color: var(--primary); text-align: center; margin-top: 0; }
 
-        .input-box {
+        .search-area {
             display: flex;
-            margin: 20px 0;
-            border: 2px solid #ddd;
+            background: #f1f3f6;
             border-radius: 12px;
-            overflow: hidden;
-            transition: 0.3s;
+            padding: 5px;
+            margin-bottom: 20px;
         }
-
-        .input-box:focus-within { border-color: var(--primary-color); }
 
         input {
             flex: 1;
-            padding: 15px;
             border: none;
-            outline: none;
+            background: transparent;
+            padding: 12px;
             font-size: 16px;
+            outline: none;
         }
 
         button {
-            padding: 0 25px;
-            background: var(--primary-color);
+            background: var(--primary);
             color: white;
             border: none;
-            cursor: pointer;
+            padding: 0 20px;
+            border-radius: 10px;
             font-weight: bold;
+            cursor: pointer;
         }
 
-        #displayArea {
-            margin-top: 20px;
+        #result-display {
             display: none;
-            text-align: left;
-            animation: fadeIn 0.5s;
+            animation: fadeIn 0.5s ease;
         }
 
-        .info-item {
-            background: #f1f3f5;
-            padding: 12px;
+        .info-grid {
+            background: #f9fbff;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #eef2f7;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .label { font-weight: 600; color: #666; font-size: 13px; }
+        .value { color: #111; font-weight: 700; font-size: 14px; text-align: right; }
+        .value a { color: var(--primary); text-decoration: none; }
+
+        .social-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .social-btn {
+            text-decoration: none;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 10px;
             border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--primary-color);
+            text-align: center;
         }
 
-        .label { font-size: 12px; color: #666; display: block; }
-        .value { font-size: 16px; font-weight: 600; color: #333; }
+        .wa { background: #25D366; }
+        .tg { background: #0088cc; }
+        .imo { background: #00aaff; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #hidden-iframe { display: none; }
 
-        .loader {
-            display: none;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="header-icon">📱</div>
-    <h2 style="margin:0; color:#333;">Number Lookup</h2>
-    <p style="color:#777;">১১ ডিজিটের মোবাইল নম্বর দিন</p>
-
-    <div class="input-box">
-        <input type="text" id="phone" placeholder="01XXXXXXXXX" maxlength="11">
-        <button onclick="fetchData()">Search</button>
+<div class="main-card">
+    <div class="header">
+        <h2>🔍 Number Insight Pro</h2>
+    </div>
+    
+    <div class="search-area">
+        <input type="tel" id="numInput" placeholder="01XXXXXXXXX" maxlength="11">
+        <button onclick="startLookup()">Search</button>
     </div>
 
-    <div id="loader" class="loader"></div>
+    <iframe id="hidden-iframe"></iframe>
 
-    <div id="displayArea">
+    <div id="result-display">
+        <div class="info-grid">
+            <div class="info-row"><span class="label">📞 API রেসপন্স:</span> <span class="value" id="res-status">Success</span></div>
+            <div class="info-row"><span class="label">📡 Carrier:</span> <span class="value" id="res-carrier">Detecting...</span></div>
+            <div class="info-row"><span class="label">🌍 Country:</span> <span class="value">Bangladesh (BD)</span></div>
+            <div class="info-row"><span class="label">🌐 International Format:</span> <span class="value" id="res-intl">+88</span></div>
+            <div class="info-row"><span class="label">📞 Local Format:</span> <span class="value" id="res-local">01...</span></div>
+            <div class="info-row"><span class="label">🕒 Timezones:</span> <span class="value">Asia/Dhaka</span></div>
+            <div class="info-row"><span class="label">👤 Truecaller:</span> <span class="value" id="res-true">N/A</span></div>
+            <div class="info-row"><span class="label">❓ Name:</span> <span class="value" id="res-name">Loading...</span></div>
+            <div class="info-row"><span class="label">⏰ Timestamp:</span> <span class="value" id="res-time">--</span></div>
+            <div class="info-row"><span class="label">🌏 Browser IP:</span> <span class="value" id="res-ip">--</span></div>
+            <div class="info-row"><span class="label">📱📡 Network:</span> <span class="value" id="res-net">WiFi/Data</span></div>
+            <div class="info-row"><span class="label">🧭 Browser Map:</span> <span class="value" id="res-map"><a href="#">Click to View</a></span></div>
+            <div class="info-row"><span class="label">⏰ Time & Date:</span> <span class="value" id="res-now">--</span></div>
         </div>
+
+        <div class="social-box">
+            <a id="wa-link" href="#" target="_blank" class="social-btn wa">💬 WhatsApp</a>
+            <a id="tg-link" href="#" target="_blank" class="social-btn tg">📨 Telegram</a>
+            <a id="imo-link" href="#" target="_blank" class="social-btn imo">📱 Imo</a>
+        </div>
+    </div>
 </div>
 
 <script>
-    async function fetchData() {
-        const num = document.getElementById('phone').value;
-        const display = document.getElementById('displayArea');
-        const loader = document.getElementById('loader');
+    function getOperator(num) {
+        const prefix = num.substring(0, 3);
+        const operators = {
+            '017': 'Grameenphone', '013': 'Grameenphone',
+            '018': 'Robi',
+            '016': 'Airtel',
+            '019': 'Banglalink', '014': 'Banglalink',
+            '015': 'Teletalk'
+        };
+        return operators[prefix] || 'Unknown Operator';
+    }
 
-        if(num.length < 11) {
-            alert("সঠিক নম্বর দিন!");
+    async function startLookup() {
+        const num = document.getElementById('numInput').value;
+        const resultBox = document.getElementById('result-display');
+        const iframe = document.getElementById('hidden-iframe');
+
+        if (num.length !== 11) {
+            alert("সঠিক ১১ ডিজিট নম্বর দিন!");
             return;
         }
 
-        loader.style.display = 'block';
-        display.style.display = 'none';
+        resultBox.style.display = 'block';
+        iframe.src = "https://turecaller.pikaapis0.workers.dev/?number=+88" + num;
 
+        // অপারেটর ডিটেকশন
+        document.getElementById('res-carrier').innerText = getOperator(num);
+
+        // ব্রাউজার আইপি এবং নেটওয়ার্ক ডিটেকশন
         try {
-            // অনেক সময় ব্রাউজার সরাসরি কল ব্লক করে, তাই প্রক্সি ব্যবহার করা নিরাপদ
-            const proxy = "https://cors-anywhere.herokuapp.com/"; 
-            const url = `https://turecaller.pikaapis0.workers.dev/?number=+88${num}`;
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipRes.json();
+            document.getElementById('res-ip').innerText = ipData.ip;
 
-            // আমরা সরাসরি চেষ্টা করছি, যদি কাজ না করে তবে প্রক্সি লাগবে
-            const response = await fetch(url);
-            const data = await response.json();
+            // নেটওয়ার্ক টাইপ (যদি ব্রাউজার সাপোর্ট করে)
+            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            document.getElementById('res-net').innerText = connection ? `${connection.effectiveType.toUpperCase()} / ${connection.type || 'Data'}` : 'WiFi/Mobile Data';
+        } catch(e) { document.getElementById('res-ip').innerText = "Not Found"; }
 
-            loader.style.display = 'none';
-            display.style.display = 'block';
-
-            // এপিআই রেজাল্ট প্রসেসিং
-            let name = data.Truecaller !== "No name found" ? data.Truecaller : (data.Unknown || "নাম পাওয়া যায়নি");
-            
-            display.innerHTML = `
-                <div class="info-item" style="border-color: ${data.error ? 'red' : 'var(--success-color)'}">
-                    <span class="label">নাম / রেজাল্ট:</span>
-                    <span class="value">${name}</span>
-                </div>
-                <div class="info-item">
-                    <span class="label">স্ট্যাটাস:</span>
-                    <span class="value">${data.error ? "ত্রুটি: " + data.error : "সফলভাবে তথ্য পাওয়া গেছে"}</span>
-                </div>
-                <div class="info-item">
-                    <span class="label">ডেভেলপার:</span>
-                    <span class="value">${data.developer || "N/A"}</span>
-                </div>
-            `;
-
-        } catch (err) {
-            loader.style.display = 'none';
-            display.style.display = 'block';
-            display.innerHTML = `
-                <div class="info-item" style="border-left-color: red;">
-                    <span class="value" style="color:red;">API সংযোগ ত্রুটি!</span>
-                    <p style="font-size:12px; color:#666;">আপনার ব্রাউজার বা নেটওয়ার্ক এপিআই কলটি ব্লক করছে। ভিপিএন বা অন্য ব্রাউজার ট্রাই করুন।</p>
-                </div>
-            `;
+        // ম্যাপ লোকেশন (গুগল ম্যাপ লিঙ্ক জেনারেশন)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const url = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                document.getElementById('res-map').innerHTML = `<a href="${url}" target="_blank">📍 View on Map</a>`;
+            }, () => {
+                document.getElementById('res-map').innerText = "Location Blocked";
+            });
         }
+
+        // এপিআই ডেটা ফেচ (AllOrigins Proxy)
+        const apiUrl = `https://turecaller.pikaapis0.workers.dev/?number=+88${num}`;
+        fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`)
+            .then(res => res.json())
+            .then(proxyData => {
+                const data = JSON.parse(proxyData.contents);
+                document.getElementById('res-status').innerText = data.error ? "Error" : "Success";
+                document.getElementById('res-true').innerText = data.Truecaller || "N/A";
+                document.getElementById('res-name').innerText = data.Unknown || "Not Found";
+                document.getElementById('res-time').innerText = data.timestamp || Date.now();
+            });
+
+        // অন্যান্য তথ্য
+        document.getElementById('res-intl').innerText = "+88" + num;
+        document.getElementById('res-local').innerText = num;
+        document.getElementById('res-now').innerText = new Date().toLocaleString();
+        
+        // সোশ্যাল লিঙ্ক
+        document.getElementById('wa-link').href = `https://wa.me/+88${num}`;
+        document.getElementById('tg-link').href = `https://t.me/+88${num}`;
+        document.getElementById('imo-link').href = `https://imo.im/+88${num}`;
     }
 </script>
 
