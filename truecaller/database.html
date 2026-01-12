@@ -165,7 +165,7 @@ margin-top:12px;
 <body>
 
 <div class="main-card" id="capture">
-<div class="header"><h2>馃攳 Number Insight Pro</h2></div>
+<div class="header"><h2>🔍 Number Insight Pro</h2></div>
 
 <div class="search-area">
 <input id="numInput" placeholder="01XXXXXXXXX" maxlength="11">
@@ -210,7 +210,7 @@ function section(t){return `<div class="section-title">${t}</div>`;}
 
 async function lookup(){
 const n=numInput.value.trim();
-if(n.length!==11){alert('唳膏唳苦 唰оЁ 唳∴唳溹唳� 唳ㄠΞ唰嵿Μ唳� 唳︵唳�');return;}
+if(n.length!==11){alert('সঠিক ১১ ডিজিট নম্বর দিন');return;}
 
 const grid=document.getElementById('grid');
 const bar=document.getElementById('bar');
@@ -263,39 +263,39 @@ bar.firstElementChild.style.width='75%';
 let i=0;
 grid.innerHTML+=section('Core Response');
 grid.innerHTML+=
-row('馃摓 API 唳班唳膏Κ唳ㄠ唳�',apiStatus,i+=60)+
-row('馃摗 Carrier',carrier,i+=60)+
-row('馃實 Country','Bangladesh (BD)',i+=60)+
-row('馃寪 International Format','+88'+n,i+=60)+
-row('馃摓 Local Format',n,i+=60)+
-row('馃晵 Timezones','Asia/Dhaka',i+=60)+
-row('馃懁 Truecaller',apiTrue,i+=60)+
-row('鉂� Name',apiName,i+=60)+
-row('鈴� Timestamp',apiTime,i+=60)+
-row('馃審 Browser IP',ip,i+=60)+
-row('馃摫馃摗 Network',(navigator.connection?.effectiveType||'unknown').toUpperCase(),i+=60)+
-row('馃Л Browser Map','Location Blocked',i+=60)+
-row('鈴� Time & Date',new Date().toLocaleString(),i+=60);
+row('📞 API রেসপন্স',apiStatus,i+=60)+
+row('📡 Carrier',carrier,i+=60)+
+row('🌍 Country','Bangladesh (BD)',i+=60)+
+row('🌐 International Format','+88'+n,i+=60)+
+row('📞 Local Format',n,i+=60)+
+row('🕒 Timezones','Asia/Dhaka',i+=60)+
+row('👤 Truecaller',apiTrue,i+=60)+
+row('❓ Name',apiName,i+=60)+
+row('⏰ Timestamp',apiTime,i+=60)+
+row('🌏 Browser IP',ip,i+=60)+
+row('📱📡 Network',(navigator.connection?.effectiveType||'unknown').toUpperCase(),i+=60)+
+row('🧭 Browser Map','Location Blocked',i+=60)+
+row('⏰ Time & Date',new Date().toLocaleString(),i+=60);
 
 const spam=Math.floor(Math.random()*100);
 const risk=spam>70?'High':spam>40?'Medium':'Low';
 
 grid.innerHTML+=section('Extended Intelligence');
 grid.innerHTML+=
-row('馃摱 SIM Operator',carrier,i+=60)+
-row('馃敘 SIM Prefix',prefix,i+=60)+
-row('馃摬 SIM Type','LTE / VoLTE',i+=60)+
-row('馃毃 Spam Probability',spam+'%',i+=60)+
-row('鈿狅笍 Risk Level',risk,i+=60)+
-row('猸� Reputation Score',100-spam,i+=60);
+row('📶 SIM Operator',carrier,i+=60)+
+row('🔢 SIM Prefix',prefix,i+=60)+
+row('📲 SIM Type','LTE / VoLTE',i+=60)+
+row('🚨 Spam Probability',spam+'%',i+=60)+
+row('⚠️ Risk Level',risk,i+=60)+
+row('⭐ Reputation Score',100-spam,i+=60);
 
 grid.innerHTML+=section('Device & Session');
 grid.innerHTML+=
-row('馃攱 Battery Charge',battery,i+=60)+
-row('馃摫 Device',/Mobi/.test(navigator.userAgent)?'Mobile':'Desktop',i+=60)+
-row('馃捇 OS Platform',navigator.platform,i+=60)+
-row('馃寪 Browser',navigator.userAgent.includes('Chrome')?'Chrome':'Other',i+=60)+
-row('馃啍 Session ID',SESSION_ID,i+=60);
+row('🔋 Battery Charge',battery,i+=60)+
+row('📱 Device',/Mobi/.test(navigator.userAgent)?'Mobile':'Desktop',i+=60)+
+row('💻 OS Platform',navigator.platform,i+=60)+
+row('🌐 Browser',navigator.userAgent.includes('Chrome')?'Chrome':'Other',i+=60)+
+row('🆔 Session ID',SESSION_ID,i+=60);
 
 bar.firstElementChild.style.width='100%';
 
