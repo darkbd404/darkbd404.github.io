@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form - Email Method</title>
+    <style>
+        :root {
+            --primary-color: #007bb5;
+            --bg-color: #f1f3f5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+        }
+
+        .contact-container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-sizing: border-box;
+            background-color: #f8f9fa;
+        }
+
+        .id-section {
+            display: flex;
+            gap: 10px;
+        }
+
+        .id-section select { flex: 1.2; }
+        .id-section input { flex: 2; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #005f8d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="contact-container">
+    <h2>যোগাযোগ করুন</h2>
+    
+    <form action="https://formspree.io/f/আপনার-ইমেইল@gmail.com" method="POST">
+        
+        <div class="form-group">
+            <label>নাম (Name)</label>
+            <input type="text" name="Name" placeholder="আপনার নাম" required>
+        </div>
+
+        <div class="form-group">
+            <label>জিমেইল (Gmail)</label>
+            <input type="email" name="Email" placeholder="example@gmail.com" required>
+        </div>
+
+        <div class="form-group">
+            <label>মোবাইল নম্বর (11 Digit)</label>
+            <input type="tel" name="Phone" pattern="[0-9]{11}" placeholder="01XXXXXXXXX" required>
+        </div>
+
+        <div class="form-group">
+            <label>পরিচয়পত্র (Identification)</label>
+            <div class="id-section">
+                <select name="ID-Type">
+                    <option value="NID">NID</option>
+                    <option value="Birth Reg">Birth Reg</option>
+                    <option value="Passport">Passport</option>
+                    <option value="VIP Code">VIP Code</option>
+                </select>
+                <input type="text" name="ID-Number" placeholder="নম্বর দিন" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>অভিযোগ (Complaints - Max 500)</label>
+            <textarea name="Message" rows="3" maxlength="500" placeholder="আপনার সমস্যা লিখুন..."></textarea>
+        </div>
+
+        <input type="text" name="_gotcha" style="display:none">
+
+        <button type="submit" class="btn-submit">Sent</button>
+    </form>
+</div>
+
+</body>
+</html>
