@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form - Confirmed</title>
+    <style>
+        :root { --primary: #007bb5; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; }
+        .form-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 420px; }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; font-size: 22px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #333; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; background: #fdfdfd; font-size: 14px; }
+        .row { display: flex; gap: 8px; }
+        .captcha-box { background: #eef2f7; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin: 15px 0; border: 1px solid #d1d9e6; }
+        .btn-send { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-send:hover { background: #005f8d; }
+        #status-msg { text-align: center; margin-top: 15px; font-weight: bold; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <h2>যোগাযোগ করুন</h2>
+    <form id="contactForm">
+        <input type="hidden" name="access_key" value="8bb89f35-5634-4521-b7be-0fed5b34aec4">
+        
+        <input type="hidden" name="subject" value="New Contact From Your Website">
+
+        <div class="form-group">
+            <label>নাম (Name)</label>
+            <input type="text" name="Name" placeholder="আপনার নাম" required>
+        </div>
+
+        <div class="form-group">
+            <label>জিমেইল (Gmail)</label>
+            <input type="email" name="Email" placeholder="example@gmail.com" required>
+        </div>
+
+        <div class="form-group">
+            <label>মোবাইল নম্বর (11 Digit)</label>
+            <input type="tel" name="Phone" pattern="[0-9]{11}" placeholder="01XXXXXXXXX" required>
+        </div>
+
+        <div class="form-group">
+            <label>পরিচয়পত্র (Identification)</label>
+            <div class="row">
+                <select name="ID_Type">
+                    <option value="NID">NID</option>
+                    <option value="Birth Reg">Birth Reg</option>
+                    <option value="Passport">Passport</option>
+                    <option value="VIP Code">VIP Code</option>
+                </select>
+                <input type="text" name="ID_Number" placeholder="নম্বর" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>অভিযোগ (Complaints - Max 500)</label>
+            <textarea name="Complaint" rows="3" maxlength="500" placeholder="আপনার অভিযোগ লিখুন..."></textarea>
+        </div>
+
+        <div class="captcha-box">
+            <span id="cap-q" style="font-weight: bold; color: #007bb5;"></span>
+            <input type="number" id="cap-ans" style="width: 80px;" placeholder="?" required>
+        </div>
+
+        <button type="submit" class="btn-send" id="submitBtn">Sent</button>
+        <p id="status-msg"></p>
+    </form>
+</div>
+
+<script>
+    // ডাইনামিক ক্যাপচা সিস্টেম
+    let n1, n2, correctSum;
+    function generateCaptcha() {
+        n1 = Math.floor(Math.random() * 10);
+        n2 = Math.floor(Math.random() * 10);
+        correctSum = n1 + n2;
+        document.getElementById('cap-q').innerText = `${n1} + ${n2} = কত?`;
+    }
+    generateCaptcha();
+
+    const form = document.getElementById('contactForm');
+    const status = document.getElementById('status-msg');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // ক্যাপচা যাচাই
+        const userAns = document.getElementById('cap-ans').value;
+        if (parseInt(userAns) !== correctSum) {
+            status.style.color = "red";
+            status.innerText = "ভেরিফিকেশন সঠিক নয়!";
+            return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.innerText = "পাঠানো হচ্ছে (Sending)...";
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+        const object = Object.fromEntries(formData);
+        const json = JSON.stringify(object);
+
+        fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: json
+        })
+        .then(async (response) => {
+            if (response.status == 200) {
+                status.style.color = "green";
+                status.innerText = "সফলভাবে পাঠানো হয়েছে! ✅ আপনার ইমেইল চেক করুন।";
+                form.reset();
+                generateCaptcha();
+            } else {
+                status.style.color = "red";
+                status.innerText = "ত্রুটি! কী বা নেটওয়ার্ক সমস্যা।";
+            }
+        })
+        .catch(error => {
+            status.style.color = "red";
+            status.innerText = "ইন্টারনেট সংযোগ নেই।";
+        })
+        .finally(() => {
+            btn.innerText = "Sent";
+            btn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
