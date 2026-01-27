@@ -142,20 +142,15 @@ td{
   padding:6px 4px;
   font-size:18px;
 }
-
 td.left{
   width:50%;
   white-space:nowrap;
 }
-
 td.right{
   width:50%;
   text-align:right;
 }
 
-.received td{ font-size:20px; }
-
-/* paid seal */
 .paid{
   text-align:center;
   margin:15px 0;
@@ -198,20 +193,55 @@ td.right{
 <!-- INPUT PAGE -->
 <div id="inputPage" style="display:none;">
   <div class="input-header">
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLD1tmRCAsfAvM7-nSKPGnZcbuHGFswrizo8tvB6EKgg&s" crossorigin="anonymous">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLD1tmRCAsfAvM7-nSKPGnZcbuHGFswrizo8tvB6EKgg&s">
     <div class="title">Electricity Receipt Generate</div>
   </div>
 
   <div class="input-body">
-    <div class="field"><label>Bill Month</label><input id="billMonth" value="January 2026"></div>
-    <div class="field"><label>Bill Account Number</label><input id="billAccount" value="1003051991555"></div>
-    <div class="field"><label>Bill Amount</label><input id="billAmount" value="BDT 171.0"></div>
-    <div class="field"><label>BKash Account</label><input id="bkash" value="01620230864"></div>
-    <div class="field"><label>Payment Date</label><input id="payDate" value="25 January, 2026"></div>
-    <div class="field"><label>Transaction ID</label><input id="trx" value="DAP6GG91C2"></div>
-    <div class="field"><label>Paid to Organization</label><input id="paidOrg" value="BDT 171.0"></div>
-    <div class="field"><label>BKash Fee</label><input id="fee" value="0.0"></div>
-    <div class="field"><label>Payment Received</label><input id="received" value="171.00"></div>
+    <div class="field">
+      <label>Bill Month</label>
+      <input type="month" id="billMonth" value="2026-01">
+    </div>
+
+    <div class="field">
+      <label>Bill Account Number</label>
+      <input id="billAccount" inputmode="numeric" maxlength="13" placeholder="13 digit number" value="1003051991555">
+    </div>
+
+    <div class="field">
+      <label>Bill Amount</label>
+      <input type="number" id="billAmount" value="171.0">
+    </div>
+
+    <div class="field">
+      <label>bKash Account</label>
+      <input id="bkash" value="01620230864">
+    </div>
+
+    <div class="field">
+      <label>Payment Date</label>
+      <input type="date" id="payDate" value="2026-01-25">
+    </div>
+
+    <div class="field">
+      <label>Transaction ID</label>
+      <input id="trx" value="DAP6GG91C2">
+    </div>
+
+    <div class="field">
+      <label>Paid to Organization</label>
+      <input type="number" id="paidOrg" value="171.0">
+    </div>
+
+    <div class="field">
+      <label>bKash Fee</label>
+      <input type="number" id="fee" value="0.0">
+    </div>
+
+    <div class="field">
+      <label>Payment Received</label>
+      <input type="number" id="received" value="171.00">
+    </div>
 
     <button class="btn" onclick="generate()">Generate Receipt</button>
   </div>
@@ -222,8 +252,8 @@ td.right{
   <div class="receipt" id="capture">
 
     <div class="top">
-      <img class="palli" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8GQdDeVef1bjhoXyK3P5FhBYEOgGEcbTl95Rlb2NKYw&s=10" crossorigin="anonymous">
-      <img class="bkash" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLD1tmRCAsfAvM7-nSKPGnZcbuHGFswrizo8tvB6EKgg&s" crossorigin="anonymous">
+      <img class="palli" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8GQdDeVef1bjhoXyK3P5FhBYEOgGEcbTl95Rlb2NKYw&s=10">
+      <img class="bkash" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLD1tmRCAsfAvM7-nSKPGnZcbuHGFswrizo8tvB6EKgg&s">
     </div>
 
     <div class="title">RECEIPT</div>
@@ -244,32 +274,28 @@ td.right{
     <div class="hr"></div>
 
     <table>
-      <tr><td class="left">BKash Account</td><td class="right" id="rBkash"></td></tr>
+      <tr><td class="left">bKash Account</td><td class="right" id="rBkash"></td></tr>
       <tr><td class="left">Payment Date</td><td class="right" id="rDate"></td></tr>
       <tr><td class="left">Transaction ID</td><td class="right" id="rTrx"></td></tr>
       <tr><td class="left">Paid to Organization</td><td class="right" id="rPaidOrg"></td></tr>
-      <tr><td class="left">BKash Fee</td><td class="right" id="rFee"></td></tr>
+      <tr><td class="left">bKash Fee</td><td class="right" id="rFee"></td></tr>
     </table>
 
     <div class="hr"></div>
 
-    <table class="received">
-      <tr>
-        <td class="left">Payment Received</td>
-        <td class="right" id="rReceived"></td>
-      </tr>
+    <table>
+      <tr><td class="left">Payment Received</td><td class="right" id="rReceived"></td></tr>
     </table>
 
     <div class="hr"></div>
 
     <div class="paid">
-      <img src="https://darkbd404.github.io/logo/20260126_173401.png" crossorigin="anonymous">
+      <img src="https://darkbd404.github.io/logo/20260126_173401.png">
     </div>
 
     <div class="footer">
-   This receipt has been generated electronically
+      This receipt has been generated electronically
     </div>
-
   </div>
 
   <div class="action">
@@ -286,39 +312,49 @@ window.onload=()=>{
   },2000);
 };
 
+function formatMonth(val){
+  const d=new Date(val+"-01");
+  return d.toLocaleString('en-US',{month:'long',year:'numeric'});
+}
+function formatDate(val){
+  const d=new Date(val);
+  return d.toLocaleDateString('en-US',{day:'2-digit',month:'long',year:'numeric'});
+}
+
 function generate(){
+  if(billAccount.value.length!==13){
+    alert("Bill Account Number must be 13 digits");
+    return;
+  }
+
   inputPage.style.display="none";
   loading.style.display="flex";
+
   setTimeout(()=>{
     loading.style.display="none";
     receiptPage.style.display="block";
 
-    rBillMonth.innerText=billMonth.value;
-    rBillAccount.innerText=billAccount.value;
-    rBillAmount.innerText=billAmount.value;
-    rBkash.innerText=bkash.value;
-    rDate.innerText=payDate.value;
-    rTrx.innerText=trx.value;
-    rPaidOrg.innerText=paidOrg.value;
-    rFee.innerText=fee.value;
-    rReceived.innerText=received.value;
+    rBillMonth.innerText = formatMonth(billMonth.value);
+    rBillAccount.innerText = billAccount.value;
+    rBillAmount.innerText = "BDT " + billAmount.value;
+    rBkash.innerText = bkash.value;
+    rDate.innerText = formatDate(payDate.value);
+    rTrx.innerText = trx.value;
+    rPaidOrg.innerText = "BDT " + paidOrg.value;
+    rFee.innerText = fee.value;
+    rReceived.innerText = received.value;
   },2000);
 }
 
 function savePNG(){
   document.querySelector('.action').style.display='none';
-
-  html2canvas(document.getElementById("capture"),{
-    useCORS:true,
-    allowTaint:true,
-    scale:3.17
-  }).then(canvas=>{
+  html2canvas(capture,{scale:3.17}).then(canvas=>{
     const now=new Date();
     const name=`electricity_receipt_${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}.png`;
-    const link=document.createElement("a");
-    link.download=name;
-    link.href=canvas.toDataURL("image/png");
-    link.click();
+    const a=document.createElement("a");
+    a.download=name;
+    a.href=canvas.toDataURL();
+    a.click();
     document.querySelector('.action').style.display='flex';
   });
 }
@@ -334,4 +370,4 @@ function goBack(){
 </script>
 
 </body>
-    </html>
+</html>
