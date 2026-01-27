@@ -205,12 +205,12 @@ td.right{
 
     <div class="field">
       <label>Bill Account Number</label>
-      <input id="billAccount" inputmode="numeric" maxlength="13" placeholder="13 digit number" value="1003051991555">
+      <input id="billAccount" inputmode="numeric" maxlength="13" placeholder="13 digit number" value="1003051991540">
     </div>
 
     <div class="field">
       <label>Bill Amount</label>
-      <input type="number" id="billAmount" value="171.0">
+      <input type="number" id="billAmount" value="658.0">
     </div>
 
     <div class="field">
@@ -220,7 +220,7 @@ td.right{
 
     <div class="field">
       <label>Payment Date</label>
-      <input type="date" id="payDate" value="2026-01-25">
+      <input type="date" id="payDate">
     </div>
 
     <div class="field">
@@ -230,7 +230,7 @@ td.right{
 
     <div class="field">
       <label>Paid to Organization</label>
-      <input type="number" id="paidOrg" value="171.0">
+      <input type="number" id="paidOrg" value="658.0">
     </div>
 
     <div class="field">
@@ -240,7 +240,7 @@ td.right{
 
     <div class="field">
       <label>Payment Received</label>
-      <input type="number" id="received" value="171.00">
+      <input type="number" id="received" value="658.00">
     </div>
 
     <button class="btn" onclick="generate()">Generate Receipt</button>
@@ -306,6 +306,10 @@ td.right{
 
 <script>
 window.onload=()=>{
+  /* 🔥 AUTO SET CURRENT DATE */
+  const today = new Date().toISOString().split("T")[0];
+  payDate.value = today;
+
   setTimeout(()=>{
     loading.style.display="none";
     inputPage.style.display="block";
