@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<title>bKash Electricity Receipt</title>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family: monospace;
+  background:#f5f5f5;
+  color:#000;
+  overflow-x:hidden;
+  text-shadow:
+    0.7px 0 #000,
+   -0.7px 0 #000,
+    0 0.7px #000,
+    0 -0.7px #000;
+}
+
+/* ===== LOADING ===== */
+#loading{
+  position:fixed;
+  inset:0;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+#loading img{ width:140px; }
+
+/* ===== INPUT PAGE ===== */
+#inputPage{
+  max-width:420px;
+  margin:auto;
+  background:#fff;
+  min-height:100vh;
+}
+.input-header{
+  text-align:center;
+  padding:18px 16px 8px;
+}
+.input-header img{ height:110px; }
+.input-header .title{
+  margin-top:6px;
+  font-size:18px;
+}
+.input-body{ padding:16px; }
+
+.field{ margin-bottom:14px; }
+.field label{
+  font-size:13px;
+  margin-bottom:6px;
+  display:block;
+}
+.field input{
+  width:100%;
+  padding:14px;
+  font-size:16px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  background:#fafafa;
+}
+.field input:focus{
+  border-color:#E2136E;
+  box-shadow:0 0 0 2px rgba(226,19,110,.15);
+  background:#fff;
+}
+
+.btn{
+  width:100%;
+  padding:15px;
+  font-size:17px;
+  background:#E2136E;
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  cursor:pointer;
+  margin-top:18px;
+}
+
+/* ===== RECEIPT PAGE ===== */
+#receiptPage{
+  display:none;
+  background:#fff;
+  overflow:hidden;
+}
+
+.receipt{
+  width:420px;
+  max-width:100vw;
+  margin:0 auto;
+  padding:15px;
+  background:#fff;
+}
+
+/* logos */
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.top img.palli{ height:40px; }
+.top img.bkash{ height:80px; }
+
+.title{
+  text-align:center;
+  font-size:22px;
+  margin:10px 0;
+}
+
+/* ===== STRAIGHT DASHED LINE ===== */
+.hr{
+  height:2px;
+  width:100%;
+  background:repeating-linear-gradient(
+    to right,
+    #000 0 10px,
+    transparent 10px 18px
+  );
+  margin:10px 0;
+}
+
+.section{ font-size:20px; }
+
+/* ===== TABLE WITH OFFSET VERTICAL LINE ===== */
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:
+    linear-gradient(#000,#000) calc(55% + 10px) 0 / 2px 100% no-repeat;
+}
+
+td{
+  padding:6px 4px;
+  font-size:18px;
+}
+
+td.left{
+  width:50%;
+  white-space:nowrap;
+}
+
+td.right{
+  width:50%;
+  text-align:right;
+}
+
+.received td{ font-size:20px; }
+
+/* paid seal */
+.paid{
+  text-align:center;
+  margin:15px 0;
+}
+.paid img{ width:130px; }
+
+.footer{
+  text-align:center;
+  font-size:14px;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.action{
+  display:flex;
+  justify-content:center;
+  gap:16px;
+  padding:16px;
+}
+.action button{
+  min-width:150px;
+  padding:12px 18px;
+  font-size:16px;
+  border:none;
+  border-radius:999px;
+  color:#fff;
+  background:#E2136E;
+  box-shadow:0 6px 14px rgba(226,19,110,.35);
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOADING -->
+<div id="loading">
+  <img src="https://darkbd404.github.io/logo/XeBEi1nMWd.gif" crossorigin="anonymous">
+</div>
+
+<!-- INPUT PAGE -->
+<div id="inputPage" style="display:none;">
+  <div class="input-header">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLD1tmRCAsfAvM7-nSKPGnZcbuHGFswrizo8tvB6EKgg&s" crossorigin="anonymous">
+    <div class="title">Electricity Receipt Generate</div>
+  </div>
+
+  <div class="input-body">
+    <div class="field"><label>Bill Month</label><input id="billMonth" value="January 2026"></div>
+    <div class="field"><label>Bill Account Number</label><input id="billAccount" value="1003051991555"></div>
+    <div class="field"><label>Bill Amount</label><input id="billAmount" value="BDT 171.0"></div>
+    <div class="field"><label>BKash Account</label><input id="bkash" value="01620230864"></div>
+    <div class="field"><label>Payment Date</label><input id="payDate" value="25 January, 2026"></div>
+    <div class="field"><label>Transaction ID</label><input id="trx" value="DAP6GG91C2"></div>
+    <div class="field"><label>Paid to Organization</label><input id="paidOrg" value="BDT 171.0"></div>
+    <div class="field"><label>BKash Fee</label><input id="fee" value="0.0"></div>
+    <div class="field"><label>Payment Received</label><input id="received" value="171.00"></div>
+
+    <button class="btn" onclick="generate()">Generate Receipt</button>
+  </div>
+</div>
+
+<!-- RECEIPT PAGE -->
+<div id="receiptPage">
+  <div class="receipt" id="capture">
+
+    <div class="top">
+      <img class="palli" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8GQdDeVef1bjhoXyK3P5FhBYEOgGEcbTl95Rlb2NKYw&s=10" crossorigin="anonymous">
+      <img class="bkash" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLD1tmRCAsfAvM7-nSKPGnZcbuHGFswrizo8tvB6EKgg&s" crossorigin="anonymous">
+    </div>
+
+    <div class="title">RECEIPT</div>
+
+    <div class="hr"></div>
+    <div class="section">Bill Information</div>
+    <div class="hr"></div>
+
+    <table>
+      <tr><td class="left">Organization Name</td><td class="right">Palli Bidyut (Postpaid)</td></tr>
+      <tr><td class="left">Bill Month</td><td class="right" id="rBillMonth"></td></tr>
+      <tr><td class="left">Bill Account Number</td><td class="right" id="rBillAccount"></td></tr>
+      <tr><td class="left">Bill Amount</td><td class="right" id="rBillAmount"></td></tr>
+    </table>
+
+    <div class="hr"></div>
+    <div class="section">Payment Information</div>
+    <div class="hr"></div>
+
+    <table>
+      <tr><td class="left">BKash Account</td><td class="right" id="rBkash"></td></tr>
+      <tr><td class="left">Payment Date</td><td class="right" id="rDate"></td></tr>
+      <tr><td class="left">Transaction ID</td><td class="right" id="rTrx"></td></tr>
+      <tr><td class="left">Paid to Organization</td><td class="right" id="rPaidOrg"></td></tr>
+      <tr><td class="left">BKash Fee</td><td class="right" id="rFee"></td></tr>
+    </table>
+
+    <div class="hr"></div>
+
+    <table class="received">
+      <tr>
+        <td class="left">Payment Received</td>
+        <td class="right" id="rReceived"></td>
+      </tr>
+    </table>
+
+    <div class="hr"></div>
+
+    <div class="paid">
+      <img src="https://darkbd404.github.io/logo/20260126_173401.png" crossorigin="anonymous">
+    </div>
+
+    <div class="footer">
+   This receipt has been generated electronically
+    </div>
+
+  </div>
+
+  <div class="action">
+    <button onclick="savePNG()">Save PNG</button>
+    <button onclick="goBack()">Back</button>
+  </div>
+</div>
+
+<script>
+window.onload=()=>{
+  setTimeout(()=>{
+    loading.style.display="none";
+    inputPage.style.display="block";
+  },2000);
+};
+
+function generate(){
+  inputPage.style.display="none";
+  loading.style.display="flex";
+  setTimeout(()=>{
+    loading.style.display="none";
+    receiptPage.style.display="block";
+
+    rBillMonth.innerText=billMonth.value;
+    rBillAccount.innerText=billAccount.value;
+    rBillAmount.innerText=billAmount.value;
+    rBkash.innerText=bkash.value;
+    rDate.innerText=payDate.value;
+    rTrx.innerText=trx.value;
+    rPaidOrg.innerText=paidOrg.value;
+    rFee.innerText=fee.value;
+    rReceived.innerText=received.value;
+  },2000);
+}
+
+function savePNG(){
+  document.querySelector('.action').style.display='none';
+
+  html2canvas(document.getElementById("capture"),{
+    useCORS:true,
+    allowTaint:true,
+    scale:3.17
+  }).then(canvas=>{
+    const now=new Date();
+    const name=`electricity_receipt_${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}.png`;
+    const link=document.createElement("a");
+    link.download=name;
+    link.href=canvas.toDataURL("image/png");
+    link.click();
+    document.querySelector('.action').style.display='flex';
+  });
+}
+
+function goBack(){
+  receiptPage.style.display="none";
+  loading.style.display="flex";
+  setTimeout(()=>{
+    loading.style.display="none";
+    inputPage.style.display="block";
+  },2000);
+}
+</script>
+
+</body>
+    </html>
