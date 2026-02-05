@@ -47,8 +47,7 @@
 margin: 0;
 padding: 0;
 box-sizing: border-box;
-font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-}
+font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;}
 body {
 background-color: var(--bg-color);
 color: var(--text-primary);
@@ -97,8 +96,7 @@ transition: background-color 0.2s;
 background-color: rgba(0, 0, 0, 0.05);
 }
 .dark-theme .theme-toggle:hover {
-background-color: rgba(255, 255, 255, 0.1);
-}
+background-color: rgba(255, 255, 255, 0.1);}
 /* Main Content */
 .main-content {
 flex: 1;
@@ -147,8 +145,7 @@ font-size: 1.4rem;
 margin-bottom: 4px;
 }
 /* Cards */
-.card {
-background-color: var(--card-bg);
+.card {background-color: var(--card-bg);
 border-radius: 16px;
 padding: 20px;
 margin-bottom: 20px;
@@ -197,8 +194,7 @@ color: var(--text-primary);
 width: 100%;
 padding: 14px;
 border: 1px solid var(--border-color);
-border-radius: 12px;
-background-color: var(--card-bg);
+border-radius: 12px;background-color: var(--card-bg);
 color: var(--text-primary);
 font-size: 1rem;
 transition: border-color 0.2s;
@@ -247,8 +243,7 @@ background-color: var(--warning-color);
 }
 .btn-warning:hover {
 background-color: #e67e22;
-}
-.btn-error {
+}.btn-error {
 background-color: var(--error-color);
 }
 .btn-error:hover {
@@ -297,8 +292,7 @@ font-weight: 600;
 color: var(--text-primary);
 }
 .application-type {
-font-size: 0.9rem;
-color: var(--text-secondary);
+font-size: 0.9rem;color: var(--text-secondary);
 }
 /* Timeline */
 .timeline {
@@ -347,8 +341,7 @@ padding: 16px;
 margin-bottom: 16px;
 box-shadow: var(--shadow);
 }
-.email-subject {
-font-weight: 600;
+.email-subject {font-weight: 600;
 margin-bottom: 8px;
 color: var(--text-primary);
 }
@@ -397,8 +390,7 @@ max-height: 90vh;
 overflow-y: auto;
 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 transform: translateY(20px);
-transition: transform 0.3s;
-}
+transition: transform 0.3s;}
 .modal-overlay.active .modal {
 transform: translateY(0);
 }
@@ -447,8 +439,7 @@ gap: 12px;
 }
 .form-control {
 padding: 12px;
-}
-.btn {
+}.btn {
 padding: 12px 20px;
 }
 }
@@ -497,8 +488,7 @@ align-items: center;
 height: 100%;
 color: var(--text-secondary);
 text-align: center;
-padding: 0 10px;
-}
+padding: 0 10px;}
 .file-upload-label i {
 font-size: 1.5rem;
 margin-bottom: 5px;
@@ -547,8 +537,7 @@ background-color: rgba(67, 97, 238, 0.05);
 .tool-icon {
 font-size: 2rem;
 color: var(--accent-color);
-margin-bottom: 10px;
-}
+margin-bottom: 10px;}
 .tool-title {
 font-weight: 600;
 font-size: 0.95rem;
@@ -597,8 +586,7 @@ font-size: 0.95rem;
 </div>
 </div>
 </div>
-<!-- Report View -->
-<div id="reportView" class="view">
+<!-- Report View --><div id="reportView" class="view">
 <div class="card">
 <h2 class="card-title">New Application</h2>
 <div class="form-group">
@@ -647,8 +635,7 @@ font-size: 0.95rem;
 </div>
 </div>
 <!-- Admin View -->
-<div id="adminView" class="view">
-<div class="card">
+<div id="adminView" class="view"><div class="card">
 <h2 class="card-title">Admin Login</h2>
 <div class="form-group">
 <label class="form-label">Username</label>
@@ -666,9 +653,8 @@ font-size: 0.95rem;
 <div class="card">
 <h2 class="card-title">Admin Panel</h2>
 <div class="form-group">
-<label class="form-label">Search by Application ID</label>
-<input type="text" class="form-control" id="adminSearchById" placeholder="e.g., AR-...">
-<button class="btn" id="searchByIdBtn" style="margin-top: 10px;">Search</button>
+<label class="form-label">Search Applications</label>
+<input type="text" class="form-control" id="adminSearch" placeholder="Search by issue type...">
 </div>
 <div id="adminApplicationsList">
 <div class="empty-state">
@@ -698,8 +684,7 @@ font-size: 0.95rem;
 <div class="tool-title">Recover Email</div>
 </div>
 <div class="tool-card" onclick="alert('Enable 2FA in Settings → Security')">
-<div class="tool-icon"><i class="fas fa-shield-alt"></i></div>
-<div class="tool-title">Security Check</div>
+<div class="tool-icon"><i class="fas fa-shield-alt"></i></div><div class="tool-title">Security Check</div>
 </div>
 </div>
 </div>
@@ -723,6 +708,10 @@ font-size: 0.95rem;
 <i class="tab-icon fas fa-inbox"></i>
 <span>Inbox</span>
 </a>
+<a href="#" class="tab-item" data-view="admin">
+<i class="tab-icon fas fa-user-shield"></i>
+<span>Admin</span>
+</a>
 <a href="#" class="tab-item" data-view="facebook-tools">
 <i class="tab-icon fab fa-facebook"></i>
 <span>Tools</span>
@@ -744,8 +733,7 @@ font-size: 0.95rem;
 </div>
 </div>
 <!-- Admin Action Modal -->
-<div class="modal-overlay" id="adminActionModal">
-<div class="modal">
+<div class="modal-overlay" id="adminActionModal"><div class="modal">
 <div class="modal-header">
 <h3 class="modal-title" id="adminActionTitle">Approve Application</h3>
 <button class="close-modal" id="closeAdminActionModal">&times;</button>
@@ -756,21 +744,6 @@ font-size: 0.95rem;
 <div class="modal-footer">
 <button class="btn btn-error" id="cancelAdminAction">Cancel</button>
 <button class="btn" id="confirmAdminAction">Confirm</button>
-</div>
-</div>
-</div>
-<!-- Search Result Modal -->
-<div class="modal-overlay" id="searchResultModal">
-<div class="modal">
-<div class="modal-header">
-<h3 class="modal-title">Search Result</h3>
-<button class="close-modal" onclick="document.getElementById('searchResultModal').classList.remove('active')">&times;</button>
-</div>
-<div class="modal-body" id="searchResultBody">
-<!-- Result will be shown here -->
-</div>
-<div class="modal-footer">
-<button class="btn" onclick="document.getElementById('searchResultModal').classList.remove('active')">Close</button>
 </div>
 </div>
 </div>
@@ -789,7 +762,6 @@ const adminActionTitle = document.getElementById('adminActionTitle');
 const adminActionMessage = document.getElementById('adminActionMessage');
 const cancelAdminAction = document.getElementById('cancelAdminAction');
 const confirmAdminAction = document.getElementById('confirmAdminAction');
-const searchResultModal = document.getElementById('searchResultModal');
 
 // State
 let currentView = 'dashboard';
@@ -810,8 +782,7 @@ const issueTypes = {
             {
                 name: 'idType',
                 label: 'Upload Your ID (select)',
-                type: 'select',
-                required: true,
+                type: 'select',                required: true,
                 options: ['NID', 'Passport', 'Birth Certificate', 'Utility Bill']
             },
             { name: 'idImage', label: 'Upload ID Image (required)', type: 'file', required: true },
@@ -860,8 +831,7 @@ const issueTypes = {
             { name: 'oldMobile', label: 'Old Mobile Number', type: 'tel', required: true },
             { name: 'newMobile', label: 'New Mobile Number', type: 'tel', required: true },
             { name: 'dateOfBirth', label: 'Date of Birth', type: 'date', required: true },
-            { name: 'idImage', label: 'Upload ID Image (required)', type: 'file', required: true }
-        ]
+            { name: 'idImage', label: 'Upload ID Image (required)', type: 'file', required: true }        ]
     },
     'gmail-access': {
         label: 'Account Access With Gmail',
@@ -910,8 +880,7 @@ function setupEventListeners() {
             const view = this.getAttribute('data-view');
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             if (view === 'admin' && isAdminLoggedIn) {
-                document.getElementById('adminPanel').classList.add('active');
-            } else if (view === 'facebook-tools') {
+                document.getElementById('adminPanel').classList.add('active');            } else if (view === 'facebook-tools') {
                 document.getElementById('facebookToolsView').classList.add('active');
             } else {
                 document.getElementById(view + 'View').classList.add('active');
@@ -933,7 +902,7 @@ function setupEventListeners() {
     document.getElementById('adminLogin').addEventListener('click', handleAdminLogin);
     document.getElementById('issueType').addEventListener('change', renderDynamicForm);
     document.getElementById('submitApplication').addEventListener('click', submitApplication);
-    document.getElementById('searchByIdBtn').addEventListener('click', searchApplicationById);
+    document.getElementById('adminSearch').addEventListener('input', filterAdminApplications);
     confirmAdminAction.addEventListener('click', performAdminAction);
 }
 
@@ -960,8 +929,7 @@ function renderDynamicForm() {
     const issueType = document.getElementById('issueType').value;
     const formContainer = document.getElementById('dynamicFormFields');
     const submitBtn = document.getElementById('submitApplication');
-    if (!issueType) {
-        formContainer.innerHTML = '';
+    if (!issueType) {        formContainer.innerHTML = '';
         submitBtn.disabled = true;
         return;
     }
@@ -1010,8 +978,7 @@ function addFileUploadHandlers() {
     });
 }
 function addCharacterCounterHandlers() {
-    document.querySelectorAll('#dynamicFormFields textarea').forEach(textarea => {
-        const maxLength = parseInt(textarea.getAttribute('maxlength')) || 500;
+    document.querySelectorAll('#dynamicFormFields textarea').forEach(textarea => {        const maxLength = parseInt(textarea.getAttribute('maxlength')) || 500;
         const counterId = `${textarea.id}-counter`;
         const counterElement = document.getElementById(counterId);
         if (counterElement) {
@@ -1060,8 +1027,7 @@ function validateField(e) {
 function submitApplication() {
     const issueType = document.getElementById('issueType').value;
     if (!issueType) return;
-    const config = issueTypes[issueType];
-    const formData = {};
+    const config = issueTypes[issueType];    const formData = {};
     let isValid = true;
 
     config.fields.forEach(field => {
@@ -1110,8 +1076,7 @@ function submitApplication() {
     document.getElementById('dynamicFormFields').innerHTML = '';
     document.getElementById('submitApplication').disabled = true;
 
-    updateStats();
-    renderDashboard();
+    updateStats();    renderDashboard();
     renderHistory();
     renderInbox();
     switchToView('history');
@@ -1160,8 +1125,7 @@ function renderInbox() {
     const apps = getApplications();
     const messages = [];
     apps.forEach(app => {
-        if (app.status === 'approved') {
-            messages.push({ subject: `✅ Approved!`, preview: `Your request has been approved.`, time: app.createdAt, appId: app.id });
+        if (app.status === 'approved') {            messages.push({ subject: `✅ Approved!`, preview: `Your request has been approved.`, time: app.createdAt, appId: app.id });
         } else if (app.status === 'rejected') {
             messages.push({ subject: `❌ Rejected`, preview: `Your request was rejected.`, time: app.createdAt, appId: app.id });
         } else {
@@ -1202,43 +1166,56 @@ function renderAdminApplications() {
     }
     let html = '';
     apps.forEach(app => {
-        html += `<div class="application-item"><div class="application-header"><div class="application-id">${app.id}</div><span class="status-badge status-${app.status}">${app.status.charAt(0).toUpperCase() + app.status.slice(1)}</span></div><div class="application-type">${app.issueLabel}</div><div class="timeline-date">${formatDate(app.createdAt)}</div><div style="margin-top: 12px; display: flex; gap: 8px;"><button class="btn btn-success" onclick="updateStatus('${app.id}', 'approved')">Approve</button><button class="btn btn-error" onclick="updateStatus('${app.id}', 'rejected')">Reject</button><button class="btn" onclick="showApplicationDetails('${app.id}', true)">View</button></div></div>`;
+        html += `<div class="application-item"><div class="application-header"><div class="application-id">${app.id}</div><span class="status-badge status-${app.status}">${app.status.charAt(0).toUpperCase() + app.status.slice(1)}</span></div><div class="application-type">${app.issueLabel}</div><div class="timeline-date">${formatDate(app.createdAt)}</div><div style="margin-top: 12px; display: flex; gap: 8px;"><button class="btn btn-success" onclick="openAdminActionModal('${app.id}', 'approve')">Approve</button><button class="btn btn-error" onclick="openAdminActionModal('${app.id}', 'reject')">Reject</button><button class="btn" onclick="showApplicationDetails('${app.id}', true)">View</button></div></div>`;
     });
     document.getElementById('adminApplicationsList').innerHTML = html;
 }
-function updateStatus(id, status) {
-    const apps = getApplications();
-    const app = apps.find(a => a.id === id);
-    if (app) {
-        app.status = status;
-        app.timeline.push({ status, timestamp: new Date().toISOString(), note: `Application ${status} by admin` });
-        localStorage.setItem('applications', JSON.stringify(apps));
-        renderAdminApplications();
-        updateStats();
-        renderDashboard();
-        alert(`Application ${status} successfully!`);
-    }
-}
-function searchApplicationById() {
-    const id = document.getElementById('adminSearchById').value.trim();
-    if (!id) { alert('Please enter an Application ID'); return; }
-    const apps = getApplications();
-    const app = apps.find(a => a.id === id);
-    if (!app) {
-        document.getElementById('searchResultBody').innerHTML = '<p style="color: red;">Application not found.</p>';
-    } else {
-        let html = `<div class="form-group"><strong>Application ID:</strong> ${app.id}</div><div class="form-group"><strong>Issue Type:</strong> ${app.issueLabel}</div><div class="form-group"><strong>Status:</strong> <span class="status-badge status-${app.status}">${app.status}</span></div>`;
-        const config = issueTypes[app.issueType];
-        if (config) {
-            html += '<h3 style="margin: 20px 0 10px; font-size: 1.1rem;">Details:</h3>';
-            config.fields.forEach(field => {
-                const value = app.formData[field.name] || 'Not provided';
-                html += `<div class="form-group"><strong>${field.label}:</strong> ${value}</div>`;
-            });
+function filterAdminApplications() {
+    const searchTerm = document.getElementById('adminSearch').value.toLowerCase();
+    const applicationItems = document.querySelectorAll('#adminApplicationsList .application-item');
+    applicationItems.forEach(item => {
+        const issueType = item.querySelector('.application-type').textContent.toLowerCase();        if (issueType.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
         }
-        document.getElementById('searchResultBody').innerHTML = html;
+    });
+}
+function openAdminActionModal(appId, action) {
+    selectedApplicationId = appId;
+    currentAdminAction = action;
+    if (action === 'approve') {
+        adminActionTitle.textContent = 'Approve Application';
+        adminActionMessage.textContent = 'Are you sure you want to approve this application?';
+        confirmAdminAction.className = 'btn btn-success';
+    } else {
+        adminActionTitle.textContent = 'Reject Application';
+        adminActionMessage.textContent = 'Are you sure you want to reject this application?';
+        confirmAdminAction.className = 'btn btn-error';
     }
-    searchResultModal.classList.add('active');
+    adminActionModal.classList.add('active');
+}
+function performAdminAction() {
+    if (!selectedApplicationId || !currentAdminAction) return;
+    const apps = getApplications();
+    const appIndex = apps.findIndex(app => app.id === selectedApplicationId);
+    if (appIndex === -1) return;
+
+    apps[appIndex].status = currentAdminAction;
+    apps[appIndex].timeline.push({
+        status: currentAdminAction,
+        timestamp: new Date().toISOString(),
+        note: `Application ${currentAdminAction} by admin`
+    });
+    localStorage.setItem('applications', JSON.stringify(apps));
+
+    adminActionModal.classList.remove('active');
+    updateStats();
+    renderDashboard();
+    renderHistory();
+    renderInbox();
+    renderAdminApplications();
+    alert(`Application ${currentAdminAction} successfully!`);
 }
 
 // Show application details
@@ -1246,8 +1223,7 @@ function showApplicationDetails(appId, isAdmin = false) {
     const apps = getApplications();
     const app = apps.find(a => a.id === appId);
     if (!app) return;
-    let html = `<div class="form-group"><strong>Application ID:</strong> ${app.id}</div><div class="form-group"><strong>Issue Type:</strong> ${app.issueLabel}</div><div class="form-group"><strong>Status:</strong> <span class="status-badge status-${app.status}">${app.status.charAt(0).toUpperCase() + app.status.slice(1)}</span></div><div class="form-group"><strong>Submitted:</strong> ${formatDate(app.createdAt)}</div>`;
-    const config = issueTypes[app.issueType];
+    let html = `<div class="form-group"><strong>Application ID:</strong> ${app.id}</div><div class="form-group"><strong>Issue Type:</strong> ${app.issueLabel}</div><div class="form-group"><strong>Status:</strong> <span class="status-badge status-${app.status}">${app.status.charAt(0).toUpperCase() + app.status.slice(1)}</span></div><div class="form-group"><strong>Submitted:</strong> ${formatDate(app.createdAt)}</div>`;    const config = issueTypes[app.issueType];
     if (config) {
         html += '<h3 style="margin: 20px 0 10px; font-size: 1.1rem;">Application Details:</h3>';
         config.fields.forEach(field => {
@@ -1280,7 +1256,7 @@ function getApplications() {
 function saveApplication(application) {
     const apps = getApplications();
     apps.push(application);
-    localStorage.setItem('applications', JSON.stringify(apps));
+    localStorage.setItem('applications', JSON.stringify(apps)); // ✅ Saves as JSON in localStorage
 }
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -1296,16 +1272,14 @@ function loadData() {
     applySavedTheme();
     if (!localStorage.getItem('applications')) {
         localStorage.setItem('applications', JSON.stringify([]));
-    }
-}
+    }}
 
 // Initialize
 document.addEventListener('DOMContentLoaded', initApp);
 
 // Expose global functions
 window.showApplicationDetails = showApplicationDetails;
-window.updateStatus = updateStatus;
+window.openAdminActionModal = openAdminActionModal;
 </script>
 </body>
 </html>
-
