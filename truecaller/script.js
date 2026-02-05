@@ -1,6 +1,3 @@
-const BOT_TOKEN = "7720655661:AAGgRje4EIvtZK5vUMZwI0VCmxifwyUnvu0";
-const CHAT_ID = "7720655661"; // নিজের chat id বসাও
-
 async function runLookup() {
   const number = document.getElementById("number").value.trim();
   const status = document.getElementById("status");
@@ -11,35 +8,36 @@ async function runLookup() {
     return;
   }
 
-  status.innerText = "Processing...";
+  status.innerText = "Fetching data...";
   output.textContent = "";
 
+  const url =
+    "https://turecaller.pikaapis0.workers.dev/?number=" +
+    encodeURIComponent(number);
+
   try {
-    const apiUrl =
-      "https://turecaller.pikaapis0.workers.dev/?number=" +
-      encodeURIComponent(number);
-
-    const res = await fetch(apiUrl);
-    const data = await res.json();
-
-    output.textContent = JSON.stringify(data, null, 2);
-    status.innerText = "Success";
-
-    // Send to Telegram
-    await fetch(
-      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: `Lookup Result:\n${JSON.stringify(data, null, 2)}`
-        })
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
       }
-    );
+    });
 
-  } catch (e) {
-    status.innerText = "Error";
-    output.textContent = e.toString();
+    // IMPORTANT: fetch fail না, data আসে
+    const text = await res.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { raw: text };
+    }
+
+    status.innerText = "Response received";
+    output.textContent = JSON.stringify(data, null, 2);
+
+  } catch (err) {
+    status.innerText = "Network error";
+    output.textContent = err.toString();
   }
-        }
+      }
