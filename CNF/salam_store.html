@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salam Store | Premium Shopping</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --primary:#c9a227; --primary-dark:#a6841e; --secondary:#1a1a2e;
+            --accent:#16213e; --light:#f8f9fa; --white:#ffffff; --text:#2d2d2d;
+            --shadow:0 10px 40px rgba(0,0,0,0.12); --shadow-hover:0 20px 60px rgba(0,0,0,0.2);
+            --radius:16px; --transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Poppins',system-ui,sans-serif;background:var(--light);color:var(--text);line-height:1.6}
+        
+        /* Header */
+        header{background:linear-gradient(135deg,var(--secondary),var(--accent));color:var(--white);padding:0.8rem 2rem;position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow)}
+        .logo-area{display:flex;align-items:center;gap:1rem}
+        .logo{height:50px;width:auto;object-fit:contain;border-radius:8px;background:var(--white);padding:4px}
+        .brand h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.5px}
+        .brand p{font-size:0.75rem;opacity:0.85}
+        .header-actions{display:flex;align-items:center;gap:1rem}
+        .search-box{position:relative}
+        .search-box input{padding:0.6rem 1rem 0.6rem 2.5rem;border-radius:25px;border:none;outline:none;width:200px;font-size:0.9rem;transition:var(--transition)}
+        .search-box input:focus{width:240px;box-shadow:0 0 0 3px rgba(201,162,39,0.3)}
+        .search-box::before{content:"🔍";position:absolute;left:1rem;top:50%;transform:translateY(-50%);opacity:0.6}
+        .cart-btn{background:var(--primary);color:var(--secondary);border:none;padding:0.6rem 1.2rem;border-radius:25px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:0.4rem;transition:var(--transition)}
+        .cart-btn:hover{background:var(--primary-dark);transform:translateY(-2px)}
+        .cart-count{background:var(--secondary);color:var(--white);padding:0.15rem 0.5rem;border-radius:50%;font-size:0.75rem}
+        
+        /* Hero */
+        .hero{background:linear-gradient(135deg,rgba(26,26,46,0.95),rgba(22,33,62,0.95)),url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80');background-size:cover;background-position:center;padding:5rem 2rem;text-align:center;color:var(--white);position:relative;overflow:hidden}
+        .hero::after{content:"";position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(to top,var(--light),transparent)}
+        .hero h1{font-size:2.8rem;font-weight:700;margin-bottom:0.8rem;animation:fadeInUp 0.6s ease}
+        .hero p{font-size:1.2rem;opacity:0.95;margin-bottom:1.5rem;max-width:600px;margin-left:auto;margin-right:auto}
+        .location-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(201,162,39,0.2);padding:0.5rem 1.2rem;border-radius:30px;border:1px solid var(--primary);font-size:0.9rem}
+        
+        /* Categories */
+        .categories{display:flex;justify-content:center;gap:0.8rem;padding:1.5rem 2rem;flex-wrap:wrap;background:var(--white);border-bottom:1px solid #eee}
+        .cat-btn{padding:0.6rem 1.4rem;border:2px solid var(--accent);background:transparent;border-radius:30px;cursor:pointer;font-weight:500;transition:var(--transition);color:var(--accent)}
+        .cat-btn:hover,.cat-btn.active{background:var(--accent);color:var(--white);transform:translateY(-2px);box-shadow:var(--shadow)}
+        
+        /* Products Grid */
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2rem;padding:2rem;max-width:1400px;margin:auto}
+        .card{background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:var(--transition);position:relative}
+        .card:hover{transform:translateY(-8px);box-shadow:var(--shadow-hover)}
+        .badge{position:absolute;top:1rem;left:1rem;background:var(--primary);color:var(--secondary);padding:0.3rem 0.8rem;border-radius:20px;font-size:0.75rem;font-weight:600}
+        .wishlist{position:absolute;top:1rem;right:1rem;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:var(--transition);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+        .wishlist:hover{background:var(--primary);color:var(--white)}
+        .card img{width:100%;height:240px;object-fit:cover;transition:var(--transition)}
+        .card:hover img{transform:scale(1.05)}
+        .info{padding:1.2rem}
+        .info h3{font-size:1.1rem;font-weight:600;margin-bottom:0.3rem}
+        .rating{color:#f5c518;font-size:0.9rem;margin-bottom:0.4rem}
+        .price{display:flex;align-items:center;gap:0.5rem}
+        .price .current{color:var(--primary);font-weight:700;font-size:1.25rem}
+        .price .old{color:#999;text-decoration:line-through;font-size:0.95rem}
+        .add{width:100%;padding:0.8rem;margin-top:1rem;background:linear-gradient(135deg,var(--secondary),var(--accent));color:var(--white);border:none;border-radius:10px;cursor:pointer;font-weight:500;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:0.4rem}
+        .add:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(26,26,46,0.3)}
+        
+        /* Cart Sidebar */
+        #cart{display:none;position:fixed;top:0;right:0;width:380px;height:100%;background:var(--white);box-shadow:-10px 0 40px rgba(0,0,0,0.15);padding:1.5rem;overflow-y:auto;z-index:2000;animation:slideIn 0.3s ease}
+        .cart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #eee}
+        .close{background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text);transition:var(--transition)}
+        .close:hover{color:var(--primary);transform:rotate(90deg)}
+        .cart-item{display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid #f0f0f0}
+        .cart-item img{width:70px;height:70px;border-radius:10px;object-fit:cover}
+        .cart-info{flex:1}
+        .cart-info h4{font-size:0.95rem;font-weight:500}
+        .cart-info .price{font-size:1rem}
+        .remove{color:#e63946;background:none;border:none;cursor:pointer;font-size:0.85rem;margin-top:0.3rem}
+        .total{font-weight:700;font-size:1.3rem;text-align:right;margin:1.5rem 0;padding-top:1rem;border-top:2px solid #eee}
+        .checkout{width:100%;padding:1rem;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:var(--secondary);border:none;border-radius:12px;cursor:pointer;font-weight:600;font-size:1.05rem;transition:var(--transition)}
+        .checkout:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(201,162,39,0.4)}
+        
+        /* Footer */
+        footer{background:linear-gradient(135deg,var(--secondary),var(--accent));color:var(--white);padding:3rem 2rem 1.5rem;margin-top:3rem}
+        .footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;max-width:1200px;margin:auto}
+        .footer-section h4{margin-bottom:1rem;font-size:1.1rem;color:var(--primary)}
+        .footer-section p,.footer-section a{color:rgba(255,255,255,0.85);text-decoration:none;display:block;margin:0.4rem 0;font-size:0.95rem;transition:var(--transition)}
+        .footer-section a:hover{color:var(--primary);transform:translateX(4px)}
+        .copyright{text-align:center;padding-top:2rem;margin-top:2rem;border-top:1px solid rgba(255,255,255,0.1);font-size:0.9rem;opacity:0.8}
+        
+        /* Animations */
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+        
+        /* Responsive */
+        @media(max-width:768px){
+            header{padding:0.8rem 1rem;flex-wrap:wrap;gap:0.8rem}
+            .search-box input{width:150px}
+            .search-box input:focus{width:180px}
+            .hero{padding:3rem 1rem}
+            .hero h1{font-size:2rem}
+            .grid{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));padding:1rem}
+            #cart{width:100%;max-width:400px}
+        }
+        
+        /* Toast */
+        .toast{position:fixed;bottom:2rem;right:2rem;background:var(--secondary);color:var(--white);padding:1rem 1.5rem;border-radius:12px;box-shadow:var(--shadow);z-index:3000;animation:fadeInUp 0.3s ease;display:none}
+        .toast.show{display:block}
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo-area">
+            <img src="https://darkbd404.github.io/logo/file_000000007ec0720bb5590ee7714cf272.png" alt="Salam Store Logo" class="logo">
+            <div class="brand">
+                <h1>Salam Store</h1>
+                <p>Premium Fashion & Footwear</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="search-box"><input type="text" placeholder="Search products..." oninput="search(this.value)"></div>
+            <button class="cart-btn" onclick="toggleCart()">🛒 Cart <span class="cart-count" id="count">0</span></button>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>✨ Premium Collection</h1>
+        <p>Discover elegant girls' clothing & stylish footwear curated for quality and comfort</p>
+        <div class="location-badge">📍 Amratali Bazar, Barura, Cumilla</div>
+    </section>
+
+    <!-- Categories -->
+    <div class="categories">
+        <button class="cat-btn active" onclick="filter('all')">All Products</button>
+        <button class="cat-btn" onclick="filter('Shoes')">👟 Shoes</button>
+        <button class="cat-btn" onclick="filter('Clothes')">👗 Girls Clothes</button>
+        <button class="cat-btn" onclick="filter('New')">🆕 New Arrivals</button>
+    </div>
+
+    <!-- Products -->
+    <main class="grid" id="products"></main>
+
+    <!-- Cart -->
+    <div id="cart">
+        <div class="cart-header">
+            <h2>🛍️ Your Cart</h2>
+            <button class="close" onclick="toggleCart()">✕</button>
+        </div>
+        <div id="cart-list"></div>
+        <div class="total">Total: ৳<span id="total">0</span></div>
+        <button class="checkout" onclick="checkout()">✅ Proceed to Checkout</button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">✓ Added to cart!</div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Salam Store</h4>
+                <p>Your trusted destination for premium girls' fashion in Cumilla.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <a href="#">Home</a>
+                <a href="#">Shop</a>
+                <a href="#">New Arrivals</a>
+                <a href="#">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>📍 Amratali Bazar, Barura, Cumilla</p>
+                <p>📞 +880 XXXX-XXXXXX</p>
+                <p>✉️ info@salamstore.com</p>
+            </div>
+            <div class="footer-section">
+                <h4>Hours</h4>
+                <p>Sat-Thu: 10AM - 10PM</p>
+                <p>Friday: 2PM - 11PM</p>
+            </div>
+        </div>
+        <div class="copyright">© 2026 Salam Store. All rights reserved.</div>
+    </footer>
+
+    <script>
+        const products = [
+            {id:1,name:"Premium Kids Sneakers",price:1299,old:1599,cat:"Shoes",rating:5,img:"https://images.unsplash.com/photo-1519419899612-601c1d7a8a98?auto=format&fit=crop&w=400&q=80",badge:"Best Seller"},
+            {id:2,name:"Elegant Summer Frock",price:899,cat:"Clothes",rating:4.5,img:"https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&w=400&q=80",badge:"New"},
+            {id:3,name:"Party Heels Gold",price:1499,old:1899,cat:"Shoes",rating:5,img:"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=400&q=80"},
+            {id:4,name:"Cotton Top Set Pink",price:699,cat:"Clothes",rating:4,img:"https://images.unsplash.com/photo-1564557287815-3690b8f1b63f?auto=format&fit=crop&w=400&q=80"},
+            {id:5,name:"School Loafers Black",price:1199,cat:"Shoes",rating:4.5,img:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=400&q=80",badge:"Popular"},
+            {id:6,name:"Traditional Salwar Kameez",price:1399,old:1699,cat:"Clothes",rating:5,img:"https://images.unsplash.com/photo-1602102910675-0d1b0a9f1d0f?auto=format&fit=crop&w=400&q=80"},
+            {id:7,name:"Casual Canvas Shoes",price:899,cat:"Shoes",rating:4,img:"https://images.unsplash.com/photo-1525966222134-fcfa99d8ae77?auto=format&fit=crop&w=400&q=80"},
+            {id:8,name:"Denim Jacket Kids",price:1099,cat:"Clothes",rating:4.5,img:"https://images.unsplash.com/photo-1519239800498-889f6a5a6308?auto=format&fit=crop&w=400&q=80",badge:"New"}
+        ];
+
+        let cart = [];
+
+        function render(list=products){
+            document.getElementById('products').innerHTML = list.map(p=>`
+                <div class="card">
+                    ${p.badge?`<span class="badge">${p.badge}</span>`:''}
+                    <button class="wishlist" onclick="wishlist(this)">♡</button>
+                    <img src="${p.img}" alt="${p.name}" loading="lazy">
+                    <div class="info">
+                        <h3>${p.name}</h3>
+                        <div class="rating">${'★'.repeat(Math.floor(p.rating))}${p.rating%1?'½':''} <span style="color:#999;font-size:0.85rem">(${p.rating})</span></div>
+                        <div class="price">
+                            <span class="current">৳${p.price}</span>
+                            ${p.old?`<span class="old">৳${p.old}</span>`:''}
+                        </div>
+                        <button class="add" onclick="add(${p.id})">🛒 Add to Cart</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filter(c){
+            document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+            event.target.classList.add('active');
+            if(c==='all') render();
+            else if(c==='New') render(products.filter(p=>p.badge==='New'));
+            else render(products.filter(p=>p.cat===c));
+        }
+
+        function search(q){
+            q=q.toLowerCase();
+            render(products.filter(p=>p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)));
+        }
+
+        function add(id){
+            const item = products.find(p=>p.id===id);
+            cart.push(item);
+            updateCart();
+            showToast(`✓ ${item.name} added!`);
+        }
+
+        function remove(i){
+            cart.splice(i,1);
+            updateCart();
+        }
+
+        function updateCart(){
+            document.getElementById('count').textContent = cart.length;
+            document.getElementById('cart-list').innerHTML = cart.length?cart.map((item,i)=>`
+                <div class="cart-item">
+                    <img src="${item.img}" alt="${item.name}">
+                    <div class="cart-info">
+                        <h4>${item.name}</h4>
+                        <div class="price">৳${item.price}</div>
+                        <button class="remove" onclick="remove(${i})">Remove</button>
+                    </div>
+                </div>
+            `).join(''):'<p style="text-align:center;color:#999;padding:2rem">Your cart is empty</p>';
+            document.getElementById('total').textContent = cart.reduce((s,p)=>s+p.price,0);
+        }
+
+        function toggleCart(){
+            const c=document.getElementById('cart');
+            c.style.display = c.style.display==='block'?'none':'block';
+        }
+
+        function wishlist(btn){
+            btn.textContent = btn.textContent==='♡'?'♥':'♡';
+            btn.style.color = btn.textContent==='♥'?'#e63946':'';
+            showToast(btn.textContent==='♥'?'Added to wishlist':'Removed from wishlist');
+        }
+
+        function showToast(msg){
+            const t=document.getElementById('toast');
+            t.textContent=msg;
+            t.classList.add('show');
+            setTimeout(()=>t.classList.remove('show'),2500);
+        }
+
+        function checkout(){
+            if(!cart.length){showToast('Cart is empty!');return;}
+            showToast('🎉 Order confirmed! We will contact you shortly.');
+            cart=[];updateCart();toggleCart();
+        }
+
+        // Close cart when clicking outside
+        document.addEventListener('click',e=>{
+            const cart=document.getElementById('cart');
+            const btn=document.querySelector('.cart-btn');
+            if(cart.style.display==='block' && !cart.contains(e.target) && !btn.contains(e.target)){
+                cart.style.display='none';
+            }
+        });
+
+        render();
+    </script>
+</body>
+</html>
+
+  
