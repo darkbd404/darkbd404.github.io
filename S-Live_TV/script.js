@@ -1,7 +1,7 @@
 /* VARIABLES */
 
 // const playlistOnline = "channels.m3u";
-const playlistOnline = "https://raw.githubusercontent.com/Shariar-Ahamed/online-tv-streaming-platform/main/channels.m3u";
+const playlistOnline = "https://raw.githubusercontent.com/darkbd404/darkbd404.github.io/refs/heads/main/S-Live_TV/channels.m3u";
 const playlistLocal = "channels.m3u";
 
 let channels = [];
@@ -164,7 +164,8 @@ function setupPlayerSync() {
 function setupVolumeControl() {
   const video = document.getElementById("video");
   if (!video) return;
-  const isMutedSaved = localStorage.getItem("alpha_tv_muted") === "true";
+  const isMutedSaved = localStorage.getItem("S-Live_TV
+                                          _muted") === "true";
   video.muted = isMutedSaved;
   updateVolumeButtonState(isMutedSaved);
 
@@ -536,7 +537,7 @@ function toggleFavorite(event, url) {
     favorites.splice(index, 1);
   }
   
-  localStorage.setItem("alpha_tv_favorites", JSON.stringify(favorites));
+  localStorage.setItem("S-Live_TV_favorites", JSON.stringify(favorites));
   updateFavoritesCount();
   filterAndSearch();
 }
@@ -1144,8 +1145,8 @@ function showTermsModal(type, event) {
   
   const title = type === "privacy" ? "Privacy Policy" : "Terms of Service";
   const text = type === "privacy" 
-    ? "At Alpha TV, we value your privacy. We do not collect or store any personal data. All streams are sourced from third-party public playlists and played locally in your browser or application. Your preferences are saved only on your local device."
-    : "Welcome to Alpha TV! Our services are provided free of charge for streaming live channels. We do not host any of the video content; all streams are sourced from publicly available public playlists. By using this app, you agree to comply with your local copyright and streaming laws.";
+    ? "At S-Live_TV, we value your privacy. We do not collect or store any personal data. All streams are sourced from third-party public playlists and played locally in your browser or application. Your preferences are saved only on your local device."
+    : "Welcome to S-Live_TV! Our services are provided free of charge for streaming live channels. We do not host any of the video content; all streams are sourced from publicly available public playlists. By using this app, you agree to comply with your local copyright and streaming laws.";
   
   const modal = document.getElementById("infoModal");
   const modalTitle = document.getElementById("modalTitle");
@@ -1230,7 +1231,7 @@ let latestApkUrl = "https://github.com/Shariar-Ahamed/online-tv-streaming-platfo
 function setupMobileAppBanner() {
   if (window.Capacitor) return;
 
-  fetch("https://api.github.com/repos/Shariar-Ahamed/online-tv-streaming-platform/releases/latest")
+  fetch("https://api.github.com/repos/darkbd404/S-Live_TV/releases/latest")
     .then(response => {
       if (!response.ok) throw new Error("GitHub API error");
       return response.json();
@@ -1277,7 +1278,7 @@ const currentBuildCode = 14; // Matches version 1.1.3 build code
 function checkForUpdates() {
   if (!window.Capacitor) return;
 
-  const configUrl = "https://raw.githubusercontent.com/Shariar-Ahamed/online-tv-streaming-platform/main/app-update.json";
+  const configUrl = "https://github.com/darkbd404/darkbd404.github.io/tree/S-Live_TV";
 
   fetch(configUrl)
     .then(response => {
@@ -1291,7 +1292,7 @@ function checkForUpdates() {
 
         // Check if the user clicked "Later" for this exact build code in the last 36 hours
         const laterTime = localStorage.getItem("alpha_tv_update_later_time");
-        const laterBuild = localStorage.getItem("alpha_tv_update_later_build");
+        const laterBuild = localStorage.getItem("S-Live_TV_update_later_build");
         
         if (laterBuild && parseInt(laterBuild) === data.buildCode && laterTime) {
           const timeDiff = Date.now() - parseInt(laterTime);
