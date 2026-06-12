@@ -1,8 +1,8 @@
 /* VARIABLES */
 
-// const playlistOnline = "channels.m3u";
-const playlistOnline = "https://raw.githubusercontent.com/Shariar-Ahamed/online-tv-streaming-platform/main/channels.m3u";
-const playlistLocal = "channels.m3u";
+// const playlistOnline = "S-Live_TV/channels.m3u";
+const playlistOnline = "https://raw.githubusercontent.com/darkbd404/darkbd404.github.io/refs/heads/main/S-Live_TV/channels.m3u";
+const playlistLocal = "S-Live_TV/channels.m3u";
 
 let channels = [];
 let filteredChannels = [];
