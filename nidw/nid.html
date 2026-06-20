@@ -81,15 +81,10 @@
         .btn-search:hover { background: #00523d; }
         .btn-search:disabled { background: #ccc; cursor: not-allowed; }
 
-        /* Loading */
-        .loader {
-            text-align: center;
-            padding: 20px;
-            display: none;
-        }
+        /* Loading & Status */
+        .loader { text-align: center; padding: 20px; display: none; }
         .spinner {
-            width: 30px;
-            height: 30px;
+            width: 30px; height: 30px;
             border: 3px solid #f3f3f3;
             border-top: 3px solid #006a4e;
             border-radius: 50%;
@@ -133,18 +128,15 @@
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 15px;
         }
-        .info-item {
-            border-bottom: 1px dashed #eee;
-            padding-bottom: 8px;
-        }
+        .info-item { border-bottom: 1px dashed #eee; padding-bottom: 8px; }
         .info-label { font-size: 12px; color: #888; margin-bottom: 2px; }
         .info-value { font-size: 15px; color: #333; font-weight: 500; }
 
-        .no-data {
+        .no-data { text-align: center; padding: 40px; color: #777; display: none; }
+        .error-msg { 
+            background: #fff5f5; color: #c53030; padding: 15px; 
+            border-radius: 8px; border: 1px solid #feb2b2; display: none; 
             text-align: center;
-            padding: 40px;
-            color: #777;
-            display: none;
         }
     </style>
 </head>
@@ -153,11 +145,14 @@
 <div class="container">
     <!-- Header -->
     <div class="header">
-        <img src="https://darkbd404.github.io/nidw/logo-ec.png" alt="Logo" class="logo">
+        <img src="./logo-ec.png" alt="Logo" class="logo">
         <h1>বাংলাদেশ নির্বাচন কমিশন</h1>
         <h2>ভোটার তালিকা - (পুরুষ)</h2>
         <p>ছবি ছাড়া চূড়ান্ত ভোটার তালিকা</p>
     </div>
+
+    <!-- Error Message Area -->
+    <div id="errorMsg" class="error-msg"></div>
 
     <!-- Search Form -->
     <div class="search-box">
@@ -187,7 +182,7 @@
                 <input type="text" id="sUpazila" placeholder="উপজেলা">
             </div>
         </div>
-        <button class="btn-search" id="searchBtn" onclick="performSearch()">অনুসন্ধান করুন</button>
+        <button class="btn-search" id="searchBtn" onclick="performSearch()" disabled>অনুসন্ধান করুন</button>
     </div>
 
     <!-- Loader -->
@@ -203,29 +198,45 @@
 
 <script>
     let dbData = null;
-    // শুধু ফাইলের নাম, কোনো URL নয়
-    const DB_FILE = 'falkamuri_male.json';
+    // './' মানে বর্তমান ফোল্ডার। এটি GitHub Pages এর জন্য সবচেয়ে ভালো কাজ করে।
+    const DB_FILE = './falkamuri_male.json';
 
-    // Initialize
     window.onload = async function() {
-        document.getElementById('loader').style.display = 'block';
-        document.getElementById('searchBtn').disabled = true;
+        const loader = document.getElementById('loader');
+        const btn = document.getElementById('searchBtn');
+        const errorDiv = document.getElementById('errorMsg');
+        
+        loader.style.display = 'block';
         
         try {
-            // ব্রাউজার একই ফোল্ডার থেকে ফাইলটি খুঁজে বের করবে
-            const response = await fetch(DB_FILE);
+            // Date.now() যোগ করা হয়েছে যাতে ব্রাউজার পুরানো ক্যাশ থেকে না নেয়
+            const response = await fetch(DB_FILE + '?t=' + Date.now());
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`ফাইল পাওয়া যায়নি (Status: ${response.status})`);
             }
             
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") === -1) {
+                 // কিছু ক্ষেত্রে GitHub সঠিক হেডার দেয় না, তাই এটি সতর্কবার্তা মাত্র
+                 console.warn("Content-Type might be wrong, but trying to parse anyway.");
+            }
+
             dbData = await response.json();
             
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('searchBtn').disabled = false;
-            console.log("Database Loaded Successfully from local file");
+            // ডাটা লোড হলে বাটন চালু করুন
+            loader.style.display = 'none';
+            btn.disabled = false;
+            console.log("Database Loaded Successfully");
+            
         } catch (error) {
-            document.getElementById('loader').innerHTML = `<p style="color:red">ডাটাবেস ফাইল পাওয়া যায়নি। নিশ্চিত করুন 'falkamuri_male.json' ফাইলটি HTML ফাইলের সাথে একই ফোল্ডারে আছে।</p>`;
+            loader.style.display = 'none';
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = `
+                <strong>দুঃখিত, ডাটাবেস লোড ব্যর্থ হয়েছে!</strong><br>
+                ${error.message}<br>
+                <small>নিশ্চিত করুন 'falkamuri_male.json' ফাইলটি nid.html এর ঠিক পাশেই আছে এবং নামটি হুবহু এক (ছোট/বড় হাতের অক্ষর িক আছে কিনা দেখুন)।</small>
+            `;
             console.error("Load Error:", error);
         }
     };
@@ -240,7 +251,6 @@
         const sDistrict = document.getElementById('sDistrict').value.toLowerCase().trim();
         const sUpazila = document.getElementById('sUpazila').value.toLowerCase().trim();
 
-        // Filter Logic
         const results = dbData.voters.filter(v => {
             const matchName = !sName || (v.name && v.name.toLowerCase().includes(sName));
             const matchVoterNo = !sVoterNo || (v.voter_no && v.voter_no.toString().includes(sVoterNo));
