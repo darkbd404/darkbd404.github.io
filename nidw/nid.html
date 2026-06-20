@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ভোটার তালিকা অনুসন্ধান</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border-top: 5px solid #006a4e; /* BD Green */
+        }
+        .logo { width: 100px; margin-bottom: 10px; }
+        .header h1 { font-size: 24px; color: #006a4e; margin-bottom: 5px; }
+        .header h2 { font-size: 18px; color: #555; font-weight: 500; }
+        .header p { font-size: 14px; color: #777; margin-top: 5px; }
+
+        /* Search Box */
+        .search-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .input-group input:focus {
+            border-color: #006a4e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 106, 78, 0.1);
+        }
+        .btn-search {
+            width: 100%;
+            padding: 12px;
+            background: #006a4e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-search:hover { background: #00523d; }
+        .btn-search:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Loading */
+        .loader {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #006a4e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Result Card */
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header h3 { font-size: 16px; color: #006a4e; }
+        .badge {
+            background: #e8f5e9;
+            color: #006a4e;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .card-body { padding: 20px; }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        .info-item {
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 8px;
+        }
+        .info-label { font-size: 12px; color: #888; margin-bottom: 2px; }
+        .info-value { font-size: 15px; color: #333; font-weight: 500; }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <img src="https://darkbd404.github.io/nidw/logo-ec.png" alt="Logo" class="logo">
+        <h1>বাংলাদেশ নির্বাচন কমিশন</h1>
+        <h2>ভোটার তালিকা - (পুরুষ)</h2>
+        <p>ছবি ছাড়া চূড়ান্ত ভোটার তালিকা</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search-box">
+        <div class="input-grid">
+            <div class="input-group">
+                <label>নাম</label>
+                <input type="text" id="sName" placeholder="ভোটারের নাম">
+            </div>
+            <div class="input-group">
+                <label>ভোটার নম্বর</label>
+                <input type="text" id="sVoterNo" placeholder="ভোটার নম্বর">
+            </div>
+            <div class="input-group">
+                <label>পিতার নাম</label>
+                <input type="text" id="sFather" placeholder="পিতার নাম">
+            </div>
+            <div class="input-group">
+                <label>মাতার নাম</label>
+                <input type="text" id="sMother" placeholder="মাতার নাম">
+            </div>
+            <div class="input-group">
+                <label>জেলা</label>
+                <input type="text" id="sDistrict" placeholder="জেলা">
+            </div>
+            <div class="input-group">
+                <label>উপজেলা/থানা</label>
+                <input type="text" id="sUpazila" placeholder="উপজেলা">
+            </div>
+        </div>
+        <button class="btn-search" id="searchBtn" onclick="performSearch()">অনুসন্ধান করুন</button>
+    </div>
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <p>ডাটা লোড হচ্ছে...</p>
+    </div>
+
+    <!-- Results Area -->
+    <div id="resultsArea"></div>
+    <div class="no-data" id="noData">কোনো তথ্য পাওয়া যায়নি</div>
+</div>
+
+<script>
+    let dbData = null;
+    const DB_URL = 'https://darkbd404.github.io/nidw/falkamuri_male.json';
+
+    // Initialize
+    window.onload = async function() {
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('searchBtn').disabled = true;
+        
+        try {
+            const response = await fetch(DB_URL);
+            if (!response.ok) throw new Error('Network response was not ok');
+            dbData = await response.json();
+            
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('searchBtn').disabled = false;
+            console.log("Database Loaded Successfully");
+        } catch (error) {
+            document.getElementById('loader').innerHTML = `<p style="color:red">ডাটাবেস লোড ব্যর্থ হয়েছে। ইন্টারনেট চেক করুন।</p>`;
+            console.error("Load Error:", error);
+        }
+    };
+
+    function performSearch() {
+        if (!dbData) return;
+
+        const sName = document.getElementById('sName').value.toLowerCase().trim();
+        const sVoterNo = document.getElementById('sVoterNo').value.toLowerCase().trim();
+        const sFather = document.getElementById('sFather').value.toLowerCase().trim();
+        const sMother = document.getElementById('sMother').value.toLowerCase().trim();
+        const sDistrict = document.getElementById('sDistrict').value.toLowerCase().trim();
+        const sUpazila = document.getElementById('sUpazila').value.toLowerCase().trim();
+
+        // Filter Logic
+        const results = dbData.voters.filter(v => {
+            const matchName = !sName || (v.name && v.name.toLowerCase().includes(sName));
+            const matchVoterNo = !sVoterNo || (v.voter_no && v.voter_no.toString().includes(sVoterNo));
+            const matchFather = !sFather || (v.father_name && v.father_name.toLowerCase().includes(sFather));
+            const matchMother = !sMother || (v.mother_name && v.mother_name.toLowerCase().includes(sMother));
+            const matchDistrict = !sDistrict || (v.district && v.district.toLowerCase().includes(sDistrict));
+            const matchUpazila = !sUpazila || (v.upazila_thana && v.upazila_thana.toLowerCase().includes(sUpazila));
+
+            return matchName && matchVoterNo && matchFather && matchMother && matchDistrict && matchUpazila;
+        });
+
+        renderResults(results);
+    }
+
+    function renderResults(data) {
+        const container = document.getElementById('resultsArea');
+        const noDataMsg = document.getElementById('noData');
+        container.innerHTML = '';
+
+        if (data.length === 0) {
+            noDataMsg.style.display = 'block';
+            return;
+        }
+        noDataMsg.style.display = 'none';
+
+        data.forEach((v, index) => {
+            const html = `
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>${v.name || 'অজানা'}</h3>
+                        <span class="badge">ভোটার নং: ${v.voter_no || 'N/A'}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item"><div class="info-label">পিতার নাম</div><div class="info-value">${v.father_name || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">মাতার নাম</div><div class="info-value">${v.mother_name || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">জন্ম তারিখ</div><div class="info-value">${v.date_of_birth || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">লিঙ্গ</div><div class="info-value">${v.gender || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">পেশা</div><div class="info-value">${v.occupation || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">ঠিকানা</div><div class="info-value">${v.address || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">জেলা</div><div class="info-value">${v.district || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">উপজেলা/থানা</div><div class="info-value">${v.upazila_thana || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">ইউনিয়ন/ওয়ার্ড</div><div class="info-value">${v.union_ward_cantonment || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">পোস্ট অফিস</div><div class="info-value">${v.post_office || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">পোস্ট কোড</div><div class="info-value">${v.post_code || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">ভোটার এলাকা</div><div class="info-value">${v.voter_area_name || '-'}</div></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+    }
+</script>
+
+</body>
+</html>
