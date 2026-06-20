@@ -9,12 +9,12 @@
         :root {
             --primary: #006a4e;
             --secondary: #f42a41;
-            --bg: #f8f9fa;
+            --bg: #f0f4f8;
             --card-bg: #ffffff;
-            --text: #333;
-            --text-light: #666;
-            --border: #e0e0e0;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,92 +25,79 @@
             color: var(--text);
             min-height: 100vh;
             padding: 20px;
-            line-height: 1.6;
         }
 
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
 
-        /* Header Design */
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+            background: white;
             padding: 30px;
             border-radius: 16px;
             text-align: center;
             box-shadow: var(--shadow);
             margin-bottom: 30px;
-            border-top: 6px solid var(--primary);
+            border-top: 5px solid var(--primary);
             position: relative;
-            overflow: hidden;
         }
+        .logo { width: 90px; margin-bottom: 15px; }
+        .header h1 { font-size: 24px; color: var(--primary); margin-bottom: 5px; font-weight: 700; }
+        .header h2 { font-size: 18px; color: var(--text); font-weight: 600; margin-bottom: 15px; }
         
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(0,106,78,0.03) 0%, transparent 70%);
-            animation: rotateBg 20s linear infinite;
-            z-index: 0;
+        .doc-meta {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
         }
-
-        @keyframes rotateBg { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .logo { width: 80px; margin-bottom: 15px; position: relative; z-index: 1; }
-        .header h1 { font-size: 26px; color: var(--primary); margin-bottom: 5px; position: relative; z-index: 1; }
-        .header h2 { font-size: 18px; color: var(--text); font-weight: 600; position: relative; z-index: 1; }
-        .header-meta { 
-            display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; 
-            margin-top: 10px; font-size: 13px; color: var(--text-light); position: relative; z-index: 1;
+        .meta-tag {
+            background: #edf2f7;
+            color: var(--text);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #cbd5e0;
         }
-        .meta-badge { background: #eefbf7; padding: 4px 12px; border-radius: 20px; border: 1px solid #cceadd; }
 
         /* Search Box */
         .search-box {
-            background: var(--card-bg);
+            background: white;
             padding: 30px;
             border-radius: 16px;
             box-shadow: var(--shadow);
             margin-bottom: 30px;
-            transition: transform 0.3s ease;
         }
-        
         .input-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
             margin-bottom: 25px;
         }
-
-        .input-group { position: relative; }
-        
         .input-group label {
             display: block;
             font-size: 13px;
             color: var(--text-light);
-            margin-bottom: 8px;
-            font-weight: 500;
-            transition: 0.3s;
+            margin-bottom: 6px;
+            font-weight: 600;
         }
-
         .input-group input, .input-group select {
             width: 100%;
-            padding: 12px 15px;
+            padding: 12px;
             border: 2px solid var(--border);
             border-radius: 8px;
             font-family: inherit;
-            font-size: 15px;
+            font-size: 14px;
+            transition: all 0.3s;
             background: #fafafa;
-            transition: all 0.3s ease;
         }
-
         .input-group input:focus, .input-group select:focus {
             border-color: var(--primary);
-            background: #fff;
+            background: white;
             outline: none;
-            box-shadow: 0 0 0 4px rgba(0, 106, 78, 0.1);
-            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px rgba(0, 106, 78, 0.1);
         }
-
         .btn-search {
             width: 100%;
             padding: 14px;
@@ -121,76 +108,68 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 106, 78, 0.3);
-            position: relative;
-            overflow: hidden;
+            transition: 0.3s;
         }
+        .btn-search:hover { background: #00523d; transform: translateY(-1px); }
+        .btn-search:disabled { background: #cbd5e0; cursor: not-allowed; transform: none; }
 
-        .btn-search:hover { background: #00523d; transform: translateY(-2px); }
-        .btn-search:active { transform: translateY(0); }
-        .btn-search:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
-
-        /* Loading & Status */
-        .loader-container { text-align: center; padding: 30px; display: none; }
+        /* Loader & Error */
+        .loader { text-align: center; padding: 20px; display: none; }
         .spinner {
-            width: 40px; height: 40px;
-            border: 4px solid #f3f3f3;
+            width: 35px; height: 35px;
+            border: 4px solid #edf2f7;
             border-top: 4px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            margin: 0 auto 10px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
+        
         .error-msg { 
             background: #fff5f5; color: #c53030; padding: 15px; 
-            border-radius: 8px; border-left: 5px solid #c53030; 
-            display: none; margin-bottom: 20px; font-size: 14px;
+            border-radius: 8px; border: 1px solid #feb2b2; display: none; 
+            text-align: center; margin-bottom: 20px;
         }
 
-        /* Result Card */
+        /* Results */
         .result-card {
-            background: var(--card-bg);
+            background: white;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: var(--shadow);
             margin-bottom: 25px;
-            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid #eee;
+            animation: fadeIn 0.5s ease;
+            border: 1px solid var(--border);
         }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .card-header {
-            background: linear-gradient(to right, #f8f9fa, #fff);
+            background: #f7fafc;
             padding: 15px 25px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
         .card-header h3 { font-size: 18px; color: var(--primary); font-weight: 700; }
-        .badge-voter {
+        .badge-id {
             background: var(--primary);
             color: white;
-            padding: 5px 12px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
-            letter-spacing: 0.5px;
         }
 
         .card-body { padding: 25px; }
         
-        .info-section-title {
+        .section-title {
             font-size: 14px;
             color: var(--secondary);
             font-weight: 700;
             margin-bottom: 15px;
             padding-bottom: 5px;
-            border-bottom: 2px solid #f0f0f0;
+            border-bottom: 2px solid #edf2f7;
             display: inline-block;
         }
 
@@ -199,27 +178,16 @@
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 20px;
         }
-
-        .info-item { 
-            background: #fafafa; 
-            padding: 12px; 
-            border-radius: 8px; 
-            border: 1px solid #f0f0f0;
-            transition: 0.2s;
+        .info-item {
+            background: #fdfdfd;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #edf2f7;
         }
-        .info-item:hover { border-color: #ddd; background: #fff; }
+        .info-label { font-size: 12px; color: #a0aec0; margin-bottom: 4px; font-weight: 500; }
+        .info-value { font-size: 15px; color: #2d3748; font-weight: 600; }
 
-        .info-label { font-size: 12px; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .info-value { font-size: 15px; color: #333; font-weight: 600; word-break: break-word; }
-
-        .no-data { text-align: center; padding: 40px; color: #777; display: none; font-size: 16px; }
-        
-        /* Mobile Adjustments */
-        @media (max-width: 600px) {
-            .header h1 { font-size: 20px; }
-            .input-grid { grid-template-columns: 1fr; }
-            .card-header { flex-direction: column; align-items: flex-start; gap: 10px; }
-        }
+        .no-data { text-align: center; padding: 40px; color: #718096; display: none; }
     </style>
 </head>
 <body>
@@ -227,16 +195,17 @@
 <div class="container">
     <!-- Header -->
     <div class="header">
-        <img src="./logo-ec.png" alt="EC Logo" class="logo">
+        <img src="./logo-ec.png" alt="Logo" class="logo">
         <h1 id="orgName">বাংলাদেশ নির্বাচন কমিশন</h1>
         <h2 id="docTitle">ভোটার তালিকা</h2>
-        <div class="header-meta">
-            <span class="meta-badge" id="docType">ছবি ছাড়া চূড়ান্ত ভোটার তালিকা</span>
-            <span class="meta-badge" id="formNo">ফরম-১</span>
+        <div class="doc-meta">
+            <span class="meta-tag" id="docType">ছবি ছাড়া চূড়ান্ত ভোটার তালিকা</span>
+            <span class="meta-tag" id="formNo">ফরম-১</span>
+            <span class="meta-tag" id="pubDate">প্রকাশের তারিখ: -</span>
         </div>
     </div>
 
-    <!-- Error Message Area -->
+    <!-- Error Message -->
     <div id="errorMsg" class="error-msg"></div>
 
     <!-- Search Form -->
@@ -271,32 +240,29 @@
     </div>
 
     <!-- Loader -->
-    <div class="loader-container" id="loader">
+    <div class="loader" id="loader">
         <div class="spinner"></div>
-        <p>ডাটাবেস লোড হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন</p>
+        <p>ডাটাবেস লোড হচ্ছে...</p>
     </div>
 
     <!-- Results Area -->
     <div id="resultsArea"></div>
-    <div class="no-data" id="noData">দুঃখিত, কোনো তথ্য পাওয়া যায়নি</div>
+    <div class="no-data" id="noData">কোনো তথ্য পাওয়া যায়নি</div>
 </div>
 
 <script>
     let dbData = null;
-    let currentGender = '';
+    let headerInfo = {}; // Store header info separately
     
-    // ফাইলের নাম কনফিগারেশন
     const DB_FILES = {
         male: './falkamuri_male.json',
         female: './falkamuri_female.json'
     };
 
-    // পেজ লোড হলে কিছুই করবে না, ইউজারকে জেন্ডার সিলেক্ট করতে হবে
     window.onload = function() {
         document.getElementById('searchBtn').disabled = true;
     };
 
-    // জেন্ডার পরিবর্তন হলে ডাটা লোড ফাংশন
     async function handleGenderChange() {
         const genderSelect = document.getElementById('sGender');
         const btn = document.getElementById('searchBtn');
@@ -304,58 +270,64 @@
         const errorDiv = document.getElementById('errorMsg');
         const resultsArea = document.getElementById('resultsArea');
         
-        currentGender = genderSelect.value;
+        const gender = genderSelect.value;
         
-        // রিসেট
+        // Reset UI
         dbData = null;
+        headerInfo = {};
         resultsArea.innerHTML = '';
         errorDiv.style.display = 'none';
         btn.disabled = true;
         loader.style.display = 'block';
 
         try {
-            const filePath = DB_FILES[currentGender];
-            // Cache busting for fresh data
-            const response = await fetch(filePath + '?t=' + Date.now());
+            const response = await fetch(DB_FILES[gender] + '?t=' + Date.now());
             
-            if (!response.ok) throw new Error(`ফাইল পাওয়া যায়নি: ${filePath}`);
+            if (!response.ok) throw new Error(`ফাইল পাওয়া যায়নি: ${DB_FILES[gender]}`);
             
-            dbData = await response.json();
+            const jsonData = await response.json();
             
-            // হেডার আপডেট (যদি ডাটায় থাকে)
-            if(dbData.organization) document.getElementById('orgName').innerText = dbData.organization;
-            if(dbData.document_title) document.getElementById('docTitle').innerText = dbData.document_title;
-            if(dbData.type) document.getElementById('docType').innerText = dbData.type;
+            // Structure Handling based on your provided JSON
+            // Assuming structure: { organization: "...", document_header: {...}, voters: [...] }
             
+            dbData = jsonData.voters || [];
+            headerInfo = jsonData.document_header || {};
+            
+            // Update Header UI with real data
+            if(jsonData.organization) document.getElementById('orgName').innerText = jsonData.organization;
+            if(jsonData.document_title) document.getElementById('docTitle').innerText = jsonData.document_title;
+            
+            if(headerInfo.type) document.getElementById('docType').innerText = headerInfo.type;
+            if(headerInfo.form) document.getElementById('formNo').innerText = headerInfo.form;
+            if(headerInfo.publication_date) document.getElementById('pubDate').innerText = "প্রকাশের তারিখ: " + headerInfo.publication_date;
+
             loader.style.display = 'none';
             btn.disabled = false;
             
         } catch (error) {
             loader.style.display = 'none';
             errorDiv.style.display = 'block';
-            errorDiv.innerHTML = `<strong>ত্রুটি:</strong> ${currentGender === 'male' ? 'পুরুষ' : 'মহিলা'} ডাটাবেস লোড করা সম্ভব হয়নি।<br>${error.message}<br><small>নিশ্চিত করুন ফাইলটি সঠিক নামে ফোল্ডারে আছে।</small>`;
+            errorDiv.innerHTML = `<strong>ত্রুটি:</strong> ডাটাবেস লোড ব্যর্থ।<br>${error.message}`;
+            console.error(error);
         }
     }
 
     function performSearch() {
-        if (!dbData || !dbData.voters) return;
+        if (!dbData) return;
 
         const sName = document.getElementById('sName').value.toLowerCase().trim();
         const sFather = document.getElementById('sFather').value.toLowerCase().trim();
         const sMother = document.getElementById('sMother').value.toLowerCase().trim();
-        const sDob = document.getElementById('sDob').value; // Format YYYY-MM-DD
+        const sDob = document.getElementById('sDob').value;
 
-        // ফিল্টার লজিক
-        const results = dbData.voters.filter(v => {
+        const results = dbData.filter(v => {
             const matchName = !sName || (v.name && v.name.toLowerCase().includes(sName));
             const matchFather = !sFather || (v.father_name && v.father_name.toLowerCase().includes(sFather));
             const matchMother = !sMother || (v.mother_name && v.mother_name.toLowerCase().includes(sMother));
             
-            // DOB Matching Logic (Handling different formats if necessary, assuming standard ISO or DD-MM-YYYY in JSON)
             let matchDob = true;
             if (sDob) {
-                // Simple check: if JSON has DOB and it includes the selected date string
-                // Note: Real world DOB matching might need parsing depending on JSON format
+                // Handle potential format differences if necessary, currently assuming simple includes
                 matchDob = v.date_of_birth && v.date_of_birth.includes(sDob); 
             }
 
@@ -376,44 +348,42 @@
         }
         noDataMsg.style.display = 'none';
 
-        // Display Document Meta Info at top of results if available
-        let metaHtml = '';
-        if(dbData.total_voters || dbData.publication_date) {
-            metaHtml = `
-                <div style="margin-bottom: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #006a4e;">
-                    <p><strong>মোট ভোটার:</strong> ${dbData.total_voters || 'N/A'} | <strong>প্রকাশের তারিখ:</strong> ${dbData.publication_date || 'N/A'}</p>
-                    <p><strong>এলাকা:</strong> ${dbData.voter_area_name || ''} (${dbData.voter_area_number || ''})</p>
-                </div>
-            `;
-        }
-        container.innerHTML = metaHtml;
-
         data.forEach((v) => {
+            // Merge voter specific data with header data for display if voter data is missing
+            // But usually voter card has its own address. If not, fallback to headerInfo.
+            
+            const district = v.district || headerInfo.district || '-';
+            const upazila = v.upazila_thana || headerInfo.upazila_thana || '-';
+            const union = v.union_ward_cantonment || headerInfo.union_ward_cantonment || '-';
+            const postOffice = v.post_office || headerInfo.post_office || '-';
+            const postCode = v.post_code || headerInfo.post_code || '-';
+            const voterArea = v.voter_area_name || headerInfo.voter_area_name || '-';
+
             const html = `
                 <div class="result-card">
                     <div class="card-header">
                         <h3>${v.name || 'অজানা'}</h3>
-                        <span class="badge-voter">ID: ${v.voter_no || 'N/A'}</span>
+                        <span class="badge-id">ভোটার নং: ${v.voter_no || 'N/A'}</span>
                     </div>
                     <div class="card-body">
-                        <div class="info-section-title">ব্যক্তিগত তথ্য</div>
+                        <div class="section-title">ব্যক্তিগত তথ্য</div>
                         <div class="info-grid">
                             <div class="info-item"><div class="info-label">পিতার নাম</div><div class="info-value">${v.father_name || '-'}</div></div>
                             <div class="info-item"><div class="info-label">মাতার নাম</div><div class="info-value">${v.mother_name || '-'}</div></div>
                             <div class="info-item"><div class="info-label">জন্ম তারিখ</div><div class="info-value">${v.date_of_birth || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">লিঙ্গ</div><div class="info-value">${v.gender || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">লিঙ্গ</div><div class="info-value">${v.gender || headerInfo.gender || '-'}</div></div>
                             <div class="info-item"><div class="info-label">পেশা</div><div class="info-value">${v.occupation || '-'}</div></div>
                         </div>
 
-                        <div class="info-section-title" style="margin-top: 20px;">ঠিকানা ও অন্যান্য</div>
+                        <div class="section-title" style="margin-top: 20px;">ঠিকানা ও অন্যান্য</div>
                         <div class="info-grid">
+                            <div class="info-item"><div class="info-label">জেলা</div><div class="info-value">${district}</div></div>
+                            <div class="info-item"><div class="info-label">উপজেলা/থানা</div><div class="info-value">${upazila}</div></div>
+                            <div class="info-item"><div class="info-label">ইউনিয়ন/ওয়ার্ড</div><div class="info-value">${union}</div></div>
+                            <div class="info-item"><div class="info-label">পোস্ট অফিস</div><div class="info-value">${postOffice}</div></div>
+                            <div class="info-item"><div class="info-label">পোস্ট কোড</div><div class="info-value">${postCode}</div></div>
+                            <div class="info-item"><div class="info-label">ভোটার এলাকা</div><div class="info-value">${voterArea}</div></div>
                             <div class="info-item"><div class="info-label">ঠিকানা</div><div class="info-value">${v.address || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">জেলা</div><div class="info-value">${v.district || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">উপজেলা/থানা</div><div class="info-value">${v.upazila_thana || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">ইউনিয়ন/ওয়ার্ড</div><div class="info-value">${v.union_ward_cantonment || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">পোস্ট অফিস</div><div class="info-value">${v.post_office || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">পোস্ট কোড</div><div class="info-value">${v.post_code || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">ভোটার এলাকা</div><div class="info-value">${v.voter_area_name || '-'}</div></div>
                         </div>
                     </div>
                 </div>
