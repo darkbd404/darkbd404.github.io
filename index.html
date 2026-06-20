@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ভোটার অনুসন্ধান</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"SolaimanLipi","Noto Sans Bengali",sans-serif;
+}
+
+body{
+background:#eef2f7;
+padding:15px;
+}
+
+.container{
+max-width:600px;
+margin:auto;
+}
+
+.card{
+background:#fff;
+border-radius:25px;
+padding:20px;
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+margin-bottom:20px;
+}
+
+.logo{
+text-align:center;
+font-size:30px;
+font-weight:bold;
+color:#006b52;
+margin-bottom:10px;
+}
+
+.title{
+text-align:center;
+font-size:22px;
+font-weight:bold;
+color:#006b52;
+margin-bottom:20px;
+}
+
+.form-group{
+margin-bottom:15px;
+}
+
+label{
+display:block;
+margin-bottom:6px;
+font-size:16px;
+font-weight:600;
+}
+
+input,
+select{
+width:100%;
+height:55px;
+padding:12px;
+border:1px solid #d4dbe3;
+border-radius:12px;
+font-size:16px;
+background:#fff;
+}
+
+button{
+width:100%;
+height:55px;
+border:none;
+border-radius:12px;
+background:#006b52;
+color:white;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+background:#005540;
+}
+
+.loader{
+display:none;
+text-align:center;
+margin-top:20px;
+}
+
+.spinner{
+width:60px;
+height:60px;
+margin:auto;
+border:6px solid #ddd;
+border-top:6px solid #006b52;
+border-radius:50%;
+animation:spin 1s linear infinite;
+margin-bottom:10px;
+}
+
+@keyframes spin{
+100%{
+transform:rotate(360deg);
+}
+}
+
+.result-card{
+background:#fff;
+border:3px solid #000;
+padding:15px;
+margin-top:20px;
+font-size:18px;
+line-height:1.8;
+border-radius:10px;
+white-space:pre-line;
+}
+
+.no-data{
+background:#fff;
+padding:15px;
+border-radius:10px;
+text-align:center;
+font-size:18px;
+font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="logo">
+বাংলাদেশ নির্বাচন কমিশন
+</div>
+
+<div class="title">
+ভোটার অনুসন্ধান
+</div>
+
+<div class="form-group">
+<label>ভোটার নাম</label>
+<input type="text" id="name">
+</div>
+
+<div class="form-group">
+<label>পিতার নাম</label>
+<input type="text" id="father">
+</div>
+
+<div class="form-group">
+<label>মাতার নাম</label>
+<input type="text" id="mother">
+</div>
+
+<div class="form-group">
+<label>জন্ম তারিখ</label>
+<input type="text" id="dob" placeholder="১৫/০৩/১৯৮৬">
+</div>
+
+<div class="form-group">
+<label>ভোটার এলাকা</label>
+
+<select id="area">
+
+<option value="">নির্বাচন করুন</option>
+
+<option value="ফলকামুড়ী">
+ফলকামুড়ী
+</option>
+
+<option value="শিলমুড়ী">
+শিলমুড়ী
+</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+<label>লিঙ্গ</label>
+
+<select id="gender">
+
+<option value="">
+নির্বাচন করুন
+</option>
+
+<option value="male">
+পুরুষ
+</option>
+
+<option value="female">
+মহিলা
+</option>
+
+</select>
+
+</div>
+
+<button onclick="searchVoter()">
+অনুসন্ধান করুন
+</button>
+
+<div id="loader" class="loader">
+
+<div class="spinner"></div>
+
+<div>
+অনুসন্ধান চলছে...
+</div>
+
+</div>
+
+</div>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+/*
+
+========================================
+PDF PATH SETUP SECTION
+========================================
+
+নতুন PDF যোগ করতে শুধু এখানে যোগ করবে
+
+*/
+
+const PDF_FILES = {
+
+"ফলকামুড়ী":{
+
+male:"pdf/falkamuri_male.pdf",
+
+female:"pdf/falkamuri_female.pdf"
+
+},
+
+"শিলমুড়ী":{
+
+male:"pdf/shilmuri_male.pdf",
+
+female:"pdf/shilmuri_female.pdf"
+
+}
+
+};
+
+
+
+async function extractPDFText(pdfUrl){
+
+let text="";
+
+const pdf=await pdfjsLib.getDocument(pdfUrl).promise;
+
+for(let pageNum=1;pageNum<=pdf.numPages;pageNum++){
+
+const page=await pdf.getPage(pageNum);
+
+const content=await page.getTextContent();
+
+const strings=content.items.map(item=>item.str);
+
+text+=strings.join(" ");
+
+}
+
+return text;
+
+}
+
+
+
+async function searchVoter(){
+
+const result=document.getElementById("result");
+
+const loader=document.getElementById("loader");
+
+result.innerHTML="";
+
+loader.style.display="block";
+
+const area=document.getElementById("area").value;
+
+const gender=document.getElementById("gender").value;
+
+const name=document.getElementById("name").value.trim();
+
+const father=document.getElementById("father").value.trim();
+
+const mother=document.getElementById("mother").value.trim();
+
+const dob=document.getElementById("dob").value.trim();
+
+if(!area || !gender){
+
+loader.style.display="none";
+
+alert("ভোটার এলাকা ও লিঙ্গ নির্বাচন করুন");
+
+return;
+
+}
+
+try{
+
+const pdfPath=PDF_FILES[area][gender];
+
+const fullText=await extractPDFText(pdfPath);
+
+const records=fullText.split("নাম:");
+
+let found=false;
+
+for(let item of records){
+
+const okName=!name || item.includes(name);
+
+const okFather=!father || item.includes(father);
+
+const okMother=!mother || item.includes(mother);
+
+const okDob=!dob || item.includes(dob);
+
+if(okName && okFather && okMother && okDob){
+
+found=true;
+
+result.innerHTML+=`
+
+<div class="result-card">
+
+নাম:${item.substring(0,1000)}
+
+</div>
+
+`;
+
+}
+
+}
+
+if(!found){
+
+result.innerHTML=`
+
+<div class="no-data">
+
+কোন তথ্য পাওয়া যায়নি
+
+</div>
+
+`;
+
+}
+
+}catch(error){
+
+console.error(error);
+
+result.innerHTML=`
+
+<div class="no-data">
+
+PDF লোড করা যায়নি
+
+</div>
+
+`;
+
+}
+
+loader.style.display="none";
+
+}
+
+</script>
+
+</body>
+</html>
