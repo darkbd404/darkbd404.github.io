@@ -24,7 +24,7 @@
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 25px;
-            border-top: 5px solid #006a4e; /* BD Green */
+            border-top: 5px solid #006a4e;
         }
         .logo { width: 100px; margin-bottom: 10px; }
         .header h1 { font-size: 24px; color: #006a4e; margin-bottom: 5px; }
@@ -203,7 +203,8 @@
 
 <script>
     let dbData = null;
-    const DB_URL = 'https://darkbd404.github.io/nidw/falkamuri_male.json';
+    // শুধু ফাইলের নাম, কোনো URL নয়
+    const DB_FILE = 'falkamuri_male.json';
 
     // Initialize
     window.onload = async function() {
@@ -211,15 +212,20 @@
         document.getElementById('searchBtn').disabled = true;
         
         try {
-            const response = await fetch(DB_URL);
-            if (!response.ok) throw new Error('Network response was not ok');
+            // ব্রাউজার একই ফোল্ডার থেকে ফাইলটি খুঁজে বের করবে
+            const response = await fetch(DB_FILE);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             dbData = await response.json();
             
             document.getElementById('loader').style.display = 'none';
             document.getElementById('searchBtn').disabled = false;
-            console.log("Database Loaded Successfully");
+            console.log("Database Loaded Successfully from local file");
         } catch (error) {
-            document.getElementById('loader').innerHTML = `<p style="color:red">ডাটাবেস লোড ব্যর্থ হয়েছে। ইন্টারনেট চেক করুন।</p>`;
+            document.getElementById('loader').innerHTML = `<p style="color:red">ডাটাবেস ফাইল পাওয়া যায়নি। নিশ্চিত করুন 'falkamuri_male.json' ফাইলটি HTML ফাইলের সাথে একই ফোল্ডারে আছে।</p>`;
             console.error("Load Error:", error);
         }
     };
