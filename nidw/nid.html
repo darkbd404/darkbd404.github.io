@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ভোটার তালিকা অনুসন্ধান - নির্বাচন কমিশন</title>
+    <title>ভোটার তালিকা অনুসন্ধান</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -81,7 +81,7 @@
         .btn-search:hover { background: #00523d; }
         .btn-search:disabled { background: #ccc; cursor: not-allowed; }
 
-        /* Loading */
+        /* Loading & Status */
         .loader { text-align: center; padding: 20px; display: none; }
         .spinner {
             width: 30px; height: 30px;
@@ -111,8 +111,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
         }
         .card-header h3 { font-size: 16px; color: #006a4e; }
         .badge {
@@ -132,13 +130,13 @@
         }
         .info-item { border-bottom: 1px dashed #eee; padding-bottom: 8px; }
         .info-label { font-size: 12px; color: #888; margin-bottom: 2px; }
-        .info-value { font-size: 15px; color: #333; font-weight: 500; word-break: break-word; }
+        .info-value { font-size: 15px; color: #333; font-weight: 500; }
 
         .no-data { text-align: center; padding: 40px; color: #777; display: none; }
         .error-msg { 
             background: #fff5f5; color: #c53030; padding: 15px; 
             border-radius: 8px; border: 1px solid #feb2b2; display: none; 
-            text-align: center; margin-bottom: 20px;
+            text-align: center;
         }
     </style>
 </head>
@@ -200,35 +198,51 @@
 
 <script>
     let dbData = null;
-    // IMPORTANT: The JSON keys have trailing spaces (e.g., "name "). 
-    // We must use them exactly as they are in the file.
+    // './' মানে বর্তমান ফোল্ডার। এটি GitHub Pages এর জন্য সবচেয়ে ভালো কাজ করে।
     const DB_FILE = './falkamuri_male.json';
 
     window.onload = async function() {
-        document.getElementById('loader').style.display = 'block';
-        document.getElementById('searchBtn').disabled = true;
+        const loader = document.getElementById('loader');
+        const btn = document.getElementById('searchBtn');
+        const errorDiv = document.getElementById('errorMsg');
+        
+        loader.style.display = 'block';
         
         try {
+            // Date.now() যোগ করা হয়েছে যাতে ব্রাউজার পুরানো ক্যাশ থেকে না নেয়
             const response = await fetch(DB_FILE + '?t=' + Date.now());
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             
-            const text = await response.text();
-            dbData = JSON.parse(text);
+            if (!response.ok) {
+                throw new Error(`ফাইল পাওয়া যায়নি (Status: ${response.status})`);
+            }
             
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('searchBtn').disabled = false;
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") === -1) {
+                 // কিছু ক্ষেত্রে GitHub সঠিক হেডার দেয় না, তাই এটি সতর্কবার্তা মাত্র
+                 console.warn("Content-Type might be wrong, but trying to parse anyway.");
+            }
+
+            dbData = await response.json();
+            
+            // ডাটা লোড হলে বাটন চালু করুন
+            loader.style.display = 'none';
+            btn.disabled = false;
             console.log("Database Loaded Successfully");
+            
         } catch (error) {
-            document.getElementById('loader').style.display = 'none';
-            const errDiv = document.getElementById('errorMsg');
-            errDiv.style.display = 'block';
-            errDiv.innerHTML = `<strong>দুঃখিত!</strong><br>${error.message}<br>নিশ্চিত করুন 'falkamuri_male.json' ফাইলটি একই ফোল্ডারে আছে।`;
+            loader.style.display = 'none';
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = `
+                <strong>দুঃখিত, ডাটাবেস লোড ব্যর্থ হয়েছে!</strong><br>
+                ${error.message}<br>
+                <small>নিশ্চিত করুন 'falkamuri_male.json' ফাইলটি nid.html এর ঠিক পাশেই আছে এবং নামটি হুবহু এক (ছোট/বড় হাতের অক্ষর িক আছে কিনা দেখুন)।</small>
+            `;
             console.error("Load Error:", error);
         }
     };
 
     function performSearch() {
-        if (!dbData || !dbData.voters) return;
+        if (!dbData) return;
 
         const sName = document.getElementById('sName').value.toLowerCase().trim();
         const sVoterNo = document.getElementById('sVoterNo').value.toLowerCase().trim();
@@ -238,13 +252,12 @@
         const sUpazila = document.getElementById('sUpazila').value.toLowerCase().trim();
 
         const results = dbData.voters.filter(v => {
-            // Using keys with trailing spaces as per your JSON file
-            const matchName = !sName || (v["name "] && v["name "].toLowerCase().includes(sName));
-            const matchVoterNo = !sVoterNo || (v["voter_no "] && v["voter_no "].toString().includes(sVoterNo));
-            const matchFather = !sFather || (v["father_name "] && v["father_name "].toLowerCase().includes(sFather));
-            const matchMother = !sMother || (v["mother_name "] && v["mother_name "].toLowerCase().includes(sMother));
-            const matchDistrict = !sDistrict || (v["district "] && v["district "].toLowerCase().includes(sDistrict));
-            const matchUpazila = !sUpazila || (v["upazila_thana "] && v["upazila_thana "].toLowerCase().includes(sUpazila));
+            const matchName = !sName || (v.name && v.name.toLowerCase().includes(sName));
+            const matchVoterNo = !sVoterNo || (v.voter_no && v.voter_no.toString().includes(sVoterNo));
+            const matchFather = !sFather || (v.father_name && v.father_name.toLowerCase().includes(sFather));
+            const matchMother = !sMother || (v.mother_name && v.mother_name.toLowerCase().includes(sMother));
+            const matchDistrict = !sDistrict || (v.district && v.district.toLowerCase().includes(sDistrict));
+            const matchUpazila = !sUpazila || (v.upazila_thana && v.upazila_thana.toLowerCase().includes(sUpazila));
 
             return matchName && matchVoterNo && matchFather && matchMother && matchDistrict && matchUpazila;
         });
@@ -263,43 +276,27 @@
         }
         noDataMsg.style.display = 'none';
 
-        // Limit to 50 results for performance
-        const displayData = data.slice(0, 50);
-        if(data.length > 50) {
-            container.innerHTML += `<div style="text-align:center; padding:10px; color:#666;">প্রথম ৫০টি ফলাফল দেখানো হচ্ছে। মোট: ${data.length}</div>`;
-        }
-
-        displayData.forEach((v, index) => {
-            // Helper to safely get value with trailing space key
-            const gv = (key) => v[key] ? v[key].trim() : '-';
-
+        data.forEach((v, index) => {
             const html = `
                 <div class="result-card">
                     <div class="card-header">
-                        <h3>${gv("name ")}</h3>
-                        <span class="badge">ভোটার নং: ${gv("voter_no ")}</span>
+                        <h3>${v.name || 'অজানা'}</h3>
+                        <span class="badge">ভোটার নং: ${v.voter_no || 'N/A'}</span>
                     </div>
                     <div class="card-body">
                         <div class="info-grid">
-                            <div class="info-item"><div class="info-label">ক্রমিক নম্বর</div><div class="info-value">${gv("sl_no ")}</div></div>
-                            <div class="info-item"><div class="info-label">পিতার নাম</div><div class="info-value">${gv("father_name ")}</div></div>
-                            <div class="info-item"><div class="info-label">মাতার নাম</div><div class="info-value">${gv("mother_name ")}</div></div>
-                            <div class="info-item"><div class="info-label">জন্ম তারিখ</div><div class="info-value">${gv("date_of_birth ")}</div></div>
-                            <div class="info-item"><div class="info-label">লিঙ্গ</div><div class="info-value">${gv("gender ") || 'পুরুষ'}</div></div>
-                            <div class="info-item"><div class="info-label">পেশা</div><div class="info-value">${gv("occupation ")}</div></div>
-                            <div class="info-item"><div class="info-label">ঠিকানা</div><div class="info-value">${gv("address ")}</div></div>
-                            
-                            <!-- Document Header Info Mapped to Voter -->
-                            <div class="info-item"><div class="info-label">অঞ্চল</div><div class="info-value">${gv("region ")}</div></div>
-                            <div class="info-item"><div class="info-label">জেলা</div><div class="info-value">${gv("district ")}</div></div>
-                            <div class="info-item"><div class="info-label">উপজেলা/থানা</div><div class="info-value">${gv("upazila_thana ")}</div></div>
-                            <div class="info-item"><div class="info-label">সিটি/পৌরসভা</div><div class="info-value">${gv("city_corporation_paurashava ")}</div></div>
-                            <div class="info-item"><div class="info-label">ইউনিয়ন/ওয়ার্ড</div><div class="info-value">${gv("union_ward_cantonment ")}</div></div>
-                            <div class="info-item"><div class="info-label">ওয়ার্ড নম্বর</div><div class="info-value">${gv("ward_number_union_parishad ")}</div></div>
-                            <div class="info-item"><div class="info-label">পোস্ট অফিস</div><div class="info-value">${gv("post_office ")}</div></div>
-                            <div class="info-item"><div class="info-label">পোস্ট কোড</div><div class="info-value">${gv("post_code ")}</div></div>
-                            <div class="info-item"><div class="info-label">ভোটার এলাকার নাম</div><div class="info-value">${gv("voter_area_name ")}</div></div>
-                            <div class="info-item"><div class="info-label">ভোটার এলাকা নম্বর</div><div class="info-value">${gv("voter_area_number ")}</div></div>
+                            <div class="info-item"><div class="info-label">পিতার নাম</div><div class="info-value">${v.father_name || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">মাতার নাম</div><div class="info-value">${v.mother_name || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">জন্ম তারিখ</div><div class="info-value">${v.date_of_birth || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">লিঙ্গ</div><div class="info-value">${v.gender || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">পেশা</div><div class="info-value">${v.occupation || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">ঠিকানা</div><div class="info-value">${v.address || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">জেলা</div><div class="info-value">${v.district || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">উপজেলা/থানা</div><div class="info-value">${v.upazila_thana || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">ইউনিয়ন/ওয়ার্ড</div><div class="info-value">${v.union_ward_cantonment || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">পোস্ট অফিস</div><div class="info-value">${v.post_office || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">পোস্ট কোড</div><div class="info-value">${v.post_code || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">ভোটার এলাকা</div><div class="info-value">${v.voter_area_name || '-'}</div></div>
                         </div>
                     </div>
                 </div>
