@@ -136,16 +136,7 @@
         .error-msg { 
             background: #fff5f5; color: #c53030; padding: 15px; 
             border-radius: 8px; border: 1px solid #feb2b2; display: none; 
-            text-align: center;
-        }
-        .status-bar {
-            background: #e3f2fd;
-            color: #0d47a1;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            display: none;
+            text-align: center; margin-bottom: 20px;
         }
     </style>
 </head>
@@ -159,9 +150,6 @@
         <h2>ভোটার তালিকা - (পুরুষ)</h2>
         <p>ছবি ছাড়া চূড়ান্ত ভোটার তালিকা</p>
     </div>
-
-    <!-- Status Bar -->
-    <div id="statusBar" class="status-bar"></div>
 
     <!-- Error Message Area -->
     <div id="errorMsg" class="error-msg"></div>
@@ -200,7 +188,7 @@
     <!-- Loader -->
     <div class="loader" id="loader">
         <div class="spinner"></div>
-        <p id="loadText">ডাটা লোড হচ্ছে... (বড় ফাইল হলে সময় লাগতে পারে)</p>
+        <p>ডাটা প্রসেসিং হচ্ছে...</p>
     </div>
 
     <!-- Results Area -->
@@ -209,89 +197,61 @@
 </div>
 
 <script>
-    let allVoters = [];
+    let dbData = null;
     const DB_FILE = './falkamuri_male.json';
 
     window.onload = async function() {
         const loader = document.getElementById('loader');
         const btn = document.getElementById('searchBtn');
         const errorDiv = document.getElementById('errorMsg');
-        const statusBar = document.getElementById('statusBar');
         
         loader.style.display = 'block';
         
         try {
-            // Fetch the file as text first to handle large files better
+            // Fetch raw text to handle syntax errors manually
             const response = await fetch(DB_FILE + '?t=' + Date.now());
+            if (!response.ok) throw new Error(`ফাইল পাওয়া যায়নি (Status: ${response.status})`);
             
-            if (!response.ok) {
-                throw new Error(`ফাইল পাওয়া যায়নি (Status: ${response.status})`);
-            }
+            const rawText = await response.text();
             
-            const text = await response.text();
+            // Smart Fix: Remove stray brackets that break JSON structure
+            // This regex finds [ or ] that are NOT part of the main array structure
+            // It specifically targets the extra brackets found in your file between voter objects
+            let fixedJson = rawText.replace(/\]\s*\[/g, ',').replace(/^\s*\[\s*\{/g, '{').replace(/\}\s*\]\s*$/g, '}');
             
-            // Try to parse JSON
-            let data;
-            try {
-                data = JSON.parse(text);
-            } catch (parseError) {
-                console.error("JSON Parse Error:", parseError);
-                // If standard parse fails, try to extract voters array manually if it's malformed
-                // This is a fallback for badly formatted JSON files
-                const votersMatch = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                if (votersMatch) {
-                    try {
-                        data = { voters: JSON.parse(votersMatch[0]) };
-                    } catch (e) {
-                        throw new Error("JSON ফাইলটি ক্ষতিগ্রস্ত বা ভুল ফরম্যাটে আছে।");
-                    }
-                } else {
-                    throw new Error("JSON ফাইলটি পার্স করা যাচ্ছে না।");
-                }
+            // If the above doesn't work perfectly, try a more aggressive cleanup for nested arrays
+            if (!fixedJson.trim().startsWith('{')) {
+                 // Sometimes files have multiple root arrays. We wrap them or clean them.
+                 // Based on your file, it seems like one big object with voters array inside, 
+                 // but broken by extra brackets.
+                 fixedJson = rawText.replace(/\]\s*\[/g, ',');
             }
 
-            // Handle different JSON structures
-            if (Array.isArray(data)) {
-                allVoters = data;
-            } else if (data.voters && Array.isArray(data.voters)) {
-                allVoters = data.voters;
-            } else {
-                throw new Error("ডাটা স্ট্রাকচার অজানা। 'voters' অ্যারে পাওয়া যায়নি।");
+            dbData = JSON.parse(fixedJson);
+            
+            // Ensure voters is an array
+            if (!Array.isArray(dbData.voters)) {
+                throw new Error("ভোটারদের তালিকা খুঁজে পাওয়া যায়নি");
             }
-
-            // Remove duplicates based on voter_no if any
-            const uniqueVoters = [];
-            const seenNos = new Set();
-            for (const v of allVoters) {
-                if (v.voter_no && !seenNos.has(v.voter_no)) {
-                    seenNos.add(v.voter_no);
-                    uniqueVoters.push(v);
-                }
-            }
-            allVoters = uniqueVoters;
 
             loader.style.display = 'none';
             btn.disabled = false;
-            
-            statusBar.style.display = 'block';
-            statusBar.textContent = `সফলভাবে ${allVoters.length} জন ভোটারের ডাটা লোড হয়েছে।`;
-            
-            console.log("Database Loaded Successfully", allVoters.length);
+            console.log("Database Loaded Successfully after fixing syntax");
             
         } catch (error) {
             loader.style.display = 'none';
             errorDiv.style.display = 'block';
             errorDiv.innerHTML = `
-                <strong>দুঃখিত, ডাটাবেস লোড ব্যর্থ হয়েছে!</strong><br>
+                <strong>দুঃখিত, ডাটা লোডে সমস্যা!</strong><br>
                 ${error.message}<br>
-                <small>নিশ্চিত করুন 'falkamuri_male.json' ফাইলটি সঠিক JSON ফরম্যাটে আছে।</small>
+                <small>JSON ফাইলে সিনট্যাক্স এরর থাকতে পারে। কোডটি অটো-ফিক্স করার চেষ্টা করেছে কিন্তু ব্যর্থ হয়েছে।</small>
             `;
             console.error("Load Error:", error);
         }
     };
 
     function performSearch() {
-        if (allVoters.length === 0) return;
+        if (!dbData) return;
 
         const sName = document.getElementById('sName').value.toLowerCase().trim();
         const sVoterNo = document.getElementById('sVoterNo').value.toLowerCase().trim();
@@ -300,19 +260,21 @@
         const sDistrict = document.getElementById('sDistrict').value.toLowerCase().trim();
         const sUpazila = document.getElementById('sUpazila').value.toLowerCase().trim();
 
-        // Use a more efficient filtering approach for large datasets
-        const results = allVoters.filter(v => {
-            // Early exit if no search terms
-            if (!sName && !sVoterNo && !sFather && !sMother && !sDistrict && !sUpazila) {
-                return false;
-            }
+        const results = dbData.voters.filter(v => {
+            // Handle keys with trailing spaces as seen in your JSON ("name " vs "name")
+            const name = v.name || v["name "] || "";
+            const voterNo = v.voter_no || v["voter_no "] || "";
+            const father = v.father_name || v["father_name "] || "";
+            const mother = v.mother_name || v["mother_name "] || "";
+            const district = v.district || v["district "] || dbData.document_header?.district || "";
+            const upazila = v.upazila_thana || v["upazila_thana "] || dbData.document_header?.upazila_thana || "";
 
-            const matchName = !sName || (v.name && v.name.toLowerCase().includes(sName));
-            const matchVoterNo = !sVoterNo || (v.voter_no && v.voter_no.toString().includes(sVoterNo));
-            const matchFather = !sFather || (v.father_name && v.father_name.toLowerCase().includes(sFather));
-            const matchMother = !sMother || (v.mother_name && v.mother_name.toLowerCase().includes(sMother));
-            const matchDistrict = !sDistrict || (v.district && v.district.toLowerCase().includes(sDistrict));
-            const matchUpazila = !sUpazila || (v.upazila_thana && v.upazila_thana.toLowerCase().includes(sUpazila));
+            const matchName = !sName || name.toLowerCase().includes(sName);
+            const matchVoterNo = !sVoterNo || voterNo.toString().includes(sVoterNo);
+            const matchFather = !sFather || father.toLowerCase().includes(sFather);
+            const matchMother = !sMother || mother.toLowerCase().includes(sMother);
+            const matchDistrict = !sDistrict || district.toLowerCase().includes(sDistrict);
+            const matchUpazila = !sUpazila || upazila.toLowerCase().includes(sUpazila);
 
             return matchName && matchVoterNo && matchFather && matchMother && matchDistrict && matchUpazila;
         });
@@ -331,35 +293,30 @@
         }
         noDataMsg.style.display = 'none';
 
-        // Limit results to prevent browser crash if too many matches
-        const maxResults = 100;
-        const displayData = data.slice(0, maxResults);
+        data.forEach((v, index) => {
+            // Safe access for keys with spaces
+            const getVal = (obj, key) => obj[key] || obj[key + " "] || '-';
 
-        if (data.length > maxResults) {
-            container.innerHTML += `<div style="text-align:center; padding:10px; color:#666;">প্রথম ${maxResults} টি ফলাফল দেখানো হচ্ছে। মোট ফলাফল: ${data.length}</div>`;
-        }
-
-        displayData.forEach((v, index) => {
             const html = `
                 <div class="result-card">
                     <div class="card-header">
-                        <h3>${v.name || 'অজানা'}</h3>
-                        <span class="badge">ভোটার নং: ${v.voter_no || 'N/A'}</span>
+                        <h3>${getVal(v, 'name')}</h3>
+                        <span class="badge">ভোটার নং: ${getVal(v, 'voter_no')}</span>
                     </div>
                     <div class="card-body">
                         <div class="info-grid">
-                            <div class="info-item"><div class="info-label">পিতার নাম</div><div class="info-value">${v.father_name || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">মাতার নাম</div><div class="info-value">${v.mother_name || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">জন্ম তারিখ</div><div class="info-value">${v.date_of_birth || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">লিঙ্গ</div><div class="info-value">${v.gender || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">পেশা</div><div class="info-value">${v.occupation || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">ঠিকানা</div><div class="info-value">${v.address || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">জেলা</div><div class="info-value">${v.district || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">উপজেলা/থানা</div><div class="info-value">${v.upazila_thana || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">ইউনিয়ন/ওয়ার্ড</div><div class="info-value">${v.union_ward_cantonment || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">পোস্ট অফিস</div><div class="info-value">${v.post_office || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">পোস্ট কোড</div><div class="info-value">${v.post_code || '-'}</div></div>
-                            <div class="info-item"><div class="info-label">ভোটার এলাকা</div><div class="info-value">${v.voter_area_name || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">পিতার নাম</div><div class="info-value">${getVal(v, 'father_name')}</div></div>
+                            <div class="info-item"><div class="info-label">মাতার নাম</div><div class="info-value">${getVal(v, 'mother_name')}</div></div>
+                            <div class="info-item"><div class="info-label">জন্ম তারিখ</div><div class="info-value">${getVal(v, 'date_of_birth')}</div></div>
+                            <div class="info-item"><div class="info-label">লিঙ্গ</div><div class="info-value">${getVal(v, 'gender') || 'পুরুষ'}</div></div>
+                            <div class="info-item"><div class="info-label">পেশা</div><div class="info-value">${getVal(v, 'occupation')}</div></div>
+                            <div class="info-item"><div class="info-label">ঠিকানা</div><div class="info-value">${getVal(v, 'address')}</div></div>
+                            <div class="info-item"><div class="info-label">জেলা</div><div class="info-value">${getVal(v, 'district') || dbData.document_header?.district || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">উপজেলা/থানা</div><div class="info-value">${getVal(v, 'upazila_thana') || dbData.document_header?.upazila_thana || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">ইউনিয়ন/ওয়ার্ড</div><div class="info-value">${getVal(v, 'union_ward_cantonment') || dbData.document_header?.union_ward_cantonment || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">পোস্ট অফিস</div><div class="info-value">${getVal(v, 'post_office') || dbData.document_header?.post_office || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">পোস্ট কোড</div><div class="info-value">${getVal(v, 'post_code') || dbData.document_header?.post_code || '-'}</div></div>
+                            <div class="info-item"><div class="info-label">ভোটার এলাকা</div><div class="info-value">${getVal(v, 'voter_area_name') || dbData.document_header?.voter_area_name || '-'}</div></div>
                         </div>
                     </div>
                 </div>
