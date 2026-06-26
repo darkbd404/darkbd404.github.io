@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SALAM Tv Network - Advanced Server Engine</title>
+    <title>SALAM Tv Network - GitHub Core Engine</title>
     <!-- Hls.js Streaming Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
     <!-- FontAwesome Pro v6 Icons -->
@@ -325,9 +325,8 @@
 
     <div class="mainframe-3d-canvas">
         
-        <!-- 1. CINEMATIC VIEWPOT STAGE (No Top Button Area) -->
+        <!-- 1. CINEMATIC VIEWPOT STAGE -->
         <div class="cinema-viewport-large">
-            <!-- Dynamic Character Splitted Branding Line - Placed Bottom-Left Inside Screen -->
             <div class="in-viewport-salam-bar" id="player-brand-string-box"></div>
 
             <div class="media-placeholder-layer" id="screen-placeholder">
@@ -427,17 +426,275 @@
         });
 
         // -------------------------------------------------------------
-        // SERVER CONFIGURATION DATABASE: 
-        // আপনি আপনার হোস্টিং সার্ভারে থাকা ফাইলগুলোর নাম ঠিক এভাবে নিচে কমা (,) দিয়ে বসিয়ে দিন। 
+        // FIXED SERVER CONFIGURATION DATABASE: 
+        // Updated files names from .m3u8 to exact names on GitHub repository
         // -------------------------------------------------------------
         const playlistFiles = [
-            '328-live.m3u',
-            '338-live.m3u'
-            'old-live.m3u'
+            '338-live.m3u',
+            'old-live.m3u',
+            '328-live.m3u'
         ];
 
         // Core App Infrastructure Hooks
         const video = document.getElementById('video-core-engine');
         const mainStationContainer = document.getElementById('main-station-container');
         const sideSwapPillbox = document.getElementById('side-swap-pillbox');
-        const s
+        const strictGridBox = document.getElementById('strict-grid-box');
+        const searchBar = document.getElementById('channel-search-bar');
+        const screenPlaceholder = document.getElementById('screen-placeholder');
+        const totalCountBadge = document.getElementById('total-count-badge');
+        const livePulseIndicator = document.getElementById('live-pulse-indicator');
+        const pipelineLoader = document.getElementById('system-pipeline-loader');
+        
+        // Metrics Hooks
+        const srvNode = document.getElementById('srv-node');
+        const srvPing = document.getElementById('srv-ping');
+        const srvBitrate = document.getElementById('srv-bitrate');
+        const srvViewers = document.getElementById('srv-viewers');
+        const srvFirewall = document.getElementById('srv-firewall');
+        const srvStatus = document.getElementById('srv-status');
+
+        let hlsEngine = null;
+        let globalPlaylistDb = {};
+        let registeredChannelNamesSet = new Set(); 
+        let activeCategoryGlobal = '';
+        let metricsLoopInterval = null;
+
+        const categorySchema = {
+            'NEWS 📡': ['news', 'somoy', 'jamuna', 'ekattor', 'independent', 'atn', 'dbc'],
+            'SPORTS ⚽': ['sports', 't-sports', 'gtv', 'gazi', 'cricket', 'football', 'sony', 'star'],
+            'MOVIES 🍿': ['movies', 'cinema', 'action', 'hbo', 'zee', 'gold'],
+            'ENTERTAINMENT 📺': ['entertainment', 'jalsha', 'bangla', 'colors', 'tv', 'zee bangla']
+        };
+
+        // Automated GitHub Hosting Absolute Path Fetch System
+        async function bootCloudSequence() {
+            let combinedTracksText = "";
+            // Use Cache-busting query parameter to force freshest files directly from live hosting
+            const antiCacheSeed = "?timestamp=" + new Date().getTime();
+
+            for (const fileName of playlistFiles) {
+                try {
+                    const response = await fetch(fileName + antiCacheSeed);
+                    if (response.ok) {
+                        const fileContent = await response.text();
+                        combinedTracksText += "\n" + fileContent;
+                    } else {
+                        console.error(`HTTP server response error for file: ${fileName}`);
+                    }
+                } catch (err) {
+                    console.error(`Failed loading root payload reference node: ${fileName}`, err);
+                }
+            }
+            
+            if (combinedTracksText.trim() !== "") {
+                parseM3UContent(combinedTracksText);
+            } else {
+                pipelineLoader.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--accent)"></i><span>No accessible M3U document files found on root server.</span>`;
+                screenPlaceholder.innerHTML = `<i class="fa-solid fa-server"></i><p>Server Database Offline.</p>`;
+            }
+        }
+
+        function parseM3UContent(fileContent) {
+            const lines = fileContent.split('\n');
+            globalPlaylistDb = {};
+            registeredChannelNamesSet.clear();
+            
+            let currentTrack = null;
+            let finalAbsoluteCount = 0;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if (line.startsWith('#EXTINF:')) {
+                    currentTrack = {};
+                    const logoMatch = line.match(/tvg-logo="([^"]+)"/);
+                    currentTrack.logo = logoMatch ? logoMatch[1] : '';
+                    const groupMatch = line.match(/group-title="([^"]+)"/);
+                    const rawGrp = groupMatch ? groupMatch[1] : '';
+                    const parts = line.split(',');
+                    currentTrack.name = parts[parts.length - 1].trim() || 'Active Node';
+                    
+                    // Duplicate Filter Algorithm Layer
+                    let targetCategory = 'OTHERS 🏷️';
+                    const cleanedNameUpper = currentTrack.name.toUpperCase();
+
+                    if (registeredChannelNamesSet.has(cleanedNameUpper)) {
+                        targetCategory = 'MULTIPLE CHANNELS 🔄';
+                    } else {
+                        registeredChannelNamesSet.add(cleanedNameUpper);
+                        const comparativeString = `${currentTrack.name} ${rawGrp}`.toUpperCase();
+                        for (const [keyName, keywords] of Object.entries(categorySchema)) {
+                            if (keywords.some(kw => comparativeString.includes(kw.toUpperCase()))) {
+                                targetCategory = keyName;
+                                break;
+                            }
+                        }
+                    }
+                    currentTrack.category = targetCategory;
+                } else if (line.startsWith('http') && currentTrack) {
+                    currentTrack.url = line;
+                    if (!globalPlaylistDb[currentTrack.category]) globalPlaylistDb[currentTrack.category] = [];
+                    globalPlaylistDb[currentTrack.category].push(currentTrack);
+                    finalAbsoluteCount++;
+                    currentTrack = null;
+                }
+            }
+
+            totalCountBadge.innerText = `NODES: ${finalAbsoluteCount}`;
+            pipelineLoader.style.display = 'none';
+            deploySwappingStation();
+        }
+
+        function deploySwappingStation() {
+            sideSwapPillbox.innerHTML = '';
+            const structuredKeys = Object.keys(globalPlaylistDb).sort((a, b) => {
+                if(a === 'MULTIPLE CHANNELS 🔄') return 1;
+                if(b === 'MULTIPLE CHANNELS 🔄') return -1;
+                return a.localeCompare(b);
+            });
+
+            if (structuredKeys.length === 0) {
+                screenPlaceholder.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i><p>Empty Matrix Payload.</p>`;
+                return;
+            }
+
+            structuredKeys.forEach((groupName, idx) => {
+                const pill = document.createElement('div');
+                pill.className = 'ultra-3d-pill';
+                if (idx === 0) {
+                    pill.classList.add('active');
+                    activeCategoryGlobal = groupName;
+                }
+                pill.innerText = `${groupName} (${globalPlaylistDb[groupName].length})`;
+                
+                pill.addEventListener('click', () => {
+                    document.querySelectorAll('.ultra-3d-pill').forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    activeCategoryGlobal = groupName;
+                    searchBar.value = ''; 
+                    buildStrictGrid(groupName);
+                });
+                sideSwapPillbox.appendChild(pill);
+            });
+
+            mainStationContainer.style.display = 'flex';
+            screenPlaceholder.innerHTML = `<i class="fa-solid fa-play"></i><p>Chassis Active. Select Broadcast Node Below.</p>`;
+            buildStrictGrid(structuredKeys[0]);
+        }
+
+        function buildStrictGrid(groupName, filterQuery = '') {
+            strictGridBox.innerHTML = '';
+            const channels = globalPlaylistDb[groupName] || [];
+
+            const filteredChannels = channels.filter(channel => 
+                channel.name.toLowerCase().includes(filterQuery.toLowerCase())
+            );
+
+            if (filteredChannels.length === 0) {
+                strictGridBox.innerHTML = `<div style="grid-column: span 3; text-align: center; font-size: 10px; color: var(--text-sub); padding: 20px 0;">No matching channels found</div>`;
+                return;
+            }
+
+            filteredChannels.forEach(channel => {
+                const card = document.createElement('div');
+                card.className = 'card-node-item';
+                const fallbackSVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff0055' stroke-width='2'><rect x='2' y='7' width='20' height='15' rx='2'></rect></svg>";
+                
+                card.innerHTML = `<img src="${channel.logo ? channel.logo : fallbackSVG}" onerror="this.src='${fallbackSVG}'"><span>${channel.name}</span>`;
+                
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.card-node-item').forEach(c => c.classList.remove('playing'));
+                    card.classList.add('playing');
+                    fireBroadcastTunnel(channel);
+                });
+                strictGridBox.appendChild(card);
+            });
+        }
+
+        searchBar.addEventListener('input', (e) => {
+            buildStrictGrid(activeCategoryGlobal, e.target.value);
+        });
+
+        function fireBroadcastTunnel(channel) {
+            screenPlaceholder.style.display = 'none';
+            livePulseIndicator.style.display = 'flex';
+            
+            const fallbackSVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff0055' stroke-width='2'><rect x='2' y='7' width='20' height='15' rx='2'></rect></svg>";
+            document.getElementById('monitor-ch-logo').src = channel.logo ? channel.logo : fallbackSVG;
+            document.getElementById('monitor-ch-title').innerText = channel.name;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            deployMicroTelemetry(channel.category);
+
+            if (hlsEngine) hlsEngine.destroy();
+
+            if (Hls.isSupported()) {
+                hlsEngine = new Hls({ 
+                    enableWorker: true, 
+                    lowLatencyMode: true,
+                    maxBufferLength: 30,
+                    abrEwmaDefaultEstimate: 50000000 
+                });
+                hlsEngine.loadSource(channel.url);
+                hlsEngine.attachMedia(video);
+                hlsEngine.on(Hls.Events.MANIFEST_PARSED, () => { 
+                    video.play(); 
+                    srvStatus.innerText = "ONLINE";
+                    srvStatus.style.color = "var(--neon-green)";
+                });
+                hlsEngine.on(Hls.Events.ERROR, (event, data) => { if (data.fatal) triggerOfflineDisplay(); });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = channel.url;
+                video.addEventListener('loadedmetadata', () => { 
+                    video.play(); 
+                    srvStatus.innerText = "ONLINE";
+                    srvStatus.style.color = "var(--neon-green)";
+                });
+                video.addEventListener('error', () => { triggerOfflineDisplay(); });
+            }
+        }
+
+        function triggerOfflineDisplay() {
+            screenPlaceholder.style.display = 'flex';
+            screenPlaceholder.innerHTML = `<i class="fa-solid fa-ban" style="color:var(--accent)"></i><p style="color:var(--accent); font-weight:700;">NODE STREAM OFFLINE</p>`;
+            killTelemetry();
+        }
+
+        function deployMicroTelemetry(categoryName) {
+            if (metricsLoopInterval) clearInterval(metricsLoopInterval);
+            const parsedToken = categoryName.replace(/[^\w\s]/gi, '').trim().substring(0, 5);
+            srvNode.innerText = `${parsedToken || "CORE"}-M3U`;
+            srvFirewall.innerText = "SHIELD SECURE";
+            srvFirewall.style.color = "var(--neon-green)";
+            srvStatus.innerText = "TUNING FLOW";
+            srvStatus.style.color = "orange";
+
+            let viewersCounter = Math.floor(Math.random() * (3800 - 1400)) + 1400;
+
+            metricsLoopInterval = setInterval(() => {
+                const simulatedPing = Math.floor(Math.random() * (12 - 3)) + 3;
+                const simulatedBitrate = (Math.random() * (15.2 - 8.5) + 8.5).toFixed(2); 
+                viewersCounter += Math.floor(Math.random() * (8 - (-8))) + (-8);
+
+                srvPing.innerText = `${simulatedPing} ms`;
+                srvBitrate.innerText = `${simulatedBitrate} Mbps`;
+                srvViewers.innerText = viewersCounter.toLocaleString();
+            }, 1200);
+        }
+
+        function killTelemetry() {
+            if (metricsLoopInterval) clearInterval(metricsLoopInterval);
+            srvNode.innerText = "DEAD LINK";
+            srvPing.innerText = "0 ms";
+            srvBitrate.innerText = "0.00 Mbps";
+            srvViewers.innerText = "0";
+            srvFirewall.innerText = "STANDBY";
+            srvFirewall.style.color = "var(--text-sub)";
+            srvStatus.innerText = "DISCONNECTED";
+            srvStatus.style.color = "var(--accent)";
+        }
+
+        window.addEventListener('DOMContentLoaded', bootCloudSequence);
+    </script>
+</body>
+</html>
