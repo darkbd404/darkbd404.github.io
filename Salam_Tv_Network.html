@@ -238,65 +238,71 @@
         .search-input-3d::placeholder { color: var(--text-sub); }
         .search-wrapper-3d i { position: absolute; left: 14px; font-size: 11px; color: var(--text-sub); pointer-events: none; }
 
-        /* OPTIMIZED COMPACT MATRIX SETUP (3 Columns Layout like Multiple Channels) */
+        /* EXACT MATCH 3-COLUMN STRUCTURE FROM SCREENSHOT */
         .strict-3column-matrix {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 Columns Compact Grid for all categories */
-            gap: 6px;
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px;
             max-height: 340px;
             overflow-y: auto;
-            padding: 4px 2px;
+            padding: 6px 2px;
             width: 100%;
         }
         .strict-3column-matrix::-webkit-scrollbar { width: 3px; }
         .strict-3column-matrix::-webkit-scrollbar-thumb { background: var(--text-sub); border-radius: 10px; }
 
-        /* Compact Grid Card Item Layout */
+        /* Premium Standardized Card matching Screenshot_20260627-015641.png */
         .card-node-item {
             width: 100%;
-            padding: 8px 4px; /* Reduced compact padding */
-            border-radius: 12px; 
+            padding: 14px 6px; 
+            border-radius: 14px; 
             display: flex; 
-            flex-direction: column; /* Top to bottom flow for clean micro grid structure */
+            flex-direction: column; /* Icon top, title bottom layout */
             align-items: center; 
             justify-content: center;
-            gap: 6px; 
+            gap: 8px; 
             cursor: pointer; 
             background: var(--surface);
             border: 1px solid var(--border-highlight);
-            box-shadow: 3px 3px 6px var(--shadow-outer-dark), 
-                        -3px -3px 6px var(--shadow-outer-light);
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease, border-color 0.2s ease;
+            box-shadow: 4px 4px 8px var(--shadow-outer-dark), 
+                        -4px -4px 8px var(--shadow-outer-light);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .card-node-item img, .card-node-item .custom-font-icon { 
-            width: 26px; 
-            height: 26px; 
-            font-size: 16px;
+            width: 34px; 
+            height: 34px; 
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             object-fit: contain; 
-            border-radius: 6px; 
+            border-radius: 8px; 
             color: var(--neon-blue);
             transition: transform 0.2s ease; 
         }
+        
+        /* Auto Wrapping Engine - Keeps size rigid even if name is large */
         .card-node-item span { 
-            font-size: 8px; /* Standard compact font size matching old layout */
+            font-size: 9px; 
             color: var(--text-main); 
             text-align: center; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
             font-weight: 600; 
             width: 100%;
             padding: 0 2px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Wraps up to 2 lines max, then drops ellipsis */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+            word-break: break-word;
         }
         
         /* Holographic Push/Hover Highlight Interactions */
         .card-node-item:hover {
             transform: translateY(-2px);
-            box-shadow: 4px 4px 8px var(--shadow-outer-dark), 
-                        -4px -4px 8px var(--shadow-outer-light);
+            box-shadow: 6px 6px 12px var(--shadow-outer-dark), 
+                        -6px -6px 12px var(--shadow-outer-light);
             border-color: var(--neon-blue);
         }
         .card-node-item:hover img { transform: scale(1.05); }
@@ -509,15 +515,15 @@
             globalPlaylistDb = {};
             registeredChannelNamesSet.clear();
             
-            // 1. Initialize empty arrays for specific schema categories
+            // Initialize target structural sport category block
             globalPlaylistDb['SPORTS ⚽'] = [];
 
-            // 2. Inject Custom FIFA T-sports channel directly inside SPORTS category first
+            // Inject Custom Fixed FIFA T-Sports node directly into Sports Category
             globalPlaylistDb['SPORTS ⚽'].push({
                 name: 'FIFA T-Sports',
                 url: 'http://198.195.239.50:8095/tsports/tracks-v1a1/mono.m3u8',
                 logo: '',
-                isFontIcon: true, // Uses beautiful trophy/sports font-icon
+                isFontIcon: true,
                 category: 'SPORTS ⚽'
             });
 
@@ -570,7 +576,7 @@
             sideSwapPillbox.innerHTML = '';
             
             const structuredKeys = Object.keys(globalPlaylistDb).sort((a, b) => {
-                if(a === 'SPORTS ⚽') return -1; // Push sports to front
+                if(a === 'SPORTS ⚽') return -1; 
                 if(b === 'SPORTS ⚽') return 1;
                 if(a === 'MULTIPLE CHANNELS 🔄') return 1;
                 if(b === 'MULTIPLE CHANNELS 🔄') return -1;
@@ -583,7 +589,6 @@
             }
 
             structuredKeys.forEach((groupName, idx) => {
-                // Skip rendering empty categories if any
                 if(globalPlaylistDb[groupName].length === 0) return;
 
                 const pill = document.createElement('div');
