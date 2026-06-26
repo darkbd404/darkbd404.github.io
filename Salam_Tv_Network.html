@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SALAM Tv Network</title>
+    <!-- Hls.js Streaming Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
+    <!-- FontAwesome Pro v6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Premium Neumorphic Dark/Light Mode Core */
@@ -94,22 +96,19 @@
             display: block;
         }
 
-        /* PERSISTENT BRANDING OVERLAY - SET EVEN LOWER AS REQUESTED */
+        /* BRANDING OVERLAY - NO BACKGROUND & POSITIONED FURTHER RIGHT & DOWN */
         .in-viewport-salam-bar {
             position: absolute;
-            bottom: 12px; /* Moved further down for perfect visual clearance */
-            right: 14px;
-            background: rgba(13, 10, 27, 0.6);
-            padding: 4px 10px;
-            border-radius: 6px;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            bottom: 10px; 
+            right: 6px; /* Moved further right as requested */
+            background: transparent !important; /* Removed black background completely */
+            padding: 4px;
             display: flex;
             gap: 2px;
             z-index: 2147483647 !important;
             pointer-events: none;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: none !important;
+            border: none !important;
         }
 
         .in-viewport-salam-bar span {
@@ -124,7 +123,7 @@
         }
 
         @keyframes wordWave {
-            0%, 100% { opacity: 0.5; transform: scale(0.9); text-shadow: none; color: var(--text-sub); }
+            0%, 100% { opacity: 0.6; transform: scale(0.9); text-shadow: none; color: var(--text-sub); }
             5%, 25% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 8px var(--accent-glow); color: var(--accent); }
             30%, 95% { opacity: 1; transform: scale(1); text-shadow: none; color: var(--accent); }
         }
@@ -346,7 +345,9 @@
 
     <div class="mainframe-3d-canvas">
         
+        <!-- 1. CINEMATIC VIEWPOT STAGE -->
         <div class="cinema-viewport-large" id="player-viewport-container">
+            <!-- Persistent Branding Watermark Array Box -->
             <div class="in-viewport-salam-bar" id="player-brand-string-box"></div>
 
             <div class="media-placeholder-layer" id="screen-placeholder">
@@ -356,6 +357,7 @@
             <video id="video-core-engine" controls playsinline></video>
         </div>
 
+        <!-- 2. LIVE MONITOR LOG STATS -->
         <div class="compact-live-monitor-bar">
             <img id="monitor-ch-logo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff0055' stroke-width='2'><rect x='2' y='7' width='20' height='15' rx='2'></rect></svg>">
             <h4 id="monitor-ch-title">No Active Broadcast Node</h4>
@@ -366,6 +368,7 @@
             </div>
         </div>
 
+        <!-- 3. SERVER METRICS GRAPH DISPLAY -->
         <div class="quick-server-micro-grid">
             <div class="micro-server-node">
                 <div class="micro-lbl"><i class="fa-solid fa-server" style="color:var(--neon-blue)"></i> Link Type</div>
@@ -393,11 +396,13 @@
             </div>
         </div>
 
+        <!-- System Pipeline Loader -->
         <div class="server-sync-status-box" id="system-pipeline-loader">
             <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--neon-blue)"></i>
             <span>Loading playlists from server database...</span>
         </div>
 
+        <!-- 4. CHANNELS MONITOR BOARD INTERFACE -->
         <div class="permanent-channels-station" id="main-station-container" style="display:none;">
             <div class="side-swapping-category-strip" id="side-swap-pillbox"></div>
             
@@ -409,6 +414,7 @@
             <div class="strict-3column-matrix" id="strict-grid-box"></div>
         </div>
 
+        <!-- 5. STRUCTURAL FOOTER PROFILE HUB -->
         <footer class="premium-copyright-footer">
             <div class="brand-copyright-txt">
                 <h5>Salam Tv Network</h5>
@@ -480,34 +486,15 @@
             'ENTERTAINMENT 📺': ['entertainment', 'jalsha', 'bangla', 'colors', 'tv', 'zee bangla']
         };
 
+        // Independent Async Loading Architecture
         async function bootCloudSequence() {
-            let combinedTracksText = "";
-            const antiCacheSeed = "?timestamp=" + new Date().getTime();
-
-            for (const fileName of playlistFiles) {
-                try {
-                    const response = await fetch(fileName + antiCacheSeed);
-                    if (response.ok) {
-                        const fileContent = await response.text();
-                        combinedTracksText += "\n" + fileContent;
-                    }
-                } catch (err) {
-                    console.error(`Error loading file: ${fileName}`, err);
-                }
-            }
-            
-            parseM3UContent(combinedTracksText);
-        }
-
-        function parseM3UContent(fileContent) {
-            const lines = fileContent.split('\n');
-            globalPlaylistDb = {};
+            globalPlaylistDb = {
+                'SPORTS ⚽': [],
+                'OFFLINE 🚫': []
+            };
             registeredChannelNamesSet.clear();
-            
-            globalPlaylistDb['SPORTS ⚽'] = [];
-            globalPlaylistDb['OFFLINE 🚫'] = [];
 
-            // Default Testing Node
+            // Default Static Node Loading
             globalPlaylistDb['SPORTS ⚽'].push({
                 id: 'fixed-default-tsports',
                 name: 'FIFA T-Sports',
@@ -518,8 +505,32 @@
                 category: 'SPORTS ⚽'
             });
 
+            const antiCacheSeed = "?timestamp=" + new Date().getTime();
+            let loadedSuccessfullyCount = 0;
+
+            // Load files concurrently & dynamically without loops breaking up
+            await Promise.all(playlistFiles.map(async (fileName) => {
+                try {
+                    const response = await fetch(fileName + antiCacheSeed);
+                    if (response.ok) {
+                        const fileContent = await response.text();
+                        parseSingleM3UContent(fileContent);
+                        loadedSuccessfullyCount++;
+                    }
+                } catch (err) {
+                    console.error(`Skipping file or network error on: ${fileName}`, err);
+                }
+            }));
+
+            updateTotalNodesCounter();
+            pipelineLoader.style.display = 'none';
+            deploySwappingStation();
+        }
+
+        function parseSingleM3UContent(fileContent) {
+            const lines = fileContent.split('\n');
             let currentTrack = null;
-            let trackingIdCounter = 0;
+            let trackingIdCounter = Math.floor(Math.random() * 10000);
 
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim();
@@ -550,7 +561,7 @@
                     currentTrack.category = targetCategory;
                     currentTrack.originalCategory = targetCategory;
                     currentTrack.isFontIcon = false;
-                    currentTrack.id = 'node-id-' + trackingIdCounter++;
+                    currentTrack.id = 'node-id-' + (trackingIdCounter++);
                 } else if (line.startsWith('http') && currentTrack) {
                     currentTrack.url = line;
                     
@@ -561,10 +572,6 @@
                     currentTrack = null;
                 }
             }
-
-            updateTotalNodesCounter();
-            pipelineLoader.style.display = 'none';
-            deploySwappingStation();
         }
 
         function updateTotalNodesCounter() {
@@ -587,7 +594,7 @@
             });
 
             if (!activeCategoryGlobal || !globalPlaylistDb[activeCategoryGlobal] || globalPlaylistDb[activeCategoryGlobal].length === 0) {
-                activeCategoryGlobal = structuredKeys[0];
+                activeCategoryGlobal = structuredKeys[0] || 'SPORTS ⚽';
             }
 
             structuredKeys.forEach((groupName) => {
@@ -677,14 +684,13 @@
                 hlsEngine = null;
             }
 
-            // Real-time Runtime Error Catching for Automatic Isolation Engine
             if (Hls.isSupported()) {
                 hlsEngine = new Hls({ 
                     enableWorker: true, 
                     lowLatencyMode: true,
                     maxBufferLength: 10,
-                    manifestLoadingTimeOut: 6000, 
-                    fragLoadingTimeOut: 6000
+                    manifestLoadingTimeOut: 5000, 
+                    fragLoadingTimeOut: 5000
                 });
                 hlsEngine.loadSource(channel.url);
                 hlsEngine.attachMedia(video);
@@ -697,7 +703,6 @@
 
                 hlsEngine.on(Hls.Events.ERROR, (event, data) => {
                     if (data.fatal) {
-                        console.warn("Fatal core stream error captured:", data.type);
                         isolateOfflineNode(channel);
                     }
                 });
@@ -714,25 +719,21 @@
             }
         }
 
-        // Moves dead nodes safely to Offline Category pool without crash
         function isolateOfflineNode(channel) {
             if (channel.category !== 'OFFLINE 🚫') {
-                // Remove from previous list array
                 if(globalPlaylistDb[channel.category]) {
                     globalPlaylistDb[channel.category] = globalPlaylistDb[channel.category].filter(c => c.id !== channel.id);
                 }
                 
-                // Reposition to Offline structure array
                 channel.category = 'OFFLINE 🚫';
                 globalPlaylistDb['OFFLINE 🚫'].push(channel);
                 
-                // Refresh list metrics
                 updateTotalNodesCounter();
                 deploySwappingStation();
             }
 
             screenPlaceholder.style.display = 'flex';
-            screenPlaceholder.innerHTML = `<i class="fa-solid fa-ban" style="color:var(--accent)"></i><p style="color:var(--accent); font-weight:700;">NODE OFFLINE - RELOCATED TO 🚫 BOX</p>`;
+            screenPlaceholder.innerHTML = `<i class="fa-solid fa-ban" style="color:var(--accent)"></i><p style="color:var(--accent); font-weight:700;">NODE OFFLINE - MOVED TO 🚫 BOX</p>`;
             killTelemetry();
         }
 
