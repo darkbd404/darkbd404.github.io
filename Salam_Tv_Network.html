@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SALAM Tv Network - Advanced Custom Engine</title>
-    <!-- Hls.js Streaming Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
-    <!-- FontAwesome Pro v6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Premium Neumorphic Dark/Light Mode Core */
@@ -89,20 +87,6 @@
             box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
         }
 
-        /* Fullscreen Support to enforce rendering container layout */
-        .cinema-viewport-large:fullscreen {
-            width: 100vw;
-            height: 100vh;
-            aspect-ratio: auto;
-            border-radius: 0;
-        }
-        .cinema-viewport-large:-webkit-full-screen {
-            width: 100vw;
-            height: 100vh;
-            aspect-ratio: auto;
-            border-radius: 0;
-        }
-
         video {
             width: 100%;
             height: 100%;
@@ -110,10 +94,10 @@
             display: block;
         }
 
-        /* PERSISTENT BRANDING OVERLAY - FIXED TO BOTTOM-RIGHT (সবসময় ভিডিওর উপরে থাকবে) */
+        /* PERSISTENT BRANDING OVERLAY - FIXED TO BOTTOM-RIGHT & LOWERED */
         .in-viewport-salam-bar {
             position: absolute;
-            bottom: 45px; /* Placed safely above default video control bar progress */
+            bottom: 25px; /* Lowered perfectly matching user specification */
             right: 14px;
             background: rgba(13, 10, 27, 0.6);
             padding: 4px 10px;
@@ -122,7 +106,7 @@
             -webkit-backdrop-filter: blur(4px);
             display: flex;
             gap: 2px;
-            z-index: 2147483647 !important; /* Forces top layer rendering over native fullscreen */
+            z-index: 2147483647 !important; /* Fixed rendering cross platform native layers */
             pointer-events: none;
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
@@ -235,7 +219,7 @@
             border-color: transparent;
         }
 
-        /* Neumorphic 3D Search Structure Component */
+        /* Search Structure Component */
         .search-wrapper-3d {
             position: relative;
             width: 100%;
@@ -257,7 +241,7 @@
         .search-input-3d::placeholder { color: var(--text-sub); }
         .search-wrapper-3d i { position: absolute; left: 14px; font-size: 11px; color: var(--text-sub); pointer-events: none; }
 
-        /* EXACT MATCH 3-COLUMN STRUCTURE FROM SCREENSHOT */
+        /* 3-COLUMN MATRIX STRUCTURE */
         .strict-3column-matrix {
             display: grid;
             grid-template-columns: repeat(3, 1fr); 
@@ -270,7 +254,7 @@
         .strict-3column-matrix::-webkit-scrollbar { width: 3px; }
         .strict-3column-matrix::-webkit-scrollbar-thumb { background: var(--text-sub); border-radius: 10px; }
 
-        /* Premium Standardized Card matching Screenshot */
+        /* Premium Standardized Card */
         .card-node-item {
             width: 100%;
             padding: 14px 6px; 
@@ -300,7 +284,6 @@
             transition: transform 0.2s ease; 
         }
         
-        /* Auto Wrapping Engine - Keeps size rigid even if name is large */
         .card-node-item span { 
             font-size: 9px; 
             color: var(--text-main); 
@@ -317,7 +300,6 @@
             word-break: break-word;
         }
         
-        /* Holographic Push/Hover Highlight Interactions */
         .card-node-item:hover {
             transform: translateY(-2px);
             box-shadow: 6px 6px 12px var(--shadow-outer-dark), 
@@ -370,9 +352,7 @@
 
     <div class="mainframe-3d-canvas">
         
-        <!-- 1. CINEMATIC VIEWPOT STAGE -->
         <div class="cinema-viewport-large" id="player-viewport-container">
-            <!-- Persistent Branding Watermark Array Box - Now fully tied inside the container overlay -->
             <div class="in-viewport-salam-bar" id="player-brand-string-box"></div>
 
             <div class="media-placeholder-layer" id="screen-placeholder">
@@ -382,7 +362,6 @@
             <video id="video-core-engine" controls playsinline></video>
         </div>
 
-        <!-- 2. LIVE MONITOR LOG STATS -->
         <div class="compact-live-monitor-bar">
             <img id="monitor-ch-logo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff0055' stroke-width='2'><rect x='2' y='7' width='20' height='15' rx='2'></rect></svg>">
             <h4 id="monitor-ch-title">No Active Broadcast Node</h4>
@@ -393,7 +372,6 @@
             </div>
         </div>
 
-        <!-- 3. QUANTUM SERVER METRICS GRAPH DISPLAY -->
         <div class="quick-server-micro-grid">
             <div class="micro-server-node">
                 <div class="micro-lbl"><i class="fa-solid fa-server" style="color:var(--neon-blue)"></i> Link Type</div>
@@ -421,17 +399,14 @@
             </div>
         </div>
 
-        <!-- Automated Status Terminal Box -->
         <div class="server-sync-status-box" id="system-pipeline-loader">
             <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--neon-blue)"></i>
-            <span>Fetching configuration files from server root...</span>
+            <span>Scanning playlists & auto-detecting server status...</span>
         </div>
 
-        <!-- 4. CHANNELS MONITOR BOARD INTERFACE -->
         <div class="permanent-channels-station" id="main-station-container" style="display:none;">
             <div class="side-swapping-category-strip" id="side-swap-pillbox"></div>
             
-            <!-- Dynamic 3D Embedded Search Bar -->
             <div class="search-wrapper-3d">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="channel-search-bar" class="search-input-3d" placeholder="Search station / channel node...">
@@ -440,7 +415,6 @@
             <div class="strict-3column-matrix" id="strict-grid-box"></div>
         </div>
 
-        <!-- 5. STRUCTURAL FOOTER PROFILE HUB -->
         <footer class="premium-copyright-footer">
             <div class="brand-copyright-txt">
                 <h5>Salam Tv Network</h5>
@@ -460,7 +434,7 @@
     </div>
 
     <script>
-        // Character Split Bottom-Right Infinity Wave Animation Engine
+        // Character Split Animation Engine
         const targetStringName = "Salam Tv Network";
         const stringBoxContainer = document.getElementById('player-brand-string-box');
         
@@ -478,7 +452,7 @@
             '328-live.m3u'
         ];
 
-        // Core App Infrastructure Hooks
+        // Core App Hooks
         const video = document.getElementById('video-core-engine');
         const viewportContainer = document.getElementById('player-viewport-container');
         const mainStationContainer = document.getElementById('main-station-container');
@@ -506,38 +480,12 @@
 
         const categorySchema = {
             'NEWS 📡': ['news', 'somoy', 'jamuna', 'ekattor', 'independent', 'atn', 'dbc'],
-            'SPORTS ⚽': ['sports', 't-sports', 'gtv', 'gazi', 'cricket', 'football', 'sony', 'star'],
+            'SPORTS ⚽': ['sports', 't-sports', 'gtv', 'gazi', 'cricket', 'football', 'sony', 'star', 'fifa'],
             'MOVIES 🍿': ['movies', 'cinema', 'action', 'hbo', 'zee', 'gold'],
             'ENTERTAINMENT 📺': ['entertainment', 'jalsha', 'bangla', 'colors', 'tv', 'zee bangla']
         };
 
-        // ADVANCED LAYER INTERCEPTOR SYSTEM FOR FULLSCREEN / ORIENTATION CHANGE
-        // Direct Interception on native webkit request elements
-        video.addEventListener('webkitbeginfullscreen', function(e) {
-            e.preventDefault();
-            triggerCustomViewportFullscreen();
-        });
-
-        // Event handler tracking standard fullscreen changes
-        document.addEventListener('fullscreenchange', function() {
-            if (document.fullscreenElement === video) {
-                document.exitFullscreen().then(() => {
-                    triggerCustomViewportFullscreen();
-                });
-            }
-        });
-
-        function triggerCustomViewportFullscreen() {
-            if (viewportContainer.requestFullscreen) {
-                viewportContainer.requestFullscreen();
-            } else if (viewportContainer.webkitRequestFullscreen) {
-                viewportContainer.webkitRequestFullscreen();
-            } else if (viewportContainer.msRequestFullscreen) {
-                viewportContainer.msRequestFullscreen();
-            }
-        }
-
-        // Automated GitHub Hosting Absolute Path Fetch System
+        // Rotation & native screen constraints are fully unblocked now
         async function bootCloudSequence() {
             let combinedTracksText = "";
             const antiCacheSeed = "?timestamp=" + new Date().getTime();
@@ -557,12 +505,14 @@
             parseM3UContent(combinedTracksText);
         }
 
-        function parseM3UContent(fileContent) {
+        async function parseM3UContent(fileContent) {
             const lines = fileContent.split('\n');
             globalPlaylistDb = {};
             registeredChannelNamesSet.clear();
             
+            // Initialization placeholders
             globalPlaylistDb['SPORTS ⚽'] = [];
+            globalPlaylistDb['OFFLINE 🚫'] = [];
 
             globalPlaylistDb['SPORTS ⚽'].push({
                 name: 'FIFA T-Sports',
@@ -573,7 +523,7 @@
             });
 
             let currentTrack = null;
-            let finalAbsoluteCount = 1; 
+            let temporaryAllChannelsList = [];
 
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim();
@@ -605,12 +555,47 @@
                     currentTrack.isFontIcon = false;
                 } else if (line.startsWith('http') && currentTrack) {
                     currentTrack.url = line;
-                    if (!globalPlaylistDb[currentTrack.category]) globalPlaylistDb[currentTrack.category] = [];
-                    globalPlaylistDb[currentTrack.category].push(currentTrack);
-                    finalAbsoluteCount++;
+                    temporaryAllChannelsList.push(currentTrack);
                     currentTrack = null;
                 }
             }
+
+            // AUTO ONLINE/OFFLINE CHASSIS STATUS DETECTION PIPELINE ENGINE
+            pipelineLoader.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin" style="color:var(--neon-blue)"></i> <span>Filtering & Sorting Offline Servers...</span>`;
+            
+            // Async checking in optimization batches to process quickly
+            const batchSize = 25;
+            for (let i = 0; i < temporaryAllChannelsList.length; i += batchSize) {
+                const batch = temporaryAllChannelsList.slice(i, i + batchSize);
+                await Promise.all(batch.map(async (channel) => {
+                    let isOnline = true;
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5 sec quick timeout per link
+                        
+                        const res = await fetch(channel.url, { method: 'HEAD', mode: 'no-cors', signal: controller.signal });
+                        clearTimeout(timeoutId);
+                    } catch (e) {
+                        // If it fails completely or triggers a network connection failure, flag it offline
+                        if (e.name === 'AbortError' || e.message.includes('failed') || e.message.includes('NetworkError')) {
+                            isOnline = false;
+                        }
+                    }
+
+                    if (!isOnline) {
+                        channel.category = 'OFFLINE 🚫';
+                    }
+
+                    if (!globalPlaylistDb[channel.category]) globalPlaylistDb[channel.category] = [];
+                    globalPlaylistDb[channel.category].push(channel);
+                }));
+            }
+
+            // Total Node counter compilation
+            let finalAbsoluteCount = 0;
+            Object.keys(globalPlaylistDb).forEach(k => {
+                finalAbsoluteCount += globalPlaylistDb[k].length;
+            });
 
             totalCountBadge.innerText = `NODES: ${finalAbsoluteCount}`;
             pipelineLoader.style.display = 'none';
@@ -623,8 +608,8 @@
             const structuredKeys = Object.keys(globalPlaylistDb).sort((a, b) => {
                 if(a === 'SPORTS ⚽') return -1; 
                 if(b === 'SPORTS ⚽') return 1;
-                if(a === 'MULTIPLE CHANNELS 🔄') return 1;
-                if(b === 'MULTIPLE CHANNELS 🔄') return -1;
+                if(a === 'OFFLINE 🚫') return 1; // Pushes offline list to the end
+                if(b === 'OFFLINE 🚫') return -1;
                 return a.localeCompare(b);
             });
 
@@ -633,14 +618,16 @@
                 return;
             }
 
-            structuredKeys.forEach((groupName, idx) => {
-                if(globalPlaylistDb[groupName].length === 0) return;
+            // Default to find first non-empty category
+            activeCategoryGlobal = structuredKeys[0];
+
+            structuredKeys.forEach((groupName) => {
+                if(!globalPlaylistDb[groupName] || globalPlaylistDb[groupName].length === 0) return;
 
                 const pill = document.createElement('div');
                 pill.className = 'ultra-3d-pill';
-                if (idx === 0) {
+                if (groupName === activeCategoryGlobal) {
                     pill.classList.add('active');
-                    activeCategoryGlobal = groupName;
                 }
                 pill.innerText = `${groupName} (${globalPlaylistDb[groupName].length})`;
                 
