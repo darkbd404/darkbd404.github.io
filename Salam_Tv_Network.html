@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SALAM Tv Network - Advanced Custom Engine</title>
+    <title>SALAM Tv Network</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -94,10 +94,10 @@
             display: block;
         }
 
-        /* PERSISTENT BRANDING OVERLAY - FIXED TO BOTTOM-RIGHT & LOWERED */
+        /* PERSISTENT BRANDING OVERLAY - SET EVEN LOWER AS REQUESTED */
         .in-viewport-salam-bar {
             position: absolute;
-            bottom: 25px; /* Lowered perfectly matching user specification */
+            bottom: 12px; /* Moved further down for perfect visual clearance */
             right: 14px;
             background: rgba(13, 10, 27, 0.6);
             padding: 4px 10px;
@@ -106,7 +106,7 @@
             -webkit-backdrop-filter: blur(4px);
             display: flex;
             gap: 2px;
-            z-index: 2147483647 !important; /* Fixed rendering cross platform native layers */
+            z-index: 2147483647 !important;
             pointer-events: none;
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
@@ -175,7 +175,7 @@
         .micro-lbl { font-size: 8px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
         .micro-val { font-size: 11px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* System Initializing Pipeline Loader Bar */
+        /* System Pipeline Loader */
         .server-sync-status-box {
             border-radius: 12px; padding: 11px; text-align: center;
             font-size: 10px; font-weight: 700; color: var(--text-sub); display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -269,7 +269,7 @@
             border: 1px solid var(--border-highlight);
             box-shadow: 4px 4px 8px var(--shadow-outer-dark), 
                         -4px -4px 8px var(--shadow-outer-light);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            transition: all 0.2s ease;
         }
         .card-node-item img, .card-node-item .custom-font-icon { 
             width: 34px; 
@@ -281,7 +281,6 @@
             object-fit: contain; 
             border-radius: 8px; 
             color: var(--neon-blue);
-            transition: transform 0.2s ease; 
         }
         
         .card-node-item span { 
@@ -302,14 +301,10 @@
         
         .card-node-item:hover {
             transform: translateY(-2px);
-            box-shadow: 6px 6px 12px var(--shadow-outer-dark), 
-                        -6px -6px 12px var(--shadow-outer-light);
             border-color: var(--neon-blue);
         }
-        .card-node-item:hover img { transform: scale(1.05); }
 
         .card-node-item:active, .card-node-item.playing { 
-            transform: translateY(1px);
             box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
             border-color: transparent;
         }
@@ -342,7 +337,6 @@
             transition: all 0.2s ease;
         }
         .social-3d-btn:hover { transform: scale(1.05); color: var(--accent); border-color: var(--accent); }
-        .social-3d-btn:active { box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light); transform: scale(0.98); }
         .social-3d-btn.fb:hover { color: #1877f2; border-color: #1877f2; }
         .social-3d-btn.tg:hover { color: #0088cc; border-color: #0088cc; }
         .social-3d-btn.gm:hover { color: #ea4335; border-color: #ea4335; }
@@ -401,7 +395,7 @@
 
         <div class="server-sync-status-box" id="system-pipeline-loader">
             <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--neon-blue)"></i>
-            <span>Scanning playlists & auto-detecting server status...</span>
+            <span>Loading playlists from server database...</span>
         </div>
 
         <div class="permanent-channels-station" id="main-station-container" style="display:none;">
@@ -445,7 +439,7 @@
             stringBoxContainer.appendChild(charSpan);
         });
 
-        // Server M3U Playlists Root Files Array
+        // Server M3U Playlists Database Links
         const playlistFiles = [
             '338-live.m3u',
             'old-live.m3u',
@@ -477,6 +471,7 @@
         let registeredChannelNamesSet = new Set(); 
         let activeCategoryGlobal = '';
         let metricsLoopInterval = null;
+        let currentPlayingChannelRef = null;
 
         const categorySchema = {
             'NEWS 📡': ['news', 'somoy', 'jamuna', 'ekattor', 'independent', 'atn', 'dbc'],
@@ -485,7 +480,6 @@
             'ENTERTAINMENT 📺': ['entertainment', 'jalsha', 'bangla', 'colors', 'tv', 'zee bangla']
         };
 
-        // Rotation & native screen constraints are fully unblocked now
         async function bootCloudSequence() {
             let combinedTracksText = "";
             const antiCacheSeed = "?timestamp=" + new Date().getTime();
@@ -498,32 +492,34 @@
                         combinedTracksText += "\n" + fileContent;
                     }
                 } catch (err) {
-                    console.error(`Failed loading root payload reference node: ${fileName}`, err);
+                    console.error(`Error loading file: ${fileName}`, err);
                 }
             }
             
             parseM3UContent(combinedTracksText);
         }
 
-        async function parseM3UContent(fileContent) {
+        function parseM3UContent(fileContent) {
             const lines = fileContent.split('\n');
             globalPlaylistDb = {};
             registeredChannelNamesSet.clear();
             
-            // Initialization placeholders
             globalPlaylistDb['SPORTS ⚽'] = [];
             globalPlaylistDb['OFFLINE 🚫'] = [];
 
+            // Default Testing Node
             globalPlaylistDb['SPORTS ⚽'].push({
+                id: 'fixed-default-tsports',
                 name: 'FIFA T-Sports',
                 url: 'http://198.195.239.50:8095/tsports/tracks-v1a1/mono.m3u8',
                 logo: '',
                 isFontIcon: true,
+                originalCategory: 'SPORTS ⚽',
                 category: 'SPORTS ⚽'
             });
 
             let currentTrack = null;
-            let temporaryAllChannelsList = [];
+            let trackingIdCounter = 0;
 
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim();
@@ -552,54 +548,31 @@
                         }
                     }
                     currentTrack.category = targetCategory;
+                    currentTrack.originalCategory = targetCategory;
                     currentTrack.isFontIcon = false;
+                    currentTrack.id = 'node-id-' + trackingIdCounter++;
                 } else if (line.startsWith('http') && currentTrack) {
                     currentTrack.url = line;
-                    temporaryAllChannelsList.push(currentTrack);
+                    
+                    if (!globalPlaylistDb[currentTrack.category]) {
+                        globalPlaylistDb[currentTrack.category] = [];
+                    }
+                    globalPlaylistDb[currentTrack.category].push(currentTrack);
                     currentTrack = null;
                 }
             }
 
-            // AUTO ONLINE/OFFLINE CHASSIS STATUS DETECTION PIPELINE ENGINE
-            pipelineLoader.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin" style="color:var(--neon-blue)"></i> <span>Filtering & Sorting Offline Servers...</span>`;
-            
-            // Async checking in optimization batches to process quickly
-            const batchSize = 25;
-            for (let i = 0; i < temporaryAllChannelsList.length; i += batchSize) {
-                const batch = temporaryAllChannelsList.slice(i, i + batchSize);
-                await Promise.all(batch.map(async (channel) => {
-                    let isOnline = true;
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5 sec quick timeout per link
-                        
-                        const res = await fetch(channel.url, { method: 'HEAD', mode: 'no-cors', signal: controller.signal });
-                        clearTimeout(timeoutId);
-                    } catch (e) {
-                        // If it fails completely or triggers a network connection failure, flag it offline
-                        if (e.name === 'AbortError' || e.message.includes('failed') || e.message.includes('NetworkError')) {
-                            isOnline = false;
-                        }
-                    }
+            updateTotalNodesCounter();
+            pipelineLoader.style.display = 'none';
+            deploySwappingStation();
+        }
 
-                    if (!isOnline) {
-                        channel.category = 'OFFLINE 🚫';
-                    }
-
-                    if (!globalPlaylistDb[channel.category]) globalPlaylistDb[channel.category] = [];
-                    globalPlaylistDb[channel.category].push(channel);
-                }));
-            }
-
-            // Total Node counter compilation
+        function updateTotalNodesCounter() {
             let finalAbsoluteCount = 0;
             Object.keys(globalPlaylistDb).forEach(k => {
                 finalAbsoluteCount += globalPlaylistDb[k].length;
             });
-
             totalCountBadge.innerText = `NODES: ${finalAbsoluteCount}`;
-            pipelineLoader.style.display = 'none';
-            deploySwappingStation();
         }
 
         function deploySwappingStation() {
@@ -608,28 +581,25 @@
             const structuredKeys = Object.keys(globalPlaylistDb).sort((a, b) => {
                 if(a === 'SPORTS ⚽') return -1; 
                 if(b === 'SPORTS ⚽') return 1;
-                if(a === 'OFFLINE 🚫') return 1; // Pushes offline list to the end
+                if(a === 'OFFLINE 🚫') return 1;
                 if(b === 'OFFLINE 🚫') return -1;
                 return a.localeCompare(b);
             });
 
-            if (structuredKeys.length === 0) {
-                screenPlaceholder.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i><p>Empty Matrix Payload.</p>`;
-                return;
+            if (!activeCategoryGlobal || !globalPlaylistDb[activeCategoryGlobal] || globalPlaylistDb[activeCategoryGlobal].length === 0) {
+                activeCategoryGlobal = structuredKeys[0];
             }
 
-            // Default to find first non-empty category
-            activeCategoryGlobal = structuredKeys[0];
-
             structuredKeys.forEach((groupName) => {
-                if(!globalPlaylistDb[groupName] || globalPlaylistDb[groupName].length === 0) return;
+                const totalInCat = globalPlaylistDb[groupName] ? globalPlaylistDb[groupName].length : 0;
+                if(totalInCat === 0 && groupName !== 'OFFLINE 🚫') return;
 
                 const pill = document.createElement('div');
                 pill.className = 'ultra-3d-pill';
                 if (groupName === activeCategoryGlobal) {
                     pill.classList.add('active');
                 }
-                pill.innerText = `${groupName} (${globalPlaylistDb[groupName].length})`;
+                pill.innerText = `${groupName} (${totalInCat})`;
                 
                 pill.addEventListener('click', () => {
                     document.querySelectorAll('.ultra-3d-pill').forEach(p => p.classList.remove('active'));
@@ -642,7 +612,9 @@
             });
 
             mainStationContainer.style.display = 'flex';
-            screenPlaceholder.innerHTML = `<i class="fa-solid fa-play"></i><p>Chassis Active. Select Broadcast Node Below.</p>`;
+            if(!video.src && (!hlsEngine || !hlsEngine.url)) {
+                screenPlaceholder.innerHTML = `<i class="fa-solid fa-play"></i><p>Chassis Active. Select Broadcast Node Below.</p>`;
+            }
             buildStrictGrid(activeCategoryGlobal);
         }
 
@@ -655,13 +627,17 @@
             );
 
             if (filteredChannels.length === 0) {
-                strictGridBox.innerHTML = `<div style="grid-column: span 3; text-align: center; font-size: 11px; color: var(--text-sub); padding: 20px 0;">No matching channels found</div>`;
+                strictGridBox.innerHTML = `<div style="grid-column: span 3; text-align: center; font-size: 11px; color: var(--text-sub); padding: 20px 0;">No nodes under this selection</div>`;
                 return;
             }
 
             filteredChannels.forEach(channel => {
                 const card = document.createElement('div');
                 card.className = 'card-node-item';
+                if(currentPlayingChannelRef && currentPlayingChannelRef.id === channel.id) {
+                    card.classList.add('playing');
+                }
+                
                 const fallbackSVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300f0ff' stroke-width='2'><rect x='2' y='7' width='20' height='15' rx='2'></rect></svg>";
                 
                 if(channel.isFontIcon) {
@@ -684,53 +660,79 @@
         });
 
         function fireBroadcastTunnel(channel) {
+            currentPlayingChannelRef = channel;
             screenPlaceholder.style.display = 'none';
             livePulseIndicator.style.display = 'flex';
             
             const fallbackSVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff0055' stroke-width='2'><rect x='2' y='7' width='20' height='15' rx='2'></rect></svg>";
             
-            if(channel.isFontIcon) {
-                document.getElementById('monitor-ch-logo').src = fallbackSVG;
-            } else {
-                document.getElementById('monitor-ch-logo').src = channel.logo ? channel.logo : fallbackSVG;
-            }
-            
+            document.getElementById('monitor-ch-logo').src = channel.logo && !channel.isFontIcon ? channel.logo : fallbackSVG;
             document.getElementById('monitor-ch-title').innerText = channel.name;
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
             deployMicroTelemetry(channel.category);
 
-            if (hlsEngine) hlsEngine.destroy();
+            if (hlsEngine) {
+                hlsEngine.destroy();
+                hlsEngine = null;
+            }
 
+            // Real-time Runtime Error Catching for Automatic Isolation Engine
             if (Hls.isSupported()) {
                 hlsEngine = new Hls({ 
                     enableWorker: true, 
                     lowLatencyMode: true,
-                    maxBufferLength: 30,
-                    abrEwmaDefaultEstimate: 50000000 
+                    maxBufferLength: 10,
+                    manifestLoadingTimeOut: 6000, 
+                    fragLoadingTimeOut: 6000
                 });
                 hlsEngine.loadSource(channel.url);
                 hlsEngine.attachMedia(video);
+                
                 hlsEngine.on(Hls.Events.MANIFEST_PARSED, () => { 
-                    video.play(); 
+                    video.play().catch(() => {}); 
                     srvStatus.innerText = "ONLINE";
                     srvStatus.style.color = "var(--neon-green)";
                 });
-                hlsEngine.on(Hls.Events.ERROR, (event, data) => { if (data.fatal) triggerOfflineDisplay(); });
+
+                hlsEngine.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        console.warn("Fatal core stream error captured:", data.type);
+                        isolateOfflineNode(channel);
+                    }
+                });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = channel.url;
                 video.addEventListener('loadedmetadata', () => { 
-                    video.play(); 
+                    video.play().catch(() => {}); 
                     srvStatus.innerText = "ONLINE";
                     srvStatus.style.color = "var(--neon-green)";
                 });
-                video.addEventListener('error', () => { triggerOfflineDisplay(); });
+                video.addEventListener('error', () => { 
+                    isolateOfflineNode(channel);
+                });
             }
         }
 
-        function triggerOfflineDisplay() {
+        // Moves dead nodes safely to Offline Category pool without crash
+        function isolateOfflineNode(channel) {
+            if (channel.category !== 'OFFLINE 🚫') {
+                // Remove from previous list array
+                if(globalPlaylistDb[channel.category]) {
+                    globalPlaylistDb[channel.category] = globalPlaylistDb[channel.category].filter(c => c.id !== channel.id);
+                }
+                
+                // Reposition to Offline structure array
+                channel.category = 'OFFLINE 🚫';
+                globalPlaylistDb['OFFLINE 🚫'].push(channel);
+                
+                // Refresh list metrics
+                updateTotalNodesCounter();
+                deploySwappingStation();
+            }
+
             screenPlaceholder.style.display = 'flex';
-            screenPlaceholder.innerHTML = `<i class="fa-solid fa-ban" style="color:var(--accent)"></i><p style="color:var(--accent); font-weight:700;">NODE STREAM OFFLINE</p>`;
+            screenPlaceholder.innerHTML = `<i class="fa-solid fa-ban" style="color:var(--accent)"></i><p style="color:var(--accent); font-weight:700;">NODE OFFLINE - RELOCATED TO 🚫 BOX</p>`;
             killTelemetry();
         }
 
