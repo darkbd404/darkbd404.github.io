@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SALAM Tv Network - Advanced Server Engine</title>
+    <!-- Hls.js Streaming Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
+    <!-- FontAwesome Pro v6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Premium Neumorphic Dark/Light Mode Core */
+        :root {
+            --bg-color: #0d0a1b;
+            --surface: #130f26;
+            --shadow-outer-dark: #05040a;
+            --shadow-outer-light: rgba(255, 255, 255, 0.03);
+            --shadow-inner-dark: inset 4px 4px 9px #05040a;
+            --shadow-inner-light: inset -4px -4px 9px rgba(255, 255, 255, 0.03);
+            --text-main: #e6e1f7;
+            --text-sub: #6c648a;
+            --accent: #ff0055;
+            --neon-blue: #00f0ff;
+            --neon-green: #00ff66;
+            --accent-glow: rgba(255, 0, 85, 0.4);
+            --border-highlight: rgba(255, 255, 255, 0.02);
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-color: #e0e5ec;
+                --surface: #e0e5ec;
+                --shadow-outer-dark: #a3b1c6;
+                --shadow-outer-light: #ffffff;
+                --shadow-inner-dark: inset 4px 4px 8px #a3b1c6;
+                --shadow-inner-light: inset -4px -4px 8px #ffffff;
+                --text-main: #2b3442;
+                --text-sub: #6b778c;
+                --accent: #d10043;
+                --neon-blue: #008fa8;
+                --neon-green: #00993d;
+                --accent-glow: rgba(209, 0, 67, 0.2);
+                --border-highlight: rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px 8px;
+            transition: background 0.3s ease;
+        }
+
+        /* 3D Main Canvas Chassis Frame */
+        .mainframe-3d-canvas {
+            width: 100%;
+            max-width: 480px;
+            background: var(--surface);
+            border-radius: 26px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 1px solid var(--border-highlight);
+            box-shadow: 12px 12px 24px var(--shadow-outer-dark), 
+                        -12px -12px 24px var(--shadow-outer-light);
+        }
+
+        /* 1. CINEMATIC IN-SCREEN PLAYER CHASSIS */
+        .cinema-viewport-large {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* Realigned Branding Text Element: Bottom-Left Alignment with Zero Background */
+        .in-viewport-salam-bar {
+            position: absolute;
+            bottom: 8px; 
+            left: 10px;
+            background: transparent;
+            padding: 2px;
+            display: flex;
+            gap: 2px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .in-viewport-salam-bar span {
+            font-size: 9px;
+            font-weight: 900;
+            color: var(--accent);
+            text-transform: uppercase;
+            display: inline-block;
+            opacity: 0;
+            transform: scale(0.7);
+            animation: wordWave 3.5s infinite ease-in-out;
+        }
+
+        @keyframes wordWave {
+            0%, 100% { opacity: 0.2; transform: scale(0.85); text-shadow: none; color: var(--text-sub); }
+            5%, 25% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 6px var(--accent-glow); color: var(--accent); }
+            30%, 95% { opacity: 1; transform: scale(1); text-shadow: none; color: var(--accent); }
+        }
+
+        .media-placeholder-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; background: #06040a;
+            z-index: 6; text-align: center;
+        }
+        .media-placeholder-layer i { font-size: 32px; color: var(--accent); margin-bottom: 6px; }
+
+        /* 2. REAL-TIME MULTICAST METRICS DATA LOG MONITOR */
+        .compact-live-monitor-bar {
+            padding: 10px 12px;
+            border-radius: 14px;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
+        }
+        .compact-live-monitor-bar img { width: 26px; height: 26px; object-fit: contain; border-radius: 6px; }
+        .compact-live-monitor-bar h4 { font-size: 12px; font-weight: 700; color: var(--text-main); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .total-nodes-badge {
+            font-size: 8px; font-weight: 800; color: var(--neon-blue);
+            padding: 4px 8px; border-radius: 6px;
+            background: var(--surface);
+            box-shadow: 2px 2px 5px var(--shadow-outer-dark);
+        }
+        .live-status-flash { display: flex; align-items: center; gap: 4px; font-size: 8px; color: var(--accent); font-weight: 700; }
+        .pulse-dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: pulseRhythm 1s infinite; }
+        @keyframes pulseRhythm { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* 3. ALGORITHMIC TELEMETRY MATRIX BLOCK */
+        .quick-server-micro-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .micro-server-node {
+            border-radius: 12px; padding: 8px;
+            display: flex; flex-direction: column; gap: 1px;
+            background: var(--surface);
+            border: 1px solid var(--border-highlight);
+            box-shadow: 4px 4px 8px var(--shadow-outer-dark), 
+                        -4px -4px 8px var(--shadow-outer-light);
+        }
+        .micro-lbl { font-size: 8px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
+        .micro-val { font-size: 11px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* System Initializing Pipeline Loader Bar */
+        .server-sync-status-box {
+            border-radius: 12px; padding: 11px; text-align: center;
+            font-size: 10px; font-weight: 700; color: var(--text-sub); display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
+        }
+
+        /* 4. STATION CONSOLE MODULE SELECTION HUB */
+        .permanent-channels-station {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .side-swapping-category-strip {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 2px 2px 6px 2px;
+            scroll-behavior: smooth;
+        }
+        .side-swapping-category-strip::-webkit-scrollbar { height: 3px; }
+        .side-swapping-category-strip::-webkit-scrollbar-thumb { background: var(--text-sub); border-radius: 10px; }
+        
+        .ultra-3d-pill {
+            flex: 0 0 auto;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-sub);
+            cursor: pointer;
+            background: var(--surface);
+            border: 1px solid var(--border-highlight);
+            box-shadow: 3px 3px 6px var(--shadow-outer-dark), 
+                        -3px -3px 6px var(--shadow-outer-light);
+            transition: all 0.2s ease;
+        }
+        .ultra-3d-pill.active {
+            box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
+            color: var(--accent);
+            border-color: transparent;
+        }
+
+        /* Neumorphic 3D Search Structure Component */
+        .search-wrapper-3d {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .search-input-3d {
+            width: 100%;
+            padding: 10px 14px 10px 36px;
+            font-size: 11px;
+            font-weight: 600;
+            border: none;
+            outline: none;
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--text-main);
+            box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
+        }
+        .search-input-3d::placeholder { color: var(--text-sub); }
+        .search-wrapper-3d i { position: absolute; left: 14px; font-size: 11px; color: var(--text-sub); pointer-events: none; }
+
+        /* Unified 3-Column Square Deck Grid */
+        .strict-3column-matrix {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 4px 2px;
+            width: 100%;
+        }
+        .strict-3column-matrix::-webkit-scrollbar { width: 3px; }
+        .strict-3column-matrix::-webkit-scrollbar-thumb { background: var(--text-sub); border-radius: 10px; }
+
+        /* 3D Square Card Auto-Highlight Components */
+        .card-node-item {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 12px; 
+            padding: 8px 4px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            gap: 6px; 
+            cursor: pointer; 
+            background: var(--surface);
+            border: 1px solid var(--border-highlight);
+            box-shadow: 4px 4px 8px var(--shadow-outer-dark), 
+                        -4px -4px 8px var(--shadow-outer-light);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .card-node-item img { width: 26px; height: 26px; object-fit: contain; border-radius: 6px; transition: transform 0.2s ease; }
+        .card-node-item span { font-size: 9px; color: var(--text-main); width: 100%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; padding: 0 3px; }
+        
+        /* Holographic Push/Hover Highlight Interactions */
+        .card-node-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 12px var(--shadow-outer-dark), 
+                        -6px -6px 12px var(--shadow-outer-light);
+            border-color: var(--neon-blue);
+        }
+        .card-node-item:hover img { transform: scale(1.05); }
+
+        .card-node-item:active, .card-node-item.playing { 
+            transform: translateY(1px);
+            box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
+            border-color: transparent;
+        }
+        .card-node-item.playing span { color: var(--neon-blue); font-weight: 700; }
+
+        /* 5. PERFECTLY ADHERED STRUCTURAL FOOTER PROFILE */
+        .premium-copyright-footer {
+            border-top: 1px solid var(--shadow-outer-dark);
+            padding-top: 10px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 6px;
+        }
+        .brand-copyright-txt h5 { font-size: 11px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+        .brand-copyright-txt p { font-size: 9px; color: var(--text-sub); font-weight: 600; text-align: center; }
+        
+        .contact-phone-numbers { display: flex; gap: 12px; justify-content: center; font-size: 9.5px; font-weight: 700; color: var(--neon-blue); }
+        .contact-phone-numbers span i { margin-right: 4px; color: var(--text-sub); }
+
+        .social-automatic-icon-row { display: flex; gap: 8px; justify-content: center; }
+        .social-3d-btn {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; color: var(--text-main); cursor: pointer; text-decoration: none;
+            background: var(--surface);
+            border: 1px solid var(--border-highlight);
+            box-shadow: 3px 3px 6px var(--shadow-outer-dark), 
+                        -3px -3px 6px var(--shadow-outer-light);
+            transition: all 0.2s ease;
+        }
+        .social-3d-btn:hover { transform: scale(1.05); color: var(--accent); border-color: var(--accent); }
+        .social-3d-btn:active { box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light); transform: scale(0.98); }
+        .social-3d-btn.fb:hover { color: #1877f2; border-color: #1877f2; }
+        .social-3d-btn.tg:hover { color: #0088cc; border-color: #0088cc; }
+        .social-3d-btn.gm:hover { color: #ea4335; border-color: #ea4335; }
+    </style>
+</head>
+<body>
+
+    <div class="mainframe-3d-canvas">
+        
+        <!-- 1. CINEMATIC VIEWPOT STAGE (No Top Button Area) -->
+        <div class="cinema-viewport-large">
+            <!-- Dynamic Character Splitted Branding Line - Placed Bottom-Left Inside Screen -->
+            <div class="in-viewport-salam-bar" id="player-brand-string-box"></div>
+
+            <div class="media-placeholder-layer" id="screen-placeholder">
+                <i class="fa-solid fa-satellite-dish"></i>
+                <p style="font-size:10px; font-weight:700; color:var(--text-sub);">INITIALIZING CLOUD TERMINAL...</p>
+            </div>
+            <video id="video-core-engine" controls playsinline></video>
+        </div>
+
+        <!-- 2. LIVE MONITOR LOG STATS -->
+        <div class="compact-live-monitor-bar">
+            <img id="monitor-ch-logo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff0055' stroke-width='2'><rect x='2' y='7' width='20' height='15' rx='2'></rect></svg>">
+            <h4 id="monitor-ch-title">No Active Broadcast Node</h4>
+            <div class="total-nodes-badge" id="total-count-badge">NODES: 0</div>
+            <div class="live-status-flash" id="live-pulse-indicator" style="display:none;">
+                <div class="pulse-dot"></div>
+                <span>LIVE</span>
+            </div>
+        </div>
+
+        <!-- 3. QUANTUM SERVER METRICS GRAPH DISPLAY -->
+        <div class="quick-server-micro-grid">
+            <div class="micro-server-node">
+                <div class="micro-lbl"><i class="fa-solid fa-server" style="color:var(--neon-blue)"></i> Link Type</div>
+                <div class="micro-val" id="srv-node">STANDBY</div>
+            </div>
+            <div class="micro-server-node">
+                <div class="micro-lbl"><i class="fa-solid fa-network-wired" style="color:var(--neon-green)"></i> Latency</div>
+                <div class="micro-val" id="srv-ping">0 ms</div>
+            </div>
+            <div class="micro-server-node">
+                <div class="micro-lbl"><i class="fa-solid fa-signal" style="color:var(--accent)"></i> Bitrate</div>
+                <div class="micro-val" id="srv-bitrate">0.00 Mbps</div>
+            </div>
+            <div class="micro-server-node">
+                <div class="micro-lbl"><i class="fa-solid fa-users" style="color:#6c648a"></i> Core Users</div>
+                <div class="micro-val" id="srv-viewers">0</div>
+            </div>
+            <div class="micro-server-node">
+                <div class="micro-lbl"><i class="fa-solid fa-user-shield" style="color:var(--neon-green)"></i> Firewall</div>
+                <div class="micro-val" id="srv-firewall" style="color:var(--text-sub);">INACTIVE</div>
+            </div>
+            <div class="micro-server-node">
+                <div class="micro-lbl"><i class="fa-solid fa-box" style="color:orange;"></i> Node Status</div>
+                <div class="micro-val" id="srv-status" style="color:var(--text-sub);">EMPTY</div>
+            </div>
+        </div>
+
+        <!-- Automated Status Terminal Box -->
+        <div class="server-sync-status-box" id="system-pipeline-loader">
+            <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--neon-blue)"></i>
+            <span>Fetching configuration files from server root...</span>
+        </div>
+
+        <!-- 4. CHANNELS MONITOR BOARD INTERFACE -->
+        <div class="permanent-channels-station" id="main-station-container" style="display:none;">
+            <div class="side-swapping-category-strip" id="side-swap-pillbox"></div>
+            
+            <!-- Dynamic 3D Embedded Search Bar -->
+            <div class="search-wrapper-3d">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="channel-search-bar" class="search-input-3d" placeholder="Search station / channel node...">
+            </div>
+
+            <div class="strict-3column-matrix" id="strict-grid-box"></div>
+        </div>
+
+        <!-- 5. SIGNATURE DISCRETE BOTTOM PROFILE HUB -->
+        <footer class="premium-copyright-footer">
+            <div class="brand-copyright-txt">
+                <h5>Salam Tv Network</h5>
+                <p>Developer: Abdus Salam</p>
+            </div>
+            <div class="contact-phone-numbers">
+                <span><i class="fa-solid fa-phone"></i>01620230864</span>
+                <span><i class="fa-solid fa-phone"></i>09696590864</span>
+            </div>
+            <div class="social-automatic-icon-row">
+                <a href="https://www.facebook.com/Salam.864" target="_blank" class="social-3d-btn fb"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="https://t.me/Darkbd4004" target="_blank" class="social-3d-btn tg"><i class="fa-solid fa-paper-plane"></i></a>
+                <a href="mailto:salam04836@gmail.com?subject=Salam%20Tv%20Matrix%20Feedback" class="social-3d-btn gm"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // Character Split Bottom-Left Infinity Wave Animation Engine
+        const targetStringName = "Salam Tv Network";
+        const stringBoxContainer = document.getElementById('player-brand-string-box');
+        
+        targetStringName.split("").forEach((letter, position) => {
+            const charSpan = document.createElement('span');
+            charSpan.innerText = letter === " " ? "\u00A0" : letter;
+            charSpan.style.animationDelay = `${position * 0.12}s`;
+            stringBoxContainer.appendChild(charSpan);
+        });
+
+        // -------------------------------------------------------------
+        // SERVER CONFIGURATION DATABASE: 
+        // আপনি আপনার হোস্টিং সার্ভারে থাকা ফাইলগুলোর নাম ঠিক এভাবে নিচে কমা (,) দিয়ে বসিয়ে দিন। 
+        // -------------------------------------------------------------
+        const playlistFiles = [
+            '328-live.m3u',
+            '338-live.m3u'
+            'old-live.m3u'
+        ];
+
+        // Core App Infrastructure Hooks
+        const video = document.getElementById('video-core-engine');
+        const mainStationContainer = document.getElementById('main-station-container');
+        const sideSwapPillbox = document.getElementById('side-swap-pillbox');
+        const s
