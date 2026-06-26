@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SALAM Tv Network - GitHub Core Engine</title>
-    <!-- Hls.js Streaming Engine -->
+    <title>SALAM Tv Network - Premium Grid Engine</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
-    <!-- FontAwesome Pro v6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Premium Neumorphic Dark/Light Mode Core */
@@ -238,12 +236,12 @@
         .search-input-3d::placeholder { color: var(--text-sub); }
         .search-wrapper-3d i { position: absolute; left: 14px; font-size: 11px; color: var(--text-sub); pointer-events: none; }
 
-        /* Unified 3-Column Square Deck Grid */
+        /* RESTORED: Standard Previous Grid Layout Stretched View (Not 3-Column Square anymore) */
         .strict-3column-matrix {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
+            flex-direction: column;
             gap: 8px;
-            max-height: 220px;
+            max-height: 290px;
             overflow-y: auto;
             padding: 4px 2px;
             width: 100%;
@@ -251,40 +249,38 @@
         .strict-3column-matrix::-webkit-scrollbar { width: 3px; }
         .strict-3column-matrix::-webkit-scrollbar-thumb { background: var(--text-sub); border-radius: 10px; }
 
-        /* 3D Square Card Auto-Highlight Components */
+        /* RESTORED: Rectangular Premium Row List Cards Style */
         .card-node-item {
             width: 100%;
-            aspect-ratio: 1 / 1;
+            padding: 10px 14px;
             border-radius: 12px; 
-            padding: 8px 4px;
             display: flex; 
-            flex-direction: column; 
             align-items: center; 
-            justify-content: center;
-            gap: 6px; 
+            justify-content: flex-start;
+            gap: 12px; 
             cursor: pointer; 
             background: var(--surface);
             border: 1px solid var(--border-highlight);
             box-shadow: 4px 4px 8px var(--shadow-outer-dark), 
                         -4px -4px 8px var(--shadow-outer-light);
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease, border-color 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .card-node-item img { width: 26px; height: 26px; object-fit: contain; border-radius: 6px; transition: transform 0.2s ease; }
-        .card-node-item span { font-size: 9px; color: var(--text-main); width: 100%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; padding: 0 3px; }
+        .card-node-item span { font-size: 12px; color: var(--text-main); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; flex: 1; }
         
         /* Holographic Push/Hover Highlight Interactions */
         .card-node-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 6px 6px 12px var(--shadow-outer-dark), 
-                        -6px -6px 12px var(--shadow-outer-light);
+            transform: translateX(2px);
+            box-shadow: 5px 5px 10px var(--shadow-outer-dark), 
+                        -5px -5px 10px var(--shadow-outer-light);
             border-color: var(--neon-blue);
         }
         .card-node-item:hover img { transform: scale(1.05); }
 
         .card-node-item:active, .card-node-item.playing { 
-            transform: translateY(1px);
             box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
             border-color: transparent;
+            transform: none;
         }
         .card-node-item.playing span { color: var(--neon-blue); font-weight: 700; }
 
@@ -325,7 +321,6 @@
 
     <div class="mainframe-3d-canvas">
         
-        <!-- 1. CINEMATIC VIEWPOT STAGE -->
         <div class="cinema-viewport-large">
             <div class="in-viewport-salam-bar" id="player-brand-string-box"></div>
 
@@ -336,7 +331,6 @@
             <video id="video-core-engine" controls playsinline></video>
         </div>
 
-        <!-- 2. LIVE MONITOR LOG STATS -->
         <div class="compact-live-monitor-bar">
             <img id="monitor-ch-logo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff0055' stroke-width='2'><rect x='2' y='7' width='20' height='15' rx='2'></rect></svg>">
             <h4 id="monitor-ch-title">No Active Broadcast Node</h4>
@@ -347,7 +341,6 @@
             </div>
         </div>
 
-        <!-- 3. QUANTUM SERVER METRICS GRAPH DISPLAY -->
         <div class="quick-server-micro-grid">
             <div class="micro-server-node">
                 <div class="micro-lbl"><i class="fa-solid fa-server" style="color:var(--neon-blue)"></i> Link Type</div>
@@ -375,17 +368,14 @@
             </div>
         </div>
 
-        <!-- Automated Status Terminal Box -->
         <div class="server-sync-status-box" id="system-pipeline-loader">
             <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--neon-blue)"></i>
             <span>Fetching configuration files from server root...</span>
         </div>
 
-        <!-- 4. CHANNELS MONITOR BOARD INTERFACE -->
         <div class="permanent-channels-station" id="main-station-container" style="display:none;">
             <div class="side-swapping-category-strip" id="side-swap-pillbox"></div>
             
-            <!-- Dynamic 3D Embedded Search Bar -->
             <div class="search-wrapper-3d">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="channel-search-bar" class="search-input-3d" placeholder="Search station / channel node...">
@@ -394,7 +384,6 @@
             <div class="strict-3column-matrix" id="strict-grid-box"></div>
         </div>
 
-        <!-- 5. SIGNATURE DISCRETE BOTTOM PROFILE HUB -->
         <footer class="premium-copyright-footer">
             <div class="brand-copyright-txt">
                 <h5>Salam Tv Network</h5>
@@ -425,10 +414,7 @@
             stringBoxContainer.appendChild(charSpan);
         });
 
-        // -------------------------------------------------------------
-        // FIXED SERVER CONFIGURATION DATABASE: 
-        // Updated files names from .m3u8 to exact names on GitHub repository
-        // -------------------------------------------------------------
+        // Server Configuration Files Array
         const playlistFiles = [
             '338-live.m3u',
             'old-live.m3u',
@@ -469,8 +455,17 @@
 
         // Automated GitHub Hosting Absolute Path Fetch System
         async function bootCloudSequence() {
+            // Setup default injected static FIFA T-sports channel
+            globalPlaylistDb = {
+                'FIFA T-SPORTS ⚽': [{
+                    name: 'FIFA T-sports',
+                    logo: '',
+                    url: 'http://198.195.239.50:8095/tsports/tracks-v1a1/mono.m3u8',
+                    category: 'FIFA T-SPORTS ⚽'
+                }]
+            };
+            
             let combinedTracksText = "";
-            // Use Cache-busting query parameter to force freshest files directly from live hosting
             const antiCacheSeed = "?timestamp=" + new Date().getTime();
 
             for (const fileName of playlistFiles) {
@@ -479,29 +474,21 @@
                     if (response.ok) {
                         const fileContent = await response.text();
                         combinedTracksText += "\n" + fileContent;
-                    } else {
-                        console.error(`HTTP server response error for file: ${fileName}`);
                     }
                 } catch (err) {
-                    console.error(`Failed loading root payload reference node: ${fileName}`, err);
+                    console.error(`Failed loading node: ${fileName}`, err);
                 }
             }
             
-            if (combinedTracksText.trim() !== "") {
-                parseM3UContent(combinedTracksText);
-            } else {
-                pipelineLoader.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--accent)"></i><span>No accessible M3U document files found on root server.</span>`;
-                screenPlaceholder.innerHTML = `<i class="fa-solid fa-server"></i><p>Server Database Offline.</p>`;
-            }
+            parseM3UContent(combinedTracksText);
         }
 
         function parseM3UContent(fileContent) {
             const lines = fileContent.split('\n');
-            globalPlaylistDb = {};
             registeredChannelNamesSet.clear();
             
             let currentTrack = null;
-            let finalAbsoluteCount = 0;
+            let finalAbsoluteCount = 1; // Starting from 1 because of pre-injected FIFA channel
 
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim();
@@ -514,7 +501,6 @@
                     const parts = line.split(',');
                     currentTrack.name = parts[parts.length - 1].trim() || 'Active Node';
                     
-                    // Duplicate Filter Algorithm Layer
                     let targetCategory = 'OTHERS 🏷️';
                     const cleanedNameUpper = currentTrack.name.toUpperCase();
 
@@ -547,16 +533,15 @@
 
         function deploySwappingStation() {
             sideSwapPillbox.innerHTML = '';
+            
+            // Priority Sort for Categories
             const structuredKeys = Object.keys(globalPlaylistDb).sort((a, b) => {
+                if(a === 'FIFA T-SPORTS ⚽') return -1;
+                if(b === 'FIFA T-SPORTS ⚽') return 1;
                 if(a === 'MULTIPLE CHANNELS 🔄') return 1;
                 if(b === 'MULTIPLE CHANNELS 🔄') return -1;
                 return a.localeCompare(b);
             });
-
-            if (structuredKeys.length === 0) {
-                screenPlaceholder.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i><p>Empty Matrix Payload.</p>`;
-                return;
-            }
 
             structuredKeys.forEach((groupName, idx) => {
                 const pill = document.createElement('div');
@@ -591,7 +576,7 @@
             );
 
             if (filteredChannels.length === 0) {
-                strictGridBox.innerHTML = `<div style="grid-column: span 3; text-align: center; font-size: 10px; color: var(--text-sub); padding: 20px 0;">No matching channels found</div>`;
+                strictGridBox.innerHTML = `<div style="text-align: center; font-size: 11px; color: var(--text-sub); padding: 20px 0;">No matching channels found</div>`;
                 return;
             }
 
@@ -639,62 +624,4 @@
                 hlsEngine.attachMedia(video);
                 hlsEngine.on(Hls.Events.MANIFEST_PARSED, () => { 
                     video.play(); 
-                    srvStatus.innerText = "ONLINE";
-                    srvStatus.style.color = "var(--neon-green)";
-                });
-                hlsEngine.on(Hls.Events.ERROR, (event, data) => { if (data.fatal) triggerOfflineDisplay(); });
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = channel.url;
-                video.addEventListener('loadedmetadata', () => { 
-                    video.play(); 
-                    srvStatus.innerText = "ONLINE";
-                    srvStatus.style.color = "var(--neon-green)";
-                });
-                video.addEventListener('error', () => { triggerOfflineDisplay(); });
-            }
-        }
-
-        function triggerOfflineDisplay() {
-            screenPlaceholder.style.display = 'flex';
-            screenPlaceholder.innerHTML = `<i class="fa-solid fa-ban" style="color:var(--accent)"></i><p style="color:var(--accent); font-weight:700;">NODE STREAM OFFLINE</p>`;
-            killTelemetry();
-        }
-
-        function deployMicroTelemetry(categoryName) {
-            if (metricsLoopInterval) clearInterval(metricsLoopInterval);
-            const parsedToken = categoryName.replace(/[^\w\s]/gi, '').trim().substring(0, 5);
-            srvNode.innerText = `${parsedToken || "CORE"}-M3U`;
-            srvFirewall.innerText = "SHIELD SECURE";
-            srvFirewall.style.color = "var(--neon-green)";
-            srvStatus.innerText = "TUNING FLOW";
-            srvStatus.style.color = "orange";
-
-            let viewersCounter = Math.floor(Math.random() * (3800 - 1400)) + 1400;
-
-            metricsLoopInterval = setInterval(() => {
-                const simulatedPing = Math.floor(Math.random() * (12 - 3)) + 3;
-                const simulatedBitrate = (Math.random() * (15.2 - 8.5) + 8.5).toFixed(2); 
-                viewersCounter += Math.floor(Math.random() * (8 - (-8))) + (-8);
-
-                srvPing.innerText = `${simulatedPing} ms`;
-                srvBitrate.innerText = `${simulatedBitrate} Mbps`;
-                srvViewers.innerText = viewersCounter.toLocaleString();
-            }, 1200);
-        }
-
-        function killTelemetry() {
-            if (metricsLoopInterval) clearInterval(metricsLoopInterval);
-            srvNode.innerText = "DEAD LINK";
-            srvPing.innerText = "0 ms";
-            srvBitrate.innerText = "0.00 Mbps";
-            srvViewers.innerText = "0";
-            srvFirewall.innerText = "STANDBY";
-            srvFirewall.style.color = "var(--text-sub)";
-            srvStatus.innerText = "DISCONNECTED";
-            srvStatus.style.color = "var(--accent)";
-        }
-
-        window.addEventListener('DOMContentLoaded', bootCloudSequence);
-    </script>
-</body>
-</html>
+                    srvStatus
