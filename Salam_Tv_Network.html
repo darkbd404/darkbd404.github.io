@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SALAM Tv Network - Advanced Custom Engine</title>
+    <title>SALAM Tv Network</title>
     <!-- Hls.js Streaming Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
     <!-- FontAwesome Pro v6 Icons -->
@@ -89,6 +89,20 @@
             box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
         }
 
+        /* Fullscreen structural override to force container rendering mode */
+        .cinema-viewport-large:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            aspect-ratio: auto;
+            border-radius: 0;
+        }
+        .cinema-viewport-large:-webkit-full-screen {
+            width: 100vw;
+            height: 100vh;
+            aspect-ratio: auto;
+            border-radius: 0;
+        }
+
         video {
             width: 100%;
             height: 100%;
@@ -96,21 +110,25 @@
             display: block;
         }
 
-        /* Branding Text Element */
+        /* PERSISTENT BRANDING OVERLAY - FORCED ON TOP IN FULLSCREEN & ROTATION */
         .in-viewport-salam-bar {
             position: absolute;
-            bottom: 8px; 
-            left: 10px;
-            background: transparent;
-            padding: 2px;
+            top: 12px; 
+            left: 14px;
+            background: rgba(13, 10, 27, 0.4);
+            padding: 4px 10px;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             display: flex;
             gap: 2px;
-            z-index: 10;
+            z-index: 2147483647 !important; /* Ultimate priority top layer */
             pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .in-viewport-salam-bar span {
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 900;
             color: var(--accent);
             text-transform: uppercase;
@@ -121,8 +139,8 @@
         }
 
         @keyframes wordWave {
-            0%, 100% { opacity: 0.2; transform: scale(0.85); text-shadow: none; color: var(--text-sub); }
-            5%, 25% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 6px var(--accent-glow); color: var(--accent); }
+            0%, 100% { opacity: 0.4; transform: scale(0.9); text-shadow: none; color: var(--text-sub); }
+            5%, 25% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 8px var(--accent-glow); color: var(--accent); }
             30%, 95% { opacity: 1; transform: scale(1); text-shadow: none; color: var(--accent); }
         }
 
@@ -251,13 +269,13 @@
         .strict-3column-matrix::-webkit-scrollbar { width: 3px; }
         .strict-3column-matrix::-webkit-scrollbar-thumb { background: var(--text-sub); border-radius: 10px; }
 
-        /* Premium Standardized Card matching Screenshot_20260627-015641.png */
+        /* Premium Standardized Card matching Screenshot */
         .card-node-item {
             width: 100%;
             padding: 14px 6px; 
             border-radius: 14px; 
             display: flex; 
-            flex-direction: column; /* Icon top, title bottom layout */
+            flex-direction: column; 
             align-items: center; 
             justify-content: center;
             gap: 8px; 
@@ -290,7 +308,7 @@
             width: 100%;
             padding: 0 2px;
             display: -webkit-box;
-            -webkit-line-clamp: 2; /* Wraps up to 2 lines max, then drops ellipsis */
+            -webkit-line-clamp: 2; 
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -344,7 +362,7 @@
         .social-3d-btn:active { box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light); transform: scale(0.98); }
         .social-3d-btn.fb:hover { color: #1877f2; border-color: #1877f2; }
         .social-3d-btn.tg:hover { color: #0088cc; border-color: #0088cc; }
-        .social-3d-btn.gm:hover { color: #ea4335; border-color: #ea4335; }
+        .social-3d-btn.gm:hover { color: #dynamic; border-color: #ea4335; }
     </style>
 </head>
 <body>
@@ -352,7 +370,8 @@
     <div class="mainframe-3d-canvas">
         
         <!-- 1. CINEMATIC VIEWPOT STAGE -->
-        <div class="cinema-viewport-large">
+        <div class="cinema-viewport-large" id="player-viewport-container">
+            <!-- Persistent Branding Watermark Array Box -->
             <div class="in-viewport-salam-bar" id="player-brand-string-box"></div>
 
             <div class="media-placeholder-layer" id="screen-placeholder">
@@ -440,7 +459,7 @@
     </div>
 
     <script>
-        // Character Split Bottom-Left Infinity Wave Animation Engine
+        // Character Split Top-Left Infinity Wave Animation Engine
         const targetStringName = "Salam Tv Network";
         const stringBoxContainer = document.getElementById('player-brand-string-box');
         
@@ -460,6 +479,7 @@
 
         // Core App Infrastructure Hooks
         const video = document.getElementById('video-core-engine');
+        const viewportContainer = document.getElementById('player-viewport-container');
         const mainStationContainer = document.getElementById('main-station-container');
         const sideSwapPillbox = document.getElementById('side-swap-pillbox');
         const strictGridBox = document.getElementById('strict-grid-box');
@@ -490,6 +510,31 @@
             'ENTERTAINMENT 📺': ['entertainment', 'jalsha', 'bangla', 'colors', 'tv', 'zee bangla']
         };
 
+        // ADVANCED FULLSCREEN INTERCEPTOR ENGINE
+        // Intercepts browser default fullscreen action to force container view on top
+        video.addEventListener('webkitbeginfullscreen', function(e) {
+            e.preventDefault();
+            launchSecureFullscreen();
+        });
+
+        video.addEventListener('fullscreenchange', function(e) {
+            if (document.fullscreenElement === video) {
+                document.exitFullscreen().then(() => {
+                    launchSecureFullscreen();
+                });
+            }
+        });
+
+        function launchSecureFullscreen() {
+            if (viewportContainer.requestFullscreen) {
+                viewportContainer.requestFullscreen();
+            } else if (viewportContainer.webkitRequestFullscreen) {
+                viewportContainer.webkitRequestFullscreen();
+            } else if (viewportContainer.msRequestFullscreen) {
+                viewportContainer.msRequestFullscreen();
+            }
+        }
+
         // Automated GitHub Hosting Absolute Path Fetch System
         async function bootCloudSequence() {
             let combinedTracksText = "";
@@ -515,10 +560,8 @@
             globalPlaylistDb = {};
             registeredChannelNamesSet.clear();
             
-            // Initialize target structural sport category block
             globalPlaylistDb['SPORTS ⚽'] = [];
 
-            // Inject Custom Fixed FIFA T-Sports node directly into Sports Category
             globalPlaylistDb['SPORTS ⚽'].push({
                 name: 'FIFA T-Sports',
                 url: 'http://198.195.239.50:8095/tsports/tracks-v1a1/mono.m3u8',
