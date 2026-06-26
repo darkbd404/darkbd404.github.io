@@ -96,23 +96,21 @@
             display: block;
         }
 
-        /* BRANDING OVERLAY - NO BACKGROUND & POSITIONED FURTHER RIGHT & DOWN */
+        /* Branding Text Element */
         .in-viewport-salam-bar {
             position: absolute;
-            bottom: 10px; 
-            right: 6px; /* Moved further right as requested */
-            background: transparent !important; /* Removed black background completely */
-            padding: 4px;
+            bottom: 8px; 
+            left: 10px;
+            background: transparent;
+            padding: 2px;
             display: flex;
             gap: 2px;
-            z-index: 2147483647 !important;
+            z-index: 10;
             pointer-events: none;
-            box-shadow: none !important;
-            border: none !important;
         }
 
         .in-viewport-salam-bar span {
-            font-size: 11px;
+            font-size: 9px;
             font-weight: 900;
             color: var(--accent);
             text-transform: uppercase;
@@ -123,8 +121,8 @@
         }
 
         @keyframes wordWave {
-            0%, 100% { opacity: 0.6; transform: scale(0.9); text-shadow: none; color: var(--text-sub); }
-            5%, 25% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 8px var(--accent-glow); color: var(--accent); }
+            0%, 100% { opacity: 0.2; transform: scale(0.85); text-shadow: none; color: var(--text-sub); }
+            5%, 25% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 6px var(--accent-glow); color: var(--accent); }
             30%, 95% { opacity: 1; transform: scale(1); text-shadow: none; color: var(--accent); }
         }
 
@@ -174,7 +172,7 @@
         .micro-lbl { font-size: 8px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
         .micro-val { font-size: 11px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* System Pipeline Loader */
+        /* System Initializing Pipeline Loader Bar */
         .server-sync-status-box {
             border-radius: 12px; padding: 11px; text-align: center;
             font-size: 10px; font-weight: 700; color: var(--text-sub); display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -218,7 +216,7 @@
             border-color: transparent;
         }
 
-        /* Search Structure Component */
+        /* Neumorphic 3D Search Structure Component */
         .search-wrapper-3d {
             position: relative;
             width: 100%;
@@ -240,7 +238,7 @@
         .search-input-3d::placeholder { color: var(--text-sub); }
         .search-wrapper-3d i { position: absolute; left: 14px; font-size: 11px; color: var(--text-sub); pointer-events: none; }
 
-        /* 3-COLUMN MATRIX STRUCTURE */
+        /* EXACT MATCH 3-COLUMN STRUCTURE FROM SCREENSHOT */
         .strict-3column-matrix {
             display: grid;
             grid-template-columns: repeat(3, 1fr); 
@@ -253,13 +251,13 @@
         .strict-3column-matrix::-webkit-scrollbar { width: 3px; }
         .strict-3column-matrix::-webkit-scrollbar-thumb { background: var(--text-sub); border-radius: 10px; }
 
-        /* Premium Standardized Card */
+        /* Premium Standardized Card matching Screenshot_20260627-015641.png */
         .card-node-item {
             width: 100%;
             padding: 14px 6px; 
             border-radius: 14px; 
             display: flex; 
-            flex-direction: column; 
+            flex-direction: column; /* Icon top, title bottom layout */
             align-items: center; 
             justify-content: center;
             gap: 8px; 
@@ -268,7 +266,7 @@
             border: 1px solid var(--border-highlight);
             box-shadow: 4px 4px 8px var(--shadow-outer-dark), 
                         -4px -4px 8px var(--shadow-outer-light);
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .card-node-item img, .card-node-item .custom-font-icon { 
             width: 34px; 
@@ -280,8 +278,10 @@
             object-fit: contain; 
             border-radius: 8px; 
             color: var(--neon-blue);
+            transition: transform 0.2s ease; 
         }
         
+        /* Auto Wrapping Engine - Keeps size rigid even if name is large */
         .card-node-item span { 
             font-size: 9px; 
             color: var(--text-main); 
@@ -290,7 +290,7 @@
             width: 100%;
             padding: 0 2px;
             display: -webkit-box;
-            -webkit-line-clamp: 2; 
+            -webkit-line-clamp: 2; /* Wraps up to 2 lines max, then drops ellipsis */
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -298,12 +298,17 @@
             word-break: break-word;
         }
         
+        /* Holographic Push/Hover Highlight Interactions */
         .card-node-item:hover {
             transform: translateY(-2px);
+            box-shadow: 6px 6px 12px var(--shadow-outer-dark), 
+                        -6px -6px 12px var(--shadow-outer-light);
             border-color: var(--neon-blue);
         }
+        .card-node-item:hover img { transform: scale(1.05); }
 
         .card-node-item:active, .card-node-item.playing { 
+            transform: translateY(1px);
             box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
             border-color: transparent;
         }
@@ -336,6 +341,7 @@
             transition: all 0.2s ease;
         }
         .social-3d-btn:hover { transform: scale(1.05); color: var(--accent); border-color: var(--accent); }
+        .social-3d-btn:active { box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light); transform: scale(0.98); }
         .social-3d-btn.fb:hover { color: #1877f2; border-color: #1877f2; }
         .social-3d-btn.tg:hover { color: #0088cc; border-color: #0088cc; }
         .social-3d-btn.gm:hover { color: #ea4335; border-color: #ea4335; }
@@ -346,8 +352,7 @@
     <div class="mainframe-3d-canvas">
         
         <!-- 1. CINEMATIC VIEWPOT STAGE -->
-        <div class="cinema-viewport-large" id="player-viewport-container">
-            <!-- Persistent Branding Watermark Array Box -->
+        <div class="cinema-viewport-large">
             <div class="in-viewport-salam-bar" id="player-brand-string-box"></div>
 
             <div class="media-placeholder-layer" id="screen-placeholder">
@@ -368,7 +373,7 @@
             </div>
         </div>
 
-        <!-- 3. SERVER METRICS GRAPH DISPLAY -->
+        <!-- 3. QUANTUM SERVER METRICS GRAPH DISPLAY -->
         <div class="quick-server-micro-grid">
             <div class="micro-server-node">
                 <div class="micro-lbl"><i class="fa-solid fa-server" style="color:var(--neon-blue)"></i> Link Type</div>
@@ -396,16 +401,17 @@
             </div>
         </div>
 
-        <!-- System Pipeline Loader -->
+        <!-- Automated Status Terminal Box -->
         <div class="server-sync-status-box" id="system-pipeline-loader">
             <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--neon-blue)"></i>
-            <span>Loading playlists from server database...</span>
+            <span>Fetching configuration files from server root...</span>
         </div>
 
         <!-- 4. CHANNELS MONITOR BOARD INTERFACE -->
         <div class="permanent-channels-station" id="main-station-container" style="display:none;">
             <div class="side-swapping-category-strip" id="side-swap-pillbox"></div>
             
+            <!-- Dynamic 3D Embedded Search Bar -->
             <div class="search-wrapper-3d">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="channel-search-bar" class="search-input-3d" placeholder="Search station / channel node...">
@@ -434,7 +440,7 @@
     </div>
 
     <script>
-        // Character Split Animation Engine
+        // Character Split Bottom-Left Infinity Wave Animation Engine
         const targetStringName = "Salam Tv Network";
         const stringBoxContainer = document.getElementById('player-brand-string-box');
         
@@ -445,16 +451,15 @@
             stringBoxContainer.appendChild(charSpan);
         });
 
-        // Server M3U Playlists Database Links
+        // Server M3U Playlists Root Files Array
         const playlistFiles = [
             '338-live.m3u',
             'old-live.m3u',
             '328-live.m3u'
         ];
 
-        // Core App Hooks
+        // Core App Infrastructure Hooks
         const video = document.getElementById('video-core-engine');
-        const viewportContainer = document.getElementById('player-viewport-container');
         const mainStationContainer = document.getElementById('main-station-container');
         const sideSwapPillbox = document.getElementById('side-swap-pillbox');
         const strictGridBox = document.getElementById('strict-grid-box');
@@ -477,60 +482,53 @@
         let registeredChannelNamesSet = new Set(); 
         let activeCategoryGlobal = '';
         let metricsLoopInterval = null;
-        let currentPlayingChannelRef = null;
 
         const categorySchema = {
             'NEWS 📡': ['news', 'somoy', 'jamuna', 'ekattor', 'independent', 'atn', 'dbc'],
-            'SPORTS ⚽': ['sports', 't-sports', 'gtv', 'gazi', 'cricket', 'football', 'sony', 'star', 'fifa'],
+            'SPORTS ⚽': ['sports', 't-sports', 'gtv', 'gazi', 'cricket', 'football', 'sony', 'star'],
             'MOVIES 🍿': ['movies', 'cinema', 'action', 'hbo', 'zee', 'gold'],
             'ENTERTAINMENT 📺': ['entertainment', 'jalsha', 'bangla', 'colors', 'tv', 'zee bangla']
         };
 
-        // Independent Async Loading Architecture
+        // Automated GitHub Hosting Absolute Path Fetch System
         async function bootCloudSequence() {
-            globalPlaylistDb = {
-                'SPORTS ⚽': [],
-                'OFFLINE 🚫': []
-            };
-            registeredChannelNamesSet.clear();
-
-            // Default Static Node Loading
-            globalPlaylistDb['SPORTS ⚽'].push({
-                id: 'fixed-default-tsports',
-                name: 'FIFA T-Sports',
-                url: 'http://198.195.239.50:8095/tsports/tracks-v1a1/mono.m3u8',
-                logo: '',
-                isFontIcon: true,
-                originalCategory: 'SPORTS ⚽',
-                category: 'SPORTS ⚽'
-            });
-
+            let combinedTracksText = "";
             const antiCacheSeed = "?timestamp=" + new Date().getTime();
-            let loadedSuccessfullyCount = 0;
 
-            // Load files concurrently & dynamically without loops breaking up
-            await Promise.all(playlistFiles.map(async (fileName) => {
+            for (const fileName of playlistFiles) {
                 try {
                     const response = await fetch(fileName + antiCacheSeed);
                     if (response.ok) {
                         const fileContent = await response.text();
-                        parseSingleM3UContent(fileContent);
-                        loadedSuccessfullyCount++;
+                        combinedTracksText += "\n" + fileContent;
                     }
                 } catch (err) {
-                    console.error(`Skipping file or network error on: ${fileName}`, err);
+                    console.error(`Failed loading root payload reference node: ${fileName}`, err);
                 }
-            }));
-
-            updateTotalNodesCounter();
-            pipelineLoader.style.display = 'none';
-            deploySwappingStation();
+            }
+            
+            parseM3UContent(combinedTracksText);
         }
 
-        function parseSingleM3UContent(fileContent) {
+        function parseM3UContent(fileContent) {
             const lines = fileContent.split('\n');
+            globalPlaylistDb = {};
+            registeredChannelNamesSet.clear();
+            
+            // Initialize target structural sport category block
+            globalPlaylistDb['SPORTS ⚽'] = [];
+
+            // Inject Custom Fixed FIFA T-Sports node directly into Sports Category
+            globalPlaylistDb['SPORTS ⚽'].push({
+                name: 'FIFA T-Sports',
+                url: 'http://198.195.239.50:8095/tsports/tracks-v1a1/mono.m3u8',
+                logo: '',
+                isFontIcon: true,
+                category: 'SPORTS ⚽'
+            });
+
             let currentTrack = null;
-            let trackingIdCounter = Math.floor(Math.random() * 10000);
+            let finalAbsoluteCount = 1; 
 
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim();
@@ -559,27 +557,19 @@
                         }
                     }
                     currentTrack.category = targetCategory;
-                    currentTrack.originalCategory = targetCategory;
                     currentTrack.isFontIcon = false;
-                    currentTrack.id = 'node-id-' + (trackingIdCounter++);
                 } else if (line.startsWith('http') && currentTrack) {
                     currentTrack.url = line;
-                    
-                    if (!globalPlaylistDb[currentTrack.category]) {
-                        globalPlaylistDb[currentTrack.category] = [];
-                    }
+                    if (!globalPlaylistDb[currentTrack.category]) globalPlaylistDb[currentTrack.category] = [];
                     globalPlaylistDb[currentTrack.category].push(currentTrack);
+                    finalAbsoluteCount++;
                     currentTrack = null;
                 }
             }
-        }
 
-        function updateTotalNodesCounter() {
-            let finalAbsoluteCount = 0;
-            Object.keys(globalPlaylistDb).forEach(k => {
-                finalAbsoluteCount += globalPlaylistDb[k].length;
-            });
             totalCountBadge.innerText = `NODES: ${finalAbsoluteCount}`;
+            pipelineLoader.style.display = 'none';
+            deploySwappingStation();
         }
 
         function deploySwappingStation() {
@@ -588,25 +578,26 @@
             const structuredKeys = Object.keys(globalPlaylistDb).sort((a, b) => {
                 if(a === 'SPORTS ⚽') return -1; 
                 if(b === 'SPORTS ⚽') return 1;
-                if(a === 'OFFLINE 🚫') return 1;
-                if(b === 'OFFLINE 🚫') return -1;
+                if(a === 'MULTIPLE CHANNELS 🔄') return 1;
+                if(b === 'MULTIPLE CHANNELS 🔄') return -1;
                 return a.localeCompare(b);
             });
 
-            if (!activeCategoryGlobal || !globalPlaylistDb[activeCategoryGlobal] || globalPlaylistDb[activeCategoryGlobal].length === 0) {
-                activeCategoryGlobal = structuredKeys[0] || 'SPORTS ⚽';
+            if (structuredKeys.length === 0) {
+                screenPlaceholder.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i><p>Empty Matrix Payload.</p>`;
+                return;
             }
 
-            structuredKeys.forEach((groupName) => {
-                const totalInCat = globalPlaylistDb[groupName] ? globalPlaylistDb[groupName].length : 0;
-                if(totalInCat === 0 && groupName !== 'OFFLINE 🚫') return;
+            structuredKeys.forEach((groupName, idx) => {
+                if(globalPlaylistDb[groupName].length === 0) return;
 
                 const pill = document.createElement('div');
                 pill.className = 'ultra-3d-pill';
-                if (groupName === activeCategoryGlobal) {
+                if (idx === 0) {
                     pill.classList.add('active');
+                    activeCategoryGlobal = groupName;
                 }
-                pill.innerText = `${groupName} (${totalInCat})`;
+                pill.innerText = `${groupName} (${globalPlaylistDb[groupName].length})`;
                 
                 pill.addEventListener('click', () => {
                     document.querySelectorAll('.ultra-3d-pill').forEach(p => p.classList.remove('active'));
@@ -619,9 +610,7 @@
             });
 
             mainStationContainer.style.display = 'flex';
-            if(!video.src && (!hlsEngine || !hlsEngine.url)) {
-                screenPlaceholder.innerHTML = `<i class="fa-solid fa-play"></i><p>Chassis Active. Select Broadcast Node Below.</p>`;
-            }
+            screenPlaceholder.innerHTML = `<i class="fa-solid fa-play"></i><p>Chassis Active. Select Broadcast Node Below.</p>`;
             buildStrictGrid(activeCategoryGlobal);
         }
 
@@ -634,17 +623,13 @@
             );
 
             if (filteredChannels.length === 0) {
-                strictGridBox.innerHTML = `<div style="grid-column: span 3; text-align: center; font-size: 11px; color: var(--text-sub); padding: 20px 0;">No nodes under this selection</div>`;
+                strictGridBox.innerHTML = `<div style="grid-column: span 3; text-align: center; font-size: 11px; color: var(--text-sub); padding: 20px 0;">No matching channels found</div>`;
                 return;
             }
 
             filteredChannels.forEach(channel => {
                 const card = document.createElement('div');
                 card.className = 'card-node-item';
-                if(currentPlayingChannelRef && currentPlayingChannelRef.id === channel.id) {
-                    card.classList.add('playing');
-                }
-                
                 const fallbackSVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300f0ff' stroke-width='2'><rect x='2' y='7' width='20' height='15' rx='2'></rect></svg>";
                 
                 if(channel.isFontIcon) {
@@ -667,73 +652,53 @@
         });
 
         function fireBroadcastTunnel(channel) {
-            currentPlayingChannelRef = channel;
             screenPlaceholder.style.display = 'none';
             livePulseIndicator.style.display = 'flex';
             
             const fallbackSVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff0055' stroke-width='2'><rect x='2' y='7' width='20' height='15' rx='2'></rect></svg>";
             
-            document.getElementById('monitor-ch-logo').src = channel.logo && !channel.isFontIcon ? channel.logo : fallbackSVG;
+            if(channel.isFontIcon) {
+                document.getElementById('monitor-ch-logo').src = fallbackSVG;
+            } else {
+                document.getElementById('monitor-ch-logo').src = channel.logo ? channel.logo : fallbackSVG;
+            }
+            
             document.getElementById('monitor-ch-title').innerText = channel.name;
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
             deployMicroTelemetry(channel.category);
 
-            if (hlsEngine) {
-                hlsEngine.destroy();
-                hlsEngine = null;
-            }
+            if (hlsEngine) hlsEngine.destroy();
 
             if (Hls.isSupported()) {
                 hlsEngine = new Hls({ 
                     enableWorker: true, 
                     lowLatencyMode: true,
-                    maxBufferLength: 10,
-                    manifestLoadingTimeOut: 5000, 
-                    fragLoadingTimeOut: 5000
+                    maxBufferLength: 30,
+                    abrEwmaDefaultEstimate: 50000000 
                 });
                 hlsEngine.loadSource(channel.url);
                 hlsEngine.attachMedia(video);
-                
                 hlsEngine.on(Hls.Events.MANIFEST_PARSED, () => { 
-                    video.play().catch(() => {}); 
+                    video.play(); 
                     srvStatus.innerText = "ONLINE";
                     srvStatus.style.color = "var(--neon-green)";
                 });
-
-                hlsEngine.on(Hls.Events.ERROR, (event, data) => {
-                    if (data.fatal) {
-                        isolateOfflineNode(channel);
-                    }
-                });
+                hlsEngine.on(Hls.Events.ERROR, (event, data) => { if (data.fatal) triggerOfflineDisplay(); });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = channel.url;
                 video.addEventListener('loadedmetadata', () => { 
-                    video.play().catch(() => {}); 
+                    video.play(); 
                     srvStatus.innerText = "ONLINE";
                     srvStatus.style.color = "var(--neon-green)";
                 });
-                video.addEventListener('error', () => { 
-                    isolateOfflineNode(channel);
-                });
+                video.addEventListener('error', () => { triggerOfflineDisplay(); });
             }
         }
 
-        function isolateOfflineNode(channel) {
-            if (channel.category !== 'OFFLINE 🚫') {
-                if(globalPlaylistDb[channel.category]) {
-                    globalPlaylistDb[channel.category] = globalPlaylistDb[channel.category].filter(c => c.id !== channel.id);
-                }
-                
-                channel.category = 'OFFLINE 🚫';
-                globalPlaylistDb['OFFLINE 🚫'].push(channel);
-                
-                updateTotalNodesCounter();
-                deploySwappingStation();
-            }
-
+        function triggerOfflineDisplay() {
             screenPlaceholder.style.display = 'flex';
-            screenPlaceholder.innerHTML = `<i class="fa-solid fa-ban" style="color:var(--accent)"></i><p style="color:var(--accent); font-weight:700;">NODE OFFLINE - MOVED TO 🚫 BOX</p>`;
+            screenPlaceholder.innerHTML = `<i class="fa-solid fa-ban" style="color:var(--accent)"></i><p style="color:var(--accent); font-weight:700;">NODE STREAM OFFLINE</p>`;
             killTelemetry();
         }
 
