@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SALAM Tv Network</title>
+    <title>SALAM Tv Network - Advanced Custom Engine</title>
     <!-- Hls.js Streaming Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
     <!-- FontAwesome Pro v6 Icons -->
@@ -89,7 +89,7 @@
             box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light);
         }
 
-        /* Fullscreen structural override to force container rendering mode */
+        /* Fullscreen Support to enforce rendering container layout */
         .cinema-viewport-large:fullscreen {
             width: 100vw;
             height: 100vh;
@@ -110,25 +110,26 @@
             display: block;
         }
 
-        /* PERSISTENT BRANDING OVERLAY - FORCED ON TOP IN FULLSCREEN & ROTATION */
+        /* PERSISTENT BRANDING OVERLAY - FIXED TO BOTTOM-RIGHT (সবসময় ভিডিওর উপরে থাকবে) */
         .in-viewport-salam-bar {
             position: absolute;
-            top: 12px; 
-            left: 14px;
-            background: rgba(13, 10, 27, 0.4);
+            bottom: 45px; /* Placed safely above default video control bar progress */
+            right: 14px;
+            background: rgba(13, 10, 27, 0.6);
             padding: 4px 10px;
-            border-radius: 8px;
+            border-radius: 6px;
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
             display: flex;
             gap: 2px;
-            z-index: 2147483647 !important; /* Ultimate priority top layer */
+            z-index: 2147483647 !important; /* Forces top layer rendering over native fullscreen */
             pointer-events: none;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
         .in-viewport-salam-bar span {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 900;
             color: var(--accent);
             text-transform: uppercase;
@@ -139,7 +140,7 @@
         }
 
         @keyframes wordWave {
-            0%, 100% { opacity: 0.4; transform: scale(0.9); text-shadow: none; color: var(--text-sub); }
+            0%, 100% { opacity: 0.5; transform: scale(0.9); text-shadow: none; color: var(--text-sub); }
             5%, 25% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 8px var(--accent-glow); color: var(--accent); }
             30%, 95% { opacity: 1; transform: scale(1); text-shadow: none; color: var(--accent); }
         }
@@ -362,7 +363,7 @@
         .social-3d-btn:active { box-shadow: var(--shadow-inner-dark), var(--shadow-inner-light); transform: scale(0.98); }
         .social-3d-btn.fb:hover { color: #1877f2; border-color: #1877f2; }
         .social-3d-btn.tg:hover { color: #0088cc; border-color: #0088cc; }
-        .social-3d-btn.gm:hover { color: #dynamic; border-color: #ea4335; }
+        .social-3d-btn.gm:hover { color: #ea4335; border-color: #ea4335; }
     </style>
 </head>
 <body>
@@ -371,7 +372,7 @@
         
         <!-- 1. CINEMATIC VIEWPOT STAGE -->
         <div class="cinema-viewport-large" id="player-viewport-container">
-            <!-- Persistent Branding Watermark Array Box -->
+            <!-- Persistent Branding Watermark Array Box - Now fully tied inside the container overlay -->
             <div class="in-viewport-salam-bar" id="player-brand-string-box"></div>
 
             <div class="media-placeholder-layer" id="screen-placeholder">
@@ -459,7 +460,7 @@
     </div>
 
     <script>
-        // Character Split Top-Left Infinity Wave Animation Engine
+        // Character Split Bottom-Right Infinity Wave Animation Engine
         const targetStringName = "Salam Tv Network";
         const stringBoxContainer = document.getElementById('player-brand-string-box');
         
@@ -510,22 +511,23 @@
             'ENTERTAINMENT 📺': ['entertainment', 'jalsha', 'bangla', 'colors', 'tv', 'zee bangla']
         };
 
-        // ADVANCED FULLSCREEN INTERCEPTOR ENGINE
-        // Intercepts browser default fullscreen action to force container view on top
+        // ADVANCED LAYER INTERCEPTOR SYSTEM FOR FULLSCREEN / ORIENTATION CHANGE
+        // Direct Interception on native webkit request elements
         video.addEventListener('webkitbeginfullscreen', function(e) {
             e.preventDefault();
-            launchSecureFullscreen();
+            triggerCustomViewportFullscreen();
         });
 
-        video.addEventListener('fullscreenchange', function(e) {
+        // Event handler tracking standard fullscreen changes
+        document.addEventListener('fullscreenchange', function() {
             if (document.fullscreenElement === video) {
                 document.exitFullscreen().then(() => {
-                    launchSecureFullscreen();
+                    triggerCustomViewportFullscreen();
                 });
             }
         });
 
-        function launchSecureFullscreen() {
+        function triggerCustomViewportFullscreen() {
             if (viewportContainer.requestFullscreen) {
                 viewportContainer.requestFullscreen();
             } else if (viewportContainer.webkitRequestFullscreen) {
