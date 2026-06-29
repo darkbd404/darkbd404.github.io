@@ -1,103 +1,91 @@
-/* ==========================================
-   WhatsApp AI Assistant
-   app.js
-========================================== */
-
 "use strict";
 
-/* ---------- Splash Screen ---------- */
+/* ===========================
+   WhatsApp AI Assistant
+   app.js
+=========================== */
 
 window.addEventListener("load", () => {
 
     setTimeout(() => {
 
         document.getElementById("splash-screen").style.display = "none";
-
         document.getElementById("app").style.display = "block";
 
-    },1500);
+    }, 1500);
 
 });
 
-/* ---------- Sidebar ---------- */
+/* ===========================
+   Sidebar
+=========================== */
 
 const sidebar = document.getElementById("sidebar");
-
 const menuBtn = document.getElementById("menu-btn");
 
 let sidebarOpen = false;
 
-menuBtn.onclick = () => {
+menuBtn.addEventListener("click", () => {
 
-    if(sidebarOpen){
+    sidebarOpen = !sidebarOpen;
 
-        sidebar.style.left="-280px";
+    sidebar.style.left = sidebarOpen ? "0" : "-280px";
 
-        sidebarOpen=false;
+});
 
-    }else{
-
-        sidebar.style.left="0";
-
-        sidebarOpen=true;
-
-    }
-
-};
-
-/* ---------- Toast ---------- */
+/* ===========================
+   Toast
+=========================== */
 
 function showToast(message){
 
-    const toast=document.getElementById("toast");
+    const toast = document.getElementById("toast");
 
-    toast.innerHTML=message;
+    toast.innerHTML = message;
 
-    toast.style.display="block";
+    toast.style.display = "block";
 
-    setTimeout(()=>{
+    setTimeout(() => {
 
-        toast.style.display="none";
+        toast.style.display = "none";
 
     },2500);
 
 }
 
-/* ---------- Status ---------- */
+/* ===========================
+   Status
+=========================== */
 
-const aiStatus=document.getElementById("ai-status");
+const aiStatus = document.getElementById("ai-status");
+const waStatus = document.getElementById("wa-status");
 
-const waStatus=document.getElementById("wa-status");
+function setAIStatus(status){
 
-document.getElementById("start-ai").onclick=()=>{
+    aiStatus.innerHTML = status;
 
-    aiStatus.innerHTML="🟢 Online";
+}
 
-    waStatus.innerHTML="🟢 Ready";
+function setWAStatus(status){
 
-    showToast("AI Started");
+    waStatus.innerHTML = status;
 
-};
+}
 
-/* ---------- Pages ---------- */
+/* ===========================
+   Pages
+=========================== */
 
-const pages=[
+const pages = [
 
-"dashboardPage",
-
-"whatsappPage",
-
-"aiPage",
-
-"faqPage",
-
-"memoryPage",
-
-"logsPage",
-
-"settingsPage",
-
-"aboutPage"
+    "dashboardPage",
+    "whatsappPage",
+    "aiPage",
+    "faqPage",
+    "memoryPage",
+    "logsPage",
+    "settingsPage",
+    "aboutPage"
 
 ];
 
@@ -113,10 +101,9 @@ function openPage(page){
 
 }
 
-openPage("dashboardPage");
-/* ==========================================
+/* ===========================
    Navigation
-========================================== */
+=========================== */
 
 document.getElementById("nav-dashboard").onclick=()=>openPage("dashboardPage");
 
@@ -134,61 +121,267 @@ document.getElementById("nav-settings").onclick=()=>openPage("settingsPage");
 
 document.getElementById("nav-about").onclick=()=>openPage("aboutPage");
 
+openPage("dashboardPage");
+/* ===========================
+   API Configuration
+=========================== */
 
-/* ==========================================
-   Save API
-========================================== */
+const apiKeyInput = document.getElementById("apikey");
+const providerInput = document.getElementById("provider");
+const modelInput = document.getElementById("model");
 
-const apiKey=document.getElementById("apikey");
+function loadApiSettings(){
 
-const provider=document.getElementById("provider");
+    apiKeyInput.value =
+        localStorage.getItem("apiKey") || "";
 
-const model=document.getElementById("model");
+    providerInput.value =
+        localStorage.getItem("provider") || "openrouter";
 
-apiKey.value=localStorage.getItem("apiKey")||"";
+    modelInput.value =
+        localStorage.getItem("model") ||
+        APP_CONFIG.defaultModel;
 
-provider.value=localStorage.getItem("provider")||"openrouter";
+}
 
-model.value=localStorage.getItem("model")||"deepseek/deepseek-chat-v3-0324:free";
+function saveApiSettings(){
 
-document.getElementById("saveApi").onclick=()=>{
+    localStorage.setItem(
+        "apiKey",
+        apiKeyInput.value.trim()
+    );
 
-localStorage.setItem("apiKey",apiKey.value);
+    localStorage.setItem(
+        "provider",
+        providerInput.value
+    );
 
-localStorage.setItem("provider",provider.value);
+    localStorage.setItem(
+        "model",
+        modelInput.value
+    );
 
-localStorage.setItem("model",model.value);
+    showToast("API Saved");
 
-showToast("API Saved");
+}
 
-};
+document
+.getElementById("saveApi")
+.onclick = saveApiSettings;
 
+loadApiSettings();
 
-/* ==========================================
+/* ===========================
    Prompt
-========================================== */
+=========================== */
 
-const promptBox=document.getElementById("systemPrompt");
+const promptBox =
+document.getElementById("systemPrompt");
 
-promptBox.value=localStorage.getItem("systemPrompt")||`You are my WhatsApp AI Assistant.
+function loadPrompt(){
+
+    promptBox.value =
+        localStorage.getItem("systemPrompt") ||
+
+`You are my WhatsApp AI Assistant.
 
 Always reply in the user's language.
 
 Keep replies short.
 
-Be polite.
-
 If you don't know the answer say:
-"I don't know."`;
 
-document.getElementById("savePrompt").onclick=()=>{
+I don't know.`;
 
-localStorage.setItem("systemPrompt",promptBox.value);
+}
 
-showToast("Prompt Saved");
+function savePrompt(){
+
+    localStorage.setItem(
+
+        "systemPrompt",
+
+        promptBox.value
+
+    );
+
+    showToast("Prompt Saved");
+
+}
+
+document
+.getElementById("savePrompt")
+.onclick = savePrompt;
+
+loadPrompt();
+
+/* ===========================
+   Start AI
+=========================== */
+
+document
+.getElementById("start-ai")
+.onclick = async()=>{
+
+    setAIStatus("🟢 Online");
+
+    setWAStatus("🟢 Ready");
+
+    showToast("Testing AI...");
+
+    const reply =
+    await askAI("Hello");
+
+    if(reply){
+
+        console.log(reply);
+
+        showToast("AI Connected");
+
+    }else{
+
+        showToast("Connection Failed");
+
+    }
+
+};
+/* ==========================================
+   FAQ
+========================================== */
+
+const faqQuestion = document.getElementById("faqQuestion");
+const faqAnswer = document.getElementById("faqAnswer");
+const faqList = document.getElementById("faqList");
+
+function renderFAQ(){
+
+    const list = loadFAQ();
+
+    if(list.length===0){
+
+        faqList.innerHTML="No FAQ Added";
+
+        return;
+
+    }
+
+    faqList.innerHTML="";
+
+    list.forEach(item=>{
+
+        faqList.innerHTML+=`
+
+        <div class="card">
+
+            <b>${item.question}</b>
+
+            <p>${item.answer}</p>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+document.getElementById("addFaq").onclick=()=>{
+
+    const q=faqQuestion.value.trim();
+
+    const a=faqAnswer.value.trim();
+
+    if(!q || !a){
+
+        showToast("Fill all fields");
+
+        return;
+
+    }
+
+    addFAQ(q,a);
+
+    faqQuestion.value="";
+
+    faqAnswer.value="";
+
+    renderFAQ();
+
+    showToast("FAQ Added");
 
 };
 
+renderFAQ();
+
+/* ==========================================
+   Memory
+========================================== */
+
+const memoryList=document.getElementById("memoryList");
+
+function renderMemory(){
+
+    const memory=getMemory();
+
+    if(memory.length===0){
+
+        memoryList.innerHTML="No Memory";
+
+        return;
+
+    }
+
+    memoryList.innerHTML="";
+
+    memory.forEach(item=>{
+
+        memoryList.innerHTML+=`
+
+        <div class="card">
+
+            <b>User:</b>
+
+            <p>${item.user}</p>
+
+            <b>AI:</b>
+
+            <p>${item.assistant}</p>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+document.getElementById("clearMemory").onclick=()=>{
+
+    clearMemory();
+
+    renderMemory();
+
+    showToast("Memory Cleared");
+
+};
+
+renderMemory();
+
+/* ==========================================
+   Logs
+========================================== */
+
+const logs=document.getElementById("logs");
+
+logs.innerHTML="System Ready";
+
+document.getElementById("clearLogs").onclick=()=>{
+
+    logs.innerHTML="Logs Cleared";
+
+    showToast("Logs Cleared");
+
+};
 
 /* ==========================================
    Settings
@@ -196,107 +389,20 @@ showToast("Prompt Saved");
 
 document.getElementById("saveSettings").onclick=()=>{
 
-localStorage.setItem("language",
+    APP_CONFIG.language=document.getElementById("language").value;
 
-document.getElementById("language").value);
+    APP_CONFIG.darkMode=document.getElementById("darkMode").checked;
 
-localStorage.setItem("darkMode",
+    saveConfig();
 
-document.getElementById("darkMode").checked);
-
-showToast("Settings Saved");
+    showToast("Settings Saved");
 
 };
 
-
 /* ==========================================
-   FAQ
+   Finish
 ========================================== */
 
-document.getElementById("addFaq").onclick=()=>{
+console.log("WhatsApp AI Assistant Loaded");
 
-showToast("FAQ Feature Coming Soon");
-
-};
-
-
-/* ==========================================
-   Memory
-========================================== */
-
-document.getElementById("clearMemory").onclick=()=>{
-
-localStorage.removeItem("memory");
-
-showToast("Memory Cleared");
-
-};
-
-
-/* ==========================================
-   Logs
-========================================== */
-
-document.getElementById("clearLogs").onclick=()=>{
-
-localStorage.removeItem("logs");
-
-showToast("Logs Cleared");
-
-};
-
-console.log("WhatsApp AI Assistant Loaded Successfully");
-/* ==========================================
-   AI Chat Engine
-========================================== */
-
-async function sendMessageToAI(message){
-
-    if(!message){
-
-        showToast("Message Empty");
-
-        return;
-
-    }
-
-    showToast("AI Thinking...");
-
-    const reply = await askAI(message);
-
-    if(!reply){
-
-        showToast("No Reply");
-
-        return;
-
-    }
-
-    console.log("User :",message);
-
-    console.log("AI :",reply);
-
-    showToast("Reply Received");
-
-    return reply;
-
-}
-
-
-/* ==========================================
-   Test Button
-========================================== */
-
-document.getElementById("start-ai").onclick = async ()=>{
-
-    aiStatus.innerHTML="🟢 Online";
-
-    waStatus.innerHTML="🟢 Connected";
-
-    showToast("Testing AI...");
-
-    const reply = await sendMessageToAI("Hello");
-
-    console.log(reply);
-
-};
+showToast("Application Ready");
