@@ -1,128 +1,189 @@
-/* ==========================================
-   WhatsApp AI Assistant - Memory Engine
-========================================== */
-
 "use strict";
 
-const MEMORY_KEY = "ai_memory";
-// Fallback limit if CONFIG is not defined in app.js
-const MEMORY_LIMIT = (typeof CONFIG !== 'undefined' && CONFIG.memoryLimit) ? CONFIG.memoryLimit : 20;
+/* ==========================================
+   Memory Engine V3
+========================================== */
 
-/* ---------- Core Logic ---------- */
+const MEMORY_KEY = "ai_memory_v3";
 
-function loadMemory() {
-    try {
-        const data = localStorage.getItem(MEMORY_KEY);
-        return data ? JSON.parse(data) : [];
-    } catch (e) {
-        console.error("Memory Load Error:", e);
-        return [];
+/* ---------- Load ---------- */
+
+function getMemory(){
+
+    try{
+
+        return JSON.parse(
+
+            localStorage.getItem(MEMORY_KEY)
+
+        ) || [];
+
     }
+
+    catch(e){
+
+        return [];
+
+    }
+
 }
 
-function saveMemory(memoryArray) {
-    localStorage.setItem(MEMORY_KEY, JSON.stringify(memoryArray));
+/* ---------- Save ---------- */
+
+function saveMemory(memory){
+
+    localStorage.setItem(
+
+        MEMORY_KEY,
+
+        JSON.stringify(memory)
+
+    );
+
 }
 
-function addMemory(userMsg, assistantMsg) {
-    if (!userMsg && !assistantMsg) return; // Prevent saving empty turns
-    
-    const memory = loadMemory();
+/* ---------- Add ---------- */
+
+function addMemory(user,assistant){
+
+    if(!user || !assistant){
+
+        return;
+
+    }
+
+    const memory=getMemory();
+
+    const last=memory[memory.length-1];
+
+    if(
+
+        last &&
+
+        last.user===user &&
+
+        last.assistant===assistant
+
+    ){
+
+        return;
+
+    }
+
     memory.push({
-        id: Date.now(),
-        time: new Date().toISOString(),
-        user: userMsg || "",
-        assistant: assistantMsg || ""
+
+        id:Date.now(),
+
+        time:new Date().toLocaleString(),
+
+        user:user,
+
+        assistant:assistant
+
     });
 
-    // Trim oldest messages if limit is exceeded
-    while (memory.length > MEMORY_LIMIT) {
+    while(
+
+        memory.length>
+
+        APP.MEMORY_LIMIT
+
+    ){
+
         memory.shift();
+
     }
 
     saveMemory(memory);
+
 }
 
-function clearMemory() {
-    localStorage.removeItem(MEMORY_KEY);
-    renderMemoryList(); // Update UI immediately
+/* ---------- Clear ---------- */
+
+function clearMemory(){
+
+    localStorage.removeItem(
+
+        MEMORY_KEY
+
+    );
+
 }
 
-function getMemory() {
-    return loadMemory();
-}
+/* ---------- Prompt ---------- */
 
-/* ---------- AI Integration ---------- */
+function memoryToPrompt(limit=10){
 
-/**
- * Formats memory into a prompt context for the AI.
- * @param {number} limit - Number of recent turns to include.
- */
-function memoryToPrompt(limit = 10) {
-    const memory = loadMemory();
-    if (!memory.length) return "";
+    const memory=getMemory()
 
-    const last = memory.slice(-limit);
-    let text = "\n--- CONVERSATION HISTORY ---\nUse this context to remember previous messages:\n\n";
-    
-    last.forEach(item => {
-        if (item.user) text += `User: ${item.user}\n`;
-        if (item.assistant) text += `Assistant: ${item.assistant}\n`;
-        text += "\n";
+    .slice(-limit);
+
+    let text="";
+
+    memory.forEach(item=>{
+
+        text+=
+
+        "User: "+
+
+        item.user+
+
+        "\nAssistant: "+
+
+        item.assistant+
+
+        "\n\n";
+
     });
-    
-    text += "--- END HISTORY ---\n";
+
     return text;
+
 }
 
-/* ---------- UI Rendering ---------- */
+/* ---------- Export ---------- */
 
-function renderMemoryList() {
-    const listEl = document.getElementById("memoryList");
-    if (!listEl) return;
+function exportMemory(){
 
-    const memory = loadMemory();
-    
-    if (memory.length === 0) {
-        listEl.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:1rem;">No Memory Saved</p>';
-        return;
+    return JSON.stringify(
+
+        getMemory(),
+
+        null,
+
+        2
+
+    );
+
+}
+
+/* ---------- Import ---------- */
+
+function importMemory(json){
+
+    try{
+
+        const data=
+
+        JSON.parse(json);
+
+        if(Array.isArray(data)){
+
+            saveMemory(data);
+
+            return true;
+
+        }
+
     }
 
-    // Show most recent conversations at the top
-    const reversed = [...memory].reverse();
-    
-    listEl.innerHTML = reversed.map(item => {
-        const date = new Date(item.time).toLocaleString();
-        return `
-            <div class="memory-item" style="border-bottom:1px solid var(--border); padding:10px 0;">
-                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:5px;">${date}</div>
-                <div><strong>You:</strong> ${escapeHTML(item.user)}</div>
-                <div style="color:var(--primary); margin-top:4px;"><strong>AI:</strong> ${escapeHTML(item.assistant)}</div>
-            </div>
-        `;
-    }).join("");
-}
+    catch(e){
 
-// Helper to prevent XSS when displaying user/AI text
-function escapeHTML(str) {
-    if (!str) return "";
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
+        console.error(e);
 
-/* ---------- Initialization Hook ---------- */
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Initial Render
-    renderMemoryList();
-    
-    // Ensure UI updates when the clear button is clicked
-    const clearBtn = document.getElementById("clearMemory");
-    if (clearBtn) {
-        clearBtn.addEventListener("click", () => {
-            // Small delay to ensure localStorage is cleared by app.js first
-            setTimeout(renderMemoryList, 50); 
-        });
     }
-});
+
+    return false;
+
+}
+
+console.log("Memory Engine V3 Loaded");
