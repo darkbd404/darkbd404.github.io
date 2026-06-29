@@ -246,3 +246,57 @@ showToast("Logs Cleared");
 };
 
 console.log("WhatsApp AI Assistant Loaded Successfully");
+/* ==========================================
+   AI Chat Engine
+========================================== */
+
+async function sendMessageToAI(message){
+
+    if(!message){
+
+        showToast("Message Empty");
+
+        return;
+
+    }
+
+    showToast("AI Thinking...");
+
+    const reply = await askAI(message);
+
+    if(!reply){
+
+        showToast("No Reply");
+
+        return;
+
+    }
+
+    console.log("User :",message);
+
+    console.log("AI :",reply);
+
+    showToast("Reply Received");
+
+    return reply;
+
+}
+
+
+/* ==========================================
+   Test Button
+========================================== */
+
+document.getElementById("start-ai").onclick = async ()=>{
+
+    aiStatus.innerHTML="🟢 Online";
+
+    waStatus.innerHTML="🟢 Connected";
+
+    showToast("Testing AI...");
+
+    const reply = await sendMessageToAI("Hello");
+
+    console.log(reply);
+
+};
