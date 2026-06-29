@@ -1,1 +1,121 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp AI Assistant</title>
+
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="WhatsApp AI Assistant">
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/icon-192.png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<!-- Splash Screen -->
+<div id="splash-screen">
+    <h1>WhatsApp AI Assistant</h1>
+    <p>Loading...</p>
+</div>
+
+<!-- Main App -->
+<div id="app">
+
+    <!-- Header -->
+    <header>
+
+        <button id="menu-btn">
+            ☰
+        </button>
+
+        <h2>
+            WhatsApp AI Assistant
+        </h2>
+
+        <button id="settings-btn">
+            ⚙
+        </button>
+
+    </header>
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+
+        <ul>
+
+            <li>Dashboard</li>
+
+            <li>AI Settings</li>
+
+            <li>WhatsApp Settings</li>
+
+            <li>FAQ</li>
+
+            <li>Memory</li>
+
+            <li>Logs</li>
+
+            <li>About</li>
+
+        </ul>
+
+    </aside>
+
+    <!-- Dashboard -->
+
+    <main>
+
+        <section id="dashboard">
+
+            <h3>Dashboard</h3>
+
+            <div class="card">
+
+                <h4>AI Status</h4>
+
+                <span id="ai-status">
+                    Offline
+                </span>
+
+            </div>
+
+            <div class="card">
+
+                <h4>WhatsApp Status</h4>
+
+                <span id="wa-status">
+                    Disconnected
+                </span>
+
+            </div>
+
+            <div class="card">
+
+                <button id="start-ai">
+                    START AI
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- Toast -->
+
+<div id="toast"></div>
+
+<!-- JS -->
+
+<script src="js/app.js"></script>
+
+</body>
+</html>
