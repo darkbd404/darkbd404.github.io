@@ -9,9 +9,9 @@
 
 <meta name="theme-color" content="#25D366">
 
-<meta name="description" content="WhatsApp AI Assistant">
+<meta name="description" content="WhatsApp AI Assistant V3">
 
-<title>WhatsApp AI Assistant</title>
+<title>WhatsApp AI Assistant V3</title>
 
 <link rel="manifest" href="manifest.json">
 
@@ -27,7 +27,7 @@
 
 <body>
 
-<!-- Loading Screen -->
+<!-- Loading -->
 
 <div id="loading">
 
@@ -35,11 +35,11 @@
 
 <h1>WhatsApp AI Assistant</h1>
 
-<p>Initializing AI...</p>
+<p>Loading...</p>
 
 </div>
 
-<!-- Main App -->
+<!-- App -->
 
 <div id="app">
 
@@ -135,11 +135,7 @@ settings
 
 <li id="nav-dashboard">
 
-<span class="material-symbols-rounded">
-
-dashboard
-
-</span>
+<span class="material-symbols-rounded">dashboard</span>
 
 Dashboard
 
@@ -147,11 +143,7 @@ Dashboard
 
 <li id="nav-chat">
 
-<span class="material-symbols-rounded">
-
-chat
-
-</span>
+<span class="material-symbols-rounded">chat</span>
 
 Chat
 
@@ -159,11 +151,7 @@ Chat
 
 <li id="nav-whatsapp">
 
-<span class="material-symbols-rounded">
-
-forum
-
-</span>
+<span class="material-symbols-rounded">forum</span>
 
 WhatsApp
 
@@ -171,11 +159,7 @@ WhatsApp
 
 <li id="nav-ai">
 
-<span class="material-symbols-rounded">
-
-psychology
-
-</span>
+<span class="material-symbols-rounded">psychology</span>
 
 AI
 
@@ -183,11 +167,7 @@ AI
 
 <li id="nav-faq">
 
-<span class="material-symbols-rounded">
-
-quiz
-
-</span>
+<span class="material-symbols-rounded">quiz</span>
 
 FAQ
 
@@ -195,11 +175,7 @@ FAQ
 
 <li id="nav-memory">
 
-<span class="material-symbols-rounded">
-
-memory
-
-</span>
+<span class="material-symbols-rounded">memory</span>
 
 Memory
 
@@ -207,11 +183,7 @@ Memory
 
 <li id="nav-logs">
 
-<span class="material-symbols-rounded">
-
-description
-
-</span>
+<span class="material-symbols-rounded">description</span>
 
 Logs
 
@@ -219,11 +191,7 @@ Logs
 
 <li id="nav-settings">
 
-<span class="material-symbols-rounded">
-
-tune
-
-</span>
+<span class="material-symbols-rounded">tune</span>
 
 Settings
 
@@ -236,379 +204,15 @@ Settings
 <!-- Main -->
 
 <main id="mainContent">
-
-<section id="dashboardPage">
-<!-- ==========================
-     Settings Page
+     <!-- ==========================
+     Dashboard Page
 ========================== -->
 
-<section id="settingsPage" class="page" style="display:none;">
-<!-- ==========================
-     FAQ Page
-========================== -->
+<section id="dashboardPage" class="page">
 
-<section id="faqPage" class="page" style="display:none;">
-<!-- ==========================
-     Memory Page
-========================== -->
-
-<section id="memoryPage" class="page" style="display:none;">
-<!-- ==========================
-     Logs Page
-========================== -->
-
-<section id="logsPage" class="page" style="display:none;">
-<!-- ==========================
-     AI Page
-========================== -->
-
-<section id="aiPage" class="page" style="display:none;">
-<!-- ==========================
-     WhatsApp Page
-========================== -->
-
-<section id="whatsappPage" class="page" style="display:none;">
-
-<h1>WhatsApp Control Center</h1>
-
-<div class="settings-grid">
-
-<div class="setting-card">
-
-<h3>Connection Status</h3>
-
-<p><b>Status:</b> <span id="waConnectionStatus">Disconnected</span></p>
-
-<p><b>Device:</b> <span id="waDevice">Unknown</span></p>
-
-<p><b>Queue:</b> <span id="waQueue">0</span></p>
-
-</div>
-
-<div class="setting-card">
-
-<h3>Controls</h3>
-
-<button id="connectWaBtn">
-
-Connect
-
-</button>
-
-<button id="disconnectWaBtn">
-
-Disconnect
-
-</button>
-
-<button id="refreshWaBtn">
-
-Refresh Status
-
-</button>
-
-</div>
-
-</div>
-
-</section>
-<h1>AI Control Center</h1>
-
-<div class="settings-grid">
-
-<div class="setting-card">
-
-<h3>AI Information</h3>
-
-<p><b>Provider:</b> OpenRouter</p>
-<p><b>Model:</b> <span id="currentModel">Not Selected</span></p>
-<p><b>Status:</b> <span id="aiLiveStatus">Offline</span></p>
-
-</div>
-
-<div class="setting-card">
-
-<h3>AI Tools</h3>
-
-<button id="reloadModelBtn">
-
-Reload Model
-
-</button>
-
-<button id="pingAiBtn">
-
-Ping AI
-
-</button>
-
-<button id="clearChatBtn">
-
-Clear Chat
-
-</button>
-
-</div>
-
-</div>
-
-</section>
-<h1>System Logs</h1>
-
-<div class="settings-grid">
-
-<div class="setting-card">
-
-<h3>Logs</h3>
-
-<div id="logsContainer">
-
-No Logs Available
-
-</div>
-
-</div>
-
-<div class="setting-card">
-
-<h3>Log Tools</h3>
-
-<button id="exportLogsBtn">
-
-Export Logs
-
-</button>
-
-<button id="clearLogsBtn">
-
-Clear Logs
-
-</button>
-
-</div>
-
-</div>
-
-</section>
-<h1>Memory Manager</h1>
-
-<div class="settings-grid">
-
-<div class="setting-card">
-
-<h3>Search Memory</h3>
-
-<input
-type="text"
-id="memorySearch"
-placeholder="Search conversation...">
-
-<div id="memoryList">
-
-No Memory Found
-
-</div>
-
-</div>
-
-<div class="setting-card">
-
-<h3>Memory Tools</h3>
-
-<button id="exportMemoryBtn">
-
-Export Memory
-
-</button>
-
-<button id="importMemoryBtn">
-
-Import Memory
-
-</button>
-
-<button id="clearMemoryBtn">
-
-Clear Memory
-
-</button>
-
-<textarea
-id="memoryImportBox"
-rows="8"
-placeholder="Paste exported memory here..."></textarea>
-
-</div>
-
-</div>
-
-</section>
-<h1>FAQ Manager</h1>
-
-<div class="settings-grid">
-
-<div class="setting-card">
-
-<h3>Add FAQ</h3>
-
-<label>Question</label>
-
-<input
-type="text"
-id="faqQuestion"
-placeholder="Enter Question">
-
-<label>Answer</label>
-
-<textarea
-id="faqAnswer"
-placeholder="Enter Answer"
-rows="6"></textarea>
-
-<button id="addFaqBtn">
-
-Add FAQ
-
-</button>
-
-</div>
-
-<div class="setting-card">
-
-<h3>Saved FAQ</h3>
-
-<div id="faqList">
-
-No FAQ Added
-
-</div>
-
-<button id="exportFaqBtn">
-
-Export FAQ
-
-</button>
-
-<button id="clearFaqBtn">
-
-Clear FAQ
-
-</button>
-
-</div>
-
-</div>
-
-</section>
-<h1>Settings</h1>
-
-<div class="settings-grid">
-
-<div class="setting-card">
-
-<h3>OpenRouter API</h3>
-
-<label>API Key</label>
-
-<input
-type="password"
-id="apiKey"
-placeholder="Paste your OpenRouter API Key">
-
-<button id="saveApiBtn">
-
-Save API Key
-
-</button>
-
-</div>
-
-<div class="setting-card">
-
-<h3>AI Model</h3>
-
-<select id="modelSelect">
-
-<option value="deepseek/deepseek-chat-v3-0324:free">
-
-DeepSeek Chat V3 (Free)
-
-</option>
-
-<option value="meta-llama/llama-3.3-8b-instruct:free">
-
-Llama 3.3 8B (Free)
-
-</option>
-
-<option value="qwen/qwen3-32b:free">
-
-Qwen 3 32B (Free)
-
-</option>
-
-</select>
-
-<button id="saveModelBtn">
-
-Save Model
-
-</button>
-
-</div>
-
-<div class="setting-card">
-
-<h3>AI Settings</h3>
-
-<label>Temperature</label>
-
-<input
-type="number"
-id="temperature"
-min="0"
-max="2"
-step="0.1"
-value="0.7">
-
-<label>Max Tokens</label>
-
-<input
-type="number"
-id="maxTokens"
-value="1024">
-
-</div>
-
-<div class="setting-card">
-
-<h3>Connection</h3>
-
-<button id="testConnectionBtn">
-
-Test AI Connection
-
-</button>
-
-<p id="connectionStatus">
-
-Not Tested
-
-</p>
-
-</div>
-
-</div>
-
-</section>
-<h1>
-
-Dashboard
-
-</h1>
+<h1>Dashboard</h1>
 
 <div class="cards">
-  <!-- Status Cards -->
 
 <div class="card ai-card">
 
@@ -700,15 +304,15 @@ quiz
 
 </div>
 
-<!-- AI Chat -->
+<!-- Chat -->
 
-<section class="chat-section">
+<div class="chat-section">
 
 <div class="chat-header">
 
 <div>
 
-<h2>AI Conversation</h2>
+<h2>AI Chat</h2>
 
 <p>Powered by OpenRouter</p>
 
@@ -730,7 +334,7 @@ Ready
 
 <div class="bubble">
 
-👋 Welcome! I am your WhatsApp AI Assistant.
+👋 Welcome to WhatsApp AI Assistant.
 
 </div>
 
@@ -741,8 +345,11 @@ Ready
 <div class="chat-input">
 
 <input
+
 type="text"
+
 id="messageInput"
+
 placeholder="Type your message...">
 
 <button id="sendBtn">
@@ -756,10 +363,6 @@ send
 </button>
 
 </div>
-
-</section>
-
-<!-- Quick Actions -->
 
 <div class="quick-actions">
 
@@ -812,6 +415,385 @@ Memory
 </button>
 
 </div>
+
+</section>
+<!-- ==========================
+     Settings Page
+========================== -->
+
+<section id="settingsPage" class="page" style="display:none;">
+
+<h1>Settings</h1>
+
+<div class="settings-grid">
+
+<div class="setting-card">
+
+<h3>OpenRouter API</h3>
+
+<label>API Key</label>
+
+<input type="password" id="apiKey" placeholder="Paste your API Key">
+
+<button id="saveApiBtn">Save API Key</button>
+
+</div>
+
+<div class="setting-card">
+
+<h3>AI Model</h3>
+
+<select id="modelSelect">
+
+<option value="deepseek/deepseek-chat-v3-0324:free">
+DeepSeek Chat V3
+</option>
+
+<option value="meta-llama/llama-3.3-8b-instruct:free">
+Llama 3.3
+</option>
+
+<option value="qwen/qwen3-32b:free">
+Qwen 3
+</option>
+
+</select>
+
+<button id="saveModelBtn">
+Save Model
+</button>
+
+</div>
+
+<div class="setting-card">
+
+<h3>AI Parameters</h3>
+
+<label>Temperature</label>
+
+<input type="number" id="temperature" value="0.7" step="0.1">
+
+<label>Max Tokens</label>
+
+<input type="number" id="maxTokens" value="1024">
+
+<button id="testConnectionBtn">
+
+Test Connection
+
+</button>
+
+<p id="connectionStatus">
+
+Not Tested
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ==========================
+     FAQ Page
+========================== -->
+
+<section id="faqPage" class="page" style="display:none;">
+
+<h1>FAQ Manager</h1>
+
+<div class="settings-grid">
+
+<div class="setting-card">
+
+<h3>Add FAQ</h3>
+
+<input
+type="text"
+id="faqQuestion"
+placeholder="Question">
+
+<textarea
+id="faqAnswer"
+rows="6"
+placeholder="Answer"></textarea>
+
+<button id="addFaqBtn">
+
+Add FAQ
+
+</button>
+
+</div>
+
+<div class="setting-card">
+
+<h3>FAQ List</h3>
+
+<div id="faqList">
+
+No FAQ Added
+
+</div>
+
+<button id="exportFaqBtn">
+
+Export FAQ
+
+</button>
+
+<button id="clearFaqBtn">
+
+Clear FAQ
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ==========================
+     Memory Page
+========================== -->
+
+<section id="memoryPage" class="page" style="display:none;">
+
+<h1>Memory Manager</h1>
+
+<div class="settings-grid">
+
+<div class="setting-card">
+
+<h3>Memory Search</h3>
+
+<input
+type="text"
+id="memorySearch"
+placeholder="Search Memory">
+
+<div id="memoryList">
+
+No Memory
+
+</div>
+
+</div>
+
+<div class="setting-card">
+
+<h3>Memory Tools</h3>
+
+<button id="exportMemoryBtn">
+
+Export Memory
+
+</button>
+
+<button id="importMemoryBtn">
+
+Import Memory
+
+</button>
+
+<button id="clearMemoryBtn">
+
+Clear Memory
+
+</button>
+
+<textarea
+id="memoryImportBox"
+rows="8"
+placeholder="Paste exported JSON here"></textarea>
+
+</div>
+
+</div>
+
+</section>
+<!-- ==========================
+     Logs Page
+========================== -->
+
+<section id="logsPage" class="page" style="display:none;">
+
+<h1>System Logs</h1>
+
+<div class="settings-grid">
+
+<div class="setting-card">
+
+<h3>Logs</h3>
+
+<div id="logsContainer">
+
+No Logs Available
+
+</div>
+
+</div>
+
+<div class="setting-card">
+
+<button id="exportLogsBtn">
+
+Export Logs
+
+</button>
+
+<button id="clearLogsBtn">
+
+Clear Logs
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ==========================
+     AI Page
+========================== -->
+
+<section id="aiPage" class="page" style="display:none;">
+
+<h1>AI Control Center</h1>
+
+<div class="settings-grid">
+
+<div class="setting-card">
+
+<h3>AI Information</h3>
+
+<p><b>Provider:</b> OpenRouter</p>
+
+<p><b>Model:</b>
+
+<span id="currentModel">
+
+Not Selected
+
+</span>
+
+</p>
+
+<p><b>Status:</b>
+
+<span id="aiLiveStatus">
+
+Offline
+
+</span>
+
+</p>
+
+</div>
+
+<div class="setting-card">
+
+<button id="reloadModelBtn">
+
+Reload Model
+
+</button>
+
+<button id="pingAiBtn">
+
+Ping AI
+
+</button>
+
+<button id="clearChatBtn">
+
+Clear Chat
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ==========================
+     WhatsApp Page
+========================== -->
+
+<section id="whatsappPage" class="page" style="display:none;">
+
+<h1>WhatsApp Control Center</h1>
+
+<div class="settings-grid">
+
+<div class="setting-card">
+
+<p>
+
+<b>Status:</b>
+
+<span id="waConnectionStatus">
+
+Disconnected
+
+</span>
+
+</p>
+
+<p>
+
+<b>Device:</b>
+
+<span id="waDevice">
+
+Unknown
+
+</span>
+
+</p>
+
+<p>
+
+<b>Queue:</b>
+
+<span id="waQueue">
+
+0
+
+</span>
+
+</p>
+
+</div>
+
+<div class="setting-card">
+
+<button id="connectWaBtn">
+
+Connect
+
+</button>
+
+<button id="disconnectWaBtn">
+
+Disconnect
+
+</button>
+
+<button id="refreshWaBtn">
+
+Refresh
+
+</button>
+
+</div>
+
+</div>
+
 </section>
 
 </main>
@@ -830,7 +812,7 @@ dashboard
 
 </span>
 
-<span>Home</span>
+Home
 
 </button>
 
@@ -842,7 +824,7 @@ chat
 
 </span>
 
-<span>Chat</span>
+Chat
 
 </button>
 
@@ -854,7 +836,7 @@ forum
 
 </span>
 
-<span>WA</span>
+WA
 
 </button>
 
@@ -866,7 +848,7 @@ smart_toy
 
 </span>
 
-<span>AI</span>
+AI
 
 </button>
 
@@ -878,13 +860,11 @@ settings
 
 </span>
 
-<span>Settings</span>
+Settings
 
 </button>
 
 </nav>
-
-<!-- Floating Action Button -->
 
 <button id="fab">
 
@@ -896,15 +876,9 @@ auto_awesome
 
 </button>
 
-<!-- Toast -->
-
 <div id="toast"></div>
 
-<!-- Loading Overlay -->
-
 <div id="overlay"></div>
-
-<!-- Scripts -->
 
 <script src="config/config.js"></script>
 
@@ -933,6 +907,7 @@ auto_awesome
 <script src="js/ai-page.js"></script>
 
 <script src="js/whatsapp-page.js"></script>
+
 </body>
 
 </html>
