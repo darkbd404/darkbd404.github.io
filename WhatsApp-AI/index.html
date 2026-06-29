@@ -1,154 +1,600 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp AI Assistant</title>
 
-    <meta name="theme-color" content="#0f172a">
-    <meta name="description" content="WhatsApp AI Assistant">
+<meta charset="UTF-8">
 
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icons/icon-192.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css">
+<meta name="theme-color" content="#0f172a">
+
+<meta name="description" content="WhatsApp AI Assistant">
+
+<title>WhatsApp AI Assistant</title>
+
+<link rel="manifest" href="manifest.json">
+
+<link rel="stylesheet" href="css/style.css">
+
+<link rel="icon" href="icons/icon-192.png">
+
 </head>
 
 <body>
 
-<!-- Splash Screen -->
+<!-- Splash -->
+
 <div id="splash-screen">
-    <h1>WhatsApp AI Assistant</h1>
-    <p>Loading...</p>
-</div>
 
-<!-- Main App -->
-<div id="app">
+    <div class="logo-box">
 
-    <!-- Header -->
-    <header>
+        <h1>WhatsApp AI</h1>
 
-        <button id="menu-btn">
-            ☰
-        </button>
-
-        <h2>
-            WhatsApp AI Assistant
-        </h2>
-
-        <button id="settings-btn">
-            ⚙
-        </button>
-
-    </header>
-
-    <!-- Sidebar -->
-    <aside id="sidebar">
-
-        <ul>
-
-            <li>Dashboard</li>
-
-            <li>AI Settings</li>
-
-            <li>WhatsApp Settings</li>
-
-            <li>FAQ</li>
-
-            <li>Memory</li>
-
-            <li>Logs</li>
-
-            <li>About</li>
-
-        </ul>
-
-    </aside>
-
-    <!-- Dashboard -->
-
-    <main>
-
-        <section id="dashboard">
-
-            <h3>Dashboard</h3>
-
-            <div class="card">
-
-                <h4>AI Status</h4>
-
-                <span id="ai-status">
-                    Offline
-                </span>
-
-            </div>
-
-            <div class="card">
-
-                <h4>WhatsApp Status</h4>
-
-                <span id="wa-status">
-                    Disconnected
-                </span>
-
-            </div>
-
-            <div class="card">
-
-                <button id="start-ai">
-                    START AI
-                </button>
-
-            </div>
-
-        </section>
-
-    </main>
-<!-- Settings Panel -->
-
-<section id="settingsPage" style="display:none;">
-
-    <div class="card">
-
-        <h2>Settings</h2>
-
-        <label>AI Provider</label>
-
-        <select id="provider">
-            <option>OpenRouter</option>
-        </select>
-
-        <br><br>
-
-        <label>API Key</label>
-
-        <input
-            type="password"
-            id="apikey"
-            placeholder="Paste API Key">
-
-        <br><br>
-
-        <button id="saveApi">
-
-            Save API Key
-
-        </button>
+        <p>AI Assistant</p>
 
     </div>
 
-</section>
 </div>
 
-<!-- Toast -->
+<!-- App -->
+
+<div id="app">
+
+<header>
+
+<button id="menu-btn">
+
+☰
+
+</button>
+
+<h2>
+
+WhatsApp AI Assistant
+
+</h2>
+
+<button id="settings-btn">
+
+⚙
+
+</button>
+
+</header>
+
+<!-- Sidebar -->
+
+<aside id="sidebar">
+
+<div class="profile">
+
+<div class="avatar">
+
+🤖
+
+</div>
+
+<h3>
+
+WhatsApp AI
+
+</h3>
+
+<p>
+
+Version 1.0
+
+</p>
+
+</div>
+
+<nav>
+
+<ul>
+
+<li id="nav-dashboard">
+
+Dashboard
+
+</li>
+
+<li id="nav-whatsapp">
+
+WhatsApp
+
+</li>
+
+<li id="nav-ai">
+
+AI
+
+</li>
+
+<li id="nav-faq">
+
+FAQ
+
+</li>
+
+<li id="nav-memory">
+
+Memory
+
+</li>
+
+<li id="nav-logs">
+
+Logs
+
+</li>
+
+<li id="nav-settings">
+
+Settings
+
+</li>
+
+<li id="nav-about">
+
+About
+
+</li>
+
+</ul>
+
+</nav>
+
+</aside>
+
+<main>
+
+<!-- Dashboard -->
+
+<section id="dashboardPage">
+
+<h1>
+
+Dashboard
+
+</h1>
+
+<div class="card">
+
+<h3>
+
+AI Status
+
+</h3>
+
+<p id="ai-status">
+
+Offline
+
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+WhatsApp Status
+
+</h3>
+
+<p id="wa-status">
+
+Disconnected
+
+</p>
+
+</div>
+
+<div class="card">
+
+<button id="start-ai">
+
+START AI
+
+</button>
+
+</div>
+
+</section>
+<!-- WhatsApp Page -->
+
+<section id="whatsappPage" style="display:none;">
+
+<div class="card">
+
+<h2>
+
+WhatsApp Control
+
+</h2>
+
+<label>
+
+Auto Reply
+
+</label>
+
+<label class="switch">
+
+<input type="checkbox" id="autoReply">
+
+<span class="slider"></span>
+
+</label>
+
+<br><br>
+
+<label>
+
+Reply Delay (Seconds)
+
+</label>
+
+<input
+type="number"
+id="replyDelay"
+value="2"
+min="0"
+max="60">
+
+<br><br>
+
+<label>
+
+Ignore Groups
+
+</label>
+
+<label class="switch">
+
+<input type="checkbox" id="ignoreGroups">
+
+<span class="slider"></span>
+
+</label>
+
+<br><br>
+
+<label>
+
+Ignore Saved Contacts
+
+</label>
+
+<label class="switch">
+
+<input type="checkbox" id="ignoreContacts">
+
+<span class="slider"></span>
+
+</label>
+
+</div>
+
+</section>
+
+<!-- AI Page -->
+
+<section id="aiPage" style="display:none;">
+
+<div class="card">
+
+<h2>
+
+AI Configuration
+
+</h2>
+
+<label>
+
+AI Provider
+
+</label>
+
+<select id="provider">
+
+<option value="openrouter">
+
+OpenRouter
+
+</option>
+
+</select>
+
+<br><br>
+
+<label>
+
+API Key
+
+</label>
+
+<input
+type="password"
+id="apikey"
+placeholder="Paste OpenRouter API Key">
+
+<br><br>
+
+<label>
+
+Model
+
+</label>
+
+<select id="model">
+
+<option>
+
+deepseek/deepseek-chat-v3-0324:free
+
+</option>
+
+<option>
+
+google/gemma-3-27b-it:free
+
+</option>
+
+<option>
+
+qwen/qwen3-30b-a3b:free
+
+</option>
+
+</select>
+
+<br><br>
+
+<button id="saveApi">
+
+Save Configuration
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>
+
+System Prompt
+
+</h2>
+
+<textarea
+id="systemPrompt"
+rows="10"
+placeholder="Enter AI Prompt"></textarea>
+
+<br><br>
+
+<button id="savePrompt">
+
+Save Prompt
+
+</button>
+
+</div>
+
+</section>
+<!-- FAQ Page -->
+
+<section id="faqPage" style="display:none;">
+
+<div class="card">
+
+<h2>FAQ Manager</h2>
+
+<input
+type="text"
+id="faqQuestion"
+placeholder="Question">
+
+<br><br>
+
+<textarea
+id="faqAnswer"
+rows="5"
+placeholder="Answer"></textarea>
+
+<br><br>
+
+<button id="addFaq">
+
+Add FAQ
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>FAQ List</h2>
+
+<div id="faqList">
+
+No FAQ Added
+
+</div>
+
+</div>
+
+</section>
+
+<!-- Memory Page -->
+
+<section id="memoryPage" style="display:none;">
+
+<div class="card">
+
+<h2>
+
+Conversation Memory
+
+</h2>
+
+<div id="memoryList">
+
+No Memory
+
+</div>
+
+<br>
+
+<button id="clearMemory">
+
+Clear Memory
+
+</button>
+
+</div>
+
+</section>
+
+<!-- Logs Page -->
+
+<section id="logsPage" style="display:none;">
+
+<div class="card">
+
+<h2>
+
+Logs
+
+</h2>
+
+<div id="logs">
+
+No Logs
+
+</div>
+
+<br>
+
+<button id="clearLogs">
+
+Clear Logs
+
+</button>
+
+</div>
+
+</section>
+
+<!-- Settings Page -->
+
+<section id="settingsPage" style="display:none;">
+
+<div class="card">
+
+<h2>
+
+Application Settings
+
+</h2>
+
+<label>
+
+Dark Mode
+
+</label>
+
+<label class="switch">
+
+<input
+type="checkbox"
+checked
+id="darkMode">
+
+<span class="slider"></span>
+
+</label>
+
+<br><br>
+
+<label>
+
+Language
+
+</label>
+
+<select id="language">
+
+<option>
+
+English
+
+</option>
+
+<option>
+
+বাংলা
+
+</option>
+
+</select>
+
+<br><br>
+
+<button id="saveSettings">
+
+Save Settings
+
+</button>
+
+</div>
+
+</section>
+
+<!-- About -->
+
+<section id="aboutPage" style="display:none;">
+
+<div class="card">
+
+<h2>
+
+WhatsApp AI Assistant
+
+</h2>
+
+<p>
+
+Version 1.0
+
+</p>
+
+<p>
+
+Powered by OpenRouter Free AI
+
+</p>
+
+<p>
+
+GitHub Project
+
+</p>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
 
 <div id="toast"></div>
-
-<!-- JS -->
 
 <script src="js/app.js"></script>
 
 </body>
+
 </html>
