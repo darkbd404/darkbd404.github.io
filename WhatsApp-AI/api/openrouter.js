@@ -1,75 +1,114 @@
 /* ==========================================
    WhatsApp AI Assistant
-   OpenRouter API
+   OpenRouter Engine v2
 ========================================== */
 
 "use strict";
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_URL =
+"https://openrouter.ai/api/v1/chat/completions";
 
 async function askAI(userMessage){
 
-    const apiKey = localStorage.getItem("apiKey");
+    /* ---------- FAQ ---------- */
 
-    const model = localStorage.getItem("model") || "deepseek/deepseek-chat-v3-0324:free";
+    const faqAnswer = searchFAQ(userMessage);
 
-    const systemPrompt = localStorage.getItem("systemPrompt") || "You are a helpful WhatsApp AI Assistant.";
+    if(faqAnswer){
+
+        addMemory(userMessage,faqAnswer);
+
+        return faqAnswer;
+
+    }
+
+    /* ---------- Memory ---------- */
+
+    const memory = memoryToPrompt();
+
+    const apiKey =
+    localStorage.getItem("apiKey");
+
+    const model =
+    localStorage.getItem("model") ||
+    APP_CONFIG.defaultModel;
+
+    const systemPrompt =
+    localStorage.getItem("systemPrompt") ||
+    "";
 
     if(!apiKey){
 
-        showToast("API Key Not Found");
+        showToast("API Key Missing");
 
         return null;
 
     }
 
+    const messages=[
+
+        {
+
+            role:"system",
+
+            content:
+            systemPrompt +
+            "\n\nConversation Memory:\n" +
+            memory +
+            "\n"
+
+        },
+
+        {
+
+            role:"user",
+
+            content:userMessage
+
+        }
+
+    ];
+
     try{
 
-        const response = await fetch(OPENROUTER_URL,{
+        const response =
+        await fetch(
 
-            method:"POST",
+            OPENROUTER_URL,
 
-            headers:{
+            {
 
-                "Content-Type":"application/json",
+                method:"POST",
 
-                "Authorization":"Bearer " + apiKey,
+                headers:{
 
-                "HTTP-Referer":window.location.origin,
+                    "Content-Type":"application/json",
 
-                "X-Title":"WhatsApp AI Assistant"
+                    "Authorization":
+                    "Bearer "+apiKey,
 
-            },
+                    "HTTP-Referer":
+                    window.location.origin,
 
-            body:JSON.stringify({
+                    "X-Title":
+                    APP_CONFIG.appName
 
-                model:model,
+                },
 
-                messages:[
+                body:JSON.stringify({
 
-                    {
+                    model:model,
 
-                        role:"system",
+                    messages:messages
 
-                        content:systemPrompt
+                })
 
-                    },
+            }
 
-                    {
+        );
 
-                        role:"user",
-
-                        content:userMessage
-
-                    }
-
-                ]
-
-            })
-
-        });
-
-        const result = await response.json();
+        const result =
+        await response.json();
 
         if(result.error){
 
@@ -83,13 +122,26 @@ async function askAI(userMessage){
 
         if(!result.choices){
 
-            showToast("No AI Response");
+            showToast("No Response");
 
             return null;
 
         }
 
-        return result.choices[0].message.content;
+        const reply =
+        result.choices[0]
+        .message
+        .content;
+
+        addMemory(
+
+            userMessage,
+
+            reply
+
+        );
+
+        return reply;
 
     }
 
@@ -106,12 +158,13 @@ async function askAI(userMessage){
 }
 
 /* ==========================================
-   Test AI
+   Test
 ========================================== */
 
 async function testAI(){
 
-    const reply = await askAI("Hello");
+    const reply =
+    await askAI("Hello");
 
     console.log(reply);
 
