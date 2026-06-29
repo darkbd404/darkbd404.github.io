@@ -1203,3 +1203,54 @@ background:#f7f7f7;
 box-shadow:var(--shadow-inset);
 
 }
+/* ==========================================
+   Memory
+========================================== */
+
+#memoryList{
+
+max-height:420px;
+
+overflow-y:auto;
+
+padding:15px;
+
+border-radius:18px;
+
+background:#f8fafc;
+
+box-shadow:var(--shadow-inset);
+
+}
+
+.memory-item{
+
+padding:15px;
+
+margin-bottom:15px;
+
+border-radius:16px;
+
+background:#fff;
+
+box-shadow:var(--shadow);
+
+}
+
+.memory-item h4{
+
+margin-bottom:8px;
+
+font-size:16px;
+
+}
+
+.memory-item p{
+
+font-size:14px;
+
+line-height:1.5;
+
+color:#555;
+
+}
