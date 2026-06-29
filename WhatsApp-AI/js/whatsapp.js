@@ -1,103 +1,147 @@
 "use strict";
 
 /* ==========================================
-   WhatsApp Engine
+   WhatsApp Bridge V3
 ========================================== */
 
-const WhatsAppEngine = {
+const WhatsAppBridge = {
 
-    connected:false,
+connected:false,
 
-    phoneNumber:"",
+device:"",
 
-    lastMessage:"",
+lastSender:"",
 
-    lastReply:"",
+lastMessage:"",
 
-    connect:function(number){
+lastReply:"",
 
-        this.phoneNumber=number;
-
-        this.connected=true;
-
-        setWAStatus("🟢 Connected");
-
-        showToast("WhatsApp Connected");
-
-    },
-
-    disconnect:function(){
-
-        this.connected=false;
-
-        this.phoneNumber="";
-
-        setWAStatus("🔴 Disconnected");
-
-        showToast("WhatsApp Disconnected");
-
-    },
-
-    async receiveMessage(message){
-
-        if(!this.connected){
-
-            console.warn("WhatsApp Not Connected");
-
-            return;
-
-        }
-
-        this.lastMessage=message;
-
-        console.log("Message :",message);
-
-        const reply=await sendChat(message);
-
-        this.lastReply=reply;
-
-        console.log("Reply :",reply);
-
-        return reply;
-
-    },
-
-    status:function(){
-
-        return{
-
-            connected:this.connected,
-
-            number:this.phoneNumber,
-
-            lastMessage:this.lastMessage,
-
-            lastReply:this.lastReply
-
-        };
-
-    }
+queue:[]
 
 };
 
-/* ==========================================
-   Test
-========================================== */
+/* ---------- Connect ---------- */
 
-async function testWhatsApp(){
+function connectWhatsApp(device="Android"){
 
-    WhatsAppEngine.connect("01700000000");
+WhatsAppBridge.connected=true;
 
-    const reply=
+WhatsAppBridge.device=device;
 
-    await WhatsAppEngine.receiveMessage(
+if(typeof setWAStatus==="function"){
 
-        "Hello"
-
-    );
-
-    console.log(reply);
+setWAStatus("🟢 Connected");
 
 }
 
-console.log("WhatsApp Engine Loaded");
+console.log("WhatsApp Connected");
+
+}
+
+/* ---------- Disconnect ---------- */
+
+function disconnectWhatsApp(){
+
+WhatsAppBridge.connected=false;
+
+WhatsAppBridge.device="";
+
+if(typeof setWAStatus==="function"){
+
+setWAStatus("🔴 Disconnected");
+
+}
+
+}
+
+/* ---------- Receive ---------- */
+
+async function receiveWhatsAppMessage(sender,message){
+
+if(!WhatsAppBridge.connected){
+
+console.warn("WhatsApp Offline");
+
+return;
+
+}
+
+WhatsAppBridge.lastSender=sender;
+
+WhatsAppBridge.lastMessage=message;
+
+const reply=await processChat(message);
+
+WhatsAppBridge.lastReply=reply;
+
+WhatsAppBridge.queue.push({
+
+sender,
+
+message,
+
+reply,
+
+time:Date.now()
+
+});
+
+return reply;
+
+}
+
+/* ---------- Queue ---------- */
+
+function getQueue(){
+
+return WhatsAppBridge.queue;
+
+}
+
+function clearQueue(){
+
+WhatsAppBridge.queue=[];
+
+}
+
+/* ---------- Status ---------- */
+
+function getWhatsAppStatus(){
+
+return{
+
+connected:WhatsAppBridge.connected,
+
+device:WhatsAppBridge.device,
+
+lastSender:WhatsAppBridge.lastSender,
+
+lastMessage:WhatsAppBridge.lastMessage,
+
+lastReply:WhatsAppBridge.lastReply,
+
+queue:getQueue().length
+
+};
+
+}
+
+/* ---------- Test ---------- */
+
+async function testWhatsApp(){
+
+connectWhatsApp("Demo Device");
+
+const reply=await receiveWhatsAppMessage(
+
+"Test User",
+
+"Hello"
+
+);
+
+console.log(reply);
+
+}
+
+console.log("WhatsApp Bridge V3 Loaded");
