@@ -790,3 +790,136 @@ document.getElementById("bottom-ai")?.addEventListener("click",()=>showPage("ai"
 document.getElementById("bottom-whatsapp")?.addEventListener("click",()=>showPage("whatsapp"));
 
 showPage("dashboard");
+/* ==========================================
+   FAQ Page V3
+========================================== */
+
+const faqQuestion = document.getElementById("faqQuestion");
+const faqAnswer = document.getElementById("faqAnswer");
+const addFaqBtn = document.getElementById("addFaqBtn");
+const faqList = document.getElementById("faqList");
+const exportFaqBtn = document.getElementById("exportFaqBtn");
+const clearFaqBtn = document.getElementById("clearFaqBtn");
+
+function renderFAQList(){
+
+    if(!faqList) return;
+
+    const data = loadFAQ();
+
+    if(data.length===0){
+
+        faqList.innerHTML="<p>No FAQ Added</p>";
+
+        return;
+
+    }
+
+    faqList.innerHTML="";
+
+    data.forEach(item=>{
+
+        const div=document.createElement("div");
+
+        div.className="setting-card";
+
+        div.innerHTML=`
+            <h4>${item.question}</h4>
+            <p>${item.answer}</p>
+            <button onclick="removeFAQ(${item.id})">
+                Delete
+            </button>
+        `;
+
+        faqList.appendChild(div);
+
+    });
+
+}
+
+function removeFAQ(id){
+
+    deleteFAQ(id);
+
+    renderFAQList();
+
+    updateCounters();
+
+    showToast("FAQ Deleted");
+
+}
+
+if(addFaqBtn){
+
+    addFaqBtn.onclick=()=>{
+
+        const q=faqQuestion.value.trim();
+
+        const a=faqAnswer.value.trim();
+
+        if(!q || !a){
+
+            showToast("Question and Answer required");
+
+            return;
+
+        }
+
+        if(addFAQ(q,a)){
+
+            faqQuestion.value="";
+            faqAnswer.value="";
+
+            renderFAQList();
+
+            updateCounters();
+
+            showToast("FAQ Added");
+
+        }else{
+
+            showToast("FAQ already exists");
+
+        }
+
+    };
+
+}
+
+if(exportFaqBtn){
+
+    exportFaqBtn.onclick=()=>{
+
+        const data=exportFAQ();
+
+        navigator.clipboard.writeText(data);
+
+        showToast("FAQ copied to clipboard");
+
+    };
+
+}
+
+if(clearFaqBtn){
+
+    clearFaqBtn.onclick=()=>{
+
+        if(confirm("Delete all FAQ?")){
+
+            clearFAQ();
+
+            renderFAQList();
+
+            updateCounters();
+
+            showToast("All FAQ Deleted");
+
+        }
+
+    };
+
+}
+
+renderFAQList();
+
+console.log("FAQ Page Loaded");
