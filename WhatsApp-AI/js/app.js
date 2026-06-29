@@ -30,20 +30,16 @@ const faqCount = document.getElementById("faqCount");
 
 /* ---------- Loading ---------- */
 
-window.addEventListener("load",()=>{
-
-setTimeout(()=>{
-
-loading.style.display="none";
-
-app.style.display="block";
-
-updateCounters();
-
-},1200);
-
-});
-
+if (!loading || !app) {
+    console.error("loading অথবা app element পাওয়া যায়নি");
+} else {
+    window.addEventListener("load", () => {
+        setTimeout(() => {
+            loading.style.display = "none";
+            app.style.display = "block";
+        }, 1200);
+    });
+}
 
 /* ---------- Toast ---------- */
 
