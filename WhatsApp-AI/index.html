@@ -17,55 +17,71 @@
 
 <link rel="stylesheet" href="css/style.css">
 
-<link rel="icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet">
 
 </head>
 
 <body>
 
-<!-- Splash -->
+<div id="loading">
 
-<div id="splash-screen">
+<div class="loader"></div>
 
-    <div class="logo-box">
+<h2>WhatsApp AI Assistant</h2>
 
-        <h1>WhatsApp AI</h1>
-
-        <p>AI Assistant</p>
-
-    </div>
+<p>Loading...</p>
 
 </div>
 
-<!-- App -->
-
 <div id="app">
 
-<header>
+<header class="topbar">
 
-<button id="menu-btn">
+<div class="logo">
 
-☰
+<span class="material-symbols-rounded">
+
+smart_toy
+
+</span>
+
+<h2>WhatsApp AI</h2>
+
+</div>
+
+<div class="top-actions">
+
+<button id="themeBtn">
+
+<span class="material-symbols-rounded">
+
+dark_mode
+
+</span>
 
 </button>
 
-<h2>
+<button id="settingsBtn">
 
-WhatsApp AI Assistant
+<span class="material-symbols-rounded">
 
-</h2>
+settings
 
-<button id="settings-btn">
-
-⚙
+</span>
 
 </button>
+
+</div>
 
 </header>
 
-<!-- Sidebar -->
+<div class="container">
 
-<aside id="sidebar">
+<aside class="sidebar">
 
 <div class="profile">
 
@@ -75,31 +91,45 @@ WhatsApp AI Assistant
 
 </div>
 
-<h3>
+<h3>AI Assistant</h3>
 
-WhatsApp AI
-
-</h3>
-
-<p>
-
-Version 1.0
-
-</p>
+<p>Premium Edition</p>
 
 </div>
-
-<nav>
 
 <ul>
 
 <li id="nav-dashboard">
 
+<span class="material-symbols-rounded">
+
+dashboard
+
+</span>
+
 Dashboard
 
 </li>
 
+<li id="nav-chat">
+
+<span class="material-symbols-rounded">
+
+chat
+
+</span>
+
+Chat
+
+</li>
+
 <li id="nav-whatsapp">
+
+<span class="material-symbols-rounded">
+
+forum
+
+</span>
 
 WhatsApp
 
@@ -107,11 +137,23 @@ WhatsApp
 
 <li id="nav-ai">
 
+<span class="material-symbols-rounded">
+
+psychology
+
+</span>
+
 AI
 
 </li>
 
 <li id="nav-faq">
+
+<span class="material-symbols-rounded">
+
+quiz
+
+</span>
 
 FAQ
 
@@ -119,11 +161,23 @@ FAQ
 
 <li id="nav-memory">
 
+<span class="material-symbols-rounded">
+
+memory
+
+</span>
+
 Memory
 
 </li>
 
 <li id="nav-logs">
+
+<span class="material-symbols-rounded">
+
+description
+
+</span>
 
 Logs
 
@@ -131,41 +185,35 @@ Logs
 
 <li id="nav-settings">
 
+<span class="material-symbols-rounded">
+
+tune
+
+</span>
+
 Settings
-
-</li>
-
-<li id="nav-about">
-
-About
 
 </li>
 
 </ul>
 
-</nav>
-
 </aside>
 
-<main>
-
-<!-- Dashboard -->
+<main class="content">
 
 <section id="dashboardPage">
 
-<h1>
+<div class="status-grid">
 
-Dashboard
+<div class="status-card">
 
-</h1>
+<span class="material-symbols-rounded">
 
-<div class="card">
+bolt
 
-<h3>
+</span>
 
-AI Status
-
-</h3>
+<h3>AI Status</h3>
 
 <p id="ai-status">
 
@@ -175,13 +223,15 @@ Offline
 
 </div>
 
-<div class="card">
+<div class="status-card">
 
-<h3>
+<span class="material-symbols-rounded">
 
-WhatsApp Status
+forum
 
-</h3>
+</span>
+
+<h3>WhatsApp</h3>
 
 <p id="wa-status">
 
@@ -191,397 +241,153 @@ Disconnected
 
 </div>
 
-<div class="card">
+<div class="status-card">
 
-<button id="start-ai">
+<span class="material-symbols-rounded">
 
-START AI
+memory
 
-</button>
+</span>
 
-</div>
+<h3>Memory</h3>
 
-</section>
-<!-- WhatsApp Page -->
+<p id="memoryCount">
 
-<section id="whatsappPage" style="display:none;">
+0 Chats
 
-<div class="card">
-
-<h2>
-
-WhatsApp Control
-
-</h2>
-
-<label>
-
-Auto Reply
-
-</label>
-
-<label class="switch">
-
-<input type="checkbox" id="autoReply">
-
-<span class="slider"></span>
-
-</label>
-
-<br><br>
-
-<label>
-
-Reply Delay (Seconds)
-
-</label>
-
-<input
-type="number"
-id="replyDelay"
-value="2"
-min="0"
-max="60">
-
-<br><br>
-
-<label>
-
-Ignore Groups
-
-</label>
-
-<label class="switch">
-
-<input type="checkbox" id="ignoreGroups">
-
-<span class="slider"></span>
-
-</label>
-
-<br><br>
-
-<label>
-
-Ignore Saved Contacts
-
-</label>
-
-<label class="switch">
-
-<input type="checkbox" id="ignoreContacts">
-
-<span class="slider"></span>
-
-</label>
+</p>
 
 </div>
 
-</section>
+<div class="status-card">
 
-<!-- AI Page -->
+<span class="material-symbols-rounded">
 
-<section id="aiPage" style="display:none;">
+article
 
-<div class="card">
+</span>
 
-<h2>
+<h3>FAQ</h3>
 
-AI Configuration
+<p id="faqCount">
 
-</h2>
+0 Items
 
-<label>
-
-AI Provider
-
-</label>
-
-<select id="provider">
-
-<option value="openrouter">
-
-OpenRouter
-
-</option>
-
-</select>
-
-<br><br>
-
-<label>
-
-API Key
-
-</label>
-
-<input
-type="password"
-id="apikey"
-placeholder="Paste OpenRouter API Key">
-
-<br><br>
-
-<label>
-
-Model
-
-</label>
-
-<select id="model">
-
-<option>
-
-deepseek/deepseek-chat-v3-0324:free
-
-</option>
-
-<option>
-
-google/gemma-3-27b-it:free
-
-</option>
-
-<option>
-
-qwen/qwen3-30b-a3b:free
-
-</option>
-
-</select>
-
-<br><br>
-
-<button id="saveApi">
-
-Save Configuration
-
-</button>
+</p>
 
 </div>
 
-<div class="card">
+</div>
+<!-- Chat Window -->
 
-<h2>
+<div class="chat-card">
 
-System Prompt
+<div class="chat-header">
 
-</h2>
+<div>
 
-<textarea
-id="systemPrompt"
-rows="10"
-placeholder="Enter AI Prompt"></textarea>
+<h2>AI Chat</h2>
 
-<br><br>
-
-<button id="savePrompt">
-
-Save Prompt
-
-</button>
+<p>Powered by OpenRouter</p>
 
 </div>
 
-</section>
-<!-- FAQ Page -->
+<div class="chat-status">
 
-<section id="faqPage" style="display:none;">
+<span class="online-dot"></span>
 
-<div class="card">
+Online
 
-<h2>FAQ Manager</h2>
+</div>
+
+</div>
+
+<div id="chatContainer" class="chat-container">
+
+<div class="ai-message">
+
+<div class="bubble">
+
+👋 Hello! I'm your WhatsApp AI Assistant.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="chat-input-area">
 
 <input
 type="text"
-id="faqQuestion"
-placeholder="Question">
+id="messageInput"
+placeholder="Type your message...">
 
-<br><br>
+<button id="sendBtn">
 
-<textarea
-id="faqAnswer"
-rows="5"
-placeholder="Answer"></textarea>
+<span class="material-symbols-rounded">
 
-<br><br>
+send
 
-<button id="addFaq">
-
-Add FAQ
+</span>
 
 </button>
 
 </div>
 
-<div class="card">
-
-<h2>FAQ List</h2>
-
-<div id="faqList">
-
-No FAQ Added
-
 </div>
 
-</div>
+<!-- Quick Actions -->
 
-</section>
+<div class="quick-grid">
 
-<!-- Memory Page -->
+<button class="quick-btn" id="start-ai">
 
-<section id="memoryPage" style="display:none;">
+<span class="material-symbols-rounded">
 
-<div class="card">
+play_circle
 
-<h2>
+</span>
 
-Conversation Memory
-
-</h2>
-
-<div id="memoryList">
-
-No Memory
-
-</div>
-
-<br>
-
-<button id="clearMemory">
-
-Clear Memory
+Start AI
 
 </button>
 
-</div>
+<button class="quick-btn">
 
-</section>
+<span class="material-symbols-rounded">
 
-<!-- Logs Page -->
+forum
 
-<section id="logsPage" style="display:none;">
+</span>
 
-<div class="card">
-
-<h2>
-
-Logs
-
-</h2>
-
-<div id="logs">
-
-No Logs
-
-</div>
-
-<br>
-
-<button id="clearLogs">
-
-Clear Logs
+WhatsApp
 
 </button>
 
-</div>
+<button class="quick-btn">
 
-</section>
+<span class="material-symbols-rounded">
 
-<!-- Settings Page -->
+quiz
 
-<section id="settingsPage" style="display:none;">
+</span>
 
-<div class="card">
-
-<h2>
-
-Application Settings
-
-</h2>
-
-<label>
-
-Dark Mode
-
-</label>
-
-<label class="switch">
-
-<input
-type="checkbox"
-checked
-id="darkMode">
-
-<span class="slider"></span>
-
-</label>
-
-<br><br>
-
-<label>
-
-Language
-
-</label>
-
-<select id="language">
-
-<option>
-
-English
-
-</option>
-
-<option>
-
-বাংলা
-
-</option>
-
-</select>
-
-<br><br>
-
-<button id="saveSettings">
-
-Save Settings
+FAQ
 
 </button>
 
-</div>
+<button class="quick-btn">
 
-</section>
+<span class="material-symbols-rounded">
 
-<!-- About -->
+memory
 
-<section id="aboutPage" style="display:none;">
+</span>
 
-<div class="card">
+Memory
 
-<h2>
-
-WhatsApp AI Assistant
-
-</h2>
-
-<p>
-
-Version 1.0
-
-</p>
-
-<p>
-
-Powered by OpenRouter Free AI
-
-</p>
-
-<p>
-
-GitHub Project
-
-</p>
+</button>
 
 </div>
 
@@ -591,13 +397,74 @@ GitHub Project
 
 </div>
 
+<nav class="bottom-nav">
+
+<button id="bottom-dashboard">
+
+<span class="material-symbols-rounded">
+
+dashboard
+
+</span>
+
+Dashboard
+
+</button>
+
+<button id="bottom-chat">
+
+<span class="material-symbols-rounded">
+
+chat
+
+</span>
+
+Chat
+
+</button>
+
+<button id="bottom-ai">
+
+<span class="material-symbols-rounded">
+
+psychology
+
+</span>
+
+AI
+
+</button>
+
+<button id="bottom-settings">
+
+<span class="material-symbols-rounded">
+
+settings
+
+</span>
+
+Settings
+
+</button>
+
+</nav>
+
+</div>
+
 <div id="toast"></div>
+
 <script src="config/config.js"></script>
+
 <script src="api/openrouter.js"></script>
+
 <script src="ai/memory.js"></script>
+
 <script src="ai/faq.js"></script>
+
 <script src="js/app.js"></script>
+
 <script src="js/chat.js"></script>
+
 <script src="js/whatsapp.js"></script>
 
 </body>
