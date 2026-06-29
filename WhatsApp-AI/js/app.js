@@ -1,57 +1,65 @@
 "use strict";
 
 /* ==========================================
-   WhatsApp AI Assistant V2
+   WhatsApp AI Assistant V3
 ========================================== */
 
-/* ---------- Elements ---------- */
+/* ==========================
+   DOM
+========================== */
 
 const loading = document.getElementById("loading");
 const app = document.getElementById("app");
 
-const sidebar = document.querySelector(".sidebar");
+const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
 
 const themeBtn = document.getElementById("themeBtn");
+const searchBtn = document.getElementById("searchBtn");
+const settingsBtn = document.getElementById("settingsBtn");
 
 const sendBtn = document.getElementById("sendBtn");
-
 const messageInput = document.getElementById("messageInput");
-
 const chatContainer = document.getElementById("chatContainer");
 
 const aiStatus = document.getElementById("ai-status");
-
 const waStatus = document.getElementById("wa-status");
-
 const memoryCount = document.getElementById("memoryCount");
-
 const faqCount = document.getElementById("faqCount");
 
+const toast = document.getElementById("toast");
 
-/* ---------- Loading ---------- */
+/* ==========================
+   Loading
+========================== */
 
-if (!loading || !app) {
-    console.error("loading অথবা app element পাওয়া যায়নি");
-} else {
-    window.addEventListener("load", () => {
-        setTimeout(() => {
-            loading.style.display = "none";
-            app.style.display = "block";
-        }, 1200);
-    });
-}
+window.addEventListener("load",()=>{
 
-/* ---------- Toast ---------- */
+setTimeout(()=>{
 
-function showToast(message){
+loading.style.display="none";
 
-const toast=document.getElementById("toast");
+app.style.display="block";
 
-toast.innerHTML=message;
+initApp();
+
+},1500);
+
+});
+
+/* ==========================
+   Toast
+========================== */
+
+function showToast(text){
+
+toast.textContent=text;
 
 toast.style.display="block";
 
-setTimeout(()=>{
+clearTimeout(window.toastTimer);
+
+window.toastTimer=setTimeout(()=>{
 
 toast.style.display="none";
 
@@ -59,48 +67,87 @@ toast.style.display="none";
 
 }
 
-
-/* ---------- Theme ---------- */
+/* ==========================
+   Theme
+========================== */
 
 let darkMode=false;
 
-themeBtn.onclick=()=>{
+themeBtn.addEventListener("click",()=>{
 
 darkMode=!darkMode;
 
-document.body.classList.toggle("dark",darkMode);
+document.body.classList.toggle("dark");
 
-showToast(
+localStorage.setItem(
 
-darkMode?
+"theme",
 
-"Dark Mode Enabled"
-
-:
-
-"Light Mode Enabled"
+darkMode
 
 );
 
-};
+showToast(
 
+darkMode
 
-/* ---------- Status ---------- */
+?
 
-function setAIStatus(status){
+"Dark Mode"
 
-aiStatus.innerHTML=status;
+:
+
+"Light Mode"
+
+);
+
+});
+
+/* ==========================
+   Sidebar
+========================== */
+
+let sidebarOpen=true;
+
+menuBtn.addEventListener("click",()=>{
+
+sidebarOpen=!sidebarOpen;
+
+if(window.innerWidth<=900){
+
+sidebar.style.display=
+
+sidebarOpen
+
+?
+
+"block"
+
+:
+
+"none";
+
+}else{
+
+sidebar.style.width=
+
+sidebarOpen
+
+?
+
+"280px"
+
+:
+
+"90px";
 
 }
 
-function setWAStatus(status){
+});
 
-waStatus.innerHTML=status;
-
-}
-
-
-/* ---------- Counters ---------- */
+/* ==========================
+   Counters
+========================== */
 
 function updateCounters(){
 
@@ -114,507 +161,373 @@ loadFAQ().length+" Items";
 
 }
 
+/* ==========================
+   Status
+========================== */
 
-/* ---------- Chat Bubble ---------- */
+function setAIStatus(text){
 
-function addBubble(text,type){
-
-const wrapper=document.createElement("div");
-
-wrapper.className=
-
-type==="user"
-
-?
-
-"user-message"
-
-:
-
-"ai-message";
-
-const bubble=document.createElement("div");
-
-bubble.className="bubble";
-
-bubble.innerHTML=text;
-
-wrapper.appendChild(bubble);
-
-chatContainer.appendChild(wrapper);
-
-chatContainer.scrollTop=
-
-chatContainer.scrollHeight;
+aiStatus.innerHTML=text;
 
 }
 
+function setWAStatus(text){
 
-/* ---------- AI Chat ---------- */
+waStatus.innerHTML=text;
 
-async function sendMessage(){
+}
 
-const text=
+console.log("V3 Part 1 Loaded");
+/* ==========================================
+   Chat Engine
+========================================== */
 
-messageInput.value.trim();
+function addMessage(text, sender = "ai") {
 
-if(text==="") return;
+    const wrapper = document.createElement("div");
 
-addBubble(text,"user");
+    wrapper.className =
+        sender === "user"
+        ? "user-message"
+        : "ai-message";
 
-messageInput.value="";
+    const bubble = document.createElement("div");
 
-showToast("Thinking...");
+    bubble.className = "bubble";
 
-const reply=
+    bubble.textContent = text;
 
-await askAI(text);
+    wrapper.appendChild(bubble);
 
-if(reply){
+    chatContainer.appendChild(wrapper);
 
-addBubble(reply,"ai");
+    chatContainer.scrollTop =
+        chatContainer.scrollHeight;
 
-showToast("Reply Received");
+}
 
-updateCounters();
+async function sendMessage() {
 
-}else{
+    const message =
+        messageInput.value.trim();
 
-addBubble(
+    if (!message) {
 
-"Unable to get reply.",
+        showToast("Type a message");
 
-"ai"
+        return;
 
+    }
+
+    addMessage(message, "user");
+
+    messageInput.value = "";
+
+    showToast("AI is thinking...");
+
+    try {
+
+        const reply =
+            await askAI(message);
+
+        if (reply) {
+
+            addMessage(reply, "ai");
+
+            setAIStatus("🟢 Online");
+
+        } else {
+
+            addMessage(
+                "No response received.",
+                "ai"
+            );
+
+        }
+
+    } catch (e) {
+
+        console.error(e);
+
+        addMessage(
+            "Connection failed.",
+            "ai"
+        );
+
+        setAIStatus("🔴 Offline");
+
+    }
+
+    updateCounters();
+
+}
+
+/* ==========================================
+   Events
+========================================== */
+
+sendBtn.addEventListener(
+    "click",
+    sendMessage
 );
-
-}
-
-}
-
-
-/* ---------- Events ---------- */
-
-sendBtn.onclick=sendMessage;
 
 messageInput.addEventListener(
+    "keydown",
+    e => {
 
-"keypress",
+        if (e.key === "Enter") {
 
-function(e){
+            e.preventDefault();
 
-if(e.key==="Enter"){
+            sendMessage();
 
-e.preventDefault();
+        }
 
-sendMessage();
-
-}
-
-}
-
+    }
 );
 
-
-/* ---------- Test ---------- */
-
-document.getElementById("start-ai").onclick=()=>{
-
-setAIStatus("🟢 Online");
-
-setWAStatus("🟢 Connected");
-
-showToast("AI Ready");
-
-};
-
-console.log("App Part 1 Loaded");
 /* ==========================================
    Navigation
 ========================================== */
 
-const pages = {
+document
+.getElementById("nav-dashboard")
+.onclick = () => {
 
-dashboard:document.getElementById("dashboardPage")
-
-};
-
-function openPage(page){
-
-Object.values(pages).forEach(item=>{
-
-if(item){
-
-item.style.display="none";
-
-}
-
-});
-
-if(pages[page]){
-
-pages[page].style.display="block";
-
-}
-
-}
-
-/* ==========================================
-   Sidebar Navigation
-========================================== */
-
-document.getElementById("nav-dashboard").onclick=()=>{
-
-openPage("dashboard");
+    showToast("Dashboard");
 
 };
 
-document.getElementById("nav-chat").onclick=()=>{
+document
+.getElementById("nav-chat")
+.onclick = () => {
 
-messageInput.focus();
-
-};
-
-document.getElementById("nav-whatsapp").onclick=()=>{
-
-showToast("WhatsApp Module");
+    messageInput.focus();
 
 };
 
-document.getElementById("nav-ai").onclick=()=>{
+document
+.getElementById("nav-whatsapp")
+.onclick = () => {
 
-showToast("AI Settings");
-
-};
-
-document.getElementById("nav-faq").onclick=()=>{
-
-showToast("FAQ Manager");
+    showToast("WhatsApp");
 
 };
 
-document.getElementById("nav-memory").onclick=()=>{
+document
+.getElementById("nav-ai")
+.onclick = () => {
 
-showToast("Memory");
-
-};
-
-document.getElementById("nav-logs").onclick=()=>{
-
-showToast("Logs");
+    showToast("AI Settings");
 
 };
 
-document.getElementById("nav-settings").onclick=()=>{
+document
+.getElementById("nav-faq")
+.onclick = () => {
 
-showToast("Settings");
+    showToast("FAQ");
 
 };
 
+document
+.getElementById("nav-memory")
+.onclick = () => {
+
+    showToast("Memory");
+
+};
+
+document
+.getElementById("nav-logs")
+.onclick = () => {
+
+    showToast("Logs");
+
+};
+
+document
+.getElementById("nav-settings")
+.onclick = () => {
+
+    showToast("Settings");
+
+};
+
+console.log("V3 Part 2 Loaded");
 /* ==========================================
    Bottom Navigation
 ========================================== */
 
-const bottomDashboard=
-
-document.getElementById("bottom-dashboard");
-
-const bottomChat=
-
-document.getElementById("bottom-chat");
-
-const bottomAI=
-
-document.getElementById("bottom-ai");
-
-const bottomSettings=
-
-document.getElementById("bottom-settings");
+const bottomDashboard = document.getElementById("bottom-dashboard");
+const bottomChat = document.getElementById("bottom-chat");
+const bottomWhatsApp = document.getElementById("bottom-whatsapp");
+const bottomAI = document.getElementById("bottom-ai");
+const bottomSettings = document.getElementById("bottom-settings");
 
 if(bottomDashboard){
-
-bottomDashboard.onclick=()=>{
-
-openPage("dashboard");
-
-};
-
+    bottomDashboard.onclick = () => {
+        showToast("Dashboard");
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+    };
 }
 
 if(bottomChat){
+    bottomChat.onclick = () => {
+        messageInput.focus();
+        showToast("Chat");
+    };
+}
 
-bottomChat.onclick=()=>{
-
-messageInput.focus();
-
-};
-
+if(bottomWhatsApp){
+    bottomWhatsApp.onclick = () => {
+        showToast("WhatsApp");
+    };
 }
 
 if(bottomAI){
+    bottomAI.onclick = async () => {
 
-bottomAI.onclick=()=>{
+        showToast("Checking AI...");
 
-showToast("AI Panel");
+        try{
 
-};
+            const result = await askAI("Reply only: OK");
 
+            if(result){
+
+                setAIStatus("🟢 Online");
+
+                showToast("AI Connected");
+
+            }else{
+
+                setAIStatus("🔴 Offline");
+
+            }
+
+        }catch(e){
+
+            console.error(e);
+
+            setAIStatus("🔴 Offline");
+
+        }
+
+    };
 }
 
 if(bottomSettings){
+    bottomSettings.onclick = () => {
+        showToast("Settings");
+    };
+}
 
-bottomSettings.onclick=()=>{
+/* ==========================================
+   Buttons
+========================================== */
 
-showToast("Settings");
+if(searchBtn){
 
-};
+    searchBtn.onclick = () => {
+
+        showToast("Search Coming Soon");
+
+    };
+
+}
+
+if(settingsBtn){
+
+    settingsBtn.onclick = () => {
+
+        showToast("Settings Panel");
+
+    };
+
+}
+
+const startBtn = document.getElementById("start-ai");
+
+if(startBtn){
+
+    startBtn.onclick = async()=>{
+
+        showToast("Starting AI...");
+
+        try{
+
+            const reply = await askAI("Hello");
+
+            if(reply){
+
+                setAIStatus("🟢 Online");
+
+                setWAStatus("🟢 Ready");
+
+                showToast("AI Ready");
+
+            }
+
+        }catch(e){
+
+            console.error(e);
+
+            setAIStatus("🔴 Offline");
+
+            showToast("Connection Failed");
+
+        }
+
+    };
 
 }
 
 /* ==========================================
-   Restore Previous Chat
+   Restore Theme
 ========================================== */
 
-const previousMemory=getMemory();
+const savedTheme = localStorage.getItem("theme");
 
-previousMemory.forEach(item=>{
+if(savedTheme === "true"){
 
-addBubble(item.user,"user");
+    darkMode = true;
 
-addBubble(item.assistant,"ai");
-
-});
-
-/* ==========================================
-   Theme Restore
-========================================== */
-
-const savedTheme=
-
-localStorage.getItem("theme");
-
-if(savedTheme==="dark"){
-
-darkMode=true;
-
-document.body.classList.add("dark");
+    document.body.classList.add("dark");
 
 }
-
-themeBtn.onclick=()=>{
-
-darkMode=!darkMode;
-
-document.body.classList.toggle("dark");
-
-localStorage.setItem(
-
-"theme",
-
-darkMode?"dark":"light"
-
-);
-
-showToast(
-
-darkMode?
-
-"Dark Mode Enabled"
-
-:
-
-"Light Mode Enabled"
-
-);
-
-};
 
 /* ==========================================
    Initialize
 ========================================== */
 
-updateCounters();
-
-openPage("dashboard");
-
-console.log("App Part 2 Loaded");
-/* ==========================================
-   Live AI Connection
-========================================== */
-
-async function checkAIConnection(){
-
-    const key = localStorage.getItem("apiKey");
-
-    if(!key){
-
-        setAIStatus("🔴 API Key Missing");
-
-        return false;
-
-    }
-
-    try{
-
-        const reply = await askAI("Reply with only OK");
-
-        if(reply){
-
-            setAIStatus("🟢 Online");
-
-            showToast("AI Connected");
-
-            return true;
-
-        }
-
-    }catch(e){
-
-        console.error(e);
-
-    }
-
-    setAIStatus("🔴 Offline");
-
-    showToast("AI Connection Failed");
-
-    return false;
-
-}
-
-
-/* ==========================================
-   WhatsApp Engine
-========================================== */
-
-function updateWhatsAppStatus(){
-
-    if(typeof WhatsAppEngine==="undefined"){
-
-        setWAStatus("⚪ Not Loaded");
-
-        return;
-
-    }
-
-    const state = WhatsAppEngine.status();
-
-    if(state.connected){
-
-        setWAStatus("🟢 Connected");
-
-    }else{
-
-        setWAStatus("🔴 Disconnected");
-
-    }
-
-}
-
-
-/* ==========================================
-   Auto Reply
-========================================== */
-
-let autoReply=false;
-
-function toggleAutoReply(){
-
-    autoReply=!autoReply;
-
-    localStorage.setItem(
-
-        "autoReply",
-
-        autoReply
-
-    );
-
-    showToast(
-
-        autoReply
-
-        ?
-
-        "Auto Reply Enabled"
-
-        :
-
-        "Auto Reply Disabled"
-
-    );
-
-}
-
-const savedAutoReply=
-
-localStorage.getItem("autoReply");
-
-if(savedAutoReply==="true"){
-
-    autoReply=true;
-
-}
-
-
-/* ==========================================
-   Test Message
-========================================== */
-
-async function runSelfTest(){
-
-    console.log("Running Self Test...");
-
-    await checkAIConnection();
-
-    updateWhatsAppStatus();
+function initApp(){
 
     updateCounters();
 
-    console.log("Self Test Finished");
+    setAIStatus("⚪ Idle");
+
+    setWAStatus("⚪ Waiting");
+
+    addMessage("👋 Welcome to WhatsApp AI Assistant V3.","ai");
 
 }
 
-
 /* ==========================================
-   Start AI Button
+   Resize
 ========================================== */
 
-document.getElementById("start-ai").onclick=async()=>{
+window.addEventListener("resize",()=>{
 
-    showToast("Starting AI...");
+    if(window.innerWidth > 900){
 
-    const ok=await checkAIConnection();
-
-    if(!ok){
-
-        return;
+        sidebar.style.display = "block";
 
     }
-
-    if(typeof WhatsAppEngine!=="undefined"){
-
-        WhatsAppEngine.connect("Demo");
-
-    }
-
-    updateWhatsAppStatus();
-
-};
-
-
-/* ==========================================
-   App Ready
-========================================== */
-
-window.addEventListener("load",()=>{
-
-    setTimeout(()=>{
-
-        runSelfTest();
-
-    },1800);
 
 });
 
-console.log("WhatsApp AI Assistant V2 Ready");
+console.log("WhatsApp AI Assistant V3 Loaded Successfully");
