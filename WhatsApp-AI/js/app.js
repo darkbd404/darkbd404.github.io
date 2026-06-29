@@ -529,3 +529,216 @@ window.addEventListener("resize",()=>{
 });
 
 console.log("WhatsApp AI Assistant V3 Loaded Successfully");
+/* ==========================================
+   Settings Page V3
+========================================== */
+
+const dashboardPage =
+document.getElementById("dashboardPage");
+
+const settingsPage =
+document.getElementById("settingsPage");
+
+/* ---------- Open Settings ---------- */
+
+function openSettings(){
+
+dashboardPage.style.display="none";
+
+settingsPage.style.display="block";
+
+}
+
+/* ---------- Open Dashboard ---------- */
+
+function openDashboard(){
+
+settingsPage.style.display="none";
+
+dashboardPage.style.display="block";
+
+}
+
+/* ---------- Sidebar ---------- */
+
+document
+.getElementById("nav-settings")
+.onclick=openSettings;
+
+document
+.getElementById("nav-dashboard")
+.onclick=openDashboard;
+
+/* ---------- Bottom Navigation ---------- */
+
+const bottomSettingsBtn=
+document.getElementById("bottom-settings");
+
+const bottomDashboardBtn=
+document.getElementById("bottom-dashboard");
+
+if(bottomSettingsBtn){
+
+bottomSettingsBtn.onclick=openSettings;
+
+}
+
+if(bottomDashboardBtn){
+
+bottomDashboardBtn.onclick=openDashboard;
+
+}
+
+/* ---------- API Key ---------- */
+
+const apiKeyInput=
+document.getElementById("apiKey");
+
+const saveApiBtn=
+document.getElementById("saveApiBtn");
+
+if(localStorage.getItem("apiKey")){
+
+apiKeyInput.value=
+
+localStorage.getItem("apiKey");
+
+}
+
+saveApiBtn.onclick=()=>{
+
+localStorage.setItem(
+
+"apiKey",
+
+apiKeyInput.value.trim()
+
+);
+
+showToast("API Key Saved");
+
+};
+
+/* ---------- Model ---------- */
+
+const modelSelect=
+document.getElementById("modelSelect");
+
+const saveModelBtn=
+document.getElementById("saveModelBtn");
+
+const savedModel=
+
+localStorage.getItem("model");
+
+if(savedModel){
+
+modelSelect.value=savedModel;
+
+}
+
+saveModelBtn.onclick=()=>{
+
+localStorage.setItem(
+
+"model",
+
+modelSelect.value
+
+);
+
+showToast("Model Saved");
+
+};
+
+/* ---------- Temperature ---------- */
+
+const temperature=
+document.getElementById("temperature");
+
+const maxTokens=
+document.getElementById("maxTokens");
+
+temperature.value=
+
+localStorage.getItem("temperature")||
+
+0.7;
+
+maxTokens.value=
+
+localStorage.getItem("maxTokens")||
+
+1024;
+
+temperature.onchange=()=>{
+
+localStorage.setItem(
+
+"temperature",
+
+temperature.value
+
+);
+
+};
+
+maxTokens.onchange=()=>{
+
+localStorage.setItem(
+
+"maxTokens",
+
+maxTokens.value
+
+);
+
+};
+
+/* ---------- Test Connection ---------- */
+
+const testConnectionBtn=
+document.getElementById("testConnectionBtn");
+
+const connectionStatus=
+document.getElementById("connectionStatus");
+
+testConnectionBtn.onclick=async()=>{
+
+connectionStatus.innerHTML=
+
+"Testing...";
+
+const ok=
+
+await testConnection();
+
+if(ok){
+
+connectionStatus.innerHTML=
+
+"🟢 Connected";
+
+showToast(
+
+"Connection Successful"
+
+);
+
+}else{
+
+connectionStatus.innerHTML=
+
+"🔴 Failed";
+
+showToast(
+
+"Connection Failed"
+
+);
+
+}
+
+};
+
+console.log("Settings Module Loaded");
