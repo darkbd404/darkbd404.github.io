@@ -1,116 +1,101 @@
 "use strict";
 
 /* ==========================================
-   WhatsApp AI Assistant
-   Chat Engine
+   Chat Engine V3
 ========================================== */
 
-let chatHistory = [];
+const chatHistory = [];
 
-function addUserMessage(message){
+/* ---------- Save History ---------- */
+
+function addHistory(role, text) {
 
     chatHistory.push({
-
-        type:"user",
-
-        text:message,
-
-        time:new Date().toLocaleTimeString()
-
+        role: role,
+        text: text,
+        time: Date.now()
     });
 
 }
 
-function addAIMessage(message){
+/* ---------- Get History ---------- */
 
-    chatHistory.push({
-
-        type:"assistant",
-
-        text:message,
-
-        time:new Date().toLocaleTimeString()
-
-    });
-
-}
-
-function getChatHistory(){
+function getChatHistory() {
 
     return chatHistory;
 
 }
 
-function clearChat(){
+/* ---------- Clear ---------- */
 
-    chatHistory=[];
+function clearChatHistory() {
+
+    chatHistory.length = 0;
 
 }
 
-async function sendChat(message){
+/* ---------- Main Chat ---------- */
 
-    if(!message){
+async function processChat(message) {
 
-        showToast("Empty Message");
+    if (!message) {
 
-        return;
+        return null;
 
     }
 
-    addUserMessage(message);
+    addHistory("user", message);
 
-    const reply = await askAI(message);
+    /* ==========================
+       FAQ First
+    ========================== */
 
-    if(reply){
+    const faqReply = searchFAQ(message);
 
-        addAIMessage(reply);
+    if (faqReply) {
 
-        renderChat();
+        addHistory("assistant", faqReply);
 
-        return reply;
+        addMemory(message, faqReply);
+
+        return faqReply;
 
     }
 
-    showToast("AI Error");
+    /* ==========================
+       AI
+    ========================== */
+
+    const aiReply = await askAI(message);
+
+    if (aiReply) {
+
+        addHistory("assistant", aiReply);
+
+        addMemory(message, aiReply);
+
+        return aiReply;
+
+    }
+
+    return "Sorry, I couldn't generate a reply.";
 
 }
 
-function renderChat(){
+/* ---------- Export ---------- */
 
-    const logs=document.getElementById("logs");
+function exportChat() {
 
-    if(!logs) return;
+    return JSON.stringify(
 
-    logs.innerHTML="";
+        chatHistory,
 
-    chatHistory.forEach(item=>{
+        null,
 
-        logs.innerHTML+=`
+        2
 
-        <div class="card">
-
-            <b>${item.type.toUpperCase()}</b>
-
-            <br><br>
-
-            ${item.text}
-
-            <br><br>
-
-            <small>${item.time}</small>
-
-        </div>
-
-        `;
-
-    });
+    );
 
 }
 
-async function testChat(){
-
-    await sendChat("Hello");
-
-}
-
-console.log("Chat Engine Loaded");
+console.log("Chat Engine V3 Loaded");
