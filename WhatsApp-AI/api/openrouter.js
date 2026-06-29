@@ -1,7 +1,7 @@
 "use strict";
 
 /* ==========================================
-   OpenRouter API V3
+   OpenRouter API V4
 ========================================== */
 
 async function askAI(userMessage){
@@ -39,11 +39,11 @@ async function askAI(userMessage){
         {
             role:"system",
             content:
-            systemPrompt +
-            "\n\nFAQ:\n" +
-            faq +
-            "\nConversation Memory:\n" +
-            memory
+                systemPrompt +
+                "\n\nFAQ:\n" +
+                faq +
+                "\nConversation Memory:\n" +
+                memory
         },
 
         {
@@ -83,9 +83,13 @@ async function askAI(userMessage){
 
         if(!response.ok){
 
-            console.error(response.status);
+            const errorText = await response.text();
 
-            showToast("API Error");
+            console.error("Status:",response.status);
+
+            console.error("Response:",errorText);
+
+            showToast("API Error " + response.status);
 
             return null;
 
@@ -103,7 +107,7 @@ async function askAI(userMessage){
 
         }
 
-        if(!json.choices){
+        if(!json.choices || !json.choices.length){
 
             showToast("No AI Response");
 
@@ -112,31 +116,22 @@ async function askAI(userMessage){
         }
 
         const reply =
-
-        json.choices[0]
-        .message
-        .content
-        .trim();
+            json.choices[0].message.content.trim();
 
         if(typeof addMemory==="function"){
 
             addMemory(
-
                 userMessage,
-
                 reply
-
             );
 
         }
 
         return reply;
 
-    }
+    }catch(error){
 
-    catch(error){
-
-        console.error(error);
+        console.error("Fetch Error:",error);
 
         showToast("Network Error");
 
@@ -152,16 +147,10 @@ async function askAI(userMessage){
 
 async function testConnection(){
 
-    const result =
+    const reply = await askAI("Reply only with OK");
 
-    await askAI(
-
-        "Reply only with OK"
-
-    );
-
-    return result;
+    return !!reply;
 
 }
 
-console.log("OpenRouter V3 Loaded");
+console.log("OpenRouter V4 Loaded");
