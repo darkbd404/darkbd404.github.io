@@ -1,408 +1,624 @@
 "use strict";
 
-/* ===========================
-   WhatsApp AI Assistant
-   app.js
-=========================== */
+/* ==========================================
+   WhatsApp AI Assistant V2
+========================================== */
 
-window.addEventListener("load", () => {
+/* ---------- Elements ---------- */
 
-    setTimeout(() => {
+const loading = document.getElementById("loading");
+const app = document.getElementById("app");
 
-        document.getElementById("splash-screen").style.display = "none";
-        document.getElementById("app").style.display = "block";
+const sidebar = document.querySelector(".sidebar");
 
-    }, 1500);
+const themeBtn = document.getElementById("themeBtn");
+
+const sendBtn = document.getElementById("sendBtn");
+
+const messageInput = document.getElementById("messageInput");
+
+const chatContainer = document.getElementById("chatContainer");
+
+const aiStatus = document.getElementById("ai-status");
+
+const waStatus = document.getElementById("wa-status");
+
+const memoryCount = document.getElementById("memoryCount");
+
+const faqCount = document.getElementById("faqCount");
+
+
+/* ---------- Loading ---------- */
+
+window.addEventListener("load",()=>{
+
+setTimeout(()=>{
+
+loading.style.display="none";
+
+app.style.display="block";
+
+updateCounters();
+
+},1200);
 
 });
 
-/* ===========================
-   Sidebar
-=========================== */
 
-const sidebar = document.getElementById("sidebar");
-const menuBtn = document.getElementById("menu-btn");
-
-let sidebarOpen = false;
-
-menuBtn.addEventListener("click", () => {
-
-    sidebarOpen = !sidebarOpen;
-
-    sidebar.style.left = sidebarOpen ? "0" : "-280px";
-
-});
-
-/* ===========================
-   Toast
-=========================== */
+/* ---------- Toast ---------- */
 
 function showToast(message){
 
-    const toast = document.getElementById("toast");
+const toast=document.getElementById("toast");
 
-    toast.innerHTML = message;
+toast.innerHTML=message;
 
-    toast.style.display = "block";
+toast.style.display="block";
 
-    setTimeout(() => {
+setTimeout(()=>{
 
-        toast.style.display = "none";
+toast.style.display="none";
 
-    },2500);
+},2500);
 
 }
 
-/* ===========================
-   Status
-=========================== */
 
-const aiStatus = document.getElementById("ai-status");
-const waStatus = document.getElementById("wa-status");
+/* ---------- Theme ---------- */
+
+let darkMode=false;
+
+themeBtn.onclick=()=>{
+
+darkMode=!darkMode;
+
+document.body.classList.toggle("dark",darkMode);
+
+showToast(
+
+darkMode?
+
+"Dark Mode Enabled"
+
+:
+
+"Light Mode Enabled"
+
+);
+
+};
+
+
+/* ---------- Status ---------- */
 
 function setAIStatus(status){
 
-    aiStatus.innerHTML = status;
+aiStatus.innerHTML=status;
 
 }
 
 function setWAStatus(status){
 
-    waStatus.innerHTML = status;
+waStatus.innerHTML=status;
 
 }
 
-/* ===========================
-   Pages
-=========================== */
 
-const pages = [
+/* ---------- Counters ---------- */
 
-    "dashboardPage",
-    "whatsappPage",
-    "aiPage",
-    "faqPage",
-    "memoryPage",
-    "logsPage",
-    "settingsPage",
-    "aboutPage"
+function updateCounters(){
 
-];
+memoryCount.innerHTML=
+
+getMemory().length+" Chats";
+
+faqCount.innerHTML=
+
+loadFAQ().length+" Items";
+
+}
+
+
+/* ---------- Chat Bubble ---------- */
+
+function addBubble(text,type){
+
+const wrapper=document.createElement("div");
+
+wrapper.className=
+
+type==="user"
+
+?
+
+"user-message"
+
+:
+
+"ai-message";
+
+const bubble=document.createElement("div");
+
+bubble.className="bubble";
+
+bubble.innerHTML=text;
+
+wrapper.appendChild(bubble);
+
+chatContainer.appendChild(wrapper);
+
+chatContainer.scrollTop=
+
+chatContainer.scrollHeight;
+
+}
+
+
+/* ---------- AI Chat ---------- */
+
+async function sendMessage(){
+
+const text=
+
+messageInput.value.trim();
+
+if(text==="") return;
+
+addBubble(text,"user");
+
+messageInput.value="";
+
+showToast("Thinking...");
+
+const reply=
+
+await askAI(text);
+
+if(reply){
+
+addBubble(reply,"ai");
+
+showToast("Reply Received");
+
+updateCounters();
+
+}else{
+
+addBubble(
+
+"Unable to get reply.",
+
+"ai"
+
+);
+
+}
+
+}
+
+
+/* ---------- Events ---------- */
+
+sendBtn.onclick=sendMessage;
+
+messageInput.addEventListener(
+
+"keypress",
+
+function(e){
+
+if(e.key==="Enter"){
+
+e.preventDefault();
+
+sendMessage();
+
+}
+
+}
+
+);
+
+
+/* ---------- Test ---------- */
+
+document.getElementById("start-ai").onclick=()=>{
+
+setAIStatus("🟢 Online");
+
+setWAStatus("🟢 Connected");
+
+showToast("AI Ready");
+
+};
+
+console.log("App Part 1 Loaded");
+/* ==========================================
+   Navigation
+========================================== */
+
+const pages = {
+
+dashboard:document.getElementById("dashboardPage")
+
+};
 
 function openPage(page){
 
-    pages.forEach(id=>{
+Object.values(pages).forEach(item=>{
 
-        document.getElementById(id).style.display="none";
+if(item){
 
-    });
-
-    document.getElementById(page).style.display="block";
+item.style.display="none";
 
 }
 
-/* ===========================
-   Navigation
-=========================== */
+});
 
-document.getElementById("nav-dashboard").onclick=()=>openPage("dashboardPage");
+if(pages[page]){
 
-document.getElementById("nav-whatsapp").onclick=()=>openPage("whatsappPage");
-
-document.getElementById("nav-ai").onclick=()=>openPage("aiPage");
-
-document.getElementById("nav-faq").onclick=()=>openPage("faqPage");
-
-document.getElementById("nav-memory").onclick=()=>openPage("memoryPage");
-
-document.getElementById("nav-logs").onclick=()=>openPage("logsPage");
-
-document.getElementById("nav-settings").onclick=()=>openPage("settingsPage");
-
-document.getElementById("nav-about").onclick=()=>openPage("aboutPage");
-
-openPage("dashboardPage");
-/* ===========================
-   API Configuration
-=========================== */
-
-const apiKeyInput = document.getElementById("apikey");
-const providerInput = document.getElementById("provider");
-const modelInput = document.getElementById("model");
-
-function loadApiSettings(){
-
-    apiKeyInput.value =
-        localStorage.getItem("apiKey") || "";
-
-    providerInput.value =
-        localStorage.getItem("provider") || "openrouter";
-
-    modelInput.value =
-        localStorage.getItem("model") ||
-        APP_CONFIG.defaultModel;
+pages[page].style.display="block";
 
 }
 
-function saveApiSettings(){
+}
 
-    localStorage.setItem(
-        "apiKey",
-        apiKeyInput.value.trim()
-    );
+/* ==========================================
+   Sidebar Navigation
+========================================== */
 
-    localStorage.setItem(
-        "provider",
-        providerInput.value
-    );
+document.getElementById("nav-dashboard").onclick=()=>{
 
-    localStorage.setItem(
-        "model",
-        modelInput.value
-    );
+openPage("dashboard");
 
-    showToast("API Saved");
+};
+
+document.getElementById("nav-chat").onclick=()=>{
+
+messageInput.focus();
+
+};
+
+document.getElementById("nav-whatsapp").onclick=()=>{
+
+showToast("WhatsApp Module");
+
+};
+
+document.getElementById("nav-ai").onclick=()=>{
+
+showToast("AI Settings");
+
+};
+
+document.getElementById("nav-faq").onclick=()=>{
+
+showToast("FAQ Manager");
+
+};
+
+document.getElementById("nav-memory").onclick=()=>{
+
+showToast("Memory");
+
+};
+
+document.getElementById("nav-logs").onclick=()=>{
+
+showToast("Logs");
+
+};
+
+document.getElementById("nav-settings").onclick=()=>{
+
+showToast("Settings");
+
+};
+
+/* ==========================================
+   Bottom Navigation
+========================================== */
+
+const bottomDashboard=
+
+document.getElementById("bottom-dashboard");
+
+const bottomChat=
+
+document.getElementById("bottom-chat");
+
+const bottomAI=
+
+document.getElementById("bottom-ai");
+
+const bottomSettings=
+
+document.getElementById("bottom-settings");
+
+if(bottomDashboard){
+
+bottomDashboard.onclick=()=>{
+
+openPage("dashboard");
+
+};
 
 }
 
-document
-.getElementById("saveApi")
-.onclick = saveApiSettings;
+if(bottomChat){
 
-loadApiSettings();
+bottomChat.onclick=()=>{
 
-/* ===========================
-   Prompt
-=========================== */
+messageInput.focus();
 
-const promptBox =
-document.getElementById("systemPrompt");
-
-function loadPrompt(){
-
-    promptBox.value =
-        localStorage.getItem("systemPrompt") ||
-
-`You are my WhatsApp AI Assistant.
-
-Always reply in the user's language.
-
-Keep replies short.
-
-If you don't know the answer say:
-
-I don't know.`;
+};
 
 }
 
-function savePrompt(){
+if(bottomAI){
 
-    localStorage.setItem(
+bottomAI.onclick=()=>{
 
-        "systemPrompt",
+showToast("AI Panel");
 
-        promptBox.value
-
-    );
-
-    showToast("Prompt Saved");
+};
 
 }
 
-document
-.getElementById("savePrompt")
-.onclick = savePrompt;
+if(bottomSettings){
 
-loadPrompt();
+bottomSettings.onclick=()=>{
 
-/* ===========================
-   Start AI
-=========================== */
+showToast("Settings");
 
-document
-.getElementById("start-ai")
-.onclick = async()=>{
+};
 
-    setAIStatus("🟢 Online");
+}
 
-    setWAStatus("🟢 Ready");
+/* ==========================================
+   Restore Previous Chat
+========================================== */
 
-    showToast("Testing AI...");
+const previousMemory=getMemory();
 
-    const reply =
-    await askAI("Hello");
+previousMemory.forEach(item=>{
 
-    if(reply){
+addBubble(item.user,"user");
 
-        console.log(reply);
+addBubble(item.assistant,"ai");
 
-        showToast("AI Connected");
+});
+
+/* ==========================================
+   Theme Restore
+========================================== */
+
+const savedTheme=
+
+localStorage.getItem("theme");
+
+if(savedTheme==="dark"){
+
+darkMode=true;
+
+document.body.classList.add("dark");
+
+}
+
+themeBtn.onclick=()=>{
+
+darkMode=!darkMode;
+
+document.body.classList.toggle("dark");
+
+localStorage.setItem(
+
+"theme",
+
+darkMode?"dark":"light"
+
+);
+
+showToast(
+
+darkMode?
+
+"Dark Mode Enabled"
+
+:
+
+"Light Mode Enabled"
+
+);
+
+};
+
+/* ==========================================
+   Initialize
+========================================== */
+
+updateCounters();
+
+openPage("dashboard");
+
+console.log("App Part 2 Loaded");
+/* ==========================================
+   Live AI Connection
+========================================== */
+
+async function checkAIConnection(){
+
+    const key = localStorage.getItem("apiKey");
+
+    if(!key){
+
+        setAIStatus("🔴 API Key Missing");
+
+        return false;
+
+    }
+
+    try{
+
+        const reply = await askAI("Reply with only OK");
+
+        if(reply){
+
+            setAIStatus("🟢 Online");
+
+            showToast("AI Connected");
+
+            return true;
+
+        }
+
+    }catch(e){
+
+        console.error(e);
+
+    }
+
+    setAIStatus("🔴 Offline");
+
+    showToast("AI Connection Failed");
+
+    return false;
+
+}
+
+
+/* ==========================================
+   WhatsApp Engine
+========================================== */
+
+function updateWhatsAppStatus(){
+
+    if(typeof WhatsAppEngine==="undefined"){
+
+        setWAStatus("⚪ Not Loaded");
+
+        return;
+
+    }
+
+    const state = WhatsAppEngine.status();
+
+    if(state.connected){
+
+        setWAStatus("🟢 Connected");
 
     }else{
 
-        showToast("Connection Failed");
+        setWAStatus("🔴 Disconnected");
 
     }
-
-};
-/* ==========================================
-   FAQ
-========================================== */
-
-const faqQuestion = document.getElementById("faqQuestion");
-const faqAnswer = document.getElementById("faqAnswer");
-const faqList = document.getElementById("faqList");
-
-function renderFAQ(){
-
-    const list = loadFAQ();
-
-    if(list.length===0){
-
-        faqList.innerHTML="No FAQ Added";
-
-        return;
-
-    }
-
-    faqList.innerHTML="";
-
-    list.forEach(item=>{
-
-        faqList.innerHTML+=`
-
-        <div class="card">
-
-            <b>${item.question}</b>
-
-            <p>${item.answer}</p>
-
-        </div>
-
-        `;
-
-    });
 
 }
 
-document.getElementById("addFaq").onclick=()=>{
-
-    const q=faqQuestion.value.trim();
-
-    const a=faqAnswer.value.trim();
-
-    if(!q || !a){
-
-        showToast("Fill all fields");
-
-        return;
-
-    }
-
-    addFAQ(q,a);
-
-    faqQuestion.value="";
-
-    faqAnswer.value="";
-
-    renderFAQ();
-
-    showToast("FAQ Added");
-
-};
-
-renderFAQ();
 
 /* ==========================================
-   Memory
+   Auto Reply
 ========================================== */
 
-const memoryList=document.getElementById("memoryList");
+let autoReply=false;
 
-function renderMemory(){
+function toggleAutoReply(){
 
-    const memory=getMemory();
+    autoReply=!autoReply;
 
-    if(memory.length===0){
+    localStorage.setItem(
 
-        memoryList.innerHTML="No Memory";
+        "autoReply",
 
-        return;
+        autoReply
 
-    }
+    );
 
-    memoryList.innerHTML="";
+    showToast(
 
-    memory.forEach(item=>{
+        autoReply
 
-        memoryList.innerHTML+=`
+        ?
 
-        <div class="card">
+        "Auto Reply Enabled"
 
-            <b>User:</b>
+        :
 
-            <p>${item.user}</p>
+        "Auto Reply Disabled"
 
-            <b>AI:</b>
-
-            <p>${item.assistant}</p>
-
-        </div>
-
-        `;
-
-    });
+    );
 
 }
 
-document.getElementById("clearMemory").onclick=()=>{
+const savedAutoReply=
 
-    clearMemory();
+localStorage.getItem("autoReply");
 
-    renderMemory();
+if(savedAutoReply==="true"){
 
-    showToast("Memory Cleared");
+    autoReply=true;
+
+}
+
+
+/* ==========================================
+   Test Message
+========================================== */
+
+async function runSelfTest(){
+
+    console.log("Running Self Test...");
+
+    await checkAIConnection();
+
+    updateWhatsAppStatus();
+
+    updateCounters();
+
+    console.log("Self Test Finished");
+
+}
+
+
+/* ==========================================
+   Start AI Button
+========================================== */
+
+document.getElementById("start-ai").onclick=async()=>{
+
+    showToast("Starting AI...");
+
+    const ok=await checkAIConnection();
+
+    if(!ok){
+
+        return;
+
+    }
+
+    if(typeof WhatsAppEngine!=="undefined"){
+
+        WhatsAppEngine.connect("Demo");
+
+    }
+
+    updateWhatsAppStatus();
 
 };
 
-renderMemory();
 
 /* ==========================================
-   Logs
+   App Ready
 ========================================== */
 
-const logs=document.getElementById("logs");
+window.addEventListener("load",()=>{
 
-logs.innerHTML="System Ready";
+    setTimeout(()=>{
 
-document.getElementById("clearLogs").onclick=()=>{
+        runSelfTest();
 
-    logs.innerHTML="Logs Cleared";
+    },1800);
 
-    showToast("Logs Cleared");
+});
 
-};
-
-/* ==========================================
-   Settings
-========================================== */
-
-document.getElementById("saveSettings").onclick=()=>{
-
-    APP_CONFIG.language=document.getElementById("language").value;
-
-    APP_CONFIG.darkMode=document.getElementById("darkMode").checked;
-
-    saveConfig();
-
-    showToast("Settings Saved");
-
-};
-
-/* ==========================================
-   Finish
-========================================== */
-
-console.log("WhatsApp AI Assistant Loaded");
-
-showToast("Application Ready");
+console.log("WhatsApp AI Assistant V2 Ready");
