@@ -742,3 +742,51 @@ showToast(
 };
 
 console.log("Settings Module Loaded");
+/* ==========================================
+   Navigation System V3
+========================================== */
+
+const pages = {
+    dashboard: document.getElementById("dashboardPage"),
+    settings: document.getElementById("settingsPage"),
+    faq: document.getElementById("faqPage"),
+    memory: document.getElementById("memoryPage"),
+    logs: document.getElementById("logsPage"),
+    ai: document.getElementById("aiPage"),
+    whatsapp: document.getElementById("whatsappPage")
+};
+
+function showPage(pageName){
+
+    Object.values(pages).forEach(page=>{
+
+        if(page){
+            page.style.display="none";
+        }
+
+    });
+
+    if(pages[pageName]){
+        pages[pageName].style.display="block";
+    }
+
+}
+
+/* Sidebar */
+
+document.getElementById("nav-dashboard")?.addEventListener("click",()=>showPage("dashboard"));
+document.getElementById("nav-settings")?.addEventListener("click",()=>showPage("settings"));
+document.getElementById("nav-faq")?.addEventListener("click",()=>showPage("faq"));
+document.getElementById("nav-memory")?.addEventListener("click",()=>showPage("memory"));
+document.getElementById("nav-logs")?.addEventListener("click",()=>showPage("logs"));
+document.getElementById("nav-ai")?.addEventListener("click",()=>showPage("ai"));
+document.getElementById("nav-whatsapp")?.addEventListener("click",()=>showPage("whatsapp"));
+
+/* Bottom Navigation */
+
+document.getElementById("bottom-dashboard")?.addEventListener("click",()=>showPage("dashboard"));
+document.getElementById("bottom-settings")?.addEventListener("click",()=>showPage("settings"));
+document.getElementById("bottom-ai")?.addEventListener("click",()=>showPage("ai"));
+document.getElementById("bottom-whatsapp")?.addEventListener("click",()=>showPage("whatsapp"));
+
+showPage("dashboard");
