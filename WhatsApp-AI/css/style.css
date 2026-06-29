@@ -1254,3 +1254,40 @@ line-height:1.5;
 color:#555;
 
 }
+/* ==========================================
+   Logs
+========================================== */
+
+#logsContainer{
+
+height:420px;
+
+overflow-y:auto;
+
+padding:15px;
+
+border-radius:18px;
+
+background:#f8fafc;
+
+box-shadow:var(--shadow-inset);
+
+}
+
+.log-item{
+
+padding:15px;
+
+margin-bottom:12px;
+
+border-radius:15px;
+
+background:#fff;
+
+box-shadow:var(--shadow);
+
+font-size:14px;
+
+line-height:1.6;
+
+}
