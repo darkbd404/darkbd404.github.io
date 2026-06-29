@@ -1,41 +1,12 @@
-/* ==========================================
-   WhatsApp AI Assistant
-   OpenRouter Engine v2
-========================================== */
-
 "use strict";
 
-const OPENROUTER_URL =
-"https://openrouter.ai/api/v1/chat/completions";
+/* ==========================================
+   OpenRouter API V3
+========================================== */
 
 async function askAI(userMessage){
 
-    /* ---------- FAQ ---------- */
-
-    const faqAnswer = searchFAQ(userMessage);
-
-    if(faqAnswer){
-
-        addMemory(userMessage,faqAnswer);
-
-        return faqAnswer;
-
-    }
-
-    /* ---------- Memory ---------- */
-
-    const memory = memoryToPrompt();
-
-    const apiKey =
-    localStorage.getItem("apiKey");
-
-    const model =
-    localStorage.getItem("model") ||
-    APP_CONFIG.defaultModel;
-
-    const systemPrompt =
-    localStorage.getItem("systemPrompt") ||
-    "";
+    const apiKey = localStorage.getItem("apiKey");
 
     if(!apiKey){
 
@@ -45,101 +16,119 @@ async function askAI(userMessage){
 
     }
 
-    const messages=[
+    const model =
+        localStorage.getItem("model") ||
+        APP.MODEL;
+
+    const systemPrompt =
+        localStorage.getItem("systemPrompt") ||
+        "You are a professional WhatsApp AI Assistant.";
+
+    const memory =
+        typeof memoryToPrompt === "function"
+        ? memoryToPrompt(10)
+        : "";
+
+    const faq =
+        typeof faqToPrompt === "function"
+        ? faqToPrompt()
+        : "";
+
+    const messages = [
 
         {
-
             role:"system",
-
             content:
             systemPrompt +
-            "\n\nConversation Memory:\n" +
-            memory +
-            "\n"
-
+            "\n\nFAQ:\n" +
+            faq +
+            "\nConversation Memory:\n" +
+            memory
         },
 
         {
-
             role:"user",
-
             content:userMessage
-
         }
 
     ];
 
     try{
 
-        const response =
-        await fetch(
+        const response = await fetch(APP.API_URL,{
 
-            OPENROUTER_URL,
+            method:"POST",
 
-            {
+            headers:{
 
-                method:"POST",
+                "Content-Type":"application/json",
 
-                headers:{
+                "Authorization":"Bearer " + apiKey,
 
-                    "Content-Type":"application/json",
+                "HTTP-Referer":location.origin,
 
-                    "Authorization":
-                    "Bearer "+apiKey,
+                "X-Title":APP.NAME
 
-                    "HTTP-Referer":
-                    window.location.origin,
+            },
 
-                    "X-Title":
-                    APP_CONFIG.appName
+            body:JSON.stringify({
 
-                },
+                model:model,
 
-                body:JSON.stringify({
+                messages:messages
 
-                    model:model,
+            })
 
-                    messages:messages
+        });
 
-                })
+        if(!response.ok){
 
-            }
+            console.error(response.status);
 
-        );
-
-        const result =
-        await response.json();
-
-        if(result.error){
-
-            console.error(result);
-
-            showToast(result.error.message);
+            showToast("API Error");
 
             return null;
 
         }
 
-        if(!result.choices){
+        const json = await response.json();
 
-            showToast("No Response");
+        if(json.error){
+
+            console.error(json.error);
+
+            showToast(json.error.message);
+
+            return null;
+
+        }
+
+        if(!json.choices){
+
+            showToast("No AI Response");
 
             return null;
 
         }
 
         const reply =
-        result.choices[0]
+
+        json.choices[0]
         .message
-        .content;
+        .content
+        .trim();
 
-        addMemory(
+        if(typeof addMemory==="function"){
 
-            userMessage,
+            addMemory(
 
-            reply
+                userMessage,
 
-        );
+                reply
+
+            );
+
+        }
 
         return reply;
 
@@ -158,14 +147,21 @@ async function askAI(userMessage){
 }
 
 /* ==========================================
-   Test
+   Connection Test
 ========================================== */
 
-async function testAI(){
+async function testConnection(){
 
-    const reply =
-    await askAI("Hello");
+    const result =
 
-    console.log(reply);
+    await askAI(
+
+        "Reply only with OK"
+
+    );
+
+    return result;
 
 }
+
+console.log("OpenRouter V3 Loaded");
