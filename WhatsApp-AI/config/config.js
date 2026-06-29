@@ -13,7 +13,7 @@ const APP = {
 
     PROVIDER : "OpenRouter",
 
-    MODEL : "deepseek/deepseek-chat-v3-0324:free",
+    MODEL : "google/gemini-2.5-flash",
 
     API_URL :
     "https://openrouter.ai/api/v1/chat/completions",
