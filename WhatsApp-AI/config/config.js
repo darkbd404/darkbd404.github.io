@@ -1,102 +1,153 @@
-/* ==========================================
-   WhatsApp AI Assistant
-   Configuration
-========================================== */
-
 "use strict";
 
-const APP_CONFIG = {
+/* ==========================================
+   WhatsApp AI Assistant V3
+   Global Configuration
+========================================== */
 
-    appName: "WhatsApp AI Assistant",
+const APP = {
 
-    version: "1.0.0",
+    NAME : "WhatsApp AI Assistant",
 
-    aiProvider: "OpenRouter",
+    VERSION : "3.0.0",
 
-    defaultModel: "deepseek/deepseek-chat-v3-0324:free",
+    PROVIDER : "OpenRouter",
 
-    language: "en",
+    MODEL : "deepseek/deepseek-chat-v3-0324:free",
 
-    autoReply: false,
+    API_URL :
+    "https://openrouter.ai/api/v1/chat/completions",
 
-    ignoreGroups: false,
+    LANGUAGE : "en",
 
-    ignoreContacts: false,
+    THEME : "light",
 
-    replyDelay: 2,
+    MEMORY_LIMIT : 100,
 
-    darkMode: true,
+    FAQ_LIMIT : 500,
 
-    memoryLimit: 100,
+    AUTO_REPLY : false,
 
-    logLimit: 500
+    DEBUG : true
 
 };
 
-
 /* ==========================================
-   Save Config
+   Storage
 ========================================== */
 
-function saveConfig(){
+const Storage = {
 
-    localStorage.setItem(
+save(key,value){
 
-        "appConfig",
+localStorage.setItem(
 
-        JSON.stringify(APP_CONFIG)
+key,
 
-    );
+JSON.stringify(value)
+
+);
+
+},
+
+get(key,defaultValue=null){
+
+try{
+
+const data=
+
+localStorage.getItem(key);
+
+if(!data){
+
+return defaultValue;
 
 }
 
-
-/* ==========================================
-   Load Config
-========================================== */
-
-function loadConfig(){
-
-    const data = localStorage.getItem("appConfig");
-
-    if(data){
-
-        try{
-
-            const config = JSON.parse(data);
-
-            Object.assign(APP_CONFIG, config);
-
-        }
-
-        catch(e){
-
-            console.error(e);
-
-        }
-
-    }
+return JSON.parse(data);
 
 }
 
+catch(e){
 
-/* ==========================================
-   Reset Config
-========================================== */
-
-function resetConfig(){
-
-    localStorage.removeItem("appConfig");
-
-    saveConfig();
+return defaultValue;
 
 }
 
+},
+
+remove(key){
+
+localStorage.removeItem(key);
+
+},
+
+clear(){
+
+localStorage.clear();
+
+}
+
+};
 
 /* ==========================================
-   Initialize
+   App Settings
 ========================================== */
 
-loadConfig();
+const Settings = {
 
-saveConfig();
+load(){
+
+APP.THEME=
+
+Storage.get(
+
+"theme",
+
+"light"
+
+);
+
+APP.AUTO_REPLY=
+
+Storage.get(
+
+"autoReply",
+
+false
+
+);
+
+},
+
+save(){
+
+Storage.save(
+
+"theme",
+
+APP.THEME
+
+);
+
+Storage.save(
+
+"autoReply",
+
+APP.AUTO_REPLY
+
+);
+
+}
+
+};
+
+Settings.load();
+
+console.log(
+
+APP.NAME+
+
+" Config Loaded"
+
+);
