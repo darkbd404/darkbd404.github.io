@@ -1,1 +1,9 @@
-
+{
+  "name": "WhatsApp AI Assistant",
+  "short_name": "WhatsApp AI",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#eef2f7",
+  "theme_color": "#25D366",
+  "icons": []
+}
