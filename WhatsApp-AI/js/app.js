@@ -227,9 +227,7 @@ async function sendMessage() {
 
     try {
 
-        const reply =
-            await askAI(message);
-
+        const reply = await processChat(message);
         if (reply) {
 
             addMessage(reply, "ai");
