@@ -1,228 +1,136 @@
-/* ==========================================
-   WhatsApp AI Assistant - app.js
-========================================== */
-
-"use strict";
-
-/* ---------- State & Config ---------- */
-const CONFIG = {
-    splashDelay: 1500,
-    toastDuration: 2500,
-    defaultPrompt: `You are my WhatsApp AI Assistant.\nAlways reply in the user's language.\nKeep replies short.\nBe polite.\nIf you don't know the answer say:\n"I don't know."`,
-    defaultModel: "deepseek/deepseek-chat-v3-0324:free"
-};
-
-const PAGES = [
-    "dashboardPage", "whatsappPage", "aiPage", "faqPage", 
-    "memoryPage", "logsPage", "settingsPage", "aboutPage"
-];
-
-/* ---------- Helpers ---------- */
-
-/** Safe element getter */
-const getEl = (id) => document.getElementById(id);
-
-/** Show toast notification */
-function showToast(message) {
-    const toast = getEl("toast");
-    if (!toast) return;
-    toast.textContent = message; // Use textContent for security/performance
-    toast.style.display = "block";
-    
-    // Clear existing timeout to prevent flickering if called rapidly
-    if (window.toastTimeout) clearTimeout(window.toastTimeout);
-    
-    window.toastTimeout = setTimeout(() => {
-        toast.style.display = "none";
-    }, CONFIG.toastDuration);
+:root {
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --text: #111b21;
+    --text-muted: #667781;
+    --primary: #00a884;
+    --header-bg: #008069;
+    --header-text: #ffffff;
+    --sidebar-bg: #ffffff;
+    --border: #e9edef;
+    --input-bg: #f0f2f5;
 }
 
-/** Switch visible page */
-function openPage(pageId) {
-    PAGES.forEach(id => {
-        const el = getEl(id);
-        if (el) el.style.display = (id === pageId) ? "block" : "none";
-    });
+body.dark-mode {
+    --bg: #111b21;
+    --card: #1f2c33;
+    --text: #e9edef;
+    --text-muted: #8696a0;
+    --primary: #00a884;
+    --header-bg: #1f2c33;
+    --header-text: #e9edef;
+    --sidebar-bg: #111b21;
+    --border: #2a3942;
+    --input-bg: #2a3942;
 }
 
-/* ---------- Initialization ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-window.addEventListener("load", () => {
-    // Splash Screen
-    setTimeout(() => {
-        const splash = getEl("splash-screen");
-        const app = getEl("app");
-        if (splash) splash.style.display = "none";
-        if (app) app.style.display = "block";
-    }, CONFIG.splashDelay);
-
-    // Load Saved Data
-    loadSettings();
-    
-    // Initial View
-    openPage("dashboardPage");
-});
-
-/* ---------- Sidebar Logic ---------- */
-
-let sidebarOpen = false;
-const sidebar = getEl("sidebar");
-const menuBtn = getEl("menu-btn");
-
-if (menuBtn && sidebar) {
-    menuBtn.onclick = () => {
-        sidebarOpen = !sidebarOpen;
-        sidebar.style.left = sidebarOpen ? "0" : "-280px";
-    };
+body {
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
 }
 
-/* ---------- Navigation ---------- */
-
-// Map nav IDs to page IDs dynamically to avoid repetitive code
-const navMap = {
-    "nav-dashboard": "dashboardPage",
-    "nav-whatsapp": "whatsappPage",
-    "nav-ai": "aiPage",
-    "nav-faq": "faqPage",
-    "nav-memory": "memoryPage",
-    "nav-logs": "logsPage",
-    "nav-settings": "settingsPage",
-    "nav-about": "aboutPage"
-};
-
-Object.keys(navMap).forEach(navId => {
-    const btn = getEl(navId);
-    if (btn) {
-        btn.onclick = () => openPage(navMap[navId]);
-    }
-});
-
-/* ---------- Settings & Storage ---------- */
-
-function loadSettings() {
-    // API Config
-    const apiKeyEl = getEl("apikey");
-    const providerEl = getEl("provider");
-    const modelEl = getEl("model");
-    
-    if (apiKeyEl) apiKeyEl.value = localStorage.getItem("apiKey") || "";
-    if (providerEl) providerEl.value = localStorage.getItem("provider") || "openrouter";
-    if (modelEl) modelEl.value = localStorage.getItem("model") || CONFIG.defaultModel;
-
-    // System Prompt
-    const promptBox = getEl("systemPrompt");
-    if (promptBox) {
-        promptBox.value = localStorage.getItem("systemPrompt") || CONFIG.defaultPrompt;
-    }
-    
-    // UI Settings (Apply dark mode if saved)
-    const darkMode = localStorage.getItem("darkMode") === "true";
-    const darkModeEl = getEl("darkMode");
-    if (darkModeEl) darkModeEl.checked = darkMode;
-    if (darkMode) document.body.classList.add("dark-mode"); // Assuming CSS class exists
+/* Splash Screen */
+#splash-screen {
+    position: fixed; inset: 0;
+    background: var(--primary);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
 }
+.logo-box { text-align: center; }
 
-// Save API Credentials
-getEl("saveApi")?.addEventListener("click", () => {
-    localStorage.setItem("apiKey", getEl("apikey").value);
-    localStorage.setItem("provider", getEl("provider").value);
-    localStorage.setItem("model", getEl("model").value);
-    showToast("API Saved");
-});
-
-// Save System Prompt
-getEl("savePrompt")?.addEventListener("click", () => {
-    localStorage.setItem("systemPrompt", getEl("systemPrompt").value);
-    showToast("Prompt Saved");
-});
-
-// Save General Settings
-getEl("saveSettings")?.addEventListener("click", () => {
-    const lang = getEl("language")?.value;
-    const isDark = getEl("darkMode")?.checked;
-    
-    if (lang) localStorage.setItem("language", lang);
-    localStorage.setItem("darkMode", isDark);
-    
-    // Apply dark mode immediately
-    if (isDark) document.body.classList.add("dark-mode");
-    else document.body.classList.remove("dark-mode");
-    
-    showToast("Settings Saved");
-});
-
-/* ---------- Features ---------- */
-
-// Start AI / Test Connection
-getEl("start-ai")?.addEventListener("click", async () => {
-    const aiStatus = getEl("ai-status");
-    const waStatus = getEl("wa-status");
-    
-    if (aiStatus) aiStatus.innerHTML = "🟢 Online";
-    if (waStatus) waStatus.innerHTML = "🟢 Connected";
-    
-    showToast("Testing AI...");
-    
-    try {
-        // Note: askAI must be defined globally or imported
-        const reply = await sendMessageToAI("Hello");
-        console.log("Test Reply:", reply);
-    } catch (error) {
-        console.error(error);
-        showToast("AI Test Failed");
-    }
-});
-
-// FAQ
-getEl("addFaq")?.addEventListener("click", () => {
-    showToast("FAQ Feature Coming Soon");
-});
-
-// Memory
-getEl("clearMemory")?.addEventListener("click", () => {
-    localStorage.removeItem("memory");
-    showToast("Memory Cleared");
-});
-
-// Logs
-getEl("clearLogs")?.addEventListener("click", () => {
-    localStorage.removeItem("logs");
-    showToast("Logs Cleared");
-});
-
-/* ---------- AI Engine ---------- */
-
-async function sendMessageToAI(message) {
-    if (!message || !message.trim()) {
-        showToast("Message Empty");
-        return null;
-    }
-
-    showToast("AI Thinking...");
-
-    try {
-        // Ensure askAI is available in scope
-        if (typeof askAI !== 'function') {
-            throw new Error("askAI function not defined");
-        }
-
-        const reply = await askAI(message);
-
-        if (!reply) {
-            showToast("No Reply");
-            return null;
-        }
-
-        console.log("User :", message);
-        console.log("AI :", reply);
-        showToast("Reply Received");
-        return reply;
-
-    } catch (error) {
-        console.error("AI Error:", error);
-        showToast("AI Error");
-        return null;
-    }
+/* App Layout */
+#app { display: none; }
+header {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding: 1rem;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
+header button { background: none; border: none; color: inherit; font-size: 1.5rem; cursor: pointer; }
 
-console.log("WhatsApp AI Assistant Loaded Successfully");
+/* Sidebar */
+#sidebar {
+    position: fixed; top: 0; left: -280px; bottom: 0;
+    width: 280px; background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    z-index: 200; transition: left 0.3s ease;
+    display: flex; flex-direction: column;
+}
+#sidebar .profile { padding: 2rem 1rem; text-align: center; border-bottom: 1px solid var(--border); }
+.avatar { font-size: 3rem; margin-bottom: 0.5rem; }
+#sidebar nav ul { list-style: none; padding: 1rem 0; flex: 1; }
+#sidebar nav li { padding: 0; }
+.nav-btn {
+    width: 100%; padding: 1rem 1.5rem;
+    background: none; border: none; text-align: left;
+    color: var(--text); font-size: 1rem; cursor: pointer;
+    transition: background 0.2s;
+}
+.nav-btn:hover { background: var(--input-bg); }
+
+/* Main Content */
+main { padding: 1rem; max-width: 800px; margin: 0 auto; }
+.page { display: none; animation: fadeIn 0.3s; }
+.page.active { display: block; } /* Fallback if JS fails */
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Cards */
+.card {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.card h2, .card h3 { margin-bottom: 1rem; color: var(--text); }
+
+/* Form Elements */
+.form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; margin-top: 1rem; }
+input, select, textarea {
+    width: 100%; padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px; background: var(--input-bg);
+    color: var(--text); font-size: 1rem;
+}
+textarea { resize: vertical; }
+
+button:not(.nav-btn):not(header button) {
+    background: var(--primary); color: white;
+    border: none; padding: 0.75rem 1.5rem;
+    border-radius: 6px; font-weight: 600;
+    cursor: pointer; margin-top: 1rem;
+    transition: opacity 0.2s;
+}
+button:hover { opacity: 0.9; }
+
+/* Toggle Switch */
+.switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background-color: #ccc; transition: .4s; border-radius: 24px;
+}
+.slider:before {
+    position: absolute; content: ""; height: 18px; width: 18px;
+    left: 3px; bottom: 3px; background-color: white;
+    transition: .4s; border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--primary); }
+input:checked + .slider:before { transform: translateX(26px); }
+
+/* Toast */
+#toast {
+    display: none; position: fixed; bottom: 2rem; left: 50%;
+    transform: translateX(-50%); background: #333; color: white;
+    padding: 0.75rem 1.5rem; border-radius: 20px;
+    z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-size: 0.9rem;
+}
