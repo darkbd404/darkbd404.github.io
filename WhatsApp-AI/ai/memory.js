@@ -1,10 +1,10 @@
 "use strict";
 
 /* ==========================================
-   Memory Engine V3
+   Memory Engine V5 (Gemini)
 ========================================== */
 
-const MEMORY_KEY = "ai_memory_v3";
+const MEMORY_KEY = "gemini_memory_v5";
 
 /* ---------- Load ---------- */
 
@@ -12,15 +12,21 @@ function getMemory(){
 
     try{
 
-        return JSON.parse(
+        const data = localStorage.getItem(MEMORY_KEY);
 
-            localStorage.getItem(MEMORY_KEY)
+        if(!data){
 
-        ) || [];
+            return [];
+
+        }
+
+        return JSON.parse(data);
 
     }
 
-    catch(e){
+    catch(error){
+
+        console.error(error);
 
         return [];
 
@@ -52,9 +58,9 @@ function addMemory(user,assistant){
 
     }
 
-    const memory=getMemory();
+    const memory = getMemory();
 
-    const last=memory[memory.length-1];
+    const last = memory[memory.length-1];
 
     if(
 
@@ -72,7 +78,7 @@ function addMemory(user,assistant){
 
     memory.push({
 
-        id:Date.now(),
+        id:crypto.randomUUID(),
 
         time:new Date().toLocaleString(),
 
@@ -82,17 +88,29 @@ function addMemory(user,assistant){
 
     });
 
-    while(
-
-        memory.length>
-
-        APP.MEMORY_LIMIT
-
-    ){
+    while(memory.length > APP.MEMORY_LIMIT){
 
         memory.shift();
 
     }
+
+    saveMemory(memory);
+
+    if(typeof updateCounters==="function"){
+
+        updateCounters();
+
+    }
+
+}
+
+/* ---------- Delete ---------- */
+
+function deleteMemory(id){
+
+    const memory = getMemory()
+
+    .filter(item=>item.id!==id);
 
     saveMemory(memory);
 
@@ -108,35 +126,28 @@ function clearMemory(){
 
     );
 
+    if(typeof updateCounters==="function"){
+
+        updateCounters();
+
+    }
+
 }
 
 /* ---------- Prompt ---------- */
 
 function memoryToPrompt(limit=10){
 
-    const memory=getMemory()
+    const memory =
 
-    .slice(-limit);
+    getMemory().slice(-limit);
 
-    let text="";
+    return memory.map(item=>
 
-    memory.forEach(item=>{
+`User: ${item.user}
+Assistant: ${item.assistant}`
 
-        text+=
-
-        "User: "+
-
-        item.user+
-
-        "\nAssistant: "+
-
-        item.assistant+
-
-        "\n\n";
-
-    });
-
-    return text;
+    ).join("\n\n");
 
 }
 
@@ -162,28 +173,42 @@ function importMemory(json){
 
     try{
 
-        const data=
+        const data = JSON.parse(json);
 
-        JSON.parse(json);
+        if(!Array.isArray(data)){
 
-        if(Array.isArray(data)){
-
-            saveMemory(data);
-
-            return true;
+            return false;
 
         }
 
+        saveMemory(data);
+
+        if(typeof updateCounters==="function"){
+
+            updateCounters();
+
+        }
+
+        return true;
+
     }
 
-    catch(e){
+    catch(error){
 
-        console.error(e);
+        console.error(error);
+
+        return false;
 
     }
-
-    return false;
 
 }
 
-console.log("Memory Engine V3 Loaded");
+/* ---------- Count ---------- */
+
+function memoryCountValue(){
+
+    return getMemory().length;
+
+}
+
+console.log("Memory Engine V5 Loaded");
