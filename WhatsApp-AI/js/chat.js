@@ -1,50 +1,60 @@
 "use strict";
 
 /* ==========================================
-   Chat Engine V3
+   Chat Engine V5 (Gemini)
 ========================================== */
 
 const chatHistory = [];
 
-/* ---------- Save History ---------- */
+/* ---------- History ---------- */
 
-function addHistory(role, text) {
+function addHistory(role,text){
 
     chatHistory.push({
-        role: role,
-        text: text,
-        time: Date.now()
+
+        id:crypto.randomUUID(),
+
+        role,
+
+        text,
+
+        time:new Date().toLocaleString()
+
     });
 
 }
 
-/* ---------- Get History ---------- */
-
-function getChatHistory() {
+function getChatHistory(){
 
     return chatHistory;
 
 }
 
-/* ---------- Clear ---------- */
-
-function clearChatHistory() {
+function clearChatHistory(){
 
     chatHistory.length = 0;
 
 }
 
-/* ---------- Main Chat ---------- */
+/* ---------- Chat ---------- */
 
-async function processChat(message) {
+async function processChat(message){
 
-    if (!message) {
+    if(!message){
 
         return null;
 
     }
 
-    addHistory("user", message);
+    message = message.trim();
+
+    if(message===""){
+
+        return null;
+
+    }
+
+    addHistory("user",message);
 
     /* ==========================
        FAQ First
@@ -52,39 +62,53 @@ async function processChat(message) {
 
     const faqReply = searchFAQ(message);
 
-    if (faqReply) {
+    if(faqReply){
 
-        addHistory("assistant", faqReply);
+        addHistory("assistant",faqReply);
 
-        addMemory(message, faqReply);
+        addMemory(message,faqReply);
 
         return faqReply;
 
     }
 
     /* ==========================
-       AI
+       Gemini
     ========================== */
 
-    const aiReply = await askAI(message);
+    let aiReply = null;
 
-    if (aiReply) {
+    try{
 
-        addHistory("assistant", aiReply);
+        aiReply = await askAI(message);
 
-        addMemory(message, aiReply);
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        return "❌ Gemini API Error.";
+
+    }
+
+    if(aiReply){
+
+        addHistory("assistant",aiReply);
+
+        addMemory(message,aiReply);
 
         return aiReply;
 
     }
 
-    return "Sorry, I couldn't generate a reply.";
+    return "⚠️ No response received.";
 
 }
 
 /* ---------- Export ---------- */
 
-function exportChat() {
+function exportChat(){
 
     return JSON.stringify(
 
@@ -98,4 +122,42 @@ function exportChat() {
 
 }
 
-console.log("Chat Engine V3 Loaded");
+/* ---------- Import ---------- */
+
+function importChat(json){
+
+    try{
+
+        const data = JSON.parse(json);
+
+        if(Array.isArray(data)){
+
+            chatHistory.length = 0;
+
+            chatHistory.push(...data);
+
+            return true;
+
+        }
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+    return false;
+
+}
+
+/* ---------- Count ---------- */
+
+function chatCount(){
+
+    return chatHistory.length;
+
+}
+
+console.log("Chat Engine V5 Loaded");
