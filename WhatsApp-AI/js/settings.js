@@ -1,7 +1,7 @@
 "use strict";
 
 /* ==========================================
-   Settings Module V3
+   Settings Module V5 (Gemini)
 ========================================== */
 
 const apiKeyInput = document.getElementById("apiKey");
@@ -51,19 +51,23 @@ function loadSettings(){
 
 }
 
-/* ---------- Save API ---------- */
+/* ---------- Save Gemini API ---------- */
 
 saveApiBtn?.addEventListener("click",()=>{
 
-    localStorage.setItem(
+    const key = apiKeyInput.value.trim();
 
-        "apiKey",
+    if(!key){
 
-        apiKeyInput.value.trim()
+        showToast("Enter Gemini API Key");
 
-    );
+        return;
 
-    showToast("API Key Saved");
+    }
+
+    localStorage.setItem("apiKey",key);
+
+    showToast("Gemini API Key Saved");
 
 });
 
@@ -79,11 +83,11 @@ saveModelBtn?.addEventListener("click",()=>{
 
     );
 
-    showToast("Model Saved");
+    showToast("Gemini Model Saved");
 
 });
 
-/* ---------- Save Temperature ---------- */
+/* ---------- Temperature ---------- */
 
 temperatureInput?.addEventListener("change",()=>{
 
@@ -97,7 +101,7 @@ temperatureInput?.addEventListener("change",()=>{
 
 });
 
-/* ---------- Save Max Tokens ---------- */
+/* ---------- Max Tokens ---------- */
 
 maxTokensInput?.addEventListener("change",()=>{
 
@@ -119,23 +123,37 @@ testConnectionBtn?.addEventListener(
 
 async()=>{
 
-connectionStatus.innerHTML="Testing...";
+    connectionStatus.textContent="Testing...";
 
-const result=await testConnection();
+    showToast("Testing Gemini...");
 
-if(result){
+    try{
 
-connectionStatus.innerHTML="🟢 Connected";
+        const ok = await testConnection();
 
-showToast("AI Connected");
+        if(ok){
 
-}else{
+            connectionStatus.textContent="🟢 Gemini Connected";
 
-connectionStatus.innerHTML="🔴 Failed";
+            showToast("Gemini Connected");
 
-showToast("Connection Failed");
+        }else{
 
-}
+            connectionStatus.textContent="🔴 Connection Failed";
+
+            showToast("Gemini Connection Failed");
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+        connectionStatus.textContent="🔴 Error";
+
+        showToast("Connection Error");
+
+    }
 
 }
 
@@ -143,4 +161,4 @@ showToast("Connection Failed");
 
 loadSettings();
 
-console.log("Settings Module Loaded");
+console.log("Gemini Settings Loaded");
