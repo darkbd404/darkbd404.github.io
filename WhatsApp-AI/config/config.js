@@ -37,57 +37,37 @@ const APP = {
    Local Storage
 ========================================== */
 
-const Storage = {
+get(key, defaultValue = null){
 
-    save(key,value){
+    try{
 
-        localStorage.setItem(
-            key,
-            JSON.stringify(value)
-        );
+        const data = localStorage.getItem(key);
 
-    },
-
-    get(key,defaultValue=null){
-
-        try{
-
-            const data=
-            localStorage.getItem(key);
-
-            if(!data){
-
-                return defaultValue;
-
-            }
-
-            return JSON.parse(data);
-
-        }
-
-        catch(error){
-
-            console.error(error);
+        if(data === null){
 
             return defaultValue;
 
         }
 
-    },
+        try{
 
-    remove(key){
+            return JSON.parse(data);
 
-        localStorage.removeItem(key);
+        }catch{
 
-    },
+            return data;
 
-    clear(){
+        }
 
-        localStorage.clear();
+    }catch(error){
+
+        console.error(error);
+
+        return defaultValue;
 
     }
 
-};
+}
 
 /* ==========================================
    Settings
