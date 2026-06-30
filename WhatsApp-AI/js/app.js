@@ -1,21 +1,172 @@
+"use strict";
+
 /* ==========================================
-   WhatsApp AI Assistant V5
+   WhatsApp AI Assistant V6
+   app.js - Part 1
+========================================== */
+
+/* ---------- DOM ---------- */
+
+const loading=document.getElementById("loading");
+const app=document.getElementById("app");
+
+const sidebar=document.getElementById("sidebar");
+
+const menuBtn=document.getElementById("menuBtn");
+
+const searchBtn=document.getElementById("searchBtn");
+const themeBtn=document.getElementById("themeBtn");
+const settingsBtn=document.getElementById("settingsBtn");
+
+const toast=document.getElementById("toast");
+
+const aiStatus=document.getElementById("ai-status");
+const waStatus=document.getElementById("wa-status");
+
+const memoryCount=document.getElementById("memoryCount");
+const faqCount=document.getElementById("faqCount");
+
+/* ---------- Loading ---------- */
+
+window.addEventListener("load",()=>{
+
+setTimeout(()=>{
+
+if(loading){
+
+loading.style.display="none";
+
+}
+
+if(app){
+
+app.style.display="block";
+
+}
+
+updateCounters();
+
+},800);
+
+});
+
+/* ---------- Toast ---------- */
+
+function showToast(text){
+
+if(!toast)return;
+
+toast.textContent=text;
+
+toast.style.display="block";
+
+clearTimeout(window.toastTimer);
+
+window.toastTimer=setTimeout(()=>{
+
+toast.style.display="none";
+
+},2500);
+
+}
+
+/* ---------- Counters ---------- */
+
+function updateCounters(){
+
+if(memoryCount){
+
+memoryCount.textContent=
+
+getMemory().length+" Chats";
+
+}
+
+if(faqCount){
+
+faqCount.textContent=
+
+loadFAQ().length+" Items";
+
+}
+
+}
+
+/* ---------- Status ---------- */
+
+function setAIStatus(text){
+
+if(aiStatus){
+
+aiStatus.textContent=text;
+
+}
+
+}
+
+function setWAStatus(text){
+
+if(waStatus){
+
+waStatus.textContent=text;
+
+}
+
+}
+
+console.log("App V6 Part 1 Loaded");
+/* ==========================================
+   WhatsApp AI Assistant V6
    app.js - Part 2
 ========================================== */
+
+/* ---------- Theme ---------- */
+
+let darkMode = localStorage.getItem("theme")==="dark";
+
+if(darkMode){
+
+document.body.classList.add("dark");
+
+}
+
+themeBtn?.addEventListener("click",()=>{
+
+darkMode=!darkMode;
+
+document.body.classList.toggle("dark");
+
+localStorage.setItem(
+
+"theme",
+
+darkMode ? "dark" : "light"
+
+);
+
+showToast(
+
+darkMode ? "Dark Mode" : "Light Mode"
+
+);
+
+});
+
+/* ---------- Sidebar ---------- */
+
+menuBtn?.addEventListener("click",()=>{
+
+sidebar?.classList.toggle("show");
+
+});
 
 /* ---------- Search ---------- */
 
 searchBtn?.addEventListener("click",()=>{
 
-    const input=document.getElementById("messageInput");
+document.getElementById("messageInput")?.focus();
 
-    if(input){
-
-        input.focus();
-
-    }
-
-    showToast("Search Ready");
+showToast("Search Ready");
 
 });
 
@@ -23,23 +174,11 @@ searchBtn?.addEventListener("click",()=>{
 
 settingsBtn?.addEventListener("click",()=>{
 
-    if(typeof showPage==="function"){
+if(typeof showPage==="function"){
 
-        showPage("settings");
+showPage("settings");
 
-    }
-
-});
-
-/* ---------- Floating Button ---------- */
-
-const fab=document.getElementById("fab");
-
-fab?.addEventListener("click",()=>{
-
-    document.getElementById("messageInput")?.focus();
-
-    showToast("Ready to Chat");
+}
 
 });
 
@@ -49,159 +188,38 @@ const startAI=document.getElementById("start-ai");
 
 startAI?.addEventListener("click",async()=>{
 
-    setAIStatus("🟡 Connecting...");
+setAIStatus("🟡 Connecting...");
 
-    showToast("Connecting Gemini...");
+showToast("Connecting Gemini...");
 
-    try{
+try{
 
-        const ok=await testConnection();
+const ok=await testConnection();
 
-        if(ok){
+if(ok){
 
-            setAIStatus("🟢 Gemini Connected");
+setAIStatus("🟢 Gemini Connected");
 
-            showToast("Gemini Connected");
+showToast("Gemini Connected");
 
-        }else{
+}else{
 
-            setAIStatus("🔴 Offline");
+setAIStatus("🔴 Offline");
 
-            showToast("Connection Failed");
-
-        }
-
-    }catch(e){
-
-        console.error(e);
-
-        setAIStatus("🔴 Error");
-
-        showToast("Gemini Error");
-
-    }
-
-});
-
-/* ---------- Restore Theme ---------- */
-
-if(localStorage.getItem("theme")==="dark"){
-
-    document.body.classList.add("dark");
+showToast("Connection Failed");
 
 }
 
-/* ---------- Refresh Dashboard ---------- */
+}catch(error){
 
-function refreshDashboard(){
+console.error(error);
 
-    updateCounters();
+setAIStatus("🔴 Error");
+
+showToast("Gemini Error");
 
 }
 
-/* ---------- Auto Refresh ---------- */
-
-setInterval(()=>{
-
-    refreshDashboard();
-
-},5000);
-
-console.log("App V5 Part 2 Loaded");
-/* ==========================================
-   WhatsApp AI Assistant V5
-   app.js - Part 3
-========================================== */
-
-/* ---------- Sidebar ---------- */
-
-const menuBtn=document.getElementById("menuBtn");
-
-menuBtn?.addEventListener("click",()=>{
-
-    if(!sidebar) return;
-
-    sidebar.classList.toggle("show");
-
 });
 
-/* ---------- Close Sidebar ---------- */
-
-document.addEventListener("click",(e)=>{
-
-    if(window.innerWidth>900) return;
-
-    if(!sidebar) return;
-
-    const clickInsideSidebar=sidebar.contains(e.target);
-
-    const clickMenu=e.target.closest("#menuBtn");
-
-    if(!clickInsideSidebar && !clickMenu){
-
-        sidebar.classList.remove("show");
-
-    }
-
-});
-
-/* ---------- Window Resize ---------- */
-
-window.addEventListener("resize",()=>{
-
-    if(window.innerWidth>900){
-
-        sidebar?.classList.remove("show");
-
-    }
-
-});
-
-/* ---------- Keyboard Shortcut ---------- */
-
-document.addEventListener("keydown",(e)=>{
-
-    if(e.ctrlKey && e.key.toLowerCase()==="k"){
-
-        e.preventDefault();
-
-        document.getElementById("messageInput")?.focus();
-
-        showToast("Search Ready");
-
-    }
-
-});
-
-/* ---------- Online / Offline ---------- */
-
-window.addEventListener("online",()=>{
-
-    showToast("Internet Connected");
-
-});
-
-window.addEventListener("offline",()=>{
-
-    showToast("Internet Disconnected");
-
-});
-
-/* ---------- Global ---------- */
-
-window.showToast=showToast;
-window.setAIStatus=setAIStatus;
-window.setWAStatus=setWAStatus;
-window.updateCounters=updateCounters;
-
-/* ---------- Error Handler ---------- */
-
-window.onerror=function(msg,url,line){
-
-    console.error("App Error:",msg);
-
-    return false;
-
-};
-
-console.log("App V5 Part 3 Loaded");
+console.log("App V6 Part 2 Loaded");
