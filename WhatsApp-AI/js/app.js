@@ -14,24 +14,18 @@ const app=document.getElementById("app");
 const sidebar=document.getElementById("sidebar");
 
 const menuBtn=document.getElementById("menuBtn");
-
 const searchBtn=document.getElementById("searchBtn");
-
 const themeBtn=document.getElementById("themeBtn");
-
 const settingsBtn=document.getElementById("settingsBtn");
 
 const fab=document.getElementById("fab");
-
 const toast=document.getElementById("toast");
 
-const aiStatus=document.getElementById("ai-status");
+const aiStatusElement=document.getElementById("ai-status");
+const waStatusElement=document.getElementById("wa-status");
 
-const waStatus=document.getElementById("wa-status");
-
-const memoryCount=document.getElementById("memoryCount");
-
-const faqCount=document.getElementById("faqCount");
+const memoryCounter=document.getElementById("memoryCount");
+const faqCounter=document.getElementById("faqCount");
 
 /* ---------- Loading ---------- */
 
@@ -61,7 +55,7 @@ updateCounters();
 
 function showToast(text){
 
-if(!toast) return;
+if(!toast)return;
 
 toast.textContent=text;
 
@@ -81,19 +75,19 @@ toast.style.display="none";
 
 function updateCounters(){
 
-if(memoryCount){
+if(memoryCounter){
 
-memoryCount.textContent=
+memoryCounter.textContent=
 
-memoryCountValue()+" Chats";
+getMemory().length+" Chats";
 
 }
 
-if(faqCount){
+if(faqCounter){
 
-faqCount.textContent=
+faqCounter.textContent=
 
-faqCount()+" Items";
+loadFAQ().length+" Items";
 
 }
 
@@ -103,9 +97,9 @@ faqCount()+" Items";
 
 function setAIStatus(text){
 
-if(aiStatus){
+if(aiStatusElement){
 
-aiStatus.textContent=text;
+aiStatusElement.textContent=text;
 
 }
 
@@ -113,9 +107,9 @@ aiStatus.textContent=text;
 
 function setWAStatus(text){
 
-if(waStatus){
+if(waStatusElement){
 
-waStatus.textContent=text;
+waStatusElement.textContent=text;
 
 }
 
@@ -128,33 +122,9 @@ console.log("App V6 Stable Part 1 Loaded");
    App Engine - Part 2
 ========================================== */
 
-/* ---------- Fix Dashboard Counter ---------- */
-
-const faqCounterElement = document.getElementById("faqCount");
-const memoryCounterElement = document.getElementById("memoryCount");
-
-function updateCounters(){
-
-    if(memoryCounterElement){
-
-        memoryCounterElement.textContent =
-        getMemory().length + " Chats";
-
-    }
-
-    if(faqCounterElement){
-
-        faqCounterElement.textContent =
-        loadFAQ().length + " Items";
-
-    }
-
-}
-
 /* ---------- Theme ---------- */
 
-let darkMode =
-localStorage.getItem("theme")==="dark";
+let darkMode = localStorage.getItem("theme")==="dark";
 
 if(darkMode){
 
@@ -172,7 +142,7 @@ themeBtn?.addEventListener("click",()=>{
 
         "theme",
 
-        darkMode ? "dark":"light"
+        darkMode ? "dark" : "light"
 
     );
 
@@ -208,7 +178,7 @@ searchBtn?.addEventListener("click",()=>{
 
 settingsBtn?.addEventListener("click",()=>{
 
-    if(window.showPage){
+    if(typeof window.showPage==="function"){
 
         window.showPage("settings");
 
@@ -226,26 +196,17 @@ fab?.addEventListener("click",()=>{
 
 });
 
-console.log("App V6 Stable Part 2 Loaded");
-/* ==========================================
-   WhatsApp AI Assistant
-   Version : V6 Stable
-   App Engine - Part 3
-========================================== */
-
 /* ---------- Start AI ---------- */
 
-const startAI = document.getElementById("start-ai");
+const startAI=document.getElementById("start-ai");
 
-startAI?.addEventListener("click", async()=>{
+startAI?.addEventListener("click",async()=>{
 
     setAIStatus("🟡 Connecting...");
 
-    showToast("Connecting Gemini...");
-
     try{
 
-        const ok = await testConnection();
+        const ok=await testConnection();
 
         if(ok){
 
@@ -261,7 +222,9 @@ startAI?.addEventListener("click", async()=>{
 
         }
 
-    }catch(error){
+    }
+
+    catch(error){
 
         console.error(error);
 
@@ -273,15 +236,20 @@ startAI?.addEventListener("click", async()=>{
 
 });
 
-/* ---------- Refresh Dashboard ---------- */
+console.log("App V6 Stable Part 2 Loaded");
+/* ==========================================
+   WhatsApp AI Assistant
+   Version : V6 Stable
+   App Engine - Part 3
+========================================== */
+
+/* ---------- Auto Refresh ---------- */
 
 function refreshDashboard(){
 
     updateCounters();
 
 }
-
-/* ---------- Auto Refresh ---------- */
 
 setInterval(refreshDashboard,5000);
 
@@ -319,11 +287,13 @@ document.addEventListener("click",(e)=>{
 
     }
 
-    const insideSidebar = sidebar.contains(e.target);
+    if(
 
-    const menuClicked = e.target.closest("#menuBtn");
+        !sidebar.contains(e.target) &&
 
-    if(!insideSidebar && !menuClicked){
+        !e.target.closest("#menuBtn")
+
+    ){
 
         sidebar.classList.remove("show");
 
@@ -338,6 +308,20 @@ window.addEventListener("resize",()=>{
     if(window.innerWidth>900){
 
         sidebar?.classList.remove("show");
+
+    }
+
+});
+
+/* ---------- Keyboard Shortcut ---------- */
+
+document.addEventListener("keydown",(e)=>{
+
+    if(e.ctrlKey && e.key.toLowerCase()==="k"){
+
+        e.preventDefault();
+
+        document.getElementById("messageInput")?.focus();
 
     }
 
