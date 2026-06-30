@@ -9,9 +9,9 @@
 
 <meta name="theme-color" content="#25D366">
 
-<meta name="description" content="WhatsApp AI Assistant V3">
+<meta name="description" content="WhatsApp AI Assistant V5 Powered by Gemini">
 
-<title>WhatsApp AI Assistant V3</title>
+<title>WhatsApp AI Assistant V5</title>
 
 <link rel="manifest" href="manifest.json">
 
@@ -33,9 +33,9 @@
 
 <div class="loader"></div>
 
-<h1>WhatsApp AI Assistant</h1>
+<h2>WhatsApp AI Assistant</h2>
 
-<p>Loading...</p>
+<p>Powered by Gemini AI</p>
 
 </div>
 
@@ -75,7 +75,7 @@ smart_toy
 
 <div class="header-right">
 
-<button id="searchBtn">
+<button id="searchBtn" title="Search">
 
 <span class="material-symbols-rounded">
 
@@ -85,7 +85,7 @@ search
 
 </button>
 
-<button id="themeBtn">
+<button id="themeBtn" title="Theme">
 
 <span class="material-symbols-rounded">
 
@@ -95,7 +95,7 @@ dark_mode
 
 </button>
 
-<button id="settingsBtn">
+<button id="settingsBtn" title="Settings">
 
 <span class="material-symbols-rounded">
 
@@ -125,9 +125,9 @@ settings
 
 </div>
 
-<h3>AI Assistant</h3>
+<h3>Gemini AI</h3>
 
-<p>Premium Version</p>
+<p>WhatsApp AI Assistant V5</p>
 
 </div>
 
@@ -204,9 +204,8 @@ Settings
 <!-- Main -->
 
 <main id="mainContent">
-     <!-- ==========================
-     Dashboard Page
-========================== -->
+
+<!-- Dashboard -->
 
 <section id="dashboardPage" class="page">
 
@@ -230,7 +229,7 @@ psychology
 
 <h3>AI Status</h3>
 
-<p id="ai-status">Offline</p>
+<p id="ai-status">Gemini Ready</p>
 
 </div>
 
@@ -306,7 +305,7 @@ quiz
 
 <!-- Chat -->
 
-<div class="chat-section">
+<section class="chat-section">
 
 <div class="chat-header">
 
@@ -314,7 +313,7 @@ quiz
 
 <h2>AI Chat</h2>
 
-<p>Powered by OpenRouter</p>
+<p>Powered by Google Gemini</p>
 
 </div>
 
@@ -334,7 +333,7 @@ Ready
 
 <div class="bubble">
 
-👋 Welcome to WhatsApp AI Assistant.
+👋 Welcome! Ask me anything.
 
 </div>
 
@@ -345,11 +344,8 @@ Ready
 <div class="chat-input">
 
 <input
-
 type="text"
-
 id="messageInput"
-
 placeholder="Type your message...">
 
 <button id="sendBtn">
@@ -377,8 +373,7 @@ play_circle
 Start AI
 
 </button>
-
-<button class="action-btn">
+<button class="action-btn" id="quickWhatsapp">
 
 <span class="material-symbols-rounded">
 
@@ -390,7 +385,7 @@ WhatsApp
 
 </button>
 
-<button class="action-btn">
+<button class="action-btn" id="quickFaq">
 
 <span class="material-symbols-rounded">
 
@@ -402,7 +397,7 @@ FAQ
 
 </button>
 
-<button class="action-btn">
+<button class="action-btn" id="quickMemory">
 
 <span class="material-symbols-rounded">
 
@@ -417,36 +412,31 @@ Memory
 </div>
 
 </section>
-<!-- ==========================
+
+<!-- ==========================================
      Settings Page
-========================== -->
+========================================== -->
 
 <section id="settingsPage" class="page" style="display:none;">
 
-<h1>Settings</h1>
+<h1>Gemini Settings</h1>
 
 <div class="settings-grid">
 
 <div class="setting-card">
 
-<h3>OpenRouter API</h3>
-
-<<div class="setting-card">
-
-<h3>OpenRouter API</h3>
+<h3>Google Gemini API</h3>
 
 <label for="apiKey">
 
-API Key
+Gemini API Key
 
 </label>
 
 <input
 type="password"
 id="apiKey"
-name="apiKey"
-placeholder="Paste your OpenRouter API Key"
-title="OpenRouter API Key"
+placeholder="Paste Gemini API Key"
 autocomplete="off">
 
 <button id="saveApiBtn">
@@ -457,38 +447,42 @@ Save API Key
 
 </div>
 
-</div>
-
 <div class="setting-card">
 
 <h3>AI Model</h3>
 
 <label for="modelSelect">
 
-AI Model
+Gemini Model
 
 </label>
 
-<select
-id="modelSelect"
-name="modelSelect"
-title="Select Gemini Model">
+<select id="modelSelect">
 
-<option value="gemini-2.5-flash" selected>
-Gemini 2.5 Flash (Recommended)
+<option value="gemini-2.5-flash">
+
+Gemini 2.5 Flash
+
 </option>
 
 <option value="gemini-2.5-pro">
+
 Gemini 2.5 Pro
+
 </option>
 
 <option value="gemini-2.5-flash-lite">
-Gemini 2.5 Flash Lite
+
+Gemini Flash Lite
+
 </option>
 
 </select>
+
 <button id="saveModelBtn">
+
 Save Model
+
 </button>
 
 </div>
@@ -497,17 +491,32 @@ Save Model
 
 <h3>AI Parameters</h3>
 
-<label>Temperature</label>
+<label>
 
-<input type="number" id="temperature" value="0.7" step="0.1">
+Temperature
 
-<label>Max Tokens</label>
+</label>
 
-<input type="number" id="maxTokens" value="1024">
+<input
+type="number"
+id="temperature"
+step="0.1"
+value="0.7">
+
+<label>
+
+Max Tokens
+
+</label>
+
+<input
+type="number"
+id="maxTokens"
+value="1024">
 
 <button id="testConnectionBtn">
 
-Test Connection
+Test Gemini
 
 </button>
 
@@ -523,9 +532,9 @@ Not Tested
 
 </section>
 
-<!-- ==========================
-     FAQ Page
-========================== -->
+<!-- ==========================================
+     FAQ
+========================================== -->
 
 <section id="faqPage" class="page" style="display:none;">
 
@@ -557,11 +566,11 @@ Add FAQ
 
 <div class="setting-card">
 
-<h3>FAQ List</h3>
+<h3>Saved FAQ</h3>
 
 <div id="faqList">
 
-No FAQ Added
+No FAQ Available
 
 </div>
 
@@ -583,9 +592,9 @@ Clear FAQ
 
 </section>
 
-<!-- ==========================
-     Memory Page
-========================== -->
+<!-- ==========================================
+     Memory
+========================================== -->
 
 <section id="memoryPage" class="page" style="display:none;">
 
@@ -595,7 +604,7 @@ Clear FAQ
 
 <div class="setting-card">
 
-<h3>Memory Search</h3>
+<h3>Search Memory</h3>
 
 <input
 type="text"
@@ -616,35 +625,35 @@ No Memory
 
 <button id="exportMemoryBtn">
 
-Export Memory
+Export
 
 </button>
 
 <button id="importMemoryBtn">
 
-Import Memory
+Import
 
 </button>
 
 <button id="clearMemoryBtn">
 
-Clear Memory
+Clear
 
 </button>
 
 <textarea
 id="memoryImportBox"
 rows="8"
-placeholder="Paste exported JSON here"></textarea>
+placeholder="Paste JSON Here"></textarea>
 
 </div>
 
 </div>
 
 </section>
-<!-- ==========================
+<!-- ==========================================
      Logs Page
-========================== -->
+========================================== -->
 
 <section id="logsPage" class="page" style="display:none;">
 
@@ -684,13 +693,13 @@ Clear Logs
 
 </section>
 
-<!-- ==========================
+<!-- ==========================================
      AI Page
-========================== -->
+========================================== -->
 
 <section id="aiPage" class="page" style="display:none;">
 
-<h1>AI Control Center</h1>
+<h1>Gemini AI</h1>
 
 <div class="settings-grid">
 
@@ -698,13 +707,13 @@ Clear Logs
 
 <h3>AI Information</h3>
 
-<p><b>Provider:</b> OpenRouter</p>
+<p><b>Provider:</b> Google Gemini</p>
 
 <p><b>Model:</b>
 
 <span id="currentModel">
 
-Not Selected
+gemini-2.5-flash
 
 </span>
 
@@ -714,7 +723,7 @@ Not Selected
 
 <span id="aiLiveStatus">
 
-Offline
+Ready
 
 </span>
 
@@ -732,7 +741,7 @@ Reload Model
 
 <button id="pingAiBtn">
 
-Ping AI
+Ping Gemini
 
 </button>
 
@@ -748,9 +757,9 @@ Clear Chat
 
 </section>
 
-<!-- ==========================
+<!-- ==========================================
      WhatsApp Page
-========================== -->
+========================================== -->
 
 <section id="whatsappPage" class="page" style="display:none;">
 
@@ -760,9 +769,7 @@ Clear Chat
 
 <div class="setting-card">
 
-<p>
-
-<b>Status:</b>
+<p><b>Status:</b>
 
 <span id="waConnectionStatus">
 
@@ -772,9 +779,7 @@ Disconnected
 
 </p>
 
-<p>
-
-<b>Device:</b>
+<p><b>Device:</b>
 
 <span id="waDevice">
 
@@ -784,9 +789,7 @@ Unknown
 
 </p>
 
-<p>
-
-<b>Queue:</b>
+<p><b>Queue:</b>
 
 <span id="waQueue">
 
@@ -828,7 +831,9 @@ Refresh
 
 </div>
 
-<!-- Bottom Navigation -->
+<!-- ==========================================
+     Bottom Navigation
+========================================== -->
 
 <nav class="bottom-nav">
 
@@ -840,7 +845,7 @@ dashboard
 
 </span>
 
-Home
+<span>Home</span>
 
 </button>
 
@@ -852,7 +857,7 @@ chat
 
 </span>
 
-Chat
+<span>Chat</span>
 
 </button>
 
@@ -864,7 +869,7 @@ forum
 
 </span>
 
-WA
+<span>WA</span>
 
 </button>
 
@@ -876,7 +881,7 @@ smart_toy
 
 </span>
 
-AI
+<span>AI</span>
 
 </button>
 
@@ -888,11 +893,13 @@ settings
 
 </span>
 
-Settings
+<span>Settings</span>
 
 </button>
 
 </nav>
+
+<!-- Floating Button -->
 
 <button id="fab">
 
@@ -904,9 +911,15 @@ auto_awesome
 
 </button>
 
+<!-- Toast -->
+
 <div id="toast"></div>
 
+<!-- Overlay -->
+
 <div id="overlay"></div>
+
+<!-- Scripts -->
 
 <script src="config/config.js"></script>
 
@@ -937,5 +950,4 @@ auto_awesome
 <script src="js/whatsapp-page.js"></script>
 
 </body>
-
 </html>
