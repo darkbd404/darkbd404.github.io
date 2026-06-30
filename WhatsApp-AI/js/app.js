@@ -223,3 +223,106 @@ showToast("Gemini Error");
 });
 
 console.log("App V6 Part 2 Loaded");
+/* ==========================================
+   WhatsApp AI Assistant V6
+   app.js - Part 3
+========================================== */
+
+/* ---------- Floating Button ---------- */
+
+const fab = document.getElementById("fab");
+
+fab?.addEventListener("click",()=>{
+
+    document.getElementById("messageInput")?.focus();
+
+    showToast("Ready to Chat");
+
+});
+
+/* ---------- Refresh Dashboard ---------- */
+
+function refreshDashboard(){
+
+    updateCounters();
+
+}
+
+/* ---------- Auto Refresh ---------- */
+
+setInterval(refreshDashboard,5000);
+
+/* ---------- Online / Offline ---------- */
+
+window.addEventListener("online",()=>{
+
+    setAIStatus("🟢 Online");
+
+    showToast("Internet Connected");
+
+});
+
+window.addEventListener("offline",()=>{
+
+    setAIStatus("🔴 Offline");
+
+    showToast("Internet Disconnected");
+
+});
+
+/* ---------- Keyboard Shortcut ---------- */
+
+document.addEventListener("keydown",(e)=>{
+
+    if(e.ctrlKey && e.key.toLowerCase()==="k"){
+
+        e.preventDefault();
+
+        document.getElementById("messageInput")?.focus();
+
+    }
+
+});
+
+/* ---------- Global ---------- */
+
+window.showToast = showToast;
+window.updateCounters = updateCounters;
+window.setAIStatus = setAIStatus;
+window.setWAStatus = setWAStatus;
+
+/* ---------- Error Handler ---------- */
+
+window.onerror = function(message,source,line,column,error){
+
+    console.error("Application Error:",{
+
+        message,
+
+        source,
+
+        line,
+
+        column,
+
+        error
+
+    });
+
+    return false;
+
+};
+
+/* ---------- Initialize ---------- */
+
+(function(){
+
+    updateCounters();
+
+    setAIStatus("⚪ Ready");
+
+    setWAStatus("⚪ Waiting");
+
+    console.log("WhatsApp AI Assistant V6 Ready");
+
+})();
