@@ -1,8 +1,9 @@
 "use strict";
 
 /* ==========================================
-   WhatsApp AI Assistant V6
-   app.js - Part 1
+   WhatsApp AI Assistant
+   Version : V6 Stable
+   App Engine
 ========================================== */
 
 /* ---------- DOM ---------- */
@@ -15,15 +16,21 @@ const sidebar=document.getElementById("sidebar");
 const menuBtn=document.getElementById("menuBtn");
 
 const searchBtn=document.getElementById("searchBtn");
+
 const themeBtn=document.getElementById("themeBtn");
+
 const settingsBtn=document.getElementById("settingsBtn");
+
+const fab=document.getElementById("fab");
 
 const toast=document.getElementById("toast");
 
 const aiStatus=document.getElementById("ai-status");
+
 const waStatus=document.getElementById("wa-status");
 
 const memoryCount=document.getElementById("memoryCount");
+
 const faqCount=document.getElementById("faqCount");
 
 /* ---------- Loading ---------- */
@@ -46,7 +53,7 @@ app.style.display="block";
 
 updateCounters();
 
-},800);
+},700);
 
 });
 
@@ -54,7 +61,7 @@ updateCounters();
 
 function showToast(text){
 
-if(!toast)return;
+if(!toast) return;
 
 toast.textContent=text;
 
@@ -70,7 +77,7 @@ toast.style.display="none";
 
 }
 
-/* ---------- Counters ---------- */
+/* ---------- Dashboard ---------- */
 
 function updateCounters(){
 
@@ -78,7 +85,7 @@ if(memoryCount){
 
 memoryCount.textContent=
 
-getMemory().length+" Chats";
+memoryCountValue()+" Chats";
 
 }
 
@@ -86,7 +93,7 @@ if(faqCount){
 
 faqCount.textContent=
 
-loadFAQ().length+" Items";
+faqCount()+" Items";
 
 }
 
@@ -114,41 +121,70 @@ waStatus.textContent=text;
 
 }
 
-console.log("App V6 Part 1 Loaded");
+console.log("App V6 Stable Part 1 Loaded");
 /* ==========================================
-   WhatsApp AI Assistant V6
-   app.js - Part 2
+   WhatsApp AI Assistant
+   Version : V6 Stable
+   App Engine - Part 2
 ========================================== */
+
+/* ---------- Fix Dashboard Counter ---------- */
+
+const faqCounterElement = document.getElementById("faqCount");
+const memoryCounterElement = document.getElementById("memoryCount");
+
+function updateCounters(){
+
+    if(memoryCounterElement){
+
+        memoryCounterElement.textContent =
+        getMemory().length + " Chats";
+
+    }
+
+    if(faqCounterElement){
+
+        faqCounterElement.textContent =
+        loadFAQ().length + " Items";
+
+    }
+
+}
 
 /* ---------- Theme ---------- */
 
-let darkMode = localStorage.getItem("theme")==="dark";
+let darkMode =
+localStorage.getItem("theme")==="dark";
 
 if(darkMode){
 
-document.body.classList.add("dark");
+    document.body.classList.add("dark");
 
 }
 
 themeBtn?.addEventListener("click",()=>{
 
-darkMode=!darkMode;
+    darkMode=!darkMode;
 
-document.body.classList.toggle("dark");
+    document.body.classList.toggle("dark");
 
-localStorage.setItem(
+    localStorage.setItem(
 
-"theme",
+        "theme",
 
-darkMode ? "dark" : "light"
+        darkMode ? "dark":"light"
 
-);
+    );
 
-showToast(
+    showToast(
 
-darkMode ? "Dark Mode" : "Light Mode"
+        darkMode
 
-);
+        ? "Dark Mode Enabled"
+
+        : "Light Mode Enabled"
+
+    );
 
 });
 
@@ -156,7 +192,7 @@ darkMode ? "Dark Mode" : "Light Mode"
 
 menuBtn?.addEventListener("click",()=>{
 
-sidebar?.classList.toggle("show");
+    sidebar?.classList.toggle("show");
 
 });
 
@@ -164,9 +200,7 @@ sidebar?.classList.toggle("show");
 
 searchBtn?.addEventListener("click",()=>{
 
-document.getElementById("messageInput")?.focus();
-
-showToast("Search Ready");
+    document.getElementById("messageInput")?.focus();
 
 });
 
@@ -174,69 +208,68 @@ showToast("Search Ready");
 
 settingsBtn?.addEventListener("click",()=>{
 
-if(typeof showPage==="function"){
+    if(window.showPage){
 
-showPage("settings");
+        window.showPage("settings");
 
-}
-
-});
-
-/* ---------- Start AI ---------- */
-
-const startAI=document.getElementById("start-ai");
-
-startAI?.addEventListener("click",async()=>{
-
-setAIStatus("🟡 Connecting...");
-
-showToast("Connecting Gemini...");
-
-try{
-
-const ok=await testConnection();
-
-if(ok){
-
-setAIStatus("🟢 Gemini Connected");
-
-showToast("Gemini Connected");
-
-}else{
-
-setAIStatus("🔴 Offline");
-
-showToast("Connection Failed");
-
-}
-
-}catch(error){
-
-console.error(error);
-
-setAIStatus("🔴 Error");
-
-showToast("Gemini Error");
-
-}
+    }
 
 });
-
-console.log("App V6 Part 2 Loaded");
-/* ==========================================
-   WhatsApp AI Assistant V6
-   app.js - Part 3
-========================================== */
 
 /* ---------- Floating Button ---------- */
-
-const fab = document.getElementById("fab");
 
 fab?.addEventListener("click",()=>{
 
     document.getElementById("messageInput")?.focus();
 
-    showToast("Ready to Chat");
+    showToast("Ready");
+
+});
+
+console.log("App V6 Stable Part 2 Loaded");
+/* ==========================================
+   WhatsApp AI Assistant
+   Version : V6 Stable
+   App Engine - Part 3
+========================================== */
+
+/* ---------- Start AI ---------- */
+
+const startAI = document.getElementById("start-ai");
+
+startAI?.addEventListener("click", async()=>{
+
+    setAIStatus("🟡 Connecting...");
+
+    showToast("Connecting Gemini...");
+
+    try{
+
+        const ok = await testConnection();
+
+        if(ok){
+
+            setAIStatus("🟢 Connected");
+
+            showToast("Gemini Connected");
+
+        }else{
+
+            setAIStatus("🔴 Failed");
+
+            showToast("Connection Failed");
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+        setAIStatus("🔴 Error");
+
+        showToast("Gemini Error");
+
+    }
 
 });
 
@@ -270,15 +303,41 @@ window.addEventListener("offline",()=>{
 
 });
 
-/* ---------- Keyboard Shortcut ---------- */
+/* ---------- Close Sidebar ---------- */
 
-document.addEventListener("keydown",(e)=>{
+document.addEventListener("click",(e)=>{
 
-    if(e.ctrlKey && e.key.toLowerCase()==="k"){
+    if(window.innerWidth>900){
 
-        e.preventDefault();
+        return;
 
-        document.getElementById("messageInput")?.focus();
+    }
+
+    if(!sidebar){
+
+        return;
+
+    }
+
+    const insideSidebar = sidebar.contains(e.target);
+
+    const menuClicked = e.target.closest("#menuBtn");
+
+    if(!insideSidebar && !menuClicked){
+
+        sidebar.classList.remove("show");
+
+    }
+
+});
+
+/* ---------- Resize ---------- */
+
+window.addEventListener("resize",()=>{
+
+    if(window.innerWidth>900){
+
+        sidebar?.classList.remove("show");
 
     }
 
@@ -291,38 +350,12 @@ window.updateCounters = updateCounters;
 window.setAIStatus = setAIStatus;
 window.setWAStatus = setWAStatus;
 
-/* ---------- Error Handler ---------- */
-
-window.onerror = function(message,source,line,column,error){
-
-    console.error("Application Error:",{
-
-        message,
-
-        source,
-
-        line,
-
-        column,
-
-        error
-
-    });
-
-    return false;
-
-};
-
 /* ---------- Initialize ---------- */
 
-(function(){
+updateCounters();
 
-    updateCounters();
+setAIStatus("⚪ Ready");
 
-    setAIStatus("⚪ Ready");
+setWAStatus("⚪ Waiting");
 
-    setWAStatus("⚪ Waiting");
-
-    console.log("WhatsApp AI Assistant V6 Ready");
-
-})();
+console.log("WhatsApp AI Assistant V6 Stable Ready");
