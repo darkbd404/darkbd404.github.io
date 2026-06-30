@@ -1,169 +1,110 @@
-"use strict";
-
 /* ==========================================
-   WhatsApp AI Assistant V5 (Gemini)
-   app.js - Part 1
+   WhatsApp AI Assistant V5
+   app.js - Part 2
 ========================================== */
 
-/* ---------- Elements ---------- */
+/* ---------- Search ---------- */
 
-const loading = document.getElementById("loading");
-const app = document.getElementById("app");
+searchBtn?.addEventListener("click",()=>{
 
-const sidebar = document.querySelector(".sidebar");
+    const input=document.getElementById("messageInput");
 
-const themeBtn = document.getElementById("themeBtn");
-const settingsBtn = document.getElementById("settingsBtn");
-const searchBtn = document.getElementById("searchBtn");
+    if(input){
 
-const aiStatus = document.getElementById("ai-status");
-const waStatus = document.getElementById("wa-status");
+        input.focus();
 
-const memoryCount = document.getElementById("memoryCount");
-const faqCount = document.getElementById("faqCount");
+    }
 
-const toast = document.getElementById("toast");
-
-/* ---------- Loading ---------- */
-
-window.addEventListener("load",()=>{
-
-setTimeout(()=>{
-
-if(loading){
-
-loading.style.display="none";
-
-}
-
-if(app){
-
-app.style.display="block";
-
-}
-
-initializeApp();
-
-},1000);
+    showToast("Search Ready");
 
 });
 
-/* ---------- Toast ---------- */
+/* ---------- Settings ---------- */
 
-function showToast(message){
+settingsBtn?.addEventListener("click",()=>{
 
-if(!toast) return;
+    if(typeof showPage==="function"){
 
-toast.textContent=message;
+        showPage("settings");
 
-toast.style.display="block";
-
-clearTimeout(window.toastTimer);
-
-window.toastTimer=setTimeout(()=>{
-
-toast.style.display="none";
-
-},2500);
-
-}
-
-/* ---------- Theme ---------- */
-
-let darkMode=
-
-localStorage.getItem("theme")==="dark";
-
-if(darkMode){
-
-document.body.classList.add("dark");
-
-}
-
-themeBtn?.addEventListener("click",()=>{
-
-darkMode=!darkMode;
-
-document.body.classList.toggle("dark");
-
-localStorage.setItem(
-
-"theme",
-
-darkMode?"dark":"light"
-
-);
-
-showToast(
-
-darkMode
-
-?
-
-"Dark Mode"
-
-:
-
-"Light Mode"
-
-);
+    }
 
 });
 
-/* ---------- Status ---------- */
+/* ---------- Floating Button ---------- */
 
-function setAIStatus(text){
+const fab=document.getElementById("fab");
 
-if(aiStatus){
+fab?.addEventListener("click",()=>{
 
-aiStatus.textContent=text;
+    document.getElementById("messageInput")?.focus();
+
+    showToast("Ready to Chat");
+
+});
+
+/* ---------- Start AI ---------- */
+
+const startAI=document.getElementById("start-ai");
+
+startAI?.addEventListener("click",async()=>{
+
+    setAIStatus("🟡 Connecting...");
+
+    showToast("Connecting Gemini...");
+
+    try{
+
+        const ok=await testConnection();
+
+        if(ok){
+
+            setAIStatus("🟢 Gemini Connected");
+
+            showToast("Gemini Connected");
+
+        }else{
+
+            setAIStatus("🔴 Offline");
+
+            showToast("Connection Failed");
+
+        }
+
+    }catch(e){
+
+        console.error(e);
+
+        setAIStatus("🔴 Error");
+
+        showToast("Gemini Error");
+
+    }
+
+});
+
+/* ---------- Restore Theme ---------- */
+
+if(localStorage.getItem("theme")==="dark"){
+
+    document.body.classList.add("dark");
 
 }
 
-}
+/* ---------- Refresh Dashboard ---------- */
 
-function setWAStatus(text){
+function refreshDashboard(){
 
-if(waStatus){
-
-waStatus.textContent=text;
+    updateCounters();
 
 }
 
-}
+/* ---------- Auto Refresh ---------- */
 
-/* ---------- Counter ---------- */
+setInterval(()=>{
 
-function updateCounters(){
+    refreshDashboard();
 
-if(typeof getMemory==="function"){
+},5000);
 
-memoryCount.textContent=
-
-getMemory().length+" Chats";
-
-}
-
-if(typeof loadFAQ==="function"){
-
-faqCount.textContent=
-
-loadFAQ().length+" Items";
-
-}
-
-}
-
-/* ---------- Initialize ---------- */
-
-function initializeApp(){
-
-updateCounters();
-
-setAIStatus("🟢 Gemini Ready");
-
-setWAStatus("⚪ Waiting");
-
-}
-
-console.log("App V5 Part 1 Loaded");
+console.log("App V5 Part 2 Loaded");
