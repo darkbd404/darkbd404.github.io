@@ -1,7 +1,9 @@
 "use strict";
 
 /* ==========================================
-   Gemini API V6
+   WhatsApp AI Assistant
+   Version : V6 Stable
+   Gemini API
 ========================================== */
 
 async function askAI(userMessage){
@@ -48,11 +50,11 @@ async function askAI(userMessage){
 
 systemPrompt +
 
-"\n\nFAQ:\n" +
+"\n\nFAQ\n" +
 
 faq +
 
-"\n\nConversation Memory:\n" +
+"\n\nConversation Memory\n" +
 
 memory +
 
@@ -67,11 +69,8 @@ userMessage +
         const response = await fetch(
 
             APP.API_URL +
-
             model +
-
             ":generateContent?key=" +
-
             apiKey,
 
         {
@@ -142,7 +141,7 @@ userMessage +
 
         if(!reply){
 
-            showToast("No AI Response");
+            showToast("No Response");
 
             return null;
 
@@ -170,26 +169,14 @@ userMessage +
 
 async function testConnection(){
 
-    try{
+    const result = await askAI(
 
-        const result = await askAI(
+        "Reply only with OK"
 
-            "Reply only with OK"
+    );
 
-        );
-
-        return result !== null;
-
-    }
-
-    catch(error){
-
-        console.error(error);
-
-        return false;
-
-    }
+    return result !== null;
 
 }
 
-console.log("Gemini API V6 Loaded");
+console.log("Gemini API V6 Stable Loaded");
