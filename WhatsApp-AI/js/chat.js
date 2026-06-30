@@ -1,10 +1,50 @@
 "use strict";
 
 /* ==========================================
-   Chat Engine V5 (Gemini)
+   WhatsApp AI Assistant
+   Version : V6 Stable
+   Chat Engine
 ========================================== */
 
-const chatHistory = [];
+const chatHistory=[];
+
+const chatContainer=document.getElementById("chatContainer");
+const messageInput=document.getElementById("messageInput");
+const sendBtn=document.getElementById("sendBtn");
+
+/* ---------- Bubble ---------- */
+
+function addMessage(role,text){
+
+    if(!chatContainer) return;
+
+    const row=document.createElement("div");
+
+    row.className=
+
+    role==="user"
+
+    ?"user-message"
+
+    :"ai-message";
+
+    row.innerHTML=`
+
+    <div class="bubble">
+
+    ${text}
+
+    </div>
+
+    `;
+
+    chatContainer.appendChild(row);
+
+    chatContainer.scrollTop=
+
+    chatContainer.scrollHeight;
+
+}
 
 /* ---------- History ---------- */
 
@@ -12,7 +52,7 @@ function addHistory(role,text){
 
     chatHistory.push({
 
-        id:crypto.randomUUID(),
+        id:Date.now(),
 
         role,
 
@@ -24,89 +64,17 @@ function addHistory(role,text){
 
 }
 
-function getChatHistory(){
-
-    return chatHistory;
-
-}
-
 function clearChatHistory(){
 
-    chatHistory.length = 0;
+    chatHistory.length=0;
+
+    if(chatContainer){
+
+        chatContainer.innerHTML="";
+
+    }
 
 }
-
-/* ---------- Chat ---------- */
-
-async function processChat(message){
-
-    if(!message){
-
-        return null;
-
-    }
-
-    message = message.trim();
-
-    if(message===""){
-
-        return null;
-
-    }
-
-    addHistory("user",message);
-
-    /* ==========================
-       FAQ First
-    ========================== */
-
-    const faqReply = searchFAQ(message);
-
-    if(faqReply){
-
-        addHistory("assistant",faqReply);
-
-        addMemory(message,faqReply);
-
-        return faqReply;
-
-    }
-
-    /* ==========================
-       Gemini
-    ========================== */
-
-    let aiReply = null;
-
-    try{
-
-        aiReply = await askAI(message);
-
-    }
-
-    catch(error){
-
-        console.error(error);
-
-        return "❌ Gemini API Error.";
-
-    }
-
-    if(aiReply){
-
-        addHistory("assistant",aiReply);
-
-        addMemory(message,aiReply);
-
-        return aiReply;
-
-    }
-
-    return "⚠️ No response received.";
-
-}
-
-/* ---------- Export ---------- */
 
 function exportChat(){
 
@@ -122,42 +90,130 @@ function exportChat(){
 
 }
 
-/* ---------- Import ---------- */
+/* ---------- Send ---------- */
 
-function importChat(json){
+async function sendMessage(){
 
-    try{
+    const message=
 
-        const data = JSON.parse(json);
+    messageInput.value.trim();
 
-        if(Array.isArray(data)){
+    if(!message){
 
-            chatHistory.length = 0;
-
-            chatHistory.push(...data);
-
-            return true;
-
-        }
+        return;
 
     }
 
-    catch(error){
+    addMessage(
 
-        console.error(error);
+        "user",
+
+        message
+
+    );
+
+    addHistory(
+
+        "user",
+
+        message
+
+    );
+
+    messageInput.value="";
+
+    addMessage(
+
+        "assistant",
+
+        "⏳ Thinking..."
+
+    );
+
+    const thinking=
+
+    chatContainer.lastElementChild;
+
+    let reply=
+
+    searchFAQ(message);
+
+    if(!reply){
+
+        reply=
+
+        await askAI(message);
 
     }
 
-    return false;
+    if(!reply){
+
+        reply=
+
+        "❌ No response.";
+
+    }
+
+    thinking.remove();
+
+    addMessage(
+
+        "assistant",
+
+        reply
+
+    );
+
+    addHistory(
+
+        "assistant",
+
+        reply
+
+    );
+
+    addMemory(
+
+        message,
+
+        reply
+
+    );
+
+    updateCounters();
 
 }
 
-/* ---------- Count ---------- */
+/* ---------- Events ---------- */
 
-function chatCount(){
+sendBtn?.addEventListener(
 
-    return chatHistory.length;
+"click",
+
+sendMessage
+
+);
+
+messageInput?.addEventListener(
+
+"keydown",
+
+e=>{
+
+if(e.key==="Enter"){
+
+e.preventDefault();
+
+sendMessage();
 
 }
 
-console.log("Chat Engine V5 Loaded");
+}
+
+);
+
+console.log(
+
+"Chat Engine V6 Stable Loaded"
+
+);
