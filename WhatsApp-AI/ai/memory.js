@@ -1,10 +1,12 @@
 "use strict";
 
 /* ==========================================
-   Memory Engine V5 (Gemini)
+   WhatsApp AI Assistant
+   Version : V6 Stable
+   Memory Engine
 ========================================== */
 
-const MEMORY_KEY = "gemini_memory_v5";
+const MEMORY_KEY = "wa_ai_memory_v6";
 
 /* ---------- Load ---------- */
 
@@ -14,13 +16,7 @@ function getMemory(){
 
         const data = localStorage.getItem(MEMORY_KEY);
 
-        if(!data){
-
-            return [];
-
-        }
-
-        return JSON.parse(data);
+        return data ? JSON.parse(data) : [];
 
     }
 
@@ -78,7 +74,7 @@ function addMemory(user,assistant){
 
     memory.push({
 
-        id:crypto.randomUUID(),
+        id:Date.now(),
 
         time:new Date().toLocaleString(),
 
@@ -88,7 +84,13 @@ function addMemory(user,assistant){
 
     });
 
-    while(memory.length > APP.MEMORY_LIMIT){
+    while(
+
+        memory.length >
+
+        APP.MEMORY_LIMIT
+
+    ){
 
         memory.shift();
 
@@ -96,21 +98,19 @@ function addMemory(user,assistant){
 
     saveMemory(memory);
 
-    if(typeof updateCounters==="function"){
-
-        updateCounters();
-
-    }
-
 }
 
 /* ---------- Delete ---------- */
 
 function deleteMemory(id){
 
-    const memory = getMemory()
+    const memory =
 
-    .filter(item=>item.id!==id);
+    getMemory().filter(
+
+        item=>item.id!==id
+
+    );
 
     saveMemory(memory);
 
@@ -126,28 +126,24 @@ function clearMemory(){
 
     );
 
-    if(typeof updateCounters==="function"){
-
-        updateCounters();
-
-    }
-
 }
 
 /* ---------- Prompt ---------- */
 
 function memoryToPrompt(limit=10){
 
-    const memory =
+    return getMemory()
 
-    getMemory().slice(-limit);
+    .slice(-limit)
 
-    return memory.map(item=>
+    .map(item=>
 
 `User: ${item.user}
 Assistant: ${item.assistant}`
 
-    ).join("\n\n");
+    )
+
+    .join("\n\n");
 
 }
 
@@ -183,12 +179,6 @@ function importMemory(json){
 
         saveMemory(data);
 
-        if(typeof updateCounters==="function"){
-
-            updateCounters();
-
-        }
-
         return true;
 
     }
@@ -205,10 +195,10 @@ function importMemory(json){
 
 /* ---------- Count ---------- */
 
-function memoryCountValue(){
+function memoryCount(){
 
     return getMemory().length;
 
 }
 
-console.log("Memory Engine V5 Loaded");
+console.log("Memory Engine V6 Stable Loaded");
