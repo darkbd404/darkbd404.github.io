@@ -1,7 +1,7 @@
 "use strict";
 
 /* ==========================================
-   Gemini API V5
+   Gemini API V6
 ========================================== */
 
 async function askAI(userMessage){
@@ -20,17 +20,27 @@ async function askAI(userMessage){
         localStorage.getItem("model") ||
         APP.MODEL;
 
+    const temperature =
+        parseFloat(
+            localStorage.getItem("temperature") || "0.7"
+        );
+
+    const maxTokens =
+        parseInt(
+            localStorage.getItem("maxTokens") || "1024"
+        );
+
     const systemPrompt =
         localStorage.getItem("systemPrompt") ||
         "You are a professional WhatsApp AI Assistant.";
 
     const memory =
-        typeof memoryToPrompt === "function"
+        typeof memoryToPrompt==="function"
         ? memoryToPrompt(10)
         : "";
 
     const faq =
-        typeof faqToPrompt === "function"
+        typeof faqToPrompt==="function"
         ? faqToPrompt()
         : "";
 
@@ -48,7 +58,9 @@ memory +
 
 "\n\nUser:\n" +
 
-userMessage;
+userMessage +
+
+"\n\nAssistant:";
 
     try{
 
@@ -90,7 +102,15 @@ userMessage;
 
                     }
 
-                ]
+                ],
+
+                generationConfig:{
+
+                    temperature:temperature,
+
+                    maxOutputTokens:maxTokens
+
+                }
 
             })
 
@@ -106,7 +126,7 @@ userMessage;
 
                 json.error?.message ||
 
-                "Gemini Error"
+                "Gemini API Error"
 
             );
 
@@ -116,12 +136,8 @@ userMessage;
 
         const reply =
 
-        json.candidates?.[0]
-
-        ?.content
-
-        ?.parts?.[0]
-
+        json?.candidates?.[0]
+        ?.content?.parts?.[0]
         ?.text;
 
         if(!reply){
@@ -132,19 +148,7 @@ userMessage;
 
         }
 
-        if(typeof addMemory==="function"){
-
-            addMemory(
-
-                userMessage,
-
-                reply
-
-            );
-
-        }
-
-        return reply;
+        return reply.trim();
 
     }
 
@@ -161,19 +165,31 @@ userMessage;
 }
 
 /* ==========================================
-   Connection Test
+   Test Connection
 ========================================== */
 
 async function testConnection(){
 
-    const reply = await askAI(
+    try{
 
-        "Reply only with OK"
+        const result = await askAI(
 
-    );
+            "Reply only with OK"
 
-    return !!reply;
+        );
+
+        return result !== null;
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        return false;
+
+    }
 
 }
 
-console.log("Gemini API Loaded");
+console.log("Gemini API V6 Loaded");
