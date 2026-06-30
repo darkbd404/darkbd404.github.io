@@ -1,10 +1,10 @@
 "use strict";
 
 /* ==========================================
-   FAQ Engine V3
+   FAQ Engine V5 (Gemini)
 ========================================== */
 
-const FAQ_KEY = "ai_faq_v3";
+const FAQ_KEY = "gemini_faq_v5";
 
 /* ---------- Load ---------- */
 
@@ -12,15 +12,21 @@ function loadFAQ(){
 
     try{
 
-        return JSON.parse(
+        const data = localStorage.getItem(FAQ_KEY);
 
-            localStorage.getItem(FAQ_KEY)
+        if(!data){
 
-        ) || [];
+            return [];
+
+        }
+
+        return JSON.parse(data);
 
     }
 
-    catch(e){
+    catch(error){
+
+        console.error(error);
 
         return [];
 
@@ -46,21 +52,21 @@ function saveFAQ(faq){
 
 function addFAQ(question,answer){
 
+    question = question.trim();
+
+    answer = answer.trim();
+
     if(!question || !answer){
 
         return false;
 
     }
 
-    const faq=loadFAQ();
+    const faq = loadFAQ();
 
-    const exists=faq.find(item=>
+    const exists = faq.find(item=>
 
-        item.question.toLowerCase()
-
-        ===
-
-        question.toLowerCase()
+        item.question.toLowerCase()===question.toLowerCase()
 
     );
 
@@ -72,15 +78,23 @@ function addFAQ(question,answer){
 
     faq.push({
 
-        id:Date.now(),
+        id:crypto.randomUUID(),
 
-        question:question,
+        question,
 
-        answer:answer
+        answer,
+
+        created:new Date().toLocaleString()
 
     });
 
     saveFAQ(faq);
+
+    if(typeof updateCounters==="function"){
+
+        updateCounters();
+
+    }
 
     return true;
 
@@ -90,15 +104,17 @@ function addFAQ(question,answer){
 
 function deleteFAQ(id){
 
-    const faq=
+    const faq = loadFAQ()
 
-    loadFAQ().filter(
-
-        item=>item.id!==id
-
-    );
+    .filter(item=>item.id!==id);
 
     saveFAQ(faq);
+
+    if(typeof updateCounters==="function"){
+
+        updateCounters();
+
+    }
 
 }
 
@@ -106,11 +122,13 @@ function deleteFAQ(id){
 
 function clearFAQ(){
 
-    localStorage.removeItem(
+    localStorage.removeItem(FAQ_KEY);
 
-        FAQ_KEY
+    if(typeof updateCounters==="function"){
 
-    );
+        updateCounters();
+
+    }
 
 }
 
@@ -124,21 +142,15 @@ function searchFAQ(message){
 
     }
 
-    const text=
+    const text = message.toLowerCase();
 
-    message.toLowerCase();
-
-    const faq=loadFAQ();
+    const faq = loadFAQ();
 
     for(const item of faq){
 
         if(
 
-            text.includes(
-
-                item.question.toLowerCase()
-
-            )
+            text.includes(item.question.toLowerCase())
 
         ){
 
@@ -156,27 +168,16 @@ function searchFAQ(message){
 
 function faqToPrompt(){
 
-    const faq=loadFAQ();
+    return loadFAQ()
 
-    let prompt="";
+    .map(item=>
 
-    faq.forEach(item=>{
+`Question: ${item.question}
+Answer: ${item.answer}`
 
-        prompt +=
+    )
 
-        "Q: "+
-
-        item.question+
-
-        "\nA: "+
-
-        item.answer+
-
-        "\n\n";
-
-    });
-
-    return prompt;
+    .join("\n\n");
 
 }
 
@@ -202,28 +203,42 @@ function importFAQ(json){
 
     try{
 
-        const data=
+        const data = JSON.parse(json);
 
-        JSON.parse(json);
+        if(!Array.isArray(data)){
 
-        if(Array.isArray(data)){
-
-            saveFAQ(data);
-
-            return true;
+            return false;
 
         }
 
+        saveFAQ(data);
+
+        if(typeof updateCounters==="function"){
+
+            updateCounters();
+
+        }
+
+        return true;
+
     }
 
-    catch(e){
+    catch(error){
 
-        console.error(e);
+        console.error(error);
+
+        return false;
 
     }
-
-    return false;
 
 }
 
-console.log("FAQ Engine V3 Loaded");
+/* ---------- Count ---------- */
+
+function faqCountValue(){
+
+    return loadFAQ().length;
+
+}
+
+console.log("FAQ Engine V5 Loaded");
