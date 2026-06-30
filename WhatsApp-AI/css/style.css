@@ -1300,3 +1300,36 @@ line-height:1.6;
 margin-bottom:15px;
 
 }
+/* ==========================================
+   Mobile Sidebar
+========================================== */
+
+@media(max-width:900px){
+
+#sidebar{
+
+position:fixed;
+
+left:-320px;
+
+top:74px;
+
+height:calc(100vh - 74px);
+
+width:280px;
+
+display:flex;
+
+z-index:999;
+
+transition:.35s;
+
+}
+
+#sidebar.show{
+
+left:0;
+
+}
+
+}
