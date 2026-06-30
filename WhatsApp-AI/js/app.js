@@ -1,26 +1,20 @@
 "use strict";
 
 /* ==========================================
-   WhatsApp AI Assistant V4
+   WhatsApp AI Assistant V5 (Gemini)
+   app.js - Part 1
 ========================================== */
 
-/* ==========================
-   DOM Elements
-========================== */
+/* ---------- Elements ---------- */
 
 const loading = document.getElementById("loading");
 const app = document.getElementById("app");
 
-const sidebar = document.getElementById("sidebar");
+const sidebar = document.querySelector(".sidebar");
 
-const menuBtn = document.getElementById("menuBtn");
 const themeBtn = document.getElementById("themeBtn");
-const searchBtn = document.getElementById("searchBtn");
 const settingsBtn = document.getElementById("settingsBtn");
-
-const sendBtn = document.getElementById("sendBtn");
-const messageInput = document.getElementById("messageInput");
-const chatContainer = document.getElementById("chatContainer");
+const searchBtn = document.getElementById("searchBtn");
 
 const aiStatus = document.getElementById("ai-status");
 const waStatus = document.getElementById("wa-status");
@@ -30,9 +24,7 @@ const faqCount = document.getElementById("faqCount");
 
 const toast = document.getElementById("toast");
 
-/* ==========================
-   Loading
-========================== */
+/* ---------- Loading ---------- */
 
 window.addEventListener("load",()=>{
 
@@ -50,15 +42,13 @@ app.style.display="block";
 
 }
 
-initApp();
+initializeApp();
 
-},1200);
+},1000);
 
 });
 
-/* ==========================
-   Toast
-========================== */
+/* ---------- Toast ---------- */
 
 function showToast(message){
 
@@ -78,13 +68,11 @@ toast.style.display="none";
 
 }
 
-/* ==========================
-   Theme
-========================== */
+/* ---------- Theme ---------- */
 
 let darkMode=
 
-localStorage.getItem("theme")==="true";
+localStorage.getItem("theme")==="dark";
 
 if(darkMode){
 
@@ -96,13 +84,13 @@ themeBtn?.addEventListener("click",()=>{
 
 darkMode=!darkMode;
 
-document.body.classList.toggle("dark",darkMode);
+document.body.classList.toggle("dark");
 
 localStorage.setItem(
 
 "theme",
 
-darkMode
+darkMode?"dark":"light"
 
 );
 
@@ -122,51 +110,7 @@ darkMode
 
 });
 
-/* ==========================
-   Sidebar
-========================== */
-
-let sidebarOpen=true;
-
-menuBtn?.addEventListener("click",()=>{
-
-sidebarOpen=!sidebarOpen;
-
-if(window.innerWidth<=900){
-
-sidebar.style.display=
-
-sidebarOpen
-
-?
-
-"block"
-
-:
-
-"none";
-
-}else{
-
-sidebar.style.width=
-
-sidebarOpen
-
-?
-
-"260px"
-
-:
-
-"85px";
-
-}
-
-});
-
-/* ==========================
-   Status
-========================== */
+/* ---------- Status ---------- */
 
 function setAIStatus(text){
 
@@ -188,13 +132,11 @@ waStatus.textContent=text;
 
 }
 
-/* ==========================
-   Counters
-========================== */
+/* ---------- Counter ---------- */
 
 function updateCounters(){
 
-if(memoryCount){
+if(typeof getMemory==="function"){
 
 memoryCount.textContent=
 
@@ -202,7 +144,7 @@ getMemory().length+" Chats";
 
 }
 
-if(faqCount){
+if(typeof loadFAQ==="function"){
 
 faqCount.textContent=
 
@@ -212,308 +154,16 @@ loadFAQ().length+" Items";
 
 }
 
-console.log("App Part 1 Loaded");
-/* ==========================================
-   Chat Engine
-========================================== */
+/* ---------- Initialize ---------- */
 
-function addMessage(text, sender = "ai") {
+function initializeApp(){
 
-    if (!chatContainer) return;
+updateCounters();
 
-    const wrapper = document.createElement("div");
+setAIStatus("🟢 Gemini Ready");
 
-    wrapper.className =
-        sender === "user"
-        ? "user-message"
-        : "ai-message";
-
-    const bubble = document.createElement("div");
-
-    bubble.className = "bubble";
-
-    bubble.textContent = text;
-
-    wrapper.appendChild(bubble);
-
-    chatContainer.appendChild(wrapper);
-
-    chatContainer.scrollTop =
-        chatContainer.scrollHeight;
+setWAStatus("⚪ Waiting");
 
 }
 
-/* ==========================================
-   Send Message
-========================================== */
-
-async function sendMessage() {
-
-    if (!messageInput) return;
-
-    const message = messageInput.value.trim();
-
-    if (!message) {
-
-        showToast("Type a message");
-
-        return;
-
-    }
-
-    addMessage(message, "user");
-
-    messageInput.value = "";
-
-    showToast("Thinking...");
-
-    try {
-
-        const reply = await processChat(message);
-
-        if (reply) {
-
-            addMessage(reply, "ai");
-
-            setAIStatus("🟢 Online");
-
-        } else {
-
-            addMessage("No response received.", "ai");
-
-        }
-
-    } catch (err) {
-
-        console.error(err);
-
-        addMessage("AI connection failed.", "ai");
-
-        setAIStatus("🔴 Offline");
-
-    }
-
-    updateCounters();
-
-}
-
-/* ==========================================
-   Chat Events
-========================================== */
-
-sendBtn?.addEventListener("click", sendMessage);
-
-messageInput?.addEventListener("keydown", e => {
-
-    if (e.key === "Enter") {
-
-        e.preventDefault();
-
-        sendMessage();
-
-    }
-
-});
-
-/* ==========================================
-   Chat History
-========================================== */
-
-function restoreMemory() {
-
-    const history = getMemory();
-
-    if (!history.length) return;
-
-    history.forEach(item => {
-
-        addMessage(item.user, "user");
-
-        addMessage(item.assistant, "ai");
-
-    });
-
-}
-
-console.log("App Part 2 Loaded");
-/* ==========================================
-   Initialize
-========================================== */
-
-function initApp(){
-
-    updateCounters();
-
-    restoreMemory();
-
-    setAIStatus("⚪ Idle");
-
-    setWAStatus("⚪ Waiting");
-
-}
-
-/* ==========================================
-   Search Button
-========================================== */
-
-searchBtn?.addEventListener("click",()=>{
-
-    showToast("Search feature coming soon");
-
-});
-
-/* ==========================================
-   Settings Button
-========================================== */
-
-settingsBtn?.addEventListener("click",()=>{
-
-    if(typeof showPage==="function"){
-
-        showPage("settings");
-
-    }
-
-});
-
-/* ==========================================
-   Start AI
-========================================== */
-
-const startBtn=document.getElementById("start-ai");
-
-startBtn?.addEventListener("click",async()=>{
-
-    showToast("Starting AI...");
-
-    try{
-
-        const reply=await askAI("Reply only: OK");
-
-        if(reply){
-
-            setAIStatus("🟢 Online");
-
-            setWAStatus("🟢 Ready");
-
-            showToast("AI Ready");
-
-        }else{
-
-            setAIStatus("🔴 Offline");
-
-        }
-
-    }catch(e){
-
-        console.error(e);
-
-        setAIStatus("🔴 Offline");
-
-        showToast("Connection Failed");
-
-    }
-
-});
-
-/* ==========================================
-   Floating Button
-========================================== */
-
-const fab=document.getElementById("fab");
-
-fab?.addEventListener("click",()=>{
-
-    messageInput?.focus();
-
-    showToast("Ready to chat");
-
-});
-
-console.log("App Part 3 Loaded");
-/* ==========================================
-   Window Resize
-========================================== */
-
-window.addEventListener("resize",()=>{
-
-    if(window.innerWidth>900){
-
-        if(sidebar){
-
-            sidebar.style.display="block";
-            sidebar.style.width="260px";
-
-        }
-
-    }
-
-});
-
-/* ==========================================
-   Dashboard Refresh
-========================================== */
-
-function refreshDashboard(){
-
-    updateCounters();
-
-    if(typeof refreshAIPage==="function"){
-
-        refreshAIPage();
-
-    }
-
-    if(typeof refreshWhatsAppPage==="function"){
-
-        refreshWhatsAppPage();
-
-    }
-
-}
-
-/* ==========================================
-   Global Refresh
-========================================== */
-
-window.addEventListener("focus",()=>{
-
-    refreshDashboard();
-
-});
-
-/* ==========================================
-   Auto Refresh
-========================================== */
-
-setInterval(()=>{
-
-    refreshDashboard();
-
-},3000);
-
-/* ==========================================
-   Safe Functions
-========================================== */
-
-window.showToast=showToast;
-window.setAIStatus=setAIStatus;
-window.setWAStatus=setWAStatus;
-window.updateCounters=updateCounters;
-window.addMessage=addMessage;
-
-/* ==========================================
-   Error Handler
-========================================== */
-
-window.addEventListener("error",(event)=>{
-
-    console.error("App Error:",event.error);
-
-});
-
-/* ==========================================
-   Finish
-========================================== */
-
-console.log("WhatsApp AI Assistant V4 Ready");
+console.log("App V5 Part 1 Loaded");
