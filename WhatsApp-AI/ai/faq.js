@@ -1,10 +1,12 @@
 "use strict";
 
 /* ==========================================
-   FAQ Engine V5 (Gemini)
+   WhatsApp AI Assistant
+   Version : V6 Stable
+   FAQ Engine
 ========================================== */
 
-const FAQ_KEY = "gemini_faq_v5";
+const FAQ_KEY = "wa_ai_faq_v6";
 
 /* ---------- Load ---------- */
 
@@ -14,13 +16,7 @@ function loadFAQ(){
 
         const data = localStorage.getItem(FAQ_KEY);
 
-        if(!data){
-
-            return [];
-
-        }
-
-        return JSON.parse(data);
+        return data ? JSON.parse(data) : [];
 
     }
 
@@ -66,7 +62,9 @@ function addFAQ(question,answer){
 
     const exists = faq.find(item=>
 
-        item.question.toLowerCase()===question.toLowerCase()
+        item.question.toLowerCase()===
+
+        question.toLowerCase()
 
     );
 
@@ -78,7 +76,7 @@ function addFAQ(question,answer){
 
     faq.push({
 
-        id:crypto.randomUUID(),
+        id:Date.now(),
 
         question,
 
@@ -90,12 +88,6 @@ function addFAQ(question,answer){
 
     saveFAQ(faq);
 
-    if(typeof updateCounters==="function"){
-
-        updateCounters();
-
-    }
-
     return true;
 
 }
@@ -104,17 +96,15 @@ function addFAQ(question,answer){
 
 function deleteFAQ(id){
 
-    const faq = loadFAQ()
+    saveFAQ(
 
-    .filter(item=>item.id!==id);
+        loadFAQ().filter(
 
-    saveFAQ(faq);
+            item=>item.id!==id
 
-    if(typeof updateCounters==="function"){
+        )
 
-        updateCounters();
-
-    }
+    );
 
 }
 
@@ -122,13 +112,11 @@ function deleteFAQ(id){
 
 function clearFAQ(){
 
-    localStorage.removeItem(FAQ_KEY);
+    localStorage.removeItem(
 
-    if(typeof updateCounters==="function"){
+        FAQ_KEY
 
-        updateCounters();
-
-    }
+    );
 
 }
 
@@ -150,7 +138,11 @@ function searchFAQ(message){
 
         if(
 
-            text.includes(item.question.toLowerCase())
+            text.includes(
+
+                item.question.toLowerCase()
+
+            )
 
         ){
 
@@ -213,12 +205,6 @@ function importFAQ(json){
 
         saveFAQ(data);
 
-        if(typeof updateCounters==="function"){
-
-            updateCounters();
-
-        }
-
         return true;
 
     }
@@ -235,10 +221,10 @@ function importFAQ(json){
 
 /* ---------- Count ---------- */
 
-function faqCountValue(){
+function faqCount(){
 
     return loadFAQ().length;
 
 }
 
-console.log("FAQ Engine V5 Loaded");
+console.log("FAQ Engine V6 Stable Loaded");
