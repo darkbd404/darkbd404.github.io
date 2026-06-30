@@ -1,34 +1,35 @@
 "use strict";
 
 /* ==========================================
-   WhatsApp AI Assistant V5
-   Gemini Configuration
+   WhatsApp AI Assistant
+   Version : V6 Stable
+   Powered by Google Gemini
 ========================================== */
 
 const APP = {
 
-    NAME: "WhatsApp AI Assistant",
+    NAME : "WhatsApp AI Assistant",
 
-    VERSION: "5.0.0",
+    VERSION : "6.0.0",
 
-    PROVIDER: "Google Gemini",
+    PROVIDER : "Google Gemini",
 
-    MODEL: "gemini-2.5-flash",
+    MODEL : "gemini-2.5-flash",
 
-    API_URL:
+    API_URL :
     "https://generativelanguage.googleapis.com/v1beta/models/",
 
-    LANGUAGE: "en",
+    LANGUAGE : "en",
 
-    THEME: "light",
+    THEME : "light",
 
-    MEMORY_LIMIT: 100,
+    MEMORY_LIMIT : 100,
 
-    FAQ_LIMIT: 500,
+    FAQ_LIMIT : 500,
 
-    AUTO_REPLY: false,
+    AUTO_REPLY : false,
 
-    DEBUG: true
+    DEBUG : true
 
 };
 
@@ -38,53 +39,53 @@ const APP = {
 
 const Storage = {
 
-save(key,value){
+    save(key,value){
 
-localStorage.setItem(
+        localStorage.setItem(
+            key,
+            JSON.stringify(value)
+        );
 
-key,
+    },
 
-JSON.stringify(value)
+    get(key,defaultValue=null){
 
-);
+        try{
 
-},
+            const data=
+            localStorage.getItem(key);
 
-get(key,defaultValue=null){
+            if(!data){
 
-try{
+                return defaultValue;
 
-const data=
+            }
 
-localStorage.getItem(key);
+            return JSON.parse(data);
 
-if(!data){
+        }
 
-return defaultValue;
+        catch(error){
 
-}
+            console.error(error);
 
-return JSON.parse(data);
+            return defaultValue;
 
-}catch(e){
+        }
 
-return defaultValue;
+    },
 
-}
+    remove(key){
 
-},
+        localStorage.removeItem(key);
 
-remove(key){
+    },
 
-localStorage.removeItem(key);
+    clear(){
 
-},
+        localStorage.clear();
 
-clear(){
-
-localStorage.clear();
-
-}
+    }
 
 };
 
@@ -94,58 +95,40 @@ localStorage.clear();
 
 const Settings={
 
-load(){
+    load(){
 
-APP.THEME=
+        APP.THEME=
 
-Storage.get(
+        Storage.get(
+            "theme",
+            "light"
+        );
 
-"theme",
+        APP.AUTO_REPLY=
 
-"light"
+        Storage.get(
+            "autoReply",
+            false
+        );
 
-);
+    },
 
-APP.AUTO_REPLY=
+    save(){
 
-Storage.get(
+        Storage.save(
+            "theme",
+            APP.THEME
+        );
 
-"autoReply",
+        Storage.save(
+            "autoReply",
+            APP.AUTO_REPLY
+        );
 
-false
-
-);
-
-},
-
-save(){
-
-Storage.save(
-
-"theme",
-
-APP.THEME
-
-);
-
-Storage.save(
-
-"autoReply",
-
-APP.AUTO_REPLY
-
-);
-
-}
+    }
 
 };
 
 Settings.load();
 
-console.log(
-
-APP.NAME+
-
-" Gemini Config Loaded"
-
-);
+console.log(APP.NAME+" V6 Stable Config Loaded");
