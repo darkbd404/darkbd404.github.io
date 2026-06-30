@@ -1,39 +1,39 @@
 "use strict";
 
 /* ==========================================
-   WhatsApp AI Assistant V3
-   Global Configuration
+   WhatsApp AI Assistant V5
+   Gemini Configuration
 ========================================== */
 
 const APP = {
 
-    NAME : "WhatsApp AI Assistant",
+    NAME: "WhatsApp AI Assistant",
 
-    VERSION : "3.0.0",
+    VERSION: "5.0.0",
 
-    PROVIDER : "OpenRouter",
+    PROVIDER: "Google Gemini",
 
-    MODEL : "google/gemini-2.5-flash",
+    MODEL: "gemini-2.5-flash",
 
-    API_URL :
-    "https://openrouter.ai/api/v1/chat/completions",
+    API_URL:
+    "https://generativelanguage.googleapis.com/v1beta/models/",
 
-    LANGUAGE : "en",
+    LANGUAGE: "en",
 
-    THEME : "light",
+    THEME: "light",
 
-    MEMORY_LIMIT : 100,
+    MEMORY_LIMIT: 100,
 
-    FAQ_LIMIT : 500,
+    FAQ_LIMIT: 500,
 
-    AUTO_REPLY : false,
+    AUTO_REPLY: false,
 
-    DEBUG : true
+    DEBUG: true
 
 };
 
 /* ==========================================
-   Storage
+   Local Storage
 ========================================== */
 
 const Storage = {
@@ -66,9 +66,7 @@ return defaultValue;
 
 return JSON.parse(data);
 
-}
-
-catch(e){
+}catch(e){
 
 return defaultValue;
 
@@ -91,10 +89,10 @@ localStorage.clear();
 };
 
 /* ==========================================
-   App Settings
+   Settings
 ========================================== */
 
-const Settings = {
+const Settings={
 
 load(){
 
@@ -148,6 +146,6 @@ console.log(
 
 APP.NAME+
 
-" Config Loaded"
+" Gemini Config Loaded"
 
 );
