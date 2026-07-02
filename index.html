@@ -1,88 +1,106 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PDF Voter Search</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<style>
-body{font-family:sans-serif;background:#eef2f6;padding:15px}
-.card{max-width:700px;margin:auto;background:#fff;padding:20px;border-radius:16px}
-input,select,button{width:100%;padding:12px;margin:8px 0}
-button{background:#006b52;color:#fff;border:0}
-#loader{display:none}
-canvas{width:100%;margin-top:15px;border:1px solid #ccc}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salam Voter Receipt</title>
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU2FsYW0gVm90ZXIgQXBwIiwic2hvcnRfbmFtZSI6IlZvdGVyQXBwIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJ0aGVtZV9jb2xvciI6IiMyYzNlNTAiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9wbGFjZWhvbGQuY28vMTkyIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
+    <style>
+        :root { --primary: #2c3e50; --accent: #e74c3c; --bg: #f4f4f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #34495e; }
+        
+        /* Receipt Design */
+        #receiptArea { display: none; margin-top: 30px; border: 2px dashed #ccc; padding: 20px; background: #fffdf0; position: relative; }
+        .stamp { position: absolute; top: 10px; right: 10px; border: 3px double var(--accent); color: var(--accent); padding: 5px 10px; font-weight: bold; transform: rotate(-15deg); opacity: 0.8; }
+        .signature { font-family: 'Brush Script MT', cursive; font-size: 24px; color: #000; margin-top: 20px; text-align: right; }
+        .contact-info { font-size: 12px; text-align: center; margin-top: 15px; color: #777; border-top: 1px solid #eee; padding-top: 10px; }
+    </style>
 </head>
 <body>
-<div class="card">
-<h2>ভোটার অনুসন্ধান</h2>
 
-<input id="name" placeholder="ভোটার নাম">
-<input id="father" placeholder="পিতার নাম">
-<input id="mother" placeholder="মাতার নাম">
-<input id="dob" placeholder="জন্ম তারিখ">
+<div class="container">
+    <h2>🗳️ ভোটার রিসিট জেনারেটর</h2>
+    
+    <div class="form-group">
+        <label>ইউনিয়ন নির্বাচন করুন:</label>
+        <select id="unionSelect">
+            <option value="South Lagansar">South Lagansar</option>
+            <option value="North Lagansar">North Lagansar</option>
+            <option value="East Lagansar">East Lagansar</option>
+        </select>
+    </div>
 
-<select id="area">
-<option value="ফলকামুড়ী">ফলকামুড়ী</option>
-</select>
+    <div class="form-group">
+        <label>লিংগ:</label>
+        <select id="genderSelect">
+            <option value="Male">পুরুষ</option>
+            <option value="Female">মহিলা</option>
+        </select>
+    </div>
 
-<select id="gender">
-<option value="male">পুরুষ</option>
-<option value="female">মহিলা</option>
-</select>
+    <div class="form-group">
+        <label>ভোটারের নাম:</label>
+        <input type="text" id="voterName" placeholder="নাম লিখুন">
+    </div>
 
-<button onclick="searchVoter()">অনুসন্ধান করুন</button>
-<div id="loader">লোড হচ্ছে...</div>
-<div id="result"></div>
+    <button onclick="generateReceipt()">রিসিট তৈরি করুন</button>
+
+    <div id="receiptArea">
+        <div class="stamp">PAID</div>
+        <h3 style="text-align:center; border-bottom: 2px solid #333; padding-bottom:10px;">অফিশিয়াল রিসিট</h3>
+        <p><strong>ইউনিয়ন:</strong> <span id="rUnion"></span></p>
+        <p><strong>নাম:</strong> <span id="rName"></span></p>
+        <p><strong>তারিখ:</strong> <span id="rDate"></span></p>
+        <div class="signature">Salam</div>
+        <div class="contact-info">
+            📞 017XXXXXXXX | ✉️ salam@example.com
+        </div>
+        <!-- QR Code Placeholder -->
+        <div style="text-align:center; margin-top:10px;">
+            <img id="qrCode" src="" alt="QR" style="width:100px;">
+        </div>
+    </div>
 </div>
 
 <script>
-const PDF_FILES={
-"ফলকামুড়ী":{
-male:"pdf/falkamuri_male.pdf",
-female:"pdf/falkamuri_female.pdf"
-}
-};
+    // Service Worker Registration for PWA
+    if ('serviceWorker' in navigator) {
+        const swCode = `
+            self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+            self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+            self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+        `;
+        const blob = new Blob([swCode], {type: 'application/javascript'});
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl);
+    }
 
-async function searchVoter(){
-const area=document.getElementById("area").value;
-const gender=document.getElementById("gender").value;
-const name=document.getElementById("name").value.trim();
+    function generateReceipt() {
+        const union = document.getElementById('unionSelect').value;
+        const name = document.getElementById('voterName').value;
+        
+        if(!name) return alert("দয়া করে নাম লিখুন!");
 
-document.getElementById("loader").style.display="block";
-document.getElementById("result").innerHTML="";
+        document.getElementById('rUnion').innerText = union;
+        document.getElementById('rName').innerText = name;
+        document.getElementById('rDate').innerText = new Date().toLocaleDateString();
+        
+        // Simple QR Code Generation (Using API for free)
+        const jsonData = JSON.stringify({union, name, date: new Date().toISOString()});
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(jsonData)}`;
+        document.getElementById('qrCode').src = qrUrl;
 
-try{
-const pdf=await pdfjsLib.getDocument(PDF_FILES[area][gender]).promise;
-
-for(let p=1;p<=pdf.numPages;p++){
- const page=await pdf.getPage(p);
- const txt=await page.getTextContent();
- const pageText=txt.items.map(x=>x.str).join(" ");
-
- if(!name || pageText.includes(name)){
-   const viewport=page.getViewport({scale:2});
-   const canvas=document.createElement("canvas");
-   canvas.width=viewport.width;
-   canvas.height=viewport.height;
-
-   await page.render({
-      canvasContext:canvas.getContext("2d"),
-      viewport
-   }).promise;
-
-   document.getElementById("result").appendChild(canvas);
-   break;
- }
-}
-}catch(e){
- document.getElementById("result").innerHTML="Search Error";
- console.error(e);
-}
-
-document.getElementById("loader").style.display="none";
-}
+        document.getElementById('receiptArea').style.display = 'block';
+    }
 </script>
+
 </body>
 </html>
