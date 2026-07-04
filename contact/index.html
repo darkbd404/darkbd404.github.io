@@ -3,158 +3,539 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Email Sender V1</title>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <title>Contact Us</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a, #1a1a3e, #0d0d2b);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            align-items: flex-start;
+            padding: 30px 15px;
             color: #fff;
         }
+
         .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 40px 35px;
             width: 100%;
-            max-width: 600px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 550px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            animation: fadeUp 0.6s ease;
         }
-        h2 { text-align: center; margin-bottom: 30px; color: #00d4ff; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #b8b8b8; }
-        input, textarea {
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header .icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            color: #00d4ff;
+            font-size: 26px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .header p {
+            color: #888;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        label .req {
+            color: #ff4466;
+        }
+
+        input, textarea, select {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
+            padding: 13px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
             color: #fff;
             font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
         }
+
+        input::placeholder, textarea::placeholder {
+            color: #555;
+        }
+
         input:focus, textarea:focus {
             outline: none;
             border-color: #00d4ff;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(0, 212, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
         }
-        textarea { min-height: 150px; resize: vertical; }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Image Upload */
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.03);
+        }
+
+        .upload-area.has-image {
+            border-color: #00ff88;
+            padding: 10px;
+        }
+
+        .upload-area .upload-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .upload-area .upload-text {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .upload-area .upload-hint {
+            color: #555;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .preview-container {
+            display: none;
+            position: relative;
+        }
+
+        .preview-container img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .remove-img {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 68, 68, 0.9);
+            border: none;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .remove-img:hover {
+            background: #ff0033;
+            transform: scale(1.1);
+        }
+
         .btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            padding: 15px;
+            background: linear-gradient(135deg, #00d4ff, #0077cc);
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             color: #fff;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            margin-top: 10px;
+            transition: all 0.3s ease;
+            margin-top: 5px;
+            letter-spacing: 0.5px;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Status */
         .status {
             margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 16px;
+            border-radius: 12px;
             text-align: center;
             display: none;
+            font-size: 14px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
         }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .status.success {
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.3);
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid rgba(0, 255, 136, 0.25);
             color: #00ff88;
             display: block;
         }
+
         .status.error {
-            background: rgba(255, 68, 68, 0.1);
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            color: #ff4444;
+            background: rgba(255, 68, 68, 0.08);
+            border: 1px solid rgba(255, 68, 68, 0.25);
+            color: #ff4466;
             display: block;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #444;
+            font-size: 12px;
+        }
+
+        @media (max-width: 500px) {
+            .container { padding: 25px 20px; }
+            .form-row { flex-direction: column; gap: 0; }
+            .header h2 { font-size: 22px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>📧 Custom Email Sender V-1</h2>
-        <form id="emailForm">
-            <div class="form-group">
-                <label for="to_email">প্রাপকের ইমেইল *</label>
-                <input type="email" id="to_email" name="to_email" required placeholder="receiver@example.com">
-            </div>
-            <div class="form-group">
-                <label for="subject">বিষয় *</label>
-                <input type="text" id="subject" name="subject" required placeholder="Email Subject">
-            </div>
-            <div class="form-group">
-                <label for="message">মেসেজ *</label>
-                <textarea id="message" name="message" required placeholder="আপনার মেসেজ লিখুন..."></textarea>
-            </div>
-            <button type="submit" class="btn" id="submitBtn">📤 ইমেইল পাঠান</button>
-        </form>
-        <div id="status" class="status"></div>
+
+<div class="container">
+    <div class="header">
+        <div class="icon">✉️</div>
+        <h2>Contact Us V2</h2>
+        <p>আমাদের সাথে যোগাযোগ করুন</p>
     </div>
 
-    <script type="text/javascript">
-        // ============================================
-        // 🔑 এখানে আপনার Keys বসান
-        // ============================================
-        const EMAILJS_CONFIG = {
-            PUBLIC_KEY: "PC5UBjTQgBZSViKcN",
-            SERVICE_ID: "service_ufum89p",
-            TEMPLATE_ID: "template_hytt1pq"
-        };
+    <form id="contactForm">
+        <!-- Name & Phone Row -->
+        <div class="form-row">
+            <div class="form-group">
+                <label>Name <span class="req">*</span></label>
+                <input type="text" id="name" name="name" required placeholder="আপনার নাম">
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="01XXXXXXXXX">
+            </div>
+        </div>
 
-        // Initialize EmailJS
-        emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+        <!-- Gmail -->
+        <div class="form-group">
+            <label>Gmail <span class="req">*</span></label>
+            <input type="email" id="email" name="email" required placeholder="example@gmail.com">
+        </div>
 
-        const form = document.getElementById('emailForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const statusDiv = document.getElementById('status');
+        <!-- Subject -->
+        <div class="form-group">
+            <label>Subject <span class="req">*</span></label>
+            <input type="text" id="subject" name="subject" required placeholder="বিষয় লিখুন">
+        </div>
 
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'পাঠানো হচ্ছে...';
-            statusDiv.style.display = 'none';
+        <!-- Additional Info -->
+        <div class="form-group">
+            <label>Additional Information</label>
+            <textarea id="message" name="message" placeholder="বিস্তারিত লিখুন..."></textarea>
+        </div>
 
-            const templateParams = {
-                to_email: document.getElementById('to_email').value,
-                subject: document.getElementById('subject').value,
-                message: document.getElementById('message').value,
-                from_name: 'Salam'
+        <!-- Image Upload -->
+        <div class="form-group">
+            <label>Upload Image</label>
+            <div class="upload-area" id="uploadArea">
+                <div id="uploadPlaceholder">
+                    <div class="upload-icon">🖼️</div>
+                    <div class="upload-text">Click করে image select করুন</div>
+                    <div class="upload-hint">JPG, PNG, GIF (Max 10MB)</div>
+                </div>
+                <div class="preview-container" id="previewContainer">
+                    <img id="imagePreview" src="" alt="Preview">
+                    <button type="button" class="remove-img" id="removeImg">✕</button>
+                </div>
+                <input type="file" id="imageUpload" name="image" accept="image/*">
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn" id="submitBtn">📤 Send Message</button>
+    </form>
+
+    <div id="status" class="status"></div>
+
+    <div class="footer">Powered by EmailJS & Telegram Bot</div>
+</div>
+
+<script>
+    // ============================================
+    // 🔑 CONFIGURATION - এখানে আপনার Keys বসান
+    // ============================================
+    const CONFIG = {
+        // EmailJS Keys (EmailJS Dashboard থেকে)
+        EMAILJS_PUBLIC_KEY: "PC5UBjTQgBZSViKcN",
+        EMAILJS_SERVICE_ID: "service_ufum89p",
+        EMAILJS_TEMPLATE_ID: "template_hytt1pq",
+
+        // যে email এ message যাবে (আপনার email দিন)
+        TO_EMAIL: "your_email@gmail.com",
+
+        // Telegram Bot
+        TELEGRAM_BOT_TOKEN: "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE",
+        TELEGRAM_CHAT_ID: "5916486983"
+    };
+
+    // Initialize EmailJS
+    if (CONFIG.EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
+        emailjs.init(CONFIG.EMAILJS_PUBLIC_KEY);
+    }
+
+    // ============================================
+    // Image Upload Handling
+    // ============================================
+    const imageUpload = document.getElementById('imageUpload');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const previewContainer = document.getElementById('previewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadArea = document.getElementById('uploadArea');
+    const removeImgBtn = document.getElementById('removeImg');
+    let selectedFile = null;
+
+    imageUpload.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 10 * 1024 * 1024) {
+                showStatus('error', '❌ Image size 10MB এর বেশি হতে পারবে না!');
+                return;
+            }
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                imagePreview.src = ev.target.result;
+                uploadPlaceholder.style.display = 'none';
+                previewContainer.style.display = 'block';
+                uploadArea.classList.add('has-image');
             };
-
-            emailjs.send(
-                EMAILJS_CONFIG.SERVICE_ID,
-                EMAILJS_CONFIG.TEMPLATE_ID,
-                templateParams
-            )
-            .then(function(response) {
-                showStatus('success', '✅ ইমেইল সফলভাবে পাঠানো হয়েছে!');
-                form.reset();
-            }, function(error) {
-                showStatus('error', '❌ সমস্যা: ' + (error.text || 'Unknown error'));
-            })
-            .finally(function() {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '📤 ইমেইল পাঠান';
-            });
-        });
-
-        function showStatus(type, message) {
-            statusDiv.className = 'status ' + type;
-            statusDiv.textContent = message;
-            statusDiv.style.display = 'block';
-            setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
+            reader.readAsDataURL(file);
         }
-    </script>
+    });
+
+    removeImgBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        selectedFile = null;
+        imageUpload.value = '';
+        imagePreview.src = '';
+        uploadPlaceholder.style.display = 'block';
+        previewContainer.style.display = 'none';
+        uploadArea.classList.remove('has-image');
+    });
+
+    // ============================================
+    // Form Submit
+    // ============================================
+    const form = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusDiv = document.getElementById('status');
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const subject = document.getElementById('subject').value.trim();
+        const message = document.getElementById('message').value.trim();
+
+        // Loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner"></span> Sending...';
+        statusDiv.style.display = 'none';
+
+        let emailSent = false;
+        let telegramSent = false;
+
+        try {
+            // ====== 1. EMAIL পাঠানো ======
+            if (CONFIG.EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
+                try {
+                    await emailjs.send(
+                        CONFIG.EMAILJS_SERVICE_ID,
+                        CONFIG.EMAILJS_TEMPLATE_ID,
+                        {
+                            to_email: CONFIG.TO_EMAIL,
+                            from_name: name,
+                            from_email: email,
+                            phone: phone || 'N/A',
+                            subject: subject,
+                            message: message || 'No additional info',
+                            reply_to: email
+                        }
+                    );
+                    emailSent = true;
+                } catch (err) {
+                    console.error('Email Error:', err);
+                }
+            } else {
+                emailSent = true; // Skip if not configured
+            }
+
+            // ====== 2. TELEGRAM এ পাঠানো ======
+            const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
+            const telegramText = `
+📩 <b>নতুন Contact Message</b>
+
+👤 <b>Name:</b> ${name}
+📧 <b>Email:</b> ${email}
+📱 <b>Phone:</b> ${phone || 'N/A'}
+📌 <b>Subject:</b> ${subject}
+💬 <b>Message:</b>
+${message || 'No additional info'}
+
+🕐 <b>Time:</b> ${now}`;
+
+            try {
+                // Text message পাঠানো
+                const tgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CONFIG.TELEGRAM_CHAT_ID,
+                        text: telegramText,
+                        parse_mode: 'HTML'
+                    })
+                });
+                telegramSent = tgRes.ok;
+
+                // Image থাকলে image পাঠানো
+                if (selectedFile && telegramSent) {
+                    const formData = new FormData();
+                    formData.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
+                    formData.append('photo', selectedFile);
+                    formData.append('caption', `📎 Image from: ${name} (${email})`);
+
+                    await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+            } catch (err) {
+                console.error('Telegram Error:', err);
+            }
+
+            // ====== 3. RESULT দেখানো ======
+            if (emailSent || telegramSent) {
+                showStatus('success', '✅ আপনার মেসেজ সফলভাবে পাঠানো হয়েছে!');
+                form.reset();
+                selectedFile = null;
+                uploadPlaceholder.style.display = 'block';
+                previewContainer.style.display = 'none';
+                uploadArea.classList.remove('has-image');
+            } else {
+                showStatus('error', '❌ মেসেজ পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+            }
+
+        } catch (err) {
+            console.error('Error:', err);
+            showStatus('error', '❌ কিছু একটা ভুল হয়েছে: ' + err.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '📤 Send Message';
+        }
+    });
+
+    // ============================================
+    // Status Message
+    // ============================================
+    function showStatus(type, msg) {
+        statusDiv.className = 'status ' + type;
+        statusDiv.textContent = msg;
+        statusDiv.style.display = 'block';
+        setTimeout(() => { statusDiv.style.display = 'none'; }, 6000);
+    }
+</script>
+
 </body>
 </html>
