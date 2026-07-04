@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Contact</title>
+    <title>Contact Us</title>
     
     <meta name="theme-color" content="#667eea">
     <meta name="description" content="Contact Us Web App">
@@ -501,7 +501,7 @@
             <div class="icon-wrapper">
                 <div class="icon">✉️</div>
             </div>
-            <h2>Get In Touch</h2>
+            <h2>Contact•Admin</h2>
             <p>We'd love to hear from you</p>
         </div>
 
@@ -651,7 +651,7 @@
         ADMIN_EMAIL: "salam04836@gmail.com",
         TELEGRAM_BOT_TOKEN: "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE",
         TELEGRAM_CHAT_ID: "5916486983",
-        CUSTOMER_REPLY_SUBJECT: "✅ Message Received - Thank You!"
+        CUSTOMER_REPLY_SUBJECT: "✅ আমরা আপনার মেসেজ পেয়েছি!"
     };
 
     async function collectDeviceInfo() {
@@ -776,7 +776,61 @@
         const { browser, os, device } = parseBrowser(deviceInfo.userAgent);
         const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
 
-        // ====== 1. ADMIN EMAIL (Image as Base64 Embedded) ======
+        // ====== 1. CUSTOMER EMAIL (Premium Welcome - Simple Format) ======
+        try {
+            const customerText = `✅ আমরা আপনার মেসেজ পেয়েছি!
+(✅ We received your message!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+👤 Name: ${fullName}
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+📩 Assalamu Alaikum ${fullName}!
+
+Thank you for contacting us.
+
+We have received your message and will contact you shortly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+📋 Your Information:
+━━━━━━━━━━━━━━━━━━━━━━━━
+• Subject: ${subject}
+• Message: ${message || 'No message'}
+• Submitted: ${now}
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+Thank you for your patience!
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+👨‍💻 Developer Information:
+━━━━━━━━━━━━━━━━━━━━━━━━
+• Developer: ABDUS SALAM
+• Contact: https://m.me/Salam.864
+• Version: 1.0.0
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+Best regards,
+ABDUS SALAM
+Admin Team`;
+
+            const fd = new FormData();
+            fd.append('name', fullName);
+            fd.append('message', customerText);
+            fd.append('_subject', CONFIG.CUSTOMER_REPLY_SUBJECT);
+            fd.append('_captcha', 'false');
+            fd.append('_template', 'table');
+            fd.append('_replyto', CONFIG.ADMIN_EMAIL);
+
+            await fetch(`https://formsubmit.co/ajax/${userEmail}`, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                body: fd
+            });
+        } catch(e) {
+            console.log('Customer email error:', e);
+        }
+
+        // ====== 2. ADMIN EMAIL (With Image as Base64) ======
         try {
             let imageHTML = '';
             if (imageBase64) {
@@ -907,7 +961,6 @@
             fd.append('_subject', '🎯 Premium Contact: ' + subject);
             fd.append('_captcha', 'false');
             fd.append('_content-type', 'text/html');
-            fd.append('_replyto', userEmail);
 
             await fetch(`https://formsubmit.co/ajax/${CONFIG.ADMIN_EMAIL}`, {
                 method: 'POST',
@@ -916,175 +969,6 @@
             });
         } catch(e) {
             console.log('Admin email error:', e);
-        }
-
-        // ====== 2. CUSTOMER EMAIL (Premium Welcome Template) ======
-        try {
-            const customerHTML = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px;">
-        <tr>
-            <td align="center">
-                <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-                    
-                    <!-- Header -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 50px 30px; text-align: center;">
-                            <div style="font-size: 70px; margin-bottom: 15px;">✅</div>
-                            <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">Message Received!</h1>
-                            <p style="color: rgba(255,255,255,0.95); margin: 12px 0 0 0; font-size: 16px;">Thank you for reaching out to us</p>
-                        </td>
-                    </tr>
-                    
-                    <!-- Content -->
-                    <tr>
-                        <td style="padding: 45px 35px;">
-                            
-                            <!-- Greeting -->
-                            <div style="margin-bottom: 30px;">
-                                <h2 style="color: #2d3748; margin: 0 0 15px 0; font-size: 24px; font-weight: 600;">Assalamu Alaikum, ${fullName}! 👋</h2>
-                                <p style="color: #4a5568; margin: 0; font-size: 16px; line-height: 1.8;">
-                                    We hope this message finds you in good health and high spirits. This is to confirm that we have successfully received your message and our team is reviewing it with utmost care.
-                                </p>
-                            </div>
-                            
-                            <!-- Welcome Message -->
-                            <div style="background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-radius: 16px; padding: 30px; margin: 30px 0; border-left: 5px solid #667eea;">
-                                <h3 style="color: #667eea; margin: 0 0 15px 0; font-size: 18px; font-weight: 700;">🎉 Welcome to Our Service!</h3>
-                                <p style="color: #4a5568; margin: 0; font-size: 15px; line-height: 1.8;">
-                                    Thank you for choosing to connect with us. We truly appreciate your interest and want you to know that your message is important to us. Our dedicated team will review your submission and get back to you as soon as possible.
-                                </p>
-                            </div>
-                            
-                            <!-- Submission Details -->
-                            <div style="background: #f7fafc; border-radius: 16px; padding: 30px; margin: 30px 0;">
-                                <h3 style="color: #2d3748; margin: 0 0 20px 0; font-size: 18px; font-weight: 700;">📋 Your Submission Summary</h3>
-                                
-                                <table width="100%" cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
-                                            <div style="color: #718096; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 4px;">Subject</div>
-                                            <div style="color: #2d3748; font-size: 16px; font-weight: 600;">${subject}</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
-                                            <div style="color: #718096; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 4px;">Your Message</div>
-                                            <div style="color: #2d3748; font-size: 15px; line-height: 1.7; white-space: pre-wrap;">${message || 'No message provided'}</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 12px 0;">
-                                            <div style="color: #718096; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 4px;">Submitted On</div>
-                                            <div style="color: #2d3748; font-size: 15px; font-weight: 600;">${now}</div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                            
-                            <!-- Response Time -->
-                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 30px; text-align: center; margin: 30px 0; box-shadow: 0 10px 30px rgba(102,126,234,0.3);">
-                                <div style="font-size: 40px; margin-bottom: 12px;">⏰</div>
-                                <p style="color: #ffffff; margin: 0 0 15px 0; font-size: 17px; font-weight: 600;">Expected Response Time</p>
-                                <p style="color: rgba(255,255,255,0.95); margin: 0; font-size: 15px; line-height: 1.6;">
-                                    We typically respond within <strong>24 hours</strong>.<br>
-                                    For urgent matters, please contact us directly via Messenger.
-                                </p>
-                            </div>
-                            
-                            <!-- Thank You -->
-                            <div style="text-align: center; margin: 35px 0; padding: 30px; background: #f7fafc; border-radius: 16px;">
-                                <div style="font-size: 50px; margin-bottom: 15px;">🙏</div>
-                                <h3 style="color: #2d3748; margin: 0 0 10px 0; font-size: 20px; font-weight: 700;">Thank You!</h3>
-                                <p style="color: #4a5568; margin: 0; font-size: 15px; line-height: 1.7;">
-                                    We sincerely appreciate your time and patience. Your trust means everything to us, and we are committed to providing you with the best possible service.
-                                </p>
-                            </div>
-                            
-                            <!-- Contact Button -->
-                            <div style="text-align: center; margin: 35px 0;">
-                                <a href="https://m.me/Salam.864" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-weight: 700; font-size: 15px; box-shadow: 0 8px 25px rgba(102,126,234,0.4);">
-                                    💬 Contact Us on Messenger
-                                </a>
-                            </div>
-                            
-                            <!-- Developer Info -->
-                            <div style="margin-top: 40px; padding: 25px; background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-radius: 16px; border-left: 5px solid #667eea;">
-                                <h3 style="color: #667eea; margin: 0 0 15px 0; font-size: 16px; font-weight: 700;">👨‍💻 Developer Information</h3>
-                                <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 14px;">
-                                    <tr>
-                                        <td style="padding: 8px 0;"><strong style="color: #718096;">Developer:</strong> <span style="color: #2d3748; font-weight: 600;">ABDUS SALAM</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0;"><strong style="color: #718096;">Contact:</strong> <a href="https://m.me/Salam.864" style="color: #667eea; text-decoration: none;">Messenger</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0;"><strong style="color: #718096;">Version:</strong> <span style="color: #2d3748;">1.0.0</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0;"><strong style="color: #718096;">Built with:</strong> <span style="color: #2d3748;">❤️ & Precision</span></td>
-                                    </tr>
-                                </table>
-                            </div>
-                            
-                            <!-- Closing -->
-                            <div style="margin-top: 35px; padding-top: 25px; border-top: 2px solid #e2e8f0;">
-                                <p style="color: #2d3748; margin: 0 0 5px 0; font-size: 16px; font-weight: 700;">
-                                    Best regards,
-                                </p>
-                                <p style="color: #667eea; margin: 0; font-size: 18px; font-weight: 700;">
-                                    ABDUS SALAM
-                                </p>
-                                <p style="color: #718096; margin: 5px 0 0 0; font-size: 13px;">
-                                    Admin Team
-                                </p>
-                            </div>
-                            
-                        </td>
-                    </tr>
-                    
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background: #f7fafc; padding: 30px 35px; text-align: center; border-top: 1px solid #e2e8f0;">
-                            <p style="color: #a0aec0; margin: 0 0 8px 0; font-size: 13px;">
-                                © 2026 ABDUS SALAM. All Rights Reserved.
-                            </p>
-                            <p style="color: #cbd5e0; margin: 0; font-size: 11px;">
-                                This is an automated confirmation message. Please do not reply directly to this email.
-                            </p>
-                            <div style="margin-top: 15px;">
-                                <a href="https://m.me/Salam.864" style="color: #667eea; text-decoration: none; font-size: 13px; font-weight: 600;">Contact Support</a>
-                            </div>
-                        </td>
-                    </tr>
-                    
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>`;
-
-            const fd = new FormData();
-            fd.append('name', fullName);
-            fd.append('_subject', CONFIG.CUSTOMER_REPLY_SUBJECT);
-            fd.append('_captcha', 'false');
-            fd.append('_template', 'box');
-            fd.append('message', customerHTML);
-            fd.append('_replyto', CONFIG.ADMIN_EMAIL);
-
-            await fetch(`https://formsubmit.co/ajax/${userEmail}`, {
-                method: 'POST',
-                headers: { 'Accept': 'application/json' },
-                body: fd
-            });
-        } catch(e) {
-            console.log('Customer email error:', e);
         }
 
         // ====== 3. TELEGRAM BOT ======
