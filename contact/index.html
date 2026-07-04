@@ -5,144 +5,460 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0a0a1a, #1a1a3e, #0d0d2b);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0d0d2b 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: flex-start;
             padding: 30px 15px;
             color: #fff;
+            overflow-x: hidden;
         }
-        .container {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(15px);
-            border-radius: 24px;
-            padding: 40px 35px;
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 550px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(120, 0, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(255, 0, 150, 0.08) 0%, transparent 50%);
+            animation: bgFloat 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
         }
-        .header { text-align: center; margin-bottom: 30px; }
-        .header .icon { font-size: 50px; margin-bottom: 10px; }
-        .header h2 { color: #00d4ff; font-size: 26px; }
-        .form-row { display: flex; gap: 15px; }
-        .form-row .form-group { flex: 1; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #aaa; font-size: 13px; font-weight: 600; }
-        label .req { color: #ff4466; }
+
+        @keyframes bgFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 45px 40px;
+            width: 100%;
+            max-width: 560px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: containerEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes containerEntry {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+            animation: headerEntry 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+        }
+
+        @keyframes headerEntry {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header .icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: iconBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5));
+        }
+
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(-5deg); }
+            75% { transform: translateY(-5px) rotate(5deg); }
+        }
+
+        .header h2 {
+            background: linear-gradient(135deg, #00d4ff 0%, #b24bf3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #8b92a8;
+            font-size: 14px;
+            animation: fadeIn 1s ease 0.5s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+            animation: fieldEntry 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.3s; }
+        .form-group:nth-child(2) { animation-delay: 0.4s; }
+        .form-group:nth-child(3) { animation-delay: 0.5s; }
+        .form-group:nth-child(4) { animation-delay: 0.6s; }
+        .form-group:nth-child(5) { animation-delay: 0.7s; }
+
+        @keyframes fieldEntry {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #b8bcd0;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: color 0.3s ease;
+        }
+
+        label .req {
+            color: #ff4466;
+            margin-left: 2px;
+        }
+
         input, textarea {
             width: 100%;
-            padding: 13px 16px;
+            padding: 14px 18px;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
+            border-radius: 14px;
             background: rgba(255, 255, 255, 0.04);
             color: #fff;
             font-size: 15px;
             font-family: inherit;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        input::placeholder, textarea::placeholder { color: #555; }
+
+        input::placeholder, textarea::placeholder {
+            color: #5a5f7a;
+        }
+
         input:focus, textarea:focus {
             outline: none;
             border-color: #00d4ff;
             background: rgba(0, 212, 255, 0.05);
+            box-shadow: 
+                0 0 0 4px rgba(0, 212, 255, 0.1),
+                0 0 20px rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px);
         }
-        textarea { min-height: 120px; resize: vertical; }
+
+        input:focus + label,
+        textarea:focus + label {
+            color: #00d4ff;
+        }
+
+        textarea {
+            min-height: 130px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        /* Upload Area */
         .upload-area {
-            border: 2px dashed rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 25px;
+            border: 2px dashed rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 30px;
             text-align: center;
             cursor: pointer;
             position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
-        .upload-area:hover { border-color: #00d4ff; }
-        .upload-area.has-image { border-color: #00ff88; padding: 10px; }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .upload-area:hover::before {
+            left: 100%;
+        }
+
+        .upload-area:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.03);
+            transform: translateY(-2px);
+        }
+
+        .upload-area.has-image {
+            border-color: #00ff88;
+            padding: 15px;
+            background: rgba(0, 255, 136, 0.03);
+        }
+
         .upload-area input[type="file"] {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             opacity: 0;
             cursor: pointer;
         }
-        .preview-container { display: none; position: relative; }
-        .preview-container img { max-width: 100%; max-height: 200px; border-radius: 8px; }
+
+        .preview-container {
+            display: none;
+            position: relative;
+        }
+
+        .preview-container img {
+            max-width: 100%;
+            max-height: 220px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
         .remove-img {
             position: absolute;
-            top: 5px; right: 5px;
-            background: rgba(255, 68, 68, 0.9);
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 68, 102, 0.95);
             border: none;
             color: #fff;
-            width: 28px; height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 10px rgba(255, 68, 102, 0.4);
         }
+
+        .remove-img:hover {
+            background: #ff0033;
+            transform: scale(1.15) rotate(90deg);
+        }
+
+        /* Submit Button */
         .btn {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #00d4ff, #0077cc);
+            padding: 16px;
+            background: linear-gradient(135deg, #00d4ff 0%, #b24bf3 100%);
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             color: #fff;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 5px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            letter-spacing: 0.5px;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 212, 255, 0.3); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .btn:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Spinner */
         .spinner {
             display: inline-block;
-            width: 18px; height: 18px;
-            border: 3px solid rgba(255,255,255,0.3);
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             vertical-align: middle;
-            margin-right: 8px;
+            margin-right: 10px;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Status Message */
         .status {
-            margin-top: 20px;
-            padding: 16px;
-            border-radius: 12px;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 14px;
             text-align: center;
             display: none;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            animation: statusEntry 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
+        @keyframes statusEntry {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         .status.success {
-            background: rgba(0, 255, 136, 0.08);
-            border: 1px solid rgba(0, 255, 136, 0.25);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.3);
             color: #00ff88;
             display: block;
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.2);
         }
+
         .status.error {
-            background: rgba(255, 68, 68, 0.08);
-            border: 1px solid rgba(255, 68, 68, 0.25);
+            background: linear-gradient(135deg, rgba(255, 68, 102, 0.1) 0%, rgba(255, 100, 100, 0.1) 100%);
+            border: 1px solid rgba(255, 68, 102, 0.3);
             color: #ff4466;
             display: block;
+            box-shadow: 0 5px 20px rgba(255, 68, 102, 0.2);
         }
-        .log-box {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
+
+        .status .status-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+            animation: iconPop 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes iconPop {
+            0% {
+                transform: scale(0) rotate(-180deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .status .status-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .status .status-desc {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #5a5f7a;
             font-size: 12px;
-            color: #888;
-            max-height: 150px;
-            overflow-y: auto;
-            display: none;
+            animation: fadeIn 1s ease 1s both;
         }
-        .log-box.show { display: block; }
-        .log-item { margin: 3px 0; }
-        .log-item.ok { color: #00ff88; }
-        .log-item.fail { color: #ff4466; }
+
         @media (max-width: 500px) {
-            .container { padding: 25px 20px; }
-            .form-row { flex-direction: column; gap: 0; }
+            .container {
+                padding: 30px 25px;
+            }
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .header h2 {
+                font-size: 24px;
+            }
+            .header .icon {
+                font-size: 50px;
+            }
         }
     </style>
 </head>
@@ -151,7 +467,8 @@
 <div class="container">
     <div class="header">
         <div class="icon">✉️</div>
-        <h2>Contact Us V-1</h2>
+        <h2>Contact ADMIN</h2>
+        <p>আমাদের সাথে যোগাযোগ করুন</p>
     </div>
 
     <form id="contactForm" enctype="multipart/form-data">
@@ -185,8 +502,9 @@
             <label>Upload Image</label>
             <div class="upload-area" id="uploadArea">
                 <div id="uploadPlaceholder">
-                    <div style="font-size: 40px;">🖼️</div>
-                    <div style="color: #888; font-size: 14px; margin-top: 8px;">Click করে image select করুন</div>
+                    <div style="font-size: 45px; margin-bottom: 10px;">🖼️</div>
+                    <div style="color: #b8bcd0; font-size: 14px; font-weight: 500;">Click করে image select করুন</div>
+                    <div style="color: #5a5f7a; font-size: 12px; margin-top: 5px;">JPG, PNG, GIF (Max 10MB)</div>
                 </div>
                 <div class="preview-container" id="previewContainer">
                     <img id="imagePreview" src="" alt="Preview">
@@ -196,11 +514,16 @@
             </div>
         </div>
 
-        <button type="submit" class="btn" id="submitBtn">📤 Send Message</button>
+        <button type="submit" class="btn" id="submitBtn">
+            <span>📤 Send Message</span>
+        </button>
     </form>
 
     <div id="status" class="status"></div>
-    <div id="logBox" class="log-box"></div>
+
+    <div class="footer">
+        Powered by Secure Contact System
+    </div>
 </div>
 
 <script>
@@ -208,14 +531,9 @@
     // 🔑 CONFIGURATION
     // ============================================
     const CONFIG = {
-        // Admin Email (আপনার email - যেখানে পুরো message আসবে)
         ADMIN_EMAIL: "salam04836@gmail.com",
-        
-        // Telegram Bot
         TELEGRAM_BOT_TOKEN: "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE",
         TELEGRAM_CHAT_ID: "5916486983",
-        
-        // Customer কে যে confirmation message পাঠানো হবে
         CUSTOMER_REPLY_SUBJECT: "✅ আমরা আপনার মেসেজ পেয়েছি!",
         CUSTOMER_REPLY_MESSAGE: `Assalamu Alaikum!
 
@@ -235,6 +553,60 @@ Admin Team`
     };
 
     // ============================================
+    // Browser & IP Info Collection
+    // ============================================
+    async function collectDeviceInfo() {
+        const deviceInfo = {
+            userAgent: navigator.userAgent,
+            language: navigator.language,
+            platform: navigator.platform,
+            screen: `${screen.width}x${screen.height}`,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            ip: 'Unknown',
+            location: 'Unknown'
+        };
+
+        // Get IP address
+        try {
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipRes.json();
+            deviceInfo.ip = ipData.ip;
+
+            // Get location from IP
+            const locRes = await fetch(`https://ipapi.co/${deviceInfo.ip}/json/`);
+            const locData = await locRes.json();
+            deviceInfo.location = `${locData.city || 'Unknown'}, ${locData.country_name || 'Unknown'}`;
+            deviceInfo.country = locData.country_name || 'Unknown';
+            deviceInfo.city = locData.city || 'Unknown';
+            deviceInfo.region = locData.region || 'Unknown';
+            deviceInfo.org = locData.org || 'Unknown';
+        } catch (err) {
+            console.log('IP fetch failed');
+        }
+
+        return deviceInfo;
+    }
+
+    function parseBrowser(userAgent) {
+        let browser = 'Unknown';
+        let os = 'Unknown';
+
+        if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) browser = 'Chrome';
+        else if (userAgent.includes('Firefox')) browser = 'Firefox';
+        else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari';
+        else if (userAgent.includes('Edg')) browser = 'Edge';
+        else if (userAgent.includes('Opera') || userAgent.includes('OPR')) browser = 'Opera';
+
+        if (userAgent.includes('Windows')) os = 'Windows';
+        else if (userAgent.includes('Mac')) os = 'macOS';
+        else if (userAgent.includes('Linux')) os = 'Linux';
+        else if (userAgent.includes('Android')) os = 'Android';
+        else if (userAgent.includes('iOS') || userAgent.includes('iPhone') || userAgent.includes('iPad')) os = 'iOS';
+
+        return { browser, os };
+    }
+
+    // ============================================
     // Image Upload
     // ============================================
     const imageUpload = document.getElementById('imageUpload');
@@ -249,7 +621,7 @@ Admin Team`
         const file = e.target.files[0];
         if (file) {
             if (file.size > 10 * 1024 * 1024) {
-                alert('Image 10MB এর বেশি হতে পারবে না!');
+                showStatus('error', '❌', 'File Too Large', 'Image 10MB এর বেশি হতে পারবে না');
                 return;
             }
             selectedFile = file;
@@ -274,18 +646,6 @@ Admin Team`
     });
 
     // ============================================
-    // Log Helper
-    // ============================================
-    const logBox = document.getElementById('logBox');
-    function addLog(msg, type = '') {
-        logBox.classList.add('show');
-        const div = document.createElement('div');
-        div.className = 'log-item ' + type;
-        div.textContent = '• ' + msg;
-        logBox.appendChild(div);
-    }
-
-    // ============================================
     // Form Submit
     // ============================================
     const form = document.getElementById('contactForm');
@@ -301,16 +661,16 @@ Admin Team`
         const subject = document.getElementById('subject').value.trim();
         const message = document.getElementById('message').value.trim();
 
-        logBox.innerHTML = '';
-        logBox.classList.remove('show');
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner"></span> Sending...';
+        submitBtn.innerHTML = '<span><span class="spinner"></span>Submitting...</span>';
         statusDiv.style.display = 'none';
 
-        let successCount = 0;
+        // Collect device info
+        const deviceInfo = await collectDeviceInfo();
+        const { browser, os } = parseBrowser(deviceInfo.userAgent);
+        const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
 
-        // ====== 1. ADMIN EMAIL এ পুরো message পাঠানো ======
-        addLog('Admin email এ পাঠানো হচ্ছে...');
+        // ====== 1. ADMIN EMAIL (Full data with IP + device info) ======
         try {
             const adminFormData = new FormData();
             adminFormData.append('Name', name);
@@ -318,6 +678,14 @@ Admin Team`
             adminFormData.append('Phone', phone || 'N/A');
             adminFormData.append('Subject', subject);
             adminFormData.append('Message', message || 'No message');
+            adminFormData.append('IP Address', deviceInfo.ip);
+            adminFormData.append('Location', deviceInfo.location);
+            adminFormData.append('Browser', browser);
+            adminFormData.append('Operating System', os);
+            adminFormData.append('Device', deviceInfo.platform);
+            adminFormData.append('Screen', deviceInfo.screen);
+            adminFormData.append('Timezone', deviceInfo.timezone);
+            adminFormData.append('Submitted At', now);
             adminFormData.append('_subject', '📩 নতুন Contact: ' + subject);
             adminFormData.append('_captcha', 'false');
             adminFormData.append('_template', 'table');
@@ -326,34 +694,23 @@ Admin Team`
                 adminFormData.append('attachment', selectedFile);
             }
 
-            const adminRes = await fetch(`https://formsubmit.co/ajax/${CONFIG.ADMIN_EMAIL}`, {
+            await fetch(`https://formsubmit.co/ajax/${CONFIG.ADMIN_EMAIL}`, {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
                 body: adminFormData
             });
-
-            if (adminRes.ok) {
-                addLog('✅ Admin email এ পাঠানো হয়েছে', 'ok');
-                successCount++;
-            } else {
-                addLog('❌ Admin email failed', 'fail');
-            }
         } catch (err) {
-            addLog('❌ Admin email error: ' + err.message, 'fail');
+            console.log('Admin email failed');
         }
 
-        // ====== 2. CUSTOMER EMAIL এ confirmation message পাঠানো ======
-        addLog('Customer email এ confirmation পাঠানো হচ্ছে...');
+        // ====== 2. CUSTOMER EMAIL (Welcome message only) ======
         try {
             const customerFormData = new FormData();
             customerFormData.append('name', name);
-            customerFormData.append('subject', subject);
-            customerFormData.append('message', message || 'No message');
             customerFormData.append('_subject', CONFIG.CUSTOMER_REPLY_SUBJECT);
             customerFormData.append('_captcha', 'false');
             customerFormData.append('_template', 'box');
             
-            // Custom confirmation message with variables
             const customMessage = CONFIG.CUSTOMER_REPLY_MESSAGE
                 .replace('{{subject}}', subject)
                 .replace('{{message}}', message || 'No message');
@@ -361,26 +718,17 @@ Admin Team`
             customerFormData.append('_replyto', CONFIG.ADMIN_EMAIL);
             customerFormData.append('message', customMessage);
 
-            const customerRes = await fetch(`https://formsubmit.co/ajax/${userEmail}`, {
+            await fetch(`https://formsubmit.co/ajax/${userEmail}`, {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
                 body: customerFormData
             });
-
-            if (customerRes.ok) {
-                addLog('✅ Customer email এ confirmation পাঠানো হয়েছে', 'ok');
-                successCount++;
-            } else {
-                addLog('❌ Customer email failed', 'fail');
-            }
         } catch (err) {
-            addLog('❌ Customer email error: ' + err.message, 'fail');
+            console.log('Customer email failed');
         }
 
-        // ====== 3. TELEGRAM BOT এ পাঠানো ======
-        addLog('Telegram bot এ পাঠানো হচ্ছে...');
+        // ====== 3. TELEGRAM BOT (Full data with IP + device info) ======
         try {
-            const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
             const telegramText = `📩 <b>নতুন Contact Message</b>
 
 👤 <b>Name:</b> ${name}
@@ -390,7 +738,22 @@ Admin Team`
 💬 <b>Message:</b>
 ${message || 'No message'}
 
-🕐 <b>Time:</b> ${now}`;
+━━━━━━━━━━━━━━━━━━
+🔍 <b>DEVICE INFO</b>
+━━━━━━━━━━━━━━━━━━
+🌐 <b>IP Address:</b> <code>${deviceInfo.ip}</code>
+📍 <b>Location:</b> ${deviceInfo.location}
+🏙️ <b>City:</b> ${deviceInfo.city || 'N/A'}
+🗺️ <b>Region:</b> ${deviceInfo.region || 'N/A'}
+🌍 <b>Country:</b> ${deviceInfo.country || 'N/A'}
+🏢 <b>ISP:</b> ${deviceInfo.org || 'N/A'}
+
+💻 <b>Browser:</b> ${browser}
+🖥️ <b>OS:</b> ${os}
+📱 <b>Platform:</b> ${deviceInfo.platform}
+📐 <b>Screen:</b> ${deviceInfo.screen}
+🕐 <b>Timezone:</b> ${deviceInfo.timezone}
+📅 <b>Submitted:</b> ${now}`;
 
             const tgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
@@ -402,52 +765,54 @@ ${message || 'No message'}
                 })
             });
 
-            if (tgRes.ok) {
-                addLog('✅ Telegram text পাঠানো হয়েছে', 'ok');
-                successCount++;
+            if (tgRes.ok && selectedFile) {
+                const imgForm = new FormData();
+                imgForm.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
+                imgForm.append('photo', selectedFile);
+                imgForm.append('caption', `📎 From: ${name} (${userEmail})\n🌐 IP: ${deviceInfo.ip}`);
 
-                // Image পাঠানো
-                if (selectedFile) {
-                    const imgForm = new FormData();
-                    imgForm.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
-                    imgForm.append('photo', selectedFile);
-                    imgForm.append('caption', `📎 From: ${name} (${userEmail})`);
-
-                    const imgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`, {
-                        method: 'POST',
-                        body: imgForm
-                    });
-
-                    if (imgRes.ok) {
-                        addLog('✅ Telegram image পাঠানো হয়েছে', 'ok');
-                    }
-                }
-            } else {
-                addLog('❌ Telegram failed', 'fail');
+                await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+                    method: 'POST',
+                    body: imgForm
+                });
             }
         } catch (err) {
-            addLog('❌ Telegram error: ' + err.message, 'fail');
+            console.log('Telegram failed');
         }
 
-        // ====== RESULT ======
-        if (successCount > 0) {
-            statusDiv.className = 'status success';
-            statusDiv.textContent = `✅ সফলভাবে পাঠানো হয়েছে! (${successCount}/3)`;
-            statusDiv.style.display = 'block';
-            form.reset();
-            selectedFile = null;
-            uploadPlaceholder.style.display = 'block';
-            previewContainer.style.display = 'none';
-            uploadArea.classList.remove('has-image');
-        } else {
-            statusDiv.className = 'status error';
-            statusDiv.textContent = '❌ কিছুই পাঠানো সম্ভব হয়নি।';
-            statusDiv.style.display = 'block';
-        }
+        // ====== RESULT (Simple message for customer) ======
+        showStatus(
+            'success',
+            '✅',
+            'Message Sent Successfully!',
+            'আপনার মেসেজ সফলভাবে পাঠানো হয়েছে। আমরা শীঘ্রই যোগাযোগ করব।'
+        );
+        
+        form.reset();
+        selectedFile = null;
+        uploadPlaceholder.style.display = 'block';
+        previewContainer.style.display = 'none';
+        uploadArea.classList.remove('has-image');
 
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '📤 Send Message';
+        submitBtn.innerHTML = '<span>📤 Send Message</span>';
     });
+
+    // ============================================
+    // Status Message (Customer Friendly)
+    // ============================================
+    function showStatus(type, icon, title, desc) {
+        statusDiv.className = 'status ' + type;
+        statusDiv.innerHTML = `
+            <span class="status-icon">${icon}</span>
+            <div class="status-title">${title}</div>
+            <div class="status-desc">${desc}</div>
+        `;
+        statusDiv.style.display = 'block';
+        
+        // Scroll to status
+        statusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 </script>
 
 </body>
