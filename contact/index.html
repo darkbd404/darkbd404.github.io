@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us v2</title>
+    <title>Contact Us</title>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #0a0a1a, #1a1a3e, #0d0d2b);
             min-height: 100vh;
             display: flex;
@@ -18,7 +17,6 @@
             padding: 30px 15px;
             color: #fff;
         }
-
         .container {
             background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(15px);
@@ -28,64 +26,22 @@
             max-width: 550px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            animation: fadeUp 0.6s ease;
         }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 35px;
-        }
-
-        .header .icon {
-            font-size: 50px;
-            margin-bottom: 10px;
-        }
-
-        .header h2 {
-            color: #00d4ff;
-            font-size: 26px;
-            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-        }
-
-        .header p {
-            color: #888;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 15px;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .icon { font-size: 50px; margin-bottom: 10px; }
+        .header h2 { color: #00d4ff; font-size: 26px; }
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
+        .form-group { margin-bottom: 20px; }
         label {
             display: block;
             margin-bottom: 8px;
             color: #aaa;
             font-size: 13px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-
-        label .req {
-            color: #ff4466;
-        }
-
-        input, textarea, select {
+        label .req { color: #ff4466; }
+        input, textarea {
             width: 100%;
             padding: 13px 16px;
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -94,63 +50,24 @@
             color: #fff;
             font-size: 15px;
             font-family: inherit;
-            transition: all 0.3s ease;
         }
-
-        input::placeholder, textarea::placeholder {
-            color: #555;
-        }
-
+        input::placeholder, textarea::placeholder { color: #555; }
         input:focus, textarea:focus {
             outline: none;
             border-color: #00d4ff;
             background: rgba(0, 212, 255, 0.05);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
         }
-
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        /* Image Upload */
+        textarea { min-height: 120px; resize: vertical; }
         .upload-area {
             border: 2px dashed rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
         }
-
-        .upload-area:hover {
-            border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.03);
-        }
-
-        .upload-area.has-image {
-            border-color: #00ff88;
-            padding: 10px;
-        }
-
-        .upload-area .upload-icon {
-            font-size: 40px;
-            margin-bottom: 8px;
-        }
-
-        .upload-area .upload-text {
-            color: #888;
-            font-size: 14px;
-        }
-
-        .upload-area .upload-hint {
-            color: #555;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
+        .upload-area:hover { border-color: #00d4ff; }
+        .upload-area.has-image { border-color: #00ff88; padding: 10px; }
         .upload-area input[type="file"] {
             position: absolute;
             top: 0; left: 0;
@@ -158,42 +75,22 @@
             opacity: 0;
             cursor: pointer;
         }
-
-        .preview-container {
-            display: none;
-            position: relative;
-        }
-
+        .preview-container { display: none; position: relative; }
         .preview-container img {
             max-width: 100%;
             max-height: 200px;
             border-radius: 8px;
-            object-fit: cover;
         }
-
         .remove-img {
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: 5px; right: 5px;
             background: rgba(255, 68, 68, 0.9);
             border: none;
             color: #fff;
-            width: 28px;
-            height: 28px;
+            width: 28px; height: 28px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
         }
-
-        .remove-img:hover {
-            background: #ff0033;
-            transform: scale(1.1);
-        }
-
         .btn {
             width: 100%;
             padding: 15px;
@@ -204,31 +101,13 @@
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
             margin-top: 5px;
-            letter-spacing: 0.5px;
         }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.3);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 212, 255, 0.3); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .spinner {
             display: inline-block;
-            width: 18px;
-            height: 18px;
+            width: 18px; height: 18px;
             border: 3px solid rgba(255,255,255,0.3);
             border-top-color: #fff;
             border-radius: 50%;
@@ -236,10 +115,7 @@
             vertical-align: middle;
             margin-right: 8px;
         }
-
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Status */
         .status {
             margin-top: 20px;
             padding: 16px;
@@ -247,40 +123,37 @@
             text-align: center;
             display: none;
             font-size: 14px;
-            font-weight: 500;
-            animation: slideIn 0.3s ease;
         }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .status.success {
             background: rgba(0, 255, 136, 0.08);
             border: 1px solid rgba(0, 255, 136, 0.25);
             color: #00ff88;
             display: block;
         }
-
         .status.error {
             background: rgba(255, 68, 68, 0.08);
             border: 1px solid rgba(255, 68, 68, 0.25);
             color: #ff4466;
             display: block;
         }
-
-        .footer {
-            text-align: center;
-            margin-top: 25px;
-            color: #444;
+        .log-box {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
             font-size: 12px;
+            color: #888;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
         }
-
+        .log-box.show { display: block; }
+        .log-item { margin: 3px 0; }
+        .log-item.ok { color: #00ff88; }
+        .log-item.fail { color: #ff4466; }
         @media (max-width: 500px) {
             .container { padding: 25px 20px; }
             .form-row { flex-direction: column; gap: 0; }
-            .header h2 { font-size: 22px; }
         }
     </style>
 </head>
@@ -289,65 +162,56 @@
 <div class="container">
     <div class="header">
         <div class="icon">✉️</div>
-        <h2>Contact Us V2</h2>
-        <p>আমাদের সাথে যোগাযোগ করুন</p>
+        <h2>Contact Us</h2>
     </div>
 
     <form id="contactForm">
-        <!-- Name & Phone Row -->
         <div class="form-row">
             <div class="form-group">
                 <label>Name <span class="req">*</span></label>
-                <input type="text" id="name" name="name" required placeholder="আপনার নাম">
+                <input type="text" id="name" required placeholder="আপনার নাম">
             </div>
             <div class="form-group">
-                <label>Phone Number</label>
-                <input type="tel" id="phone" name="phone" placeholder="01XXXXXXXXX">
+                <label>Phone</label>
+                <input type="tel" id="phone" placeholder="01XXXXXXXXX">
             </div>
         </div>
 
-        <!-- Gmail -->
         <div class="form-group">
-            <label>Gmail <span class="req">*</span></label>
-            <input type="email" id="email" name="email" required placeholder="example@gmail.com">
+            <label>Your Email <span class="req">*</span></label>
+            <input type="email" id="userEmail" required placeholder="আপনার email দিন">
         </div>
 
-        <!-- Subject -->
         <div class="form-group">
             <label>Subject <span class="req">*</span></label>
-            <input type="text" id="subject" name="subject" required placeholder="বিষয় লিখুন">
+            <input type="text" id="subject" required placeholder="বিষয়">
         </div>
 
-        <!-- Additional Info -->
         <div class="form-group">
-            <label>Additional Information</label>
-            <textarea id="message" name="message" placeholder="বিস্তারিত লিখুন..."></textarea>
+            <label>Message</label>
+            <textarea id="message" placeholder="বিস্তারিত লিখুন..."></textarea>
         </div>
 
-        <!-- Image Upload -->
         <div class="form-group">
             <label>Upload Image</label>
             <div class="upload-area" id="uploadArea">
                 <div id="uploadPlaceholder">
-                    <div class="upload-icon">🖼️</div>
-                    <div class="upload-text">Click করে image select করুন</div>
-                    <div class="upload-hint">JPG, PNG, GIF (Max 10MB)</div>
+                    <div style="font-size: 40px;">🖼️</div>
+                    <div style="color: #888; font-size: 14px; margin-top: 8px;">Click করে image select করুন</div>
                 </div>
                 <div class="preview-container" id="previewContainer">
                     <img id="imagePreview" src="" alt="Preview">
                     <button type="button" class="remove-img" id="removeImg">✕</button>
                 </div>
-                <input type="file" id="imageUpload" name="image" accept="image/*">
+                <input type="file" id="imageUpload" accept="image/*">
             </div>
         </div>
 
-        <!-- Submit -->
         <button type="submit" class="btn" id="submitBtn">📤 Send Message</button>
     </form>
 
     <div id="status" class="status"></div>
-
-    <div class="footer">Powered by EmailJS & Telegram Bot</div>
+    <div id="logBox" class="log-box"></div>
 </div>
 
 <script>
@@ -355,13 +219,13 @@
     // 🔑 CONFIGURATION - এখানে আপনার Keys বসান
     // ============================================
     const CONFIG = {
-        // EmailJS Keys (EmailJS Dashboard থেকে)
+        // EmailJS Keys
         EMAILJS_PUBLIC_KEY: "PC5UBjTQgBZSViKcN",
         EMAILJS_SERVICE_ID: "service_ufum89p",
         EMAILJS_TEMPLATE_ID: "template_hytt1pq",
 
-        // যে email এ message যাবে (আপনার email দিন)
-        TO_EMAIL: "your_email@gmail.com",
+        // Admin Email (যেখানে fixed message যাবে)
+        ADMIN_EMAIL: "admin@gmail.com",  // ← আপনার email দিন
 
         // Telegram Bot
         TELEGRAM_BOT_TOKEN: "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE",
@@ -374,7 +238,7 @@
     }
 
     // ============================================
-    // Image Upload Handling
+    // Image Upload
     // ============================================
     const imageUpload = document.getElementById('imageUpload');
     const uploadPlaceholder = document.getElementById('uploadPlaceholder');
@@ -388,7 +252,7 @@
         const file = e.target.files[0];
         if (file) {
             if (file.size > 10 * 1024 * 1024) {
-                showStatus('error', '❌ Image size 10MB এর বেশি হতে পারবে না!');
+                showStatus('error', '❌ Image 10MB এর বেশি হতে পারবে না!');
                 return;
             }
             selectedFile = file;
@@ -407,11 +271,22 @@
         e.stopPropagation();
         selectedFile = null;
         imageUpload.value = '';
-        imagePreview.src = '';
         uploadPlaceholder.style.display = 'block';
         previewContainer.style.display = 'none';
         uploadArea.classList.remove('has-image');
     });
+
+    // ============================================
+    // Log Helper
+    // ============================================
+    const logBox = document.getElementById('logBox');
+    function addLog(msg, type = '') {
+        logBox.classList.add('show');
+        const div = document.createElement('div');
+        div.className = 'log-item ' + type;
+        div.textContent = '• ' + msg;
+        logBox.appendChild(div);
+    }
 
     // ============================================
     // Form Submit
@@ -424,116 +299,151 @@
         e.preventDefault();
 
         const name = document.getElementById('name').value.trim();
-        const email = document.getElementById('email').value.trim();
+        const userEmail = document.getElementById('userEmail').value.trim();
         const phone = document.getElementById('phone').value.trim();
         const subject = document.getElementById('subject').value.trim();
         const message = document.getElementById('message').value.trim();
 
-        // Loading state
+        // Reset
+        logBox.innerHTML = '';
+        logBox.classList.remove('show');
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner"></span> Sending...';
         statusDiv.style.display = 'none';
 
-        let emailSent = false;
-        let telegramSent = false;
+        let successCount = 0;
+        let totalTasks = 3; // User email + Admin email + Telegram
 
+        // ====== 1. USER এর EMAIL এ পাঠানো ======
+        addLog('User email এ পাঠানো হচ্ছে...');
         try {
-            // ====== 1. EMAIL পাঠানো ======
-            if (CONFIG.EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
-                try {
-                    await emailjs.send(
-                        CONFIG.EMAILJS_SERVICE_ID,
-                        CONFIG.EMAILJS_TEMPLATE_ID,
-                        {
-                            to_email: CONFIG.TO_EMAIL,
-                            from_name: name,
-                            from_email: email,
-                            phone: phone || 'N/A',
-                            subject: subject,
-                            message: message || 'No additional info',
-                            reply_to: email
-                        }
-                    );
-                    emailSent = true;
-                } catch (err) {
-                    console.error('Email Error:', err);
-                }
+            if (CONFIG.EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
+                addLog('⚠️ EmailJS keys বসানো হয়নি', 'fail');
             } else {
-                emailSent = true; // Skip if not configured
+                await emailjs.send(
+                    CONFIG.EMAILJS_SERVICE_ID,
+                    CONFIG.EMAILJS_TEMPLATE_ID,
+                    {
+                        to_email: userEmail,  // ← User এর email
+                        from_name: 'Admin',
+                        from_email: CONFIG.ADMIN_EMAIL,
+                        reply_to: CONFIG.ADMIN_EMAIL,
+                        phone: phone || 'N/A',
+                        subject: subject,
+                        message: message || 'No message'
+                    }
+                );
+                addLog('✅ User email এ পাঠানো হয়েছে', 'ok');
+                successCount++;
             }
+        } catch (err) {
+            addLog('❌ User email failed: ' + (err.text || err.message), 'fail');
+            console.error('User email error:', err);
+        }
 
-            // ====== 2. TELEGRAM এ পাঠানো ======
+        // ====== 2. ADMIN EMAIL এ পাঠানো ======
+        addLog('Admin email এ পাঠানো হচ্ছে...');
+        try {
+            if (CONFIG.EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
+                addLog('⚠️ EmailJS keys বসানো হয়নি', 'fail');
+            } else {
+                await emailjs.send(
+                    CONFIG.EMAILJS_SERVICE_ID,
+                    CONFIG.EMAILJS_TEMPLATE_ID,
+                    {
+                        to_email: CONFIG.ADMIN_EMAIL,  // ← Admin এর fixed email
+                        from_name: name,
+                        from_email: userEmail,
+                        reply_to: userEmail,
+                        phone: phone || 'N/A',
+                        subject: subject,
+                        message: message || 'No message'
+                    }
+                );
+                addLog('✅ Admin email এ পাঠানো হয়েছে', 'ok');
+                successCount++;
+            }
+        } catch (err) {
+            addLog('❌ Admin email failed: ' + (err.text || err.message), 'fail');
+            console.error('Admin email error:', err);
+        }
+
+        // ====== 3. TELEGRAM BOT এ পাঠানো ======
+        addLog('Telegram bot এ পাঠানো হচ্ছে...');
+        try {
             const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
-            const telegramText = `
-📩 <b>নতুন Contact Message</b>
+            const telegramText = `📩 <b>নতুন Contact Message</b>
 
 👤 <b>Name:</b> ${name}
-📧 <b>Email:</b> ${email}
+📧 <b>Email:</b> ${userEmail}
 📱 <b>Phone:</b> ${phone || 'N/A'}
 📌 <b>Subject:</b> ${subject}
 💬 <b>Message:</b>
-${message || 'No additional info'}
+${message || 'No message'}
 
 🕐 <b>Time:</b> ${now}`;
 
-            try {
-                // Text message পাঠানো
-                const tgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: CONFIG.TELEGRAM_CHAT_ID,
-                        text: telegramText,
-                        parse_mode: 'HTML'
-                    })
-                });
-                telegramSent = tgRes.ok;
+            const tgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CONFIG.TELEGRAM_CHAT_ID,
+                    text: telegramText,
+                    parse_mode: 'HTML'
+                })
+            });
 
-                // Image থাকলে image পাঠানো
-                if (selectedFile && telegramSent) {
+            if (tgRes.ok) {
+                addLog('✅ Telegram text পাঠানো হয়েছে', 'ok');
+                successCount++;
+
+                // Image পাঠানো
+                if (selectedFile) {
                     const formData = new FormData();
                     formData.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
                     formData.append('photo', selectedFile);
-                    formData.append('caption', `📎 Image from: ${name} (${email})`);
+                    formData.append('caption', `📎 From: ${name} (${userEmail})`);
 
-                    await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+                    const imgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`, {
                         method: 'POST',
                         body: formData
                     });
+
+                    if (imgRes.ok) {
+                        addLog('✅ Telegram image পাঠানো হয়েছে', 'ok');
+                    } else {
+                        addLog('⚠️ Telegram image failed', 'fail');
+                    }
                 }
-            } catch (err) {
-                console.error('Telegram Error:', err);
-            }
-
-            // ====== 3. RESULT দেখানো ======
-            if (emailSent || telegramSent) {
-                showStatus('success', '✅ আপনার মেসেজ সফলভাবে পাঠানো হয়েছে!');
-                form.reset();
-                selectedFile = null;
-                uploadPlaceholder.style.display = 'block';
-                previewContainer.style.display = 'none';
-                uploadArea.classList.remove('has-image');
             } else {
-                showStatus('error', '❌ মেসেজ পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+                const errData = await tgRes.json();
+                addLog('❌ Telegram failed: ' + (errData.description || 'Unknown'), 'fail');
             }
-
         } catch (err) {
-            console.error('Error:', err);
-            showStatus('error', '❌ কিছু একটা ভুল হয়েছে: ' + err.message);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '📤 Send Message';
+            addLog('❌ Telegram error: ' + err.message, 'fail');
+            console.error('Telegram error:', err);
         }
+
+        // ====== RESULT ======
+        if (successCount > 0) {
+            showStatus('success', `✅ সফলভাবে পাঠানো হয়েছে! (${successCount}/${totalTasks})`);
+            form.reset();
+            selectedFile = null;
+            uploadPlaceholder.style.display = 'block';
+            previewContainer.style.display = 'none';
+            uploadArea.classList.remove('has-image');
+        } else {
+            showStatus('error', '❌ কিছুই পাঠানো সম্ভব হয়নি। নিচের log চেক করুন।');
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '📤 Send Message';
     });
 
-    // ============================================
-    // Status Message
-    // ============================================
     function showStatus(type, msg) {
         statusDiv.className = 'status ' + type;
         statusDiv.textContent = msg;
         statusDiv.style.display = 'block';
-        setTimeout(() => { statusDiv.style.display = 'none'; }, 6000);
     }
 </script>
 
