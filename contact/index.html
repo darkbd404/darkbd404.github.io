@@ -1,69 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact Form</title>
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+def send_html_email(receiver_email, subject, html_body):
+    """
+    HTML ফরম্যাটে ইমেইল পাঠান
+    """
+    
+    sender_email = "your_email@gmail.com"
+    app_password = "xxxx xxxx xxxx xxxx"
+    
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['From'] = sender_email
+        msg['To'] = receiver_email
+        msg['Subject'] = subject
+        
+        # HTML body
+        html_part = MIMEText(html_body, 'html')
+        msg.attach(html_part)
+        
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(sender_email, app_password)
+        server.sendmail(sender_email, receiver_email, msg.as_string())
+        server.quit()
+        
+        print(f"✅ HTML ইমেইল পাঠানো হয়েছে: {receiver_email}")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error: {str(e)}")
+        return False
 
-<link rel="stylesheet" href="style.css">
 
-</head>
-<body>
-
-<div class="container">
-
-<div class="card">
-
-<h1>Contact Us</h1>
-
-<p>Please fill out the form below.</p>
-
-<form id="contactForm">
-
-<div class="input-group">
-<label>Name</label>
-<input type="text" id="name" required>
-</div>
-
-<div class="input-group">
-<label>Email</label>
-<input type="email" id="email" required>
-</div>
-
-<div class="input-group">
-<label>Phone</label>
-<input type="tel" id="phone" required>
-</div>
-
-<div class="input-group">
-<label>Subject</label>
-<input type="text" id="subject" required>
-</div>
-
-<div class="input-group">
-<label>Message</label>
-<textarea id="message" rows="5" required></textarea>
-</div>
-
-<button type="submit" id="submitBtn">
-Submit
-</button>
-
-<div id="loading" style="display:none;">
-Sending...
-</div>
-
-<div id="result"></div>
-
-</form>
-
-</div>
-
-</div>
-
-<script src="script.js"></script>
-
+# HTML টেমপ্লেট উদাহরণ
+html_template = """
+<html>
+<body style="font-family: Arial, sans-serif;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #333;">Hello!</h2>
+        <p>This is an <b>HTML email</b> sent from Python.</p>
+        <p>Best regards,<br><strong>Salam</strong></p>
+    </div>
 </body>
 </html>
+"""
+
+send_html_email("receiver@example.com", "HTML Test", html_template)
