@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us</title>
+    <title>Customer Contact Gov-BD</title>
     <style>
         * {
             margin: 0;
@@ -13,58 +13,75 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0d0d2b 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding: 30px 15px;
+            padding: 40px 20px;
             color: #fff;
             overflow-x: hidden;
+            position: relative;
         }
 
-        body::before {
-            content: '';
+        /* Animated Background Particles */
+        .particles {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(120, 0, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(255, 0, 150, 0.08) 0%, transparent 50%);
-            animation: bgFloat 20s ease-in-out infinite;
-            pointer-events: none;
+            overflow: hidden;
             z-index: 0;
+            pointer-events: none;
         }
 
-        @keyframes bgFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -30px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
         }
 
         .container {
             position: relative;
             z-index: 1;
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: 45px 40px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(30px);
+            border-radius: 32px;
+            padding: 50px 45px;
             width: 100%;
-            max-width: 560px;
+            max-width: 600px;
             box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.5),
-                0 0 0 1px rgba(255, 255, 255, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            animation: containerEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+                0 25px 80px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            animation: containerEntry 1s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @keyframes containerEntry {
             from {
                 opacity: 0;
-                transform: translateY(50px) scale(0.95);
+                transform: translateY(60px) scale(0.9);
             }
             to {
                 opacity: 1;
@@ -74,60 +91,59 @@
 
         .header {
             text-align: center;
-            margin-bottom: 35px;
-            animation: headerEntry 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+            margin-bottom: 40px;
+            animation: headerEntry 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
         }
 
-        @keyframes headerEntry {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
+        .header .icon-wrapper {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+                box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            50% {
+                transform: scale(1.05) rotate(5deg);
+                box-shadow: 0 15px 50px rgba(102, 126, 234, 0.6);
             }
         }
 
         .header .icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-            display: inline-block;
-            animation: iconBounce 2s ease-in-out infinite;
-            filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5));
-        }
-
-        @keyframes iconBounce {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-10px) rotate(-5deg); }
-            75% { transform: translateY(-5px) rotate(5deg); }
+            font-size: 50px;
+            filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.2));
         }
 
         .header h2 {
-            background: linear-gradient(135deg, #00d4ff 0%, #b24bf3 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-size: 30px;
+            font-size: 34px;
             font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
         }
 
         .header p {
-            color: #8b92a8;
-            font-size: 14px;
-            animation: fadeIn 1s ease 0.5s both;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            color: #718096;
+            font-size: 15px;
+            font-weight: 400;
         }
 
         .form-row {
             display: flex;
-            gap: 15px;
+            gap: 18px;
         }
 
         .form-row .form-group {
@@ -135,8 +151,8 @@
         }
 
         .form-group {
-            margin-bottom: 22px;
-            animation: fieldEntry 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+            margin-bottom: 24px;
+            animation: fieldEntry 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
 
         .form-group:nth-child(1) { animation-delay: 0.3s; }
@@ -148,7 +164,7 @@
         @keyframes fieldEntry {
             from {
                 opacity: 0;
-                transform: translateX(-20px);
+                transform: translateX(-30px);
             }
             to {
                 opacity: 1;
@@ -159,7 +175,7 @@
         label {
             display: block;
             margin-bottom: 10px;
-            color: #b8bcd0;
+            color: #4a5568;
             font-size: 13px;
             font-weight: 600;
             text-transform: uppercase;
@@ -168,51 +184,52 @@
         }
 
         label .req {
-            color: #ff4466;
+            color: #e53e3e;
             margin-left: 2px;
         }
 
         input, textarea {
             width: 100%;
-            padding: 14px 18px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.04);
-            color: #fff;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            background: #f7fafc;
+            color: #2d3748;
             font-size: 15px;
-            font-family: inherit;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         input::placeholder, textarea::placeholder {
-            color: #5a5f7a;
+            color: #a0aec0;
         }
 
         input:focus, textarea:focus {
             outline: none;
-            border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.05);
+            border-color: #667eea;
+            background: #fff;
             box-shadow: 
-                0 0 0 4px rgba(0, 212, 255, 0.1),
-                0 0 20px rgba(0, 212, 255, 0.2);
+                0 0 0 4px rgba(102, 126, 234, 0.1),
+                0 5px 20px rgba(102, 126, 234, 0.15);
             transform: translateY(-2px);
         }
 
         textarea {
-            min-height: 130px;
+            min-height: 140px;
             resize: vertical;
             line-height: 1.6;
         }
 
         .upload-area {
-            border: 2px dashed rgba(255, 255, 255, 0.12);
-            border-radius: 14px;
-            padding: 30px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 16px;
+            padding: 35px;
             text-align: center;
             cursor: pointer;
             position: relative;
             transition: all 0.3s ease;
             overflow: hidden;
+            background: #f7fafc;
         }
 
         .upload-area::before {
@@ -222,8 +239,8 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
-            transition: left 0.5s ease;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.6s ease;
         }
 
         .upload-area:hover::before {
@@ -231,15 +248,16 @@
         }
 
         .upload-area:hover {
-            border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.03);
-            transform: translateY(-2px);
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
         }
 
         .upload-area.has-image {
-            border-color: #00ff88;
-            padding: 15px;
-            background: rgba(0, 255, 136, 0.03);
+            border-color: #48bb78;
+            padding: 18px;
+            background: rgba(72, 187, 120, 0.05);
         }
 
         .upload-area input[type="file"] {
@@ -259,52 +277,52 @@
 
         .preview-container img {
             max-width: 100%;
-            max-height: 220px;
-            border-radius: 10px;
+            max-height: 240px;
+            border-radius: 12px;
             object-fit: cover;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
 
         .remove-img {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(255, 68, 102, 0.95);
+            top: 10px;
+            right: 10px;
+            background: rgba(229, 62, 62, 0.95);
             border: none;
             color: #fff;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
-            box-shadow: 0 3px 10px rgba(255, 68, 102, 0.4);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 15px rgba(229, 62, 62, 0.4);
         }
 
         .remove-img:hover {
-            background: #ff0033;
-            transform: scale(1.15) rotate(90deg);
+            background: #e53e3e;
+            transform: scale(1.2) rotate(90deg);
         }
 
         .btn {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #00d4ff 0%, #b24bf3 100%);
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            border-radius: 14px;
+            border-radius: 16px;
             color: #fff;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 12px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             letter-spacing: 0.5px;
-            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
 
         .btn::before {
@@ -317,21 +335,21 @@
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.3);
             transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
+            transition: width 0.7s ease, height 0.7s ease;
         }
 
         .btn:hover::before {
-            width: 400px;
-            height: 400px;
+            width: 500px;
+            height: 500px;
         }
 
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
         }
 
         .btn:active {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
         .btn:disabled {
@@ -347,8 +365,8 @@
 
         .spinner {
             display: inline-block;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border: 3px solid rgba(255, 255, 255, 0.3);
             border-top-color: #fff;
             border-radius: 50%;
@@ -362,20 +380,20 @@
         }
 
         .status {
-            margin-top: 25px;
-            padding: 20px;
-            border-radius: 14px;
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 16px;
             text-align: center;
             display: none;
             font-size: 15px;
             font-weight: 500;
-            animation: statusEntry 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: statusEntry 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @keyframes statusEntry {
             from {
                 opacity: 0;
-                transform: translateY(-20px) scale(0.9);
+                transform: translateY(-30px) scale(0.9);
             }
             to {
                 opacity: 1;
@@ -384,31 +402,34 @@
         }
 
         .status.success {
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            color: #00ff88;
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.1) 0%, rgba(56, 178, 172, 0.1) 100%);
+            border: 2px solid rgba(72, 187, 120, 0.3);
+            color: #2f855a;
             display: block;
-            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.2);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.2);
         }
 
         .status.error {
-            background: linear-gradient(135deg, rgba(255, 68, 102, 0.1) 0%, rgba(255, 100, 100, 0.1) 100%);
-            border: 1px solid rgba(255, 68, 102, 0.3);
-            color: #ff4466;
+            background: linear-gradient(135deg, rgba(229, 62, 62, 0.1) 0%, rgba(237, 100, 166, 0.1) 100%);
+            border: 2px solid rgba(229, 62, 62, 0.3);
+            color: #c53030;
             display: block;
-            box-shadow: 0 5px 20px rgba(255, 68, 102, 0.2);
+            box-shadow: 0 8px 25px rgba(229, 62, 62, 0.2);
         }
 
         .status .status-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
+            font-size: 48px;
+            margin-bottom: 12px;
             display: block;
-            animation: iconPop 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: iconPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @keyframes iconPop {
             0% {
                 transform: scale(0) rotate(-180deg);
+            }
+            60% {
+                transform: scale(1.2) rotate(10deg);
             }
             100% {
                 transform: scale(1) rotate(0deg);
@@ -416,106 +437,135 @@
         }
 
         .status .status-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .status .status-desc {
-            font-size: 13px;
-            opacity: 0.8;
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.5;
         }
 
         .footer {
             text-align: center;
-            margin-top: 25px;
-            color: #5a5f7a;
+            margin-top: 30px;
+            color: #a0aec0;
             font-size: 12px;
             animation: fadeIn 1s ease 1s both;
         }
 
-        @media (max-width: 500px) {
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 550px) {
             .container {
-                padding: 30px 25px;
+                padding: 35px 28px;
             }
             .form-row {
                 flex-direction: column;
                 gap: 0;
             }
             .header h2 {
-                font-size: 24px;
+                font-size: 28px;
+            }
+            .header .icon-wrapper {
+                width: 85px;
+                height: 85px;
             }
             .header .icon {
-                font-size: 50px;
+                font-size: 42px;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <div class="icon">✉️</div>
-        <h2>Contact-ADMIN</h2>
-        <p>আমাদের সাথে যোগাযোগ করুন</p>
-    </div>
+    <!-- Animated Particles -->
+    <div class="particles" id="particles"></div>
 
-    <form id="contactForm" enctype="multipart/form-data">
-        <div class="form-row">
-            <div class="form-group">
-                <label>Full Name <span class="req">*</span></label>
-                <input type="text" id="name" name="full_name" required placeholder="আপনার পুরো নাম" autocomplete="name">
+    <div class="container">
+        <div class="header">
+            <div class="icon-wrapper">
+                <div class="icon">✉️</div>
             </div>
-            <div class="form-group">
-                <label>Phone</label>
-                <input type="tel" id="phone" name="phone_number" placeholder="01XXXXXXXXX" autocomplete="tel">
-            </div>
+            <h2>Customer Contact</h2>
+            <p>We'd love to hear from you. Send us a message!</p>
         </div>
 
-        <div class="form-group">
-            <label>Your Email <span class="req">*</span></label>
-            <input type="email" id="userEmail" name="email_address" required placeholder="your@email.com" autocomplete="email">
-        </div>
-
-        <div class="form-group">
-            <label>Subject <span class="req">*</span></label>
-            <input type="text" id="subject" name="email_subject" required placeholder="বিষয়">
-        </div>
-
-        <div class="form-group">
-            <label>Message</label>
-            <textarea id="message" name="full_message" placeholder="বিস্তারিত লিখুন..."></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>Upload Image</label>
-            <div class="upload-area" id="uploadArea">
-                <div id="uploadPlaceholder">
-                    <div style="font-size: 45px; margin-bottom: 10px;">🖼️</div>
-                    <div style="color: #b8bcd0; font-size: 14px; font-weight: 500;">Click করে image select করুন</div>
-                    <div style="color: #5a5f7a; font-size: 12px; margin-top: 5px;">JPG, PNG, GIF (Max 10MB)</div>
+        <form id="contactForm" enctype="multipart/form-data">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Full Name <span class="req">*</span></label>
+                    <input type="text" id="name" name="full_name" required placeholder="Abdus Salam" autocomplete="name">
                 </div>
-                <div class="preview-container" id="previewContainer">
-                    <img id="imagePreview" src="" alt="Preview">
-                    <button type="button" class="remove-img" id="removeImg">✕</button>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phone" name="phone_number" placeholder="01XXXXXXXXX" autocomplete="tel">
                 </div>
-                <input type="file" name="attachment" accept="image/*" id="imageUpload">
             </div>
+
+            <div class="form-group">
+                <label>Email Address <span class="req">*</span></label>
+                <input type="email" id="userEmail" name="email_address" required placeholder="your.email@example.com" autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label>Subject <span class="req">*</span></label>
+                <input type="text" id="subject" name="email_subject" required placeholder="How can we help you?">
+            </div>
+
+            <div class="form-group">
+                <label>Your Message</label>
+                <textarea id="message" name="full_message" placeholder="Tell us more about your inquiry..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Attach Image (Optional)</label>
+                <div class="upload-area" id="uploadArea">
+                    <div id="uploadPlaceholder">
+                        <div style="font-size: 50px; margin-bottom: 12px;">📎</div>
+                        <div style="color: #4a5568; font-size: 15px; font-weight: 600; margin-bottom: 5px;">Click to upload image</div>
+                        <div style="color: #a0aec0; font-size: 13px;">JPG, PNG, GIF (Max 10MB)</div>
+                    </div>
+                    <div class="preview-container" id="previewContainer">
+                        <img id="imagePreview" src="" alt="Preview">
+                        <button type="button" class="remove-img" id="removeImg">✕</button>
+                    </div>
+                    <input type="file" name="attachment" accept="image/*" id="imageUpload">
+                </div>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                <span>🚀 Send Message</span>
+            </button>
+        </form>
+
+        <div id="status" class="status"></div>
+
+        <div class="footer">
+            <p>🔒 Your information is secure and encrypted</p>
         </div>
-
-        <button type="submit" class="btn" id="submitBtn">
-            <span>📤 Send Message</span>
-        </button>
-    </form>
-
-    <div id="status" class="status"></div>
-
-    <div class="footer">
-        Powered by Secure Contact System
     </div>
-</div>
 
 <script>
+    // Create floating particles
+    function createParticles() {
+        const container = document.getElementById('particles');
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            container.appendChild(particle);
+        }
+    }
+    createParticles();
+
     // ============================================
     // 🔑 CONFIGURATION
     // ============================================
@@ -523,22 +573,69 @@
         ADMIN_EMAIL: "salam04836@gmail.com",
         TELEGRAM_BOT_TOKEN: "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE",
         TELEGRAM_CHAT_ID: "5916486983",
-        CUSTOMER_REPLY_SUBJECT: "✅ আমরা আপনার মেসেজ পেয়েছি!",
-        CUSTOMER_REPLY_MESSAGE: `Assalamu Alaikum {{name}}!
-
-ধন্যবাদ আমাদের সাথে যোগাযোগ করার জন্য।
-
-আমরা আপনার মেসেজ পেয়েছি এবং খুব শীঘ্রই আপনার সাথে যোগাযোগ করব।
-
-আপনার তথ্য:
-- Subject: {{subject}}
-- Message: {{message}}
-
-আপনার ধৈর্যের জন্য ধন্যবাদ!
-
-Best regards,
-Salam
-Admin Team`
+        CUSTOMER_REPLY_SUBJECT: "✅ Thank You for Contacting Us!",
+        CUSTOMER_REPLY_MESSAGE: `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #f7fafc; }
+.container { max-width: 600px; margin: 0 auto; background: #ffffff; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center; }
+.header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; }
+.header p { color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 15px; }
+.content { padding: 40px 30px; }
+.greeting { color: #2d3748; font-size: 18px; margin-bottom: 20px; }
+.message { color: #4a5568; line-height: 1.8; font-size: 15px; margin-bottom: 25px; }
+.info-box { background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-left: 4px solid #667eea; border-radius: 12px; padding: 25px; margin: 25px 0; }
+.info-item { margin-bottom: 15px; }
+.info-label { color: #718096; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 5px; }
+.info-value { color: #2d3748; font-size: 16px; font-weight: 600; }
+.cta-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 25px; text-align: center; margin: 30px 0; }
+.cta-text { color: #ffffff; font-size: 15px; margin-bottom: 15px; }
+.cta-button { display: inline-block; background: #ffffff; color: #667eea; text-decoration: none; padding: 14px 30px; border-radius: 10px; font-weight: 700; font-size: 14px; }
+.footer { background: #f7fafc; padding: 25px 30px; text-align: center; border-top: 1px solid #e2e8f0; }
+.footer p { color: #a0aec0; font-size: 13px; margin: 5px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎉 Message Received!</h1>
+        <p>Thank you for reaching out to us</p>
+    </div>
+    <div class="content">
+        <div class="greeting">Assalamu Alaikum {{name}}! 👋</div>
+        <div class="message">
+            Thank you for contacting us. We have received your message and our team will get back to you as soon as possible.
+        </div>
+        <div class="info-box">
+            <div class="info-item">
+                <div class="info-label">Subject</div>
+                <div class="info-value">{{subject}}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Your Message</div>
+                <div class="info-value" style="white-space: pre-wrap;">{{message}}</div>
+            </div>
+        </div>
+        <div class="cta-box">
+            <div class="cta-text">We typically respond within 24 hours</div>
+            <a href="mailto:salam04836@gmail.com" class="cta-button">📧 Contact Us Again</a>
+        </div>
+        <div class="message" style="margin-top: 30px;">
+            Best regards,<br>
+            <strong style="color: #667eea;">SALAM</strong><br>
+            <span style="color: #718096; font-size: 13px;">Admin Team</span>
+        </div>
+    </div>
+    <div class="footer">
+        <p>© 2026 Abdus Salam. All rights reserved.</p>
+        <p style="font-size: 11px; margin-top: 8px;">This is an automated message. Please do not reply directly.</p>
+    </div>
+</div>
+</body>
+</html>`
     };
 
     // ============================================
@@ -588,7 +685,7 @@ Admin Team`
         else if (userAgent.includes('Mac')) os = 'macOS';
         else if (userAgent.includes('Linux')) os = 'Linux';
         else if (userAgent.includes('Android')) os = 'Android';
-        else if (userAgent.includes('iOS') || userAgent.includes('iPhone') || userAgent.includes('iPad')) os = 'iOS';
+        else if (userAgent.includes('iOS')) os = 'iOS';
 
         return { browser, os };
     }
@@ -608,7 +705,7 @@ Admin Team`
         const file = e.target.files[0];
         if (file) {
             if (file.size > 10 * 1024 * 1024) {
-                showStatus('error', '❌', 'File Too Large', 'Image 10MB এর বেশি হতে পারবে না');
+                showStatus('error', '❌', 'File Too Large', 'Image must be less than 10MB');
                 return;
             }
             selectedFile = file;
@@ -642,7 +739,6 @@ Admin Team`
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // ✅ Full name সহ সব data collect করা
         const fullName = document.getElementById('name').value.trim();
         const userEmail = document.getElementById('userEmail').value.trim();
         const phone = document.getElementById('phone').value.trim();
@@ -650,26 +746,21 @@ Admin Team`
         const message = document.getElementById('message').value.trim();
 
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span><span class="spinner"></span>Submitting...</span>';
+        submitBtn.innerHTML = '<span><span class="spinner"></span>Sending...</span>';
         statusDiv.style.display = 'none';
 
-        // Collect device info
         const deviceInfo = await collectDeviceInfo();
         const { browser, os } = parseBrowser(deviceInfo.userAgent);
         const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
 
-        // ====== 1. ADMIN EMAIL (Full data with IP + device info) ======
+        // ====== 1. ADMIN EMAIL ======
         try {
             const adminFormData = new FormData();
-            
-            // ✅ Full name properly পাঠানো
             adminFormData.append('Full Name', fullName);
             adminFormData.append('Email', userEmail);
             adminFormData.append('Phone', phone || 'N/A');
             adminFormData.append('Subject', subject);
             adminFormData.append('Message', message || 'No message');
-            
-            // Device info
             adminFormData.append('IP Address', deviceInfo.ip);
             adminFormData.append('Location', deviceInfo.location);
             adminFormData.append('Browser', browser);
@@ -678,10 +769,8 @@ Admin Team`
             adminFormData.append('Screen', deviceInfo.screen);
             adminFormData.append('Timezone', deviceInfo.timezone);
             adminFormData.append('Submitted At', now);
-            
-            adminFormData.append('_subject', '📩 নতুন Contact: ' + subject);
+            adminFormData.append('_subject', '📩 New Contact: ' + subject);
             adminFormData.append('_captcha', 'false');
-            // ✅ _template remove করা - এতে full name ঠিকমতো আসবে
             adminFormData.append('_content-type', 'text/html');
             
             if (selectedFile) {
@@ -697,18 +786,18 @@ Admin Team`
             console.log('Admin email failed');
         }
 
-        // ====== 2. CUSTOMER EMAIL (Welcome message only) ======
+        // ====== 2. CUSTOMER EMAIL (Premium HTML) ======
         try {
             const customerFormData = new FormData();
             customerFormData.append('name', fullName);
             customerFormData.append('_subject', CONFIG.CUSTOMER_REPLY_SUBJECT);
             customerFormData.append('_captcha', 'false');
-            customerFormData.append('_template', 'box');
+            customerFormData.append('_content-type', 'text/html');
             
             const customMessage = CONFIG.CUSTOMER_REPLY_MESSAGE
-                .replace('{{name}}', fullName)
-                .replace('{{subject}}', subject)
-                .replace('{{message}}', message || 'No message');
+                .replace(/{{name}}/g, fullName)
+                .replace(/{{subject}}/g, subject)
+                .replace(/{{message}}/g, message || 'No message');
             
             customerFormData.append('_replyto', CONFIG.ADMIN_EMAIL);
             customerFormData.append('message', customMessage);
@@ -722,24 +811,25 @@ Admin Team`
             console.log('Customer email failed');
         }
 
-        // ====== 3. TELEGRAM BOT (Full data with IP + device info) ======
+        // ====== 3. TELEGRAM BOT (Premium Format) ======
         try {
-            const telegramText = `📩 <b>নতুন Contact Message</b>
+            const telegramText = `🎯 <b>NEW CONTACT MESSAGE</b>
 
-👤 <b>Name:</b> ${fullName}
-📧 <b>Email:</b> ${userEmail}
-📱 <b>Phone:</b> ${phone || 'N/A'}
-📌 <b>Subject:</b> ${subject}
-💬 <b>Message:</b>
-${message || 'No message'}
+👤 <b>CONTACT INFORMATION</b>
+├─ Name: <b>${fullName}</b>
+├─ Email: <code>${userEmail}</code>
+├─ Phone: ${phone || 'N/A'}
+└─ Subject: <b>${subject}</b>
 
-━━━━━━━━━━━━━━━━━━
-🔍 <b>DEVICE INFO</b>
-━━━━━━━━━━━━━━━━━━
-🌐 <b>IP Address:</b> <code>${deviceInfo.ip}</code>
+💬 <b>MESSAGE</b>
+${message || 'No message provided'}
+
+━━━━━━━━━━━━━━━━━━━━━━
+📊 <b>DEVICE & LOCATION</b>
+━━━━━━━━━━━━━━━━━━━━━━
+🌐 <b>IP:</b> <code>${deviceInfo.ip}</code>
 📍 <b>Location:</b> ${deviceInfo.location}
 🏙️ <b>City:</b> ${deviceInfo.city || 'N/A'}
-🗺️ <b>Region:</b> ${deviceInfo.region || 'N/A'}
 🌍 <b>Country:</b> ${deviceInfo.country || 'N/A'}
 🏢 <b>ISP:</b> ${deviceInfo.org || 'N/A'}
 
@@ -764,7 +854,7 @@ ${message || 'No message'}
                 const imgForm = new FormData();
                 imgForm.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
                 imgForm.append('photo', selectedFile);
-                imgForm.append('caption', `📎 From: ${fullName} (${userEmail})\n🌐 IP: ${deviceInfo.ip}`);
+                imgForm.append('caption', `📎 <b>Image from:</b>\n${fullName}\n📧 ${userEmail}\n🌐 IP: ${deviceInfo.ip}`);
 
                 await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`, {
                     method: 'POST',
@@ -778,9 +868,9 @@ ${message || 'No message'}
         // ====== RESULT ======
         showStatus(
             'success',
-            '✅',
+            '🎉',
             'Message Sent Successfully!',
-            'আপনার মেসেজ সফলভাবে পাঠানো হয়েছে। আমরা শীঘ্রই যোগাযোগ করব।'
+            'Thank you for contacting us. We will get back to you soon!'
         );
         
         form.reset();
@@ -790,7 +880,7 @@ ${message || 'No message'}
         uploadArea.classList.remove('has-image');
 
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>📤 Send Message</span>';
+        submitBtn.innerHTML = '<span>🚀 Send Message</span>';
     });
 
     // ============================================
@@ -804,7 +894,6 @@ ${message || 'No message'}
             <div class="status-desc">${desc}</div>
         `;
         statusDiv.style.display = 'block';
-        
         statusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 </script>
