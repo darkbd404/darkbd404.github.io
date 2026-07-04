@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Contact Us</title>
+    <title>Contact</title>
     
     <meta name="theme-color" content="#667eea">
     <meta name="description" content="Contact Us Web App">
@@ -317,7 +317,6 @@
             text-decoration: underline;
         }
 
-        /* Install Popup Modal */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -331,9 +330,7 @@
             animation: fadeIn 0.3s ease;
         }
 
-        .modal-overlay.show {
-            display: flex;
-        }
+        .modal-overlay.show { display: flex; }
 
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -421,10 +418,7 @@
             background-clip: text;
         }
 
-        .modal-header p {
-            font-size: 14px;
-            color: #718096;
-        }
+        .modal-header p { font-size: 14px; color: #718096; }
 
         .modal-section {
             margin-bottom: 20px;
@@ -450,16 +444,8 @@
             margin-bottom: 5px;
         }
 
-        .modal-section ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .modal-section ul li::before {
-            content: "✓ ";
-            color: #48bb78;
-            font-weight: 700;
-        }
+        .modal-section ul { list-style: none; padding-left: 0; }
+        .modal-section ul li::before { content: "✓ "; color: #48bb78; font-weight: 700; }
 
         .modal-install-btn {
             width: 100%;
@@ -495,9 +481,7 @@
             font-family: inherit;
         }
 
-        .modal-skip:hover {
-            color: #667eea;
-        }
+        .modal-skip:hover { color: #667eea; }
 
         @media (max-width: 550px) {
             .form-row { flex-direction: column; gap: 0; }
@@ -574,17 +558,14 @@
         </div>
     </div>
 
-    <!-- Install Popup Modal -->
     <div class="modal-overlay" id="installModal">
         <div class="modal-content">
             <button class="modal-close" id="modalClose">✕</button>
-            
             <div class="modal-header">
                 <span class="modal-icon">📱</span>
                 <h3>Install Our App</h3>
                 <p>Get the best experience on your device</p>
             </div>
-
             <div class="modal-section">
                 <h4>🚀 About This App</h4>
                 <ul>
@@ -595,7 +576,6 @@
                     <li>Premium Quality Service</li>
                 </ul>
             </div>
-
             <div class="modal-section">
                 <h4>👨‍💻 Developer Info</h4>
                 <p><strong>Name:</strong> ABDUS SALAM</p>
@@ -603,14 +583,12 @@
                 <p><strong>Version:</strong> 1.0.0</p>
                 <p><strong>Built with:</strong> ❤️ & Precision</p>
             </div>
-
             <button class="modal-install-btn" id="modalInstallBtn">📥 Install Now</button>
             <button class="modal-skip" id="modalSkip">Maybe Later</button>
         </div>
     </div>
 
 <script>
-    // Orbs
     (function(){
         const c = document.getElementById('orbs');
         for (let i = 0; i < 6; i++) {
@@ -627,9 +605,6 @@
         }
     })();
 
-    // ============================================
-    // PWA Install with Popup - ALWAYS SHOW
-    // ============================================
     let deferredPrompt = null;
     const installModal = document.getElementById('installModal');
     const modalClose = document.getElementById('modalClose');
@@ -641,25 +616,16 @@
         deferredPrompt = e;
     });
 
-    setTimeout(() => {
-        installModal.classList.add('show');
-    }, 2000);
+    setTimeout(() => { installModal.classList.add('show'); }, 2000);
 
-    modalClose.addEventListener('click', () => {
-        installModal.classList.remove('show');
-    });
-
-    modalSkip.addEventListener('click', () => {
-        installModal.classList.remove('show');
-    });
+    modalClose.addEventListener('click', () => { installModal.classList.remove('show'); });
+    modalSkip.addEventListener('click', () => { installModal.classList.remove('show'); });
 
     modalInstallBtn.addEventListener('click', async () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installModal.classList.remove('show');
-            }
+            if (outcome === 'accepted') installModal.classList.remove('show');
             deferredPrompt = null;
         } else {
             alert('To install:\n\n📱 Android: Click ⋮ menu → "Install app"\n💻 Windows: Click install icon in address bar\n🍎 iOS: Share → "Add to Home Screen"');
@@ -668,14 +634,10 @@
     });
 
     installModal.addEventListener('click', (e) => {
-        if (e.target === installModal) {
-            installModal.classList.remove('show');
-        }
+        if (e.target === installModal) installModal.classList.remove('show');
     });
 
-    window.addEventListener('appinstalled', () => {
-        installModal.classList.remove('show');
-    });
+    window.addEventListener('appinstalled', () => { installModal.classList.remove('show'); });
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -685,9 +647,6 @@
         });
     }
 
-    // ============================================
-    // Config
-    // ============================================
     const CONFIG = {
         ADMIN_EMAIL: "salam04836@gmail.com",
         TELEGRAM_BOT_TOKEN: "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE",
@@ -695,9 +654,6 @@
         CUSTOMER_REPLY_SUBJECT: "✅ Message Received - Thank You!"
     };
 
-    // ============================================
-    // Premium Device Info Collection
-    // ============================================
     async function collectDeviceInfo() {
         const d = {
             userAgent: navigator.userAgent,
@@ -761,9 +717,6 @@
         return { browser: b, os: o, device: device };
     }
 
-    // ============================================
-    // Image Upload
-    // ============================================
     const imageUpload = document.getElementById('imageUpload');
     const uploadPlaceholder = document.getElementById('uploadPlaceholder');
     const previewContainer = document.getElementById('previewContainer');
@@ -771,6 +724,7 @@
     const uploadArea = document.getElementById('uploadArea');
     const removeImgBtn = document.getElementById('removeImg');
     let selectedFile = null;
+    let imageBase64 = null;
 
     imageUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
@@ -783,6 +737,7 @@
         const r = new FileReader();
         r.onload = ev => {
             imagePreview.src = ev.target.result;
+            imageBase64 = ev.target.result;
             uploadPlaceholder.style.display = 'none';
             previewContainer.style.display = 'block';
             uploadArea.classList.add('has-image');
@@ -793,15 +748,13 @@
     removeImgBtn.addEventListener('click', function(e) {
         e.stopPropagation();
         selectedFile = null;
+        imageBase64 = null;
         imageUpload.value = '';
         uploadPlaceholder.style.display = 'block';
         previewContainer.style.display = 'none';
         uploadArea.classList.remove('has-image');
     });
 
-    // ============================================
-    // Form Submit
-    // ============================================
     const form = document.getElementById('contactForm');
     const submitBtn = document.getElementById('submitBtn');
     const statusDiv = document.getElementById('status');
@@ -823,48 +776,149 @@
         const { browser, os, device } = parseBrowser(deviceInfo.userAgent);
         const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
 
-        // ====== 1. ADMIN EMAIL (With Image Attachment Fix) ======
+        // ====== 1. ADMIN EMAIL (Image as Base64 Embedded) ======
         try {
+            let imageHTML = '';
+            if (imageBase64) {
+                imageHTML = `
+                    <div style="margin: 25px 0; padding: 20px; background: #f7fafc; border-radius: 12px; text-align: center;">
+                        <h3 style="color: #667eea; margin: 0 0 15px 0; font-size: 16px;">📎 Attached Image</h3>
+                        <img src="${imageBase64}" style="max-width: 100%; max-height: 400px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);" alt="Attached Image">
+                    </div>
+                `;
+            }
+
+            const adminHTML = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body style="margin: 0; padding: 0; background: #f7fafc; font-family: 'Segoe UI', Tahoma, sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background: #f7fafc; padding: 30px 20px;">
+        <tr>
+            <td align="center">
+                <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 26px;">🎯 New Contact Message</h1>
+                            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 14px;">You received a new message from your contact form</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 35px 30px;">
+                            <h2 style="color: #2d3748; margin: 0 0 20px 0; font-size: 20px;">📋 Contact Details</h2>
+                            
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background: #f7fafc; border-radius: 12px; padding: 20px;">
+                                <tr>
+                                    <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                        <strong style="color: #718096; font-size: 12px; text-transform: uppercase;">Name:</strong>
+                                        <div style="color: #2d3748; font-size: 16px; margin-top: 4px;">${fullName}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                        <strong style="color: #718096; font-size: 12px; text-transform: uppercase;">Email:</strong>
+                                        <div style="color: #2d3748; font-size: 16px; margin-top: 4px;"><a href="mailto:${userEmail}" style="color: #667eea;">${userEmail}</a></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                        <strong style="color: #718096; font-size: 12px; text-transform: uppercase;">Phone:</strong>
+                                        <div style="color: #2d3748; font-size: 16px; margin-top: 4px;">${phone || 'N/A'}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                        <strong style="color: #718096; font-size: 12px; text-transform: uppercase;">Subject:</strong>
+                                        <div style="color: #2d3748; font-size: 16px; margin-top: 4px;">${subject}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0;">
+                                        <strong style="color: #718096; font-size: 12px; text-transform: uppercase;">Message:</strong>
+                                        <div style="color: #2d3748; font-size: 15px; line-height: 1.7; margin-top: 4px; white-space: pre-wrap;">${message || 'No message'}</div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            ${imageHTML}
+
+                            <h2 style="color: #2d3748; margin: 30px 0 20px 0; font-size: 20px;">📊 Device & Location Info</h2>
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background: #f7fafc; border-radius: 12px; padding: 20px; font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">IP Address:</strong> <span style="color: #2d3748;">${deviceInfo.ip}</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">Location:</strong> <span style="color: #2d3748;">${deviceInfo.location}</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">City:</strong> <span style="color: #2d3748;">${deviceInfo.city || 'N/A'}</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">Country:</strong> <span style="color: #2d3748;">${deviceInfo.country || 'N/A'}</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">ISP:</strong> <span style="color: #2d3748;">${deviceInfo.org || 'N/A'}</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">Browser:</strong> <span style="color: #2d3748;">${browser}</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">OS:</strong> <span style="color: #2d3748;">${os}</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">Device:</strong> <span style="color: #2d3748;">${device}</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">Screen:</strong> <span style="color: #2d3748;">${deviceInfo.screen}</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">Battery:</strong> <span style="color: #2d3748;">${deviceInfo.battery}</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">Connection:</strong> <span style="color: #2d3748;">${deviceInfo.connection}</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong style="color: #718096;">Submitted:</strong> <span style="color: #2d3748;">${now}</span></td>
+                                </tr>
+                            </table>
+
+                            <div style="margin-top: 30px; text-align: center;">
+                                <a href="mailto:${userEmail}?subject=Re: ${subject}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 10px; font-weight: 700; font-size: 14px;">
+                                    ✉️ Reply via Email
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background: #f7fafc; padding: 25px 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+                            <p style="color: #a0aec0; margin: 0; font-size: 12px;">© 2026 ABDUS SALAM. All Rights Reserved.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+
             const fd = new FormData();
-            fd.append('Full Name', fullName);
-            fd.append('Email', userEmail);
-            fd.append('Phone', phone || 'N/A');
-            fd.append('Subject', subject);
-            fd.append('Message', message || 'No message');
-            fd.append('IP Address', deviceInfo.ip);
-            fd.append('Location', deviceInfo.location);
-            fd.append('City', deviceInfo.city);
-            fd.append('Country', deviceInfo.country);
-            fd.append('ISP', deviceInfo.org);
-            fd.append('Browser', browser);
-            fd.append('OS', os);
-            fd.append('Device Type', device);
-            fd.append('Screen', deviceInfo.screen);
-            fd.append('Pixel Ratio', deviceInfo.pixelRatio);
-            fd.append('Battery', deviceInfo.battery);
-            fd.append('Connection', deviceInfo.connection);
-            fd.append('Cores', deviceInfo.cores);
-            fd.append('Memory', deviceInfo.memory + ' GB');
-            fd.append('Language', deviceInfo.language);
-            fd.append('Timezone', deviceInfo.timezone);
-            fd.append('Submitted At', now);
+            fd.append('message', adminHTML);
             fd.append('_subject', '🎯 Premium Contact: ' + subject);
             fd.append('_captcha', 'false');
-            
-            // Image attachment - FormSubmit এ "attachment" নামে পাঠাতে হবে
-            if (selectedFile) {
-                fd.append('attachment', selectedFile, selectedFile.name);
-            }
+            fd.append('_content-type', 'text/html');
+            fd.append('_replyto', userEmail);
 
             await fetch(`https://formsubmit.co/ajax/${CONFIG.ADMIN_EMAIL}`, {
                 method: 'POST',
+                headers: { 'Accept': 'application/json' },
                 body: fd
             });
         } catch(e) {
             console.log('Admin email error:', e);
         }
 
-        // ====== 2. CUSTOMER EMAIL (Premium HTML - Generic Greeting) ======
+        // ====== 2. CUSTOMER EMAIL (Premium Welcome Template) ======
         try {
             const customerHTML = `<!DOCTYPE html>
 <html>
@@ -883,7 +937,7 @@
                         <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 50px 30px; text-align: center;">
                             <div style="font-size: 70px; margin-bottom: 15px;">✅</div>
                             <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">Message Received!</h1>
-                            <p style="color: rgba(255,255,255,0.95); margin: 12px 0 0 0; font-size: 16px; font-weight: 400;">Thank you for reaching out to us</p>
+                            <p style="color: rgba(255,255,255,0.95); margin: 12px 0 0 0; font-size: 16px;">Thank you for reaching out to us</p>
                         </td>
                     </tr>
                     
@@ -893,15 +947,23 @@
                             
                             <!-- Greeting -->
                             <div style="margin-bottom: 30px;">
-                                <h2 style="color: #2d3748; margin: 0 0 12px 0; font-size: 22px; font-weight: 600;">Dear Valued Customer,</h2>
+                                <h2 style="color: #2d3748; margin: 0 0 15px 0; font-size: 24px; font-weight: 600;">Assalamu Alaikum, ${fullName}! 👋</h2>
                                 <p style="color: #4a5568; margin: 0; font-size: 16px; line-height: 1.8;">
-                                    We hope this message finds you well. This is to confirm that we have successfully received your message and our team is reviewing it.
+                                    We hope this message finds you in good health and high spirits. This is to confirm that we have successfully received your message and our team is reviewing it with utmost care.
                                 </p>
                             </div>
                             
-                            <!-- Info Card -->
+                            <!-- Welcome Message -->
                             <div style="background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-radius: 16px; padding: 30px; margin: 30px 0; border-left: 5px solid #667eea;">
-                                <h3 style="color: #667eea; margin: 0 0 20px 0; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📋 Your Submission Details</h3>
+                                <h3 style="color: #667eea; margin: 0 0 15px 0; font-size: 18px; font-weight: 700;">🎉 Welcome to Our Service!</h3>
+                                <p style="color: #4a5568; margin: 0; font-size: 15px; line-height: 1.8;">
+                                    Thank you for choosing to connect with us. We truly appreciate your interest and want you to know that your message is important to us. Our dedicated team will review your submission and get back to you as soon as possible.
+                                </p>
+                            </div>
+                            
+                            <!-- Submission Details -->
+                            <div style="background: #f7fafc; border-radius: 16px; padding: 30px; margin: 30px 0;">
+                                <h3 style="color: #2d3748; margin: 0 0 20px 0; font-size: 18px; font-weight: 700;">📋 Your Submission Summary</h3>
                                 
                                 <table width="100%" cellpadding="0" cellspacing="0">
                                     <tr>
@@ -931,23 +993,48 @@
                                 <p style="color: #ffffff; margin: 0 0 15px 0; font-size: 17px; font-weight: 600;">Expected Response Time</p>
                                 <p style="color: rgba(255,255,255,0.95); margin: 0; font-size: 15px; line-height: 1.6;">
                                     We typically respond within <strong>24 hours</strong>.<br>
-                                    For urgent matters, please contact us directly.
+                                    For urgent matters, please contact us directly via Messenger.
+                                </p>
+                            </div>
+                            
+                            <!-- Thank You -->
+                            <div style="text-align: center; margin: 35px 0; padding: 30px; background: #f7fafc; border-radius: 16px;">
+                                <div style="font-size: 50px; margin-bottom: 15px;">🙏</div>
+                                <h3 style="color: #2d3748; margin: 0 0 10px 0; font-size: 20px; font-weight: 700;">Thank You!</h3>
+                                <p style="color: #4a5568; margin: 0; font-size: 15px; line-height: 1.7;">
+                                    We sincerely appreciate your time and patience. Your trust means everything to us, and we are committed to providing you with the best possible service.
                                 </p>
                             </div>
                             
                             <!-- Contact Button -->
                             <div style="text-align: center; margin: 35px 0;">
-                                <a href="https://m.me/Salam.864" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-weight: 700; font-size: 15px; box-shadow: 0 8px 25px rgba(102,126,234,0.4); transition: all 0.3s;">
+                                <a href="https://m.me/Salam.864" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-weight: 700; font-size: 15px; box-shadow: 0 8px 25px rgba(102,126,234,0.4);">
                                     💬 Contact Us on Messenger
                                 </a>
                             </div>
                             
+                            <!-- Developer Info -->
+                            <div style="margin-top: 40px; padding: 25px; background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-radius: 16px; border-left: 5px solid #667eea;">
+                                <h3 style="color: #667eea; margin: 0 0 15px 0; font-size: 16px; font-weight: 700;">👨‍💻 Developer Information</h3>
+                                <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 14px;">
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong style="color: #718096;">Developer:</strong> <span style="color: #2d3748; font-weight: 600;">ABDUS SALAM</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong style="color: #718096;">Contact:</strong> <a href="https://m.me/Salam.864" style="color: #667eea; text-decoration: none;">Messenger</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong style="color: #718096;">Version:</strong> <span style="color: #2d3748;">1.0.0</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong style="color: #718096;">Built with:</strong> <span style="color: #2d3748;">❤️ & Precision</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
                             <!-- Closing -->
                             <div style="margin-top: 35px; padding-top: 25px; border-top: 2px solid #e2e8f0;">
-                                <p style="color: #4a5568; margin: 0 0 8px 0; font-size: 15px; line-height: 1.7;">
-                                    Thank you for your patience and understanding.
-                                </p>
-                                <p style="color: #2d3748; margin: 20px 0 5px 0; font-size: 16px; font-weight: 700;">
+                                <p style="color: #2d3748; margin: 0 0 5px 0; font-size: 16px; font-weight: 700;">
                                     Best regards,
                                 </p>
                                 <p style="color: #667eea; margin: 0; font-size: 18px; font-weight: 700;">
@@ -965,7 +1052,7 @@
                     <tr>
                         <td style="background: #f7fafc; padding: 30px 35px; text-align: center; border-top: 1px solid #e2e8f0;">
                             <p style="color: #a0aec0; margin: 0 0 8px 0; font-size: 13px;">
-                                © 2026 ABDUS SALAM. All Rights Received.
+                                © 2026 ABDUS SALAM. All Rights Reserved.
                             </p>
                             <p style="color: #cbd5e0; margin: 0; font-size: 11px;">
                                 This is an automated confirmation message. Please do not reply directly to this email.
@@ -1066,6 +1153,7 @@ ${message || 'No message provided'}
         
         form.reset();
         selectedFile = null;
+        imageBase64 = null;
         uploadPlaceholder.style.display = 'block';
         previewContainer.style.display = 'none';
         uploadArea.classList.remove('has-image');
