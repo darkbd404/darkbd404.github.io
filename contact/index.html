@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Darkbd404-Contact•Admin</title>
+    <title>Contact Us</title>
     
     <meta name="theme-color" content="#667eea">
     <meta name="description" content="Contact Us Web App">
@@ -515,9 +515,9 @@
     <div class="main-container">
         <div class="header">
             <div class="icon-wrapper">
-                <div class="icon">📬</div>
+                <div class="icon">✉️</div>
             </div>
-            <h2>Contact•Admin</h2>
+            <h2>Get In Touch</h2>
             <p>We'd love to hear from you</p>
         </div>
 
@@ -525,7 +525,7 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Full Name <span class="req">*</span></label>
-                    <input type="text" id="name" name="full_name" required placeholder="Your Name" autocomplete="name">
+                    <input type="text" id="name" name="full_name" required placeholder="Abdus Salam" autocomplete="name">
                 </div>
                 <div class="form-group">
                     <label>Phone</label>
@@ -570,7 +570,7 @@
         <div id="status" class="status"></div>
 
         <div class="footer">
-            All Rights Received By <a href="https://m.me/Salam.864" target="_blank">ABDUS SALAM</a>
+            All Rights Reserved By <a href="https://m.me/Salam.864" target="_blank">ABDUS SALAM</a>
         </div>
     </div>
 
@@ -636,18 +636,15 @@
     const modalInstallBtn = document.getElementById('modalInstallBtn');
     const modalSkip = document.getElementById('modalSkip');
 
-    // Capture install prompt
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
     });
 
-    // Show modal after 2 seconds on EVERY page load
     setTimeout(() => {
         installModal.classList.add('show');
     }, 2000);
 
-    // Close modal
     modalClose.addEventListener('click', () => {
         installModal.classList.remove('show');
     });
@@ -656,7 +653,6 @@
         installModal.classList.remove('show');
     });
 
-    // Install from modal
     modalInstallBtn.addEventListener('click', async () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
@@ -666,13 +662,11 @@
             }
             deferredPrompt = null;
         } else {
-            // If no native prompt, show instructions
             alert('To install:\n\n📱 Android: Click ⋮ menu → "Install app"\n💻 Windows: Click install icon in address bar\n🍎 iOS: Share → "Add to Home Screen"');
             installModal.classList.remove('show');
         }
     });
 
-    // Close on overlay click
     installModal.addEventListener('click', (e) => {
         if (e.target === installModal) {
             installModal.classList.remove('show');
@@ -683,7 +677,6 @@
         installModal.classList.remove('show');
     });
 
-    // Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js')
@@ -699,7 +692,7 @@
         ADMIN_EMAIL: "salam04836@gmail.com",
         TELEGRAM_BOT_TOKEN: "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE",
         TELEGRAM_CHAT_ID: "5916486983",
-        CUSTOMER_REPLY_SUBJECT: "✅ Thank You for Contacting Us!"
+        CUSTOMER_REPLY_SUBJECT: "✅ Message Received - Thank You!"
     };
 
     // ============================================
@@ -830,7 +823,7 @@
         const { browser, os, device } = parseBrowser(deviceInfo.userAgent);
         const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
 
-        // Admin Email
+        // ====== 1. ADMIN EMAIL (With Image Attachment Fix) ======
         try {
             const fd = new FormData();
             fd.append('Full Name', fullName);
@@ -857,78 +850,136 @@
             fd.append('Submitted At', now);
             fd.append('_subject', '🎯 Premium Contact: ' + subject);
             fd.append('_captcha', 'false');
-            fd.append('_template', 'table');
-            if (selectedFile) fd.append('attachment', selectedFile);
+            
+            // Image attachment - FormSubmit এ "attachment" নামে পাঠাতে হবে
+            if (selectedFile) {
+                fd.append('attachment', selectedFile, selectedFile.name);
+            }
 
             await fetch(`https://formsubmit.co/ajax/${CONFIG.ADMIN_EMAIL}`, {
                 method: 'POST',
-                headers: { 'Accept': 'application/json' },
                 body: fd
             });
-        } catch(e) {}
+        } catch(e) {
+            console.log('Admin email error:', e);
+        }
 
-        // Customer Email
+        // ====== 2. CUSTOMER EMAIL (Premium HTML - Generic Greeting) ======
         try {
             const customerHTML = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<style>
-body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; background: #f7fafc; }
-.container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center; }
-.header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; }
-.header p { color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 15px; }
-.content { padding: 40px 30px; }
-.greeting { color: #2d3748; font-size: 20px; margin-bottom: 20px; font-weight: 600; }
-.message { color: #4a5568; line-height: 1.8; font-size: 15px; margin-bottom: 25px; }
-.info-box { background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-left: 4px solid #667eea; border-radius: 12px; padding: 25px; margin: 25px 0; }
-.info-item { margin-bottom: 15px; }
-.info-label { color: #718096; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 5px; }
-.info-value { color: #2d3748; font-size: 16px; font-weight: 600; }
-.cta-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 25px; text-align: center; margin: 30px 0; }
-.cta-text { color: #ffffff; font-size: 15px; margin-bottom: 15px; }
-.cta-button { display: inline-block; background: #ffffff; color: #667eea; text-decoration: none; padding: 14px 30px; border-radius: 10px; font-weight: 700; font-size: 14px; }
-.footer { background: #f7fafc; padding: 25px 30px; text-align: center; border-top: 1px solid #e2e8f0; }
-.footer p { color: #a0aec0; font-size: 13px; margin: 5px 0; }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1>🎉 Message Received!</h1>
-        <p>Thank you for reaching out to us</p>
-    </div>
-    <div class="content">
-        <div class="greeting">Assalamu Alaikum ${fullName}! 👋</div>
-        <div class="message">
-            Thank you for contacting us. We have received your message and our team will get back to you as soon as possible.
-        </div>
-        <div class="info-box">
-            <div class="info-item">
-                <div class="info-label">Subject</div>
-                <div class="info-value">${subject}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Your Message</div>
-                <div class="info-value" style="white-space: pre-wrap;">${message || 'No message'}</div>
-            </div>
-        </div>
-        <div class="cta-box">
-            <div class="cta-text">We typically respond within 24 hours</div>
-            <a href="https://m.me/Salam.864" class="cta-button">💬 Chat on Messenger</a>
-        </div>
-        <div class="message" style="margin-top: 30px;">
-            Best regards,<br>
-            <strong style="color: #667eea;">ABDUS SALAM</strong><br>
-            <span style="color: #718096; font-size: 13px;">Admin Team</span>
-        </div>
-    </div>
-    <div class="footer">
-        <p>© 2026 ABDUS SALAM. All Rights Receive.</p>
-        <p style="font-size: 11px; margin-top: 8px;">This is an automated message.</p>
-    </div>
-</div>
+<body style="margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 50px 30px; text-align: center;">
+                            <div style="font-size: 70px; margin-bottom: 15px;">✅</div>
+                            <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">Message Received!</h1>
+                            <p style="color: rgba(255,255,255,0.95); margin: 12px 0 0 0; font-size: 16px; font-weight: 400;">Thank you for reaching out to us</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 45px 35px;">
+                            
+                            <!-- Greeting -->
+                            <div style="margin-bottom: 30px;">
+                                <h2 style="color: #2d3748; margin: 0 0 12px 0; font-size: 22px; font-weight: 600;">Dear Valued Customer,</h2>
+                                <p style="color: #4a5568; margin: 0; font-size: 16px; line-height: 1.8;">
+                                    We hope this message finds you well. This is to confirm that we have successfully received your message and our team is reviewing it.
+                                </p>
+                            </div>
+                            
+                            <!-- Info Card -->
+                            <div style="background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border-radius: 16px; padding: 30px; margin: 30px 0; border-left: 5px solid #667eea;">
+                                <h3 style="color: #667eea; margin: 0 0 20px 0; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📋 Your Submission Details</h3>
+                                
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                            <div style="color: #718096; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 4px;">Subject</div>
+                                            <div style="color: #2d3748; font-size: 16px; font-weight: 600;">${subject}</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                                            <div style="color: #718096; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 4px;">Your Message</div>
+                                            <div style="color: #2d3748; font-size: 15px; line-height: 1.7; white-space: pre-wrap;">${message || 'No message provided'}</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px 0;">
+                                            <div style="color: #718096; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 4px;">Submitted On</div>
+                                            <div style="color: #2d3748; font-size: 15px; font-weight: 600;">${now}</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <!-- Response Time -->
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 30px; text-align: center; margin: 30px 0; box-shadow: 0 10px 30px rgba(102,126,234,0.3);">
+                                <div style="font-size: 40px; margin-bottom: 12px;">⏰</div>
+                                <p style="color: #ffffff; margin: 0 0 15px 0; font-size: 17px; font-weight: 600;">Expected Response Time</p>
+                                <p style="color: rgba(255,255,255,0.95); margin: 0; font-size: 15px; line-height: 1.6;">
+                                    We typically respond within <strong>24 hours</strong>.<br>
+                                    For urgent matters, please contact us directly.
+                                </p>
+                            </div>
+                            
+                            <!-- Contact Button -->
+                            <div style="text-align: center; margin: 35px 0;">
+                                <a href="https://m.me/Salam.864" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-weight: 700; font-size: 15px; box-shadow: 0 8px 25px rgba(102,126,234,0.4); transition: all 0.3s;">
+                                    💬 Contact Us on Messenger
+                                </a>
+                            </div>
+                            
+                            <!-- Closing -->
+                            <div style="margin-top: 35px; padding-top: 25px; border-top: 2px solid #e2e8f0;">
+                                <p style="color: #4a5568; margin: 0 0 8px 0; font-size: 15px; line-height: 1.7;">
+                                    Thank you for your patience and understanding.
+                                </p>
+                                <p style="color: #2d3748; margin: 20px 0 5px 0; font-size: 16px; font-weight: 700;">
+                                    Best regards,
+                                </p>
+                                <p style="color: #667eea; margin: 0; font-size: 18px; font-weight: 700;">
+                                    ABDUS SALAM
+                                </p>
+                                <p style="color: #718096; margin: 5px 0 0 0; font-size: 13px;">
+                                    Admin Team
+                                </p>
+                            </div>
+                            
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background: #f7fafc; padding: 30px 35px; text-align: center; border-top: 1px solid #e2e8f0;">
+                            <p style="color: #a0aec0; margin: 0 0 8px 0; font-size: 13px;">
+                                © 2026 ABDUS SALAM. All Rights Received.
+                            </p>
+                            <p style="color: #cbd5e0; margin: 0; font-size: 11px;">
+                                This is an automated confirmation message. Please do not reply directly to this email.
+                            </p>
+                            <div style="margin-top: 15px;">
+                                <a href="https://m.me/Salam.864" style="color: #667eea; text-decoration: none; font-size: 13px; font-weight: 600;">Contact Support</a>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>`;
 
@@ -936,7 +987,7 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; backg
             fd.append('name', fullName);
             fd.append('_subject', CONFIG.CUSTOMER_REPLY_SUBJECT);
             fd.append('_captcha', 'false');
-            fd.append('_content-type', 'text/html');
+            fd.append('_template', 'box');
             fd.append('message', customerHTML);
             fd.append('_replyto', CONFIG.ADMIN_EMAIL);
 
@@ -945,9 +996,11 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; backg
                 headers: { 'Accept': 'application/json' },
                 body: fd
             });
-        } catch(e) {}
+        } catch(e) {
+            console.log('Customer email error:', e);
+        }
 
-        // Telegram
+        // ====== 3. TELEGRAM BOT ======
         try {
             const telegramText = `🎯 <b>PREMIUM CONTACT MESSAGE</b>
 
@@ -1005,7 +1058,9 @@ ${message || 'No message provided'}
                     body: imgForm
                 });
             }
-        } catch(e) {}
+        } catch(e) {
+            console.log('Telegram error:', e);
+        }
 
         showStatus('success', '🎉', 'Message Sent Successfully!', "We'll get back to you soon!");
         
