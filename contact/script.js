@@ -9,7 +9,7 @@ const result = document.getElementById("result");
  Google Apps Script Web App URL
  Deploy করার পরে এখানে URL বসাবেন।
 */
-const WEB_APP_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL_HERE";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzXeNK0YID4th9HFBf0DHBmKL_lANtbp5r_9TpxU64hNkzwsXZ8Dgl27S3HzDDAfS7r/exec";
 
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
