@@ -2,8 +2,24 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Contact-ADMIN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Contact•ADMIN GOV.BD</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Contact Us - Premium Web App">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Contact">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons for PWA -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
     <style>
         * {
             margin: 0;
@@ -15,16 +31,12 @@
             --bg-gradient-1: #667eea;
             --bg-gradient-2: #764ba2;
             --bg-gradient-3: #f093fb;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --text-primary: #2d3748;
-            --text-secondary: #718096;
-            --text-muted: #a0aec0;
-            --input-bg: #f7fafc;
-            --input-border: #e2e8f0;
-            --input-focus: #667eea;
-            --shadow-color: rgba(0, 0, 0, 0.15);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.9);
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --input-bg: rgba(255, 255, 255, 0.15);
+            --input-border: rgba(255, 255, 255, 0.2);
+            --input-focus: rgba(255, 255, 255, 0.3);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -32,33 +44,27 @@
                 --bg-gradient-1: #1a1a2e;
                 --bg-gradient-2: #16213e;
                 --bg-gradient-3: #0f3460;
-                --card-bg: rgba(30, 30, 46, 0.95);
-                --text-primary: #e2e8f0;
-                --text-secondary: #a0aec0;
-                --text-muted: #718096;
-                --input-bg: rgba(45, 45, 61, 0.8);
-                --input-border: rgba(74, 85, 104, 0.5);
-                --input-focus: #667eea;
-                --shadow-color: rgba(0, 0, 0, 0.4);
-                --glass-bg: rgba(255, 255, 255, 0.05);
-                --glass-border: rgba(255, 255, 255, 0.1);
+                --input-bg: rgba(255, 255, 255, 0.08);
+                --input-border: rgba(255, 255, 255, 0.15);
+                --input-focus: rgba(255, 255, 255, 0.25);
             }
+        }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 40px 20px;
             color: var(--text-primary);
-            overflow-x: hidden;
             position: relative;
             transition: all 0.5s ease;
         }
 
+        /* 3D Floating Orbs - Background Only */
         .orbs {
             position: fixed;
             top: 0;
@@ -74,10 +80,8 @@
         .orb {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent);
-            box-shadow: 
-                inset 0 0 50px rgba(255, 255, 255, 0.2),
-                0 0 80px rgba(102, 126, 234, 0.3);
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), transparent);
+            box-shadow: 0 0 80px rgba(102, 126, 234, 0.2);
             animation: float3D 20s infinite ease-in-out;
             transform-style: preserve-3d;
         }
@@ -97,140 +101,83 @@
             }
         }
 
-        .container {
+        /* Main Container - No Card, No Border */
+        .main-container {
             position: relative;
             z-index: 1;
-            background: var(--card-bg);
-            backdrop-filter: blur(30px);
-            border-radius: 32px;
-            padding: 50px 45px;
             width: 100%;
             max-width: 600px;
-            box-shadow: 
-                0 25px 80px var(--shadow-color),
-                0 0 0 1px var(--glass-border),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
-            animation: containerEntry 1s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-style: preserve-3d;
-            transition: transform 0.3s ease;
-        }
-
-        .container:hover {
-            transform: translateZ(20px) rotateX(2deg);
-        }
-
-        @keyframes containerEntry {
-            from {
-                opacity: 0;
-                transform: translateY(60px) scale(0.9) rotateX(10deg);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1) rotateX(0deg);
-            }
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
             text-align: center;
             margin-bottom: 40px;
             animation: headerEntry 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
-            transform-style: preserve-3d;
         }
 
         @keyframes headerEntry {
             from {
                 opacity: 0;
-                transform: translateY(-30px) translateZ(-50px);
+                transform: translateY(-30px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0) translateZ(0);
+                transform: translateY(0);
             }
         }
 
         .header .icon-wrapper {
-            width: 110px;
-            height: 110px;
+            width: 100px;
+            height: 100px;
             margin: 0 auto 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 
-                0 15px 50px rgba(102, 126, 234, 0.5),
-                inset 0 -5px 20px rgba(0, 0, 0, 0.2),
-                inset 0 5px 20px rgba(255, 255, 255, 0.3);
             animation: icon3D 3s ease-in-out infinite;
-            transform-style: preserve-3d;
-            position: relative;
-        }
-
-        .header .icon-wrapper::before {
-            content: '';
-            position: absolute;
-            top: 10%;
-            left: 10%;
-            width: 80%;
-            height: 80%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), transparent);
-            border-radius: 50%;
-            animation: shine 2s ease-in-out infinite;
-        }
-
-        @keyframes shine {
-            0%, 100% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
         }
 
         @keyframes icon3D {
             0%, 100% {
-                transform: rotateY(0deg) rotateX(0deg) translateZ(0);
-                box-shadow: 0 15px 50px rgba(102, 126, 234, 0.5);
-            }
-            25% {
-                transform: rotateY(15deg) rotateX(5deg) translateZ(20px);
-                box-shadow: 20px 15px 50px rgba(102, 126, 234, 0.6);
+                transform: rotateY(0deg) scale(1);
             }
             50% {
-                transform: rotateY(0deg) rotateX(-5deg) translateZ(30px);
-                box-shadow: 0 20px 60px rgba(102, 126, 234, 0.7);
-            }
-            75% {
-                transform: rotateY(-15deg) rotateX(5deg) translateZ(20px);
-                box-shadow: -20px 15px 50px rgba(102, 126, 234, 0.6);
+                transform: rotateY(15deg) scale(1.05);
             }
         }
 
         .header .icon {
-            font-size: 55px;
-            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
-            transform: translateZ(30px);
+            font-size: 50px;
         }
 
         .header h2 {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 34px;
+            font-size: 32px;
             font-weight: 700;
-            letter-spacing: -0.5px;
             margin-bottom: 10px;
-            transform: translateZ(20px);
-            text-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+            color: var(--text-primary);
         }
 
         .header p {
             color: var(--text-secondary);
             font-size: 15px;
-            font-weight: 400;
-            transform: translateZ(10px);
+        }
+
+        /* Form - No Card, Transparent */
+        .form-container {
+            flex: 1;
         }
 
         .form-row {
             display: flex;
-            gap: 18px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .form-row .form-group {
@@ -238,9 +185,8 @@
         }
 
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             animation: fieldEntry 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-            transform-style: preserve-3d;
         }
 
         .form-group:nth-child(1) { animation-delay: 0.3s; }
@@ -252,43 +198,40 @@
         @keyframes fieldEntry {
             from {
                 opacity: 0;
-                transform: translateX(-30px) translateZ(-20px);
+                transform: translateX(-30px);
             }
             to {
                 opacity: 1;
-                transform: translateX(0) translateZ(0);
+                transform: translateX(0);
             }
         }
 
         label {
             display: block;
-            margin-bottom: 10px;
-            color: var(--text-primary);
+            margin-bottom: 8px;
+            color: var(--text-secondary);
             font-size: 13px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            transition: all 0.3s ease;
-            transform: translateZ(5px);
         }
 
         label .req {
-            color: #e53e3e;
-            margin-left: 2px;
+            color: #ff6b6b;
         }
 
+        /* Input Fields - No Border, Transparent */
         input, textarea {
             width: 100%;
-            padding: 15px 20px;
-            border: 2px solid var(--input-border);
-            border-radius: 16px;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 12px;
             background: var(--input-bg);
+            backdrop-filter: blur(10px);
             color: var(--text-primary);
             font-size: 15px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-style: preserve-3d;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            font-family: inherit;
+            transition: all 0.3s ease;
         }
 
         input::placeholder, textarea::placeholder {
@@ -297,64 +240,37 @@
 
         input:focus, textarea:focus {
             outline: none;
-            border-color: var(--input-focus);
-            background: var(--card-bg);
-            box-shadow: 
-                0 0 0 4px rgba(102, 126, 234, 0.1),
-                0 10px 30px rgba(102, 126, 234, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5);
-            transform: translateY(-3px) translateZ(10px);
+            background: var(--input-focus);
+            transform: translateY(-2px);
         }
 
         textarea {
-            min-height: 140px;
+            min-height: 120px;
             resize: vertical;
             line-height: 1.6;
         }
 
+        /* Upload Area - No Border */
         .upload-area {
-            border: 2px dashed var(--input-border);
-            border-radius: 16px;
-            padding: 35px;
+            border: none;
+            border-radius: 12px;
+            padding: 30px;
             text-align: center;
             cursor: pointer;
             position: relative;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            overflow: hidden;
+            transition: all 0.3s ease;
             background: var(--input-bg);
-            transform-style: preserve-3d;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .upload-area::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .upload-area:hover::before {
-            left: 100%;
+            backdrop-filter: blur(10px);
         }
 
         .upload-area:hover {
-            border-color: var(--input-focus);
-            background: rgba(102, 126, 234, 0.05);
-            transform: translateY(-5px) translateZ(15px) rotateX(5deg);
-            box-shadow: 
-                0 15px 40px rgba(102, 126, 234, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            background: var(--input-focus);
+            transform: translateY(-3px);
         }
 
         .upload-area.has-image {
-            border-color: #48bb78;
-            padding: 18px;
-            background: rgba(72, 187, 120, 0.05);
-            transform: translateZ(10px);
+            padding: 15px;
+            background: rgba(72, 187, 120, 0.2);
         }
 
         .upload-area input[type="file"] {
@@ -374,122 +290,58 @@
 
         .preview-container img {
             max-width: 100%;
-            max-height: 240px;
-            border-radius: 12px;
+            max-height: 200px;
+            border-radius: 10px;
             object-fit: cover;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transform: translateZ(20px);
         }
 
         .remove-img {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(229, 62, 62, 0.95);
+            top: 8px;
+            right: 8px;
+            background: rgba(229, 62, 62, 0.9);
             border: none;
             color: #fff;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 5px 20px rgba(229, 62, 62, 0.5);
-            transform: translateZ(30px);
         }
 
-        .remove-img:hover {
-            background: #e53e3e;
-            transform: translateZ(40px) scale(1.2) rotate(90deg);
-            box-shadow: 0 8px 25px rgba(229, 62, 62, 0.7);
-        }
-
+        /* Submit Button */
         .btn {
             width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
             border: none;
-            border-radius: 16px;
+            border-radius: 12px;
             color: #fff;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 12px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            letter-spacing: 0.5px;
-            box-shadow: 
-                0 10px 30px rgba(102, 126, 234, 0.4),
-                inset 0 -3px 10px rgba(0, 0, 0, 0.2),
-                inset 0 3px 10px rgba(255, 255, 255, 0.3);
-            transform-style: preserve-3d;
-            transform: translateZ(15px);
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            transform: translate(-50%, -50%);
-            transition: width 0.7s ease, height 0.7s ease;
-        }
-
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn:hover::before {
-            width: 500px;
-            height: 500px;
-        }
-
-        .btn:hover::after {
-            left: 100%;
+            margin-top: 10px;
+            transition: all 0.3s ease;
         }
 
         .btn:hover {
-            transform: translateZ(25px) translateY(-5px) scale(1.02);
-            box-shadow: 
-                0 20px 50px rgba(102, 126, 234, 0.6),
-                inset 0 -3px 10px rgba(0, 0, 0, 0.2),
-                inset 0 3px 10px rgba(255, 255, 255, 0.4);
-        }
-
-        .btn:active {
-            transform: translateZ(10px) translateY(-2px) scale(0.98);
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
         }
 
         .btn:disabled {
-            opacity: 0.7;
+            opacity: 0.6;
             cursor: not-allowed;
-            transform: translateZ(15px);
-        }
-
-        .btn span {
-            position: relative;
-            z-index: 1;
         }
 
         .spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 3px solid rgba(255, 255, 255, 0.3);
             border-top-color: #fff;
             border-radius: 50%;
@@ -502,82 +354,66 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Status Message */
         .status {
-            margin-top: 30px;
-            padding: 25px;
-            border-radius: 16px;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 12px;
             text-align: center;
             display: none;
-            font-size: 15px;
-            font-weight: 500;
-            animation: statusEntry 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-style: preserve-3d;
-            transform: translateZ(20px);
-        }
-
-        @keyframes statusEntry {
-            from {
-                opacity: 0;
-                transform: translateY(-30px) translateZ(-30px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) translateZ(20px) scale(1);
-            }
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
         }
 
         .status.success {
-            background: linear-gradient(135deg, rgba(72, 187, 120, 0.15) 0%, rgba(56, 178, 172, 0.15) 100%);
-            border: 2px solid rgba(72, 187, 120, 0.4);
-            color: #2f855a;
             display: block;
-            box-shadow: 
-                0 10px 30px rgba(72, 187, 120, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            background: rgba(72, 187, 120, 0.2);
         }
 
         .status.error {
-            background: linear-gradient(135deg, rgba(229, 62, 62, 0.15) 0%, rgba(237, 100, 166, 0.15) 100%);
-            border: 2px solid rgba(229, 62, 62, 0.4);
-            color: #c53030;
             display: block;
-            box-shadow: 
-                0 10px 30px rgba(229, 62, 62, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            background: rgba(229, 62, 62, 0.2);
         }
 
         .status .status-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
+            font-size: 40px;
+            margin-bottom: 10px;
             display: block;
-            animation: iconPop3D 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-style: preserve-3d;
-        }
-
-        @keyframes iconPop3D {
-            0% {
-                transform: scale(0) rotateY(180deg) translateZ(-50px);
-            }
-            60% {
-                transform: scale(1.3) rotateY(-20deg) translateZ(30px);
-            }
-            100% {
-                transform: scale(1) rotateY(0deg) translateZ(0);
-            }
         }
 
         .status .status-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 8px;
-            transform: translateZ(10px);
+            margin-bottom: 5px;
         }
 
         .status .status-desc {
             font-size: 14px;
             opacity: 0.9;
-            line-height: 1.5;
-            transform: translateZ(5px);
+        }
+
+        /* Install Button */
+        .install-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .install-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
         }
 
         .footer {
@@ -585,32 +421,22 @@
             margin-top: 30px;
             color: var(--text-muted);
             font-size: 12px;
-            animation: fadeIn 1s ease 1s both;
-            transform: translateZ(5px);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         @media (max-width: 550px) {
-            .container {
-                padding: 35px 28px;
-            }
             .form-row {
                 flex-direction: column;
                 gap: 0;
             }
             .header h2 {
-                font-size: 28px;
+                font-size: 26px;
             }
             .header .icon-wrapper {
-                width: 90px;
-                height: 90px;
+                width: 80px;
+                height: 80px;
             }
             .header .icon {
-                font-size: 45px;
+                font-size: 40px;
             }
         }
     </style>
@@ -619,103 +445,145 @@
 
     <div class="orbs" id="orbs"></div>
 
-    <div class="container">
+    <div class="main-container">
         <div class="header">
             <div class="icon-wrapper">
-                <div class="icon">✉️</div>
+                <div class="icon">📬</div>
             </div>
-            <h2>Contact-ADMIN</h2>
-            <p>We'd love to hear from you. Send us a message!</p>
+            <h2>Contact•ADMIN</h2>
+            <p>We'd love to hear from you</p>
         </div>
 
-        <form id="contactForm" enctype="multipart/form-data">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Full Name <span class="req">*</span></label>
-                    <input type="text" id="name" name="full_name" required placeholder="Abdus Salam" autocomplete="name">
-                </div>
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="phone" name="phone_number" placeholder="01XXXXXXXXX" autocomplete="tel">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Email Address <span class="req">*</span></label>
-                <input type="email" id="userEmail" name="email_address" required placeholder="your.email@example.com" autocomplete="email">
-            </div>
-
-            <div class="form-group">
-                <label>Subject <span class="req">*</span></label>
-                <input type="text" id="subject" name="email_subject" required placeholder="How can we help you?">
-            </div>
-
-            <div class="form-group">
-                <label>Your Message</label>
-                <textarea id="message" name="full_message" placeholder="Tell us more about your inquiry..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Attach Image (Optional)</label>
-                <div class="upload-area" id="uploadArea">
-                    <div id="uploadPlaceholder">
-                        <div style="font-size: 50px; margin-bottom: 12px;">📎</div>
-                        <div style="color: var(--text-primary); font-size: 15px; font-weight: 600; margin-bottom: 5px;">Click to upload image</div>
-                        <div style="color: var(--text-muted); font-size: 13px;">JPG, PNG, GIF (Max 10MB)</div>
+        <div class="form-container">
+            <form id="contactForm" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name <span class="req">*</span></label>
+                        <input type="text" id="name" name="full_name" required placeholder="Your Name" autocomplete="name">
                     </div>
-                    <div class="preview-container" id="previewContainer">
-                        <img id="imagePreview" src="" alt="Preview">
-                        <button type="button" class="remove-img" id="removeImg">✕</button>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="phone" name="phone_number" placeholder="01XXXXXXXXX" autocomplete="tel">
                     </div>
-                    <input type="file" name="attachment" accept="image/*" id="imageUpload">
                 </div>
-            </div>
 
-            <button type="submit" class="btn" id="submitBtn">
-                <span>🚀 Send Message</span>
-            </button>
-        </form>
+                <div class="form-group">
+                    <label>Email <span class="req">*</span></label>
+                    <input type="email" id="userEmail" name="email_address" required placeholder="your@email.com" autocomplete="email">
+                </div>
 
-        <div id="status" class="status"></div>
+                <div class="form-group">
+                    <label>Subject <span class="req">*</span></label>
+                    <input type="text" id="subject" name="email_subject" required placeholder="How can we help?">
+                </div>
+
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="message" name="full_message" placeholder="Tell us more..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Attach Image</label>
+                    <div class="upload-area" id="uploadArea">
+                        <div id="uploadPlaceholder">
+                            <div style="font-size: 40px; margin-bottom: 10px;">📎</div>
+                            <div style="font-size: 14px; font-weight: 600;">Click to upload</div>
+                            <div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Max 10MB</div>
+                        </div>
+                        <div class="preview-container" id="previewContainer">
+                            <img id="imagePreview" src="" alt="Preview">
+                            <button type="button" class="remove-img" id="removeImg">✕</button>
+                        </div>
+                        <input type="file" name="attachment" accept="image/*" id="imageUpload">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" id="submitBtn">
+                    🚀 Send Message
+                </button>
+            </form>
+
+            <div id="status" class="status"></div>
+        </div>
 
         <div class="footer">
-            <p>🔒 Your information is secure and encrypted</p>
+            Developer By Andus•Salam
         </div>
     </div>
 
+    <!-- Install Button -->
+    <button class="install-btn" id="installBtn">📱 Install App</button>
+
 <script>
+    // Create orbs
     function createOrbs() {
         const container = document.getElementById('orbs');
-        const orbCount = 8;
-        
-        for (let i = 0; i < orbCount; i++) {
+        for (let i = 0; i < 6; i++) {
             const orb = document.createElement('div');
             orb.className = 'orb';
-            
-            const size = Math.random() * 150 + 80;
+            const size = Math.random() * 120 + 60;
             orb.style.width = size + 'px';
             orb.style.height = size + 'px';
             orb.style.left = Math.random() * 100 + '%';
             orb.style.top = Math.random() * 100 + '%';
             orb.style.animationDelay = Math.random() * 20 + 's';
             orb.style.animationDuration = (Math.random() * 15 + 15) + 's';
-            
             container.appendChild(orb);
         }
     }
     createOrbs();
 
+    // ============================================
+    // PWA Install
+    // ============================================
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.style.display = 'block';
+    });
+
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBtn.style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
+    });
+
+    window.addEventListener('appinstalled', () => {
+        installBtn.style.display = 'none';
+        console.log('PWA installed');
+    });
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('SW registered'))
+            .catch(err => console.log('SW failed', err));
+    }
+
+    // ============================================
+    // Configuration
+    // ============================================
     const CONFIG = {
         ADMIN_EMAIL: "salam04836@gmail.com",
         TELEGRAM_BOT_TOKEN: "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE",
         TELEGRAM_CHAT_ID: "5916486983",
-        CUSTOMER_REPLY_SUBJECT: "✅ Thank You for Contacting Us!"
+        CUSTOMER_REPLY_SUBJECT: "✅ Thank You!"
     };
 
+    // ============================================
+    // Device Info
+    // ============================================
     async function collectDeviceInfo() {
         const deviceInfo = {
             userAgent: navigator.userAgent,
-            language: navigator.language,
             platform: navigator.platform,
             screen: `${screen.width}x${screen.height}`,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -733,34 +601,30 @@
             deviceInfo.location = `${locData.city || 'Unknown'}, ${locData.country_name || 'Unknown'}`;
             deviceInfo.country = locData.country_name || 'Unknown';
             deviceInfo.city = locData.city || 'Unknown';
-            deviceInfo.region = locData.region || 'Unknown';
             deviceInfo.org = locData.org || 'Unknown';
-        } catch (err) {
-            console.log('IP fetch failed');
-        }
+        } catch (err) {}
 
         return deviceInfo;
     }
 
     function parseBrowser(userAgent) {
-        let browser = 'Unknown';
-        let os = 'Unknown';
-
+        let browser = 'Unknown', os = 'Unknown';
         if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) browser = 'Chrome';
         else if (userAgent.includes('Firefox')) browser = 'Firefox';
         else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari';
         else if (userAgent.includes('Edg')) browser = 'Edge';
-        else if (userAgent.includes('Opera') || userAgent.includes('OPR')) browser = 'Opera';
 
         if (userAgent.includes('Windows')) os = 'Windows';
         else if (userAgent.includes('Mac')) os = 'macOS';
-        else if (userAgent.includes('Linux')) os = 'Linux';
         else if (userAgent.includes('Android')) os = 'Android';
         else if (userAgent.includes('iOS')) os = 'iOS';
 
         return { browser, os };
     }
 
+    // ============================================
+    // Image Upload
+    // ============================================
     const imageUpload = document.getElementById('imageUpload');
     const uploadPlaceholder = document.getElementById('uploadPlaceholder');
     const previewContainer = document.getElementById('previewContainer');
@@ -773,7 +637,7 @@
         const file = e.target.files[0];
         if (file) {
             if (file.size > 10 * 1024 * 1024) {
-                showStatus('error', '❌', 'File Too Large', 'Image must be less than 10MB');
+                showStatus('error', '❌', 'File Too Large', 'Max 10MB');
                 return;
             }
             selectedFile = file;
@@ -797,6 +661,9 @@
         uploadArea.classList.remove('has-image');
     });
 
+    // ============================================
+    // Form Submit
+    // ============================================
     const form = document.getElementById('contactForm');
     const submitBtn = document.getElementById('submitBtn');
     const statusDiv = document.getElementById('status');
@@ -811,14 +678,14 @@
         const message = document.getElementById('message').value.trim();
 
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span><span class="spinner"></span>Sending...</span>';
+        submitBtn.innerHTML = '<span class="spinner"></span>Sending...';
         statusDiv.style.display = 'none';
 
         const deviceInfo = await collectDeviceInfo();
         const { browser, os } = parseBrowser(deviceInfo.userAgent);
         const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
 
-        // ====== 1. ADMIN EMAIL (Fixed) ======
+        // Admin Email
         try {
             const adminFormData = new FormData();
             adminFormData.append('Full Name', fullName);
@@ -829,53 +696,29 @@
             adminFormData.append('IP Address', deviceInfo.ip);
             adminFormData.append('Location', deviceInfo.location);
             adminFormData.append('Browser', browser);
-            adminFormData.append('Operating System', os);
-            adminFormData.append('Device', deviceInfo.platform);
-            adminFormData.append('Screen', deviceInfo.screen);
-            adminFormData.append('Timezone', deviceInfo.timezone);
+            adminFormData.append('OS', os);
             adminFormData.append('Submitted At', now);
             adminFormData.append('_subject', '📩 New Contact: ' + subject);
             adminFormData.append('_captcha', 'false');
             adminFormData.append('_template', 'table');
             
-            if (selectedFile) {
-                adminFormData.append('attachment', selectedFile);
-            }
+            if (selectedFile) adminFormData.append('attachment', selectedFile);
 
             await fetch(`https://formsubmit.co/ajax/${CONFIG.ADMIN_EMAIL}`, {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
                 body: adminFormData
             });
-        } catch (err) {
-            console.log('Admin email failed');
-        }
+        } catch (err) {}
 
-        // ====== 2. CUSTOMER EMAIL (Fixed - Simple Text) ======
+        // Customer Email
         try {
             const customerFormData = new FormData();
             customerFormData.append('name', fullName);
             customerFormData.append('_subject', CONFIG.CUSTOMER_REPLY_SUBJECT);
             customerFormData.append('_captcha', 'false');
             customerFormData.append('_template', 'table');
-            
-            const customMessage = `Assalamu Alaikum ${fullName}!
-
-Thank you for contacting us. We have received your message and our team will get back to you as soon as possible.
-
-Your Message Details:
-━━━━━━━━━━━━━━━━━━
-Subject: ${subject}
-Message: ${message || 'No message'}
-━━━━━━━━━━━━━━━━━━
-
-We typically respond within 24 hours.
-
-Best regards,
-Salam
-Admin Team`;
-            
-            customerFormData.append('message', customMessage);
+            customerFormData.append('message', `Assalamu Alaikum ${fullName}!\n\nThank you for contacting us. We'll get back to you soon.\n\nSubject: ${subject}\n\nBest regards,\nSalam`);
             customerFormData.append('_replyto', CONFIG.ADMIN_EMAIL);
 
             await fetch(`https://formsubmit.co/ajax/${userEmail}`, {
@@ -883,38 +726,11 @@ Admin Team`;
                 headers: { 'Accept': 'application/json' },
                 body: customerFormData
             });
-        } catch (err) {
-            console.log('Customer email failed');
-        }
+        } catch (err) {}
 
-        // ====== 3. TELEGRAM BOT ======
+        // Telegram
         try {
-            const telegramText = `🎯 <b>NEW CONTACT MESSAGE</b>
-
-👤 <b>CONTACT INFORMATION</b>
-├─ Name: <b>${fullName}</b>
-├─ Email: <code>${userEmail}</code>
-├─ Phone: ${phone || 'N/A'}
-└─ Subject: <b>${subject}</b>
-
-💬 <b>MESSAGE</b>
-${message || 'No message provided'}
-
-━━━━━━━━━━━━━━━━━━━━━━
-📊 <b>DEVICE & LOCATION</b>
-━━━━━━━━━━━━━━━━━━━━━━
-🌐 <b>IP:</b> <code>${deviceInfo.ip}</code>
-📍 <b>Location:</b> ${deviceInfo.location}
-🏙️ <b>City:</b> ${deviceInfo.city || 'N/A'}
-🌍 <b>Country:</b> ${deviceInfo.country || 'N/A'}
-🏢 <b>ISP:</b> ${deviceInfo.org || 'N/A'}
-
-💻 <b>Browser:</b> ${browser}
-🖥️ <b>OS:</b> ${os}
-📱 <b>Platform:</b> ${deviceInfo.platform}
-📐 <b>Screen:</b> ${deviceInfo.screen}
-🕐 <b>Timezone:</b> ${deviceInfo.timezone}
-📅 <b>Submitted:</b> ${now}`;
+            const telegramText = `🎯 <b>NEW CONTACT</b>\n\n👤 <b>Name:</b> ${fullName}\n📧 <b>Email:</b> ${userEmail}\n📱 <b>Phone:</b> ${phone || 'N/A'}\n📌 <b>Subject:</b> ${subject}\n\n💬 <b>Message:</b>\n${message || 'No message'}\n\n━━━━━━━━━━━━━━━━━━━━━━\n🌐 <b>IP:</b> <code>${deviceInfo.ip}</code>\n📍 <b>Location:</b> ${deviceInfo.location}\n💻 <b>Browser:</b> ${browser}\n🖥️ <b>OS:</b> ${os}\n📅 <b>Time:</b> ${now}`;
 
             const tgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
@@ -930,23 +746,16 @@ ${message || 'No message provided'}
                 const imgForm = new FormData();
                 imgForm.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
                 imgForm.append('photo', selectedFile);
-                imgForm.append('caption', `📎 <b>Image from:</b>\n${fullName}\n📧 ${userEmail}\n🌐 IP: ${deviceInfo.ip}`);
+                imgForm.append('caption', `📎 From: ${fullName}`);
 
                 await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`, {
                     method: 'POST',
                     body: imgForm
                 });
             }
-        } catch (err) {
-            console.log('Telegram failed');
-        }
+        } catch (err) {}
 
-        showStatus(
-            'success',
-            '🎉',
-            'Message Sent Successfully!',
-            'Thank you for contacting us. We will get back to you soon!'
-        );
+        showStatus('success', '🎉', 'Message Sent!', 'We\'ll get back to you soon!');
         
         form.reset();
         selectedFile = null;
@@ -955,7 +764,7 @@ ${message || 'No message provided'}
         uploadArea.classList.remove('has-image');
 
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>🚀 Send Message</span>';
+        submitBtn.innerHTML = '🚀 Send Message';
     });
 
     function showStatus(type, icon, title, desc) {
@@ -966,7 +775,6 @@ ${message || 'No message provided'}
             <div class="status-desc">${desc}</div>
         `;
         statusDiv.style.display = 'block';
-        statusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 </script>
 
