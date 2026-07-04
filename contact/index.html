@@ -32,13 +32,7 @@
         .form-row { display: flex; gap: 15px; }
         .form-row .form-group { flex: 1; }
         .form-group { margin-bottom: 20px; }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #aaa;
-            font-size: 13px;
-            font-weight: 600;
-        }
+        label { display: block; margin-bottom: 8px; color: #aaa; font-size: 13px; font-weight: 600; }
         label .req { color: #ff4466; }
         input, textarea {
             width: 100%;
@@ -75,11 +69,7 @@
             cursor: pointer;
         }
         .preview-container { display: none; position: relative; }
-        .preview-container img {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 8px;
-        }
+        .preview-container img { max-width: 100%; max-height: 200px; border-radius: 8px; }
         .remove-img {
             position: absolute;
             top: 5px; right: 5px;
@@ -135,6 +125,21 @@
             color: #ff4466;
             display: block;
         }
+        .log-box {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            font-size: 12px;
+            color: #888;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+        }
+        .log-box.show { display: block; }
+        .log-item { margin: 3px 0; }
+        .log-item.ok { color: #00ff88; }
+        .log-item.fail { color: #ff4466; }
         @media (max-width: 500px) {
             .container { padding: 25px 20px; }
             .form-row { flex-direction: column; gap: 0; }
@@ -146,42 +151,34 @@
 <div class="container">
     <div class="header">
         <div class="icon">✉️</div>
-        <h2>Contact Us</h2>
+        <h2>Contact Us V-1</h2>
     </div>
 
-    <!-- ⭐ এখানে আপনার Gmail দিন -->
-    <form id="contactForm" action="https://formsubmit.co/salam04836@gmail.com" method="POST" enctype="multipart/form-data">
-        
-        <!-- FormSubmit Settings (Hidden Fields) -->
-        <input type="hidden" name="_subject" value="নতুন Contact Message!">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_next" value="https://formsubmit.co/success">
-        
+    <form id="contactForm" enctype="multipart/form-data">
         <div class="form-row">
             <div class="form-group">
                 <label>Name <span class="req">*</span></label>
-                <input type="text" name="Name" required placeholder="আপনার নাম">
+                <input type="text" id="name" name="Name" required placeholder="আপনার নাম">
             </div>
             <div class="form-group">
                 <label>Phone</label>
-                <input type="tel" name="Phone" placeholder="01XXXXXXXXX">
+                <input type="tel" id="phone" name="Phone" placeholder="01XXXXXXXXX">
             </div>
         </div>
 
         <div class="form-group">
             <label>Your Email <span class="req">*</span></label>
-            <input type="email" name="Email" required placeholder="your@email.com">
+            <input type="email" id="userEmail" name="Email" required placeholder="your@email.com">
         </div>
 
         <div class="form-group">
             <label>Subject <span class="req">*</span></label>
-            <input type="text" name="Subject" required placeholder="বিষয়">
+            <input type="text" id="subject" name="Subject" required placeholder="বিষয়">
         </div>
 
         <div class="form-group">
             <label>Message</label>
-            <textarea name="Message" placeholder="বিস্তারিত লিখুন..."></textarea>
+            <textarea id="message" name="Message" placeholder="বিস্তারিত লিখুন..."></textarea>
         </div>
 
         <div class="form-group">
@@ -203,16 +200,50 @@
     </form>
 
     <div id="status" class="status"></div>
+    <div id="logBox" class="log-box"></div>
 </div>
 
 <script>
-    // Image Upload Preview
+    // ============================================
+    // 🔑 CONFIGURATION
+    // ============================================
+    const CONFIG = {
+        // Admin Email (আপনার email - যেখানে পুরো message আসবে)
+        ADMIN_EMAIL: "salam04836@gmail.com",
+        
+        // Telegram Bot
+        TELEGRAM_BOT_TOKEN: "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE",
+        TELEGRAM_CHAT_ID: "5916486983",
+        
+        // Customer কে যে confirmation message পাঠানো হবে
+        CUSTOMER_REPLY_SUBJECT: "✅ আমরা আপনার মেসেজ পেয়েছি!",
+        CUSTOMER_REPLY_MESSAGE: `Assalamu Alaikum!
+
+ধন্যবাদ আমাদের সাথে যোগাযোগ করার জন্য।
+
+আমরা আপনার মেসেজ পেয়েছি এবং খুব শীঘ্রই আপনার সাথে যোগাযোগ করব।
+
+আপনার তথ্য:
+- Subject: {{subject}}
+- Message: {{message}}
+
+আপনার ধৈর্যের জন্য ধন্যবাদ!
+
+Best regards,
+Salam
+Admin Team`
+    };
+
+    // ============================================
+    // Image Upload
+    // ============================================
     const imageUpload = document.getElementById('imageUpload');
     const uploadPlaceholder = document.getElementById('uploadPlaceholder');
     const previewContainer = document.getElementById('previewContainer');
     const imagePreview = document.getElementById('imagePreview');
     const uploadArea = document.getElementById('uploadArea');
     const removeImgBtn = document.getElementById('removeImg');
+    let selectedFile = null;
 
     imageUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
@@ -221,6 +252,7 @@
                 alert('Image 10MB এর বেশি হতে পারবে না!');
                 return;
             }
+            selectedFile = file;
             const reader = new FileReader();
             reader.onload = function(ev) {
                 imagePreview.src = ev.target.result;
@@ -234,52 +266,187 @@
 
     removeImgBtn.addEventListener('click', function(e) {
         e.stopPropagation();
+        selectedFile = null;
         imageUpload.value = '';
         uploadPlaceholder.style.display = 'block';
         previewContainer.style.display = 'none';
         uploadArea.classList.remove('has-image');
     });
 
-    // Form Submit with AJAX (page reload হবে না)
+    // ============================================
+    // Log Helper
+    // ============================================
+    const logBox = document.getElementById('logBox');
+    function addLog(msg, type = '') {
+        logBox.classList.add('show');
+        const div = document.createElement('div');
+        div.className = 'log-item ' + type;
+        div.textContent = '• ' + msg;
+        logBox.appendChild(div);
+    }
+
+    // ============================================
+    // Form Submit
+    // ============================================
     const form = document.getElementById('contactForm');
     const submitBtn = document.getElementById('submitBtn');
     const statusDiv = document.getElementById('status');
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
+        const name = document.getElementById('name').value.trim();
+        const userEmail = document.getElementById('userEmail').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const subject = document.getElementById('subject').value.trim();
+        const message = document.getElementById('message').value.trim();
+
+        logBox.innerHTML = '';
+        logBox.classList.remove('show');
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner"></span> Sending...';
         statusDiv.style.display = 'none';
 
-        const formData = new FormData(form);
+        let successCount = 0;
 
+        // ====== 1. ADMIN EMAIL এ পুরো message পাঠানো ======
+        addLog('Admin email এ পাঠানো হচ্ছে...');
         try {
-            const response = await fetch(form.action, {
+            const adminFormData = new FormData();
+            adminFormData.append('Name', name);
+            adminFormData.append('Email', userEmail);
+            adminFormData.append('Phone', phone || 'N/A');
+            adminFormData.append('Subject', subject);
+            adminFormData.append('Message', message || 'No message');
+            adminFormData.append('_subject', '📩 নতুন Contact: ' + subject);
+            adminFormData.append('_captcha', 'false');
+            adminFormData.append('_template', 'table');
+            
+            if (selectedFile) {
+                adminFormData.append('attachment', selectedFile);
+            }
+
+            const adminRes = await fetch(`https://formsubmit.co/ajax/${CONFIG.ADMIN_EMAIL}`, {
                 method: 'POST',
-                body: formData,
-                headers: { 'Accept': 'application/json' }
+                headers: { 'Accept': 'application/json' },
+                body: adminFormData
             });
 
-            if (response.ok) {
-                statusDiv.className = 'status success';
-                statusDiv.textContent = '✅ আপনার মেসেজ সফলভাবে পাঠানো হয়েছে!';
-                statusDiv.style.display = 'block';
-                form.reset();
-                uploadPlaceholder.style.display = 'block';
-                previewContainer.style.display = 'none';
-                uploadArea.classList.remove('has-image');
+            if (adminRes.ok) {
+                addLog('✅ Admin email এ পাঠানো হয়েছে', 'ok');
+                successCount++;
             } else {
-                throw new Error('Failed');
+                addLog('❌ Admin email failed', 'fail');
             }
         } catch (err) {
-            statusDiv.className = 'status error';
-            statusDiv.textContent = '❌ সমস্যা হয়েছে। আবার চেষ্টা করুন।';
-            statusDiv.style.display = 'block';
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '📤 Send Message';
+            addLog('❌ Admin email error: ' + err.message, 'fail');
         }
+
+        // ====== 2. CUSTOMER EMAIL এ confirmation message পাঠানো ======
+        addLog('Customer email এ confirmation পাঠানো হচ্ছে...');
+        try {
+            const customerFormData = new FormData();
+            customerFormData.append('name', name);
+            customerFormData.append('subject', subject);
+            customerFormData.append('message', message || 'No message');
+            customerFormData.append('_subject', CONFIG.CUSTOMER_REPLY_SUBJECT);
+            customerFormData.append('_captcha', 'false');
+            customerFormData.append('_template', 'box');
+            
+            // Custom confirmation message with variables
+            const customMessage = CONFIG.CUSTOMER_REPLY_MESSAGE
+                .replace('{{subject}}', subject)
+                .replace('{{message}}', message || 'No message');
+            
+            customerFormData.append('_replyto', CONFIG.ADMIN_EMAIL);
+            customerFormData.append('message', customMessage);
+
+            const customerRes = await fetch(`https://formsubmit.co/ajax/${userEmail}`, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                body: customerFormData
+            });
+
+            if (customerRes.ok) {
+                addLog('✅ Customer email এ confirmation পাঠানো হয়েছে', 'ok');
+                successCount++;
+            } else {
+                addLog('❌ Customer email failed', 'fail');
+            }
+        } catch (err) {
+            addLog('❌ Customer email error: ' + err.message, 'fail');
+        }
+
+        // ====== 3. TELEGRAM BOT এ পাঠানো ======
+        addLog('Telegram bot এ পাঠানো হচ্ছে...');
+        try {
+            const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
+            const telegramText = `📩 <b>নতুন Contact Message</b>
+
+👤 <b>Name:</b> ${name}
+📧 <b>Email:</b> ${userEmail}
+📱 <b>Phone:</b> ${phone || 'N/A'}
+📌 <b>Subject:</b> ${subject}
+💬 <b>Message:</b>
+${message || 'No message'}
+
+🕐 <b>Time:</b> ${now}`;
+
+            const tgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CONFIG.TELEGRAM_CHAT_ID,
+                    text: telegramText,
+                    parse_mode: 'HTML'
+                })
+            });
+
+            if (tgRes.ok) {
+                addLog('✅ Telegram text পাঠানো হয়েছে', 'ok');
+                successCount++;
+
+                // Image পাঠানো
+                if (selectedFile) {
+                    const imgForm = new FormData();
+                    imgForm.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
+                    imgForm.append('photo', selectedFile);
+                    imgForm.append('caption', `📎 From: ${name} (${userEmail})`);
+
+                    const imgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+                        method: 'POST',
+                        body: imgForm
+                    });
+
+                    if (imgRes.ok) {
+                        addLog('✅ Telegram image পাঠানো হয়েছে', 'ok');
+                    }
+                }
+            } else {
+                addLog('❌ Telegram failed', 'fail');
+            }
+        } catch (err) {
+            addLog('❌ Telegram error: ' + err.message, 'fail');
+        }
+
+        // ====== RESULT ======
+        if (successCount > 0) {
+            statusDiv.className = 'status success';
+            statusDiv.textContent = `✅ সফলভাবে পাঠানো হয়েছে! (${successCount}/3)`;
+            statusDiv.style.display = 'block';
+            form.reset();
+            selectedFile = null;
+            uploadPlaceholder.style.display = 'block';
+            previewContainer.style.display = 'none';
+            uploadArea.classList.remove('has-image');
+        } else {
+            statusDiv.className = 'status error';
+            statusDiv.textContent = '❌ কিছুই পাঠানো সম্ভব হয়নি।';
+            statusDiv.style.display = 'block';
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '📤 Send Message';
     });
 </script>
 
