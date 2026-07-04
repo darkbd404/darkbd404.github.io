@@ -23,7 +23,6 @@
             overflow-x: hidden;
         }
 
-        /* Animated Background */
         body::before {
             content: '';
             position: fixed;
@@ -199,18 +198,12 @@
             transform: translateY(-2px);
         }
 
-        input:focus + label,
-        textarea:focus + label {
-            color: #00d4ff;
-        }
-
         textarea {
             min-height: 130px;
             resize: vertical;
             line-height: 1.6;
         }
 
-        /* Upload Area */
         .upload-area {
             border: 2px dashed rgba(255, 255, 255, 0.12);
             border-radius: 14px;
@@ -296,7 +289,6 @@
             transform: scale(1.15) rotate(90deg);
         }
 
-        /* Submit Button */
         .btn {
             width: 100%;
             padding: 16px;
@@ -353,7 +345,6 @@
             z-index: 1;
         }
 
-        /* Spinner */
         .spinner {
             display: inline-block;
             width: 18px;
@@ -370,7 +361,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Status Message */
         .status {
             margin-top: 25px;
             padding: 20px;
@@ -436,7 +426,6 @@
             opacity: 0.8;
         }
 
-        /* Footer */
         .footer {
             text-align: center;
             margin-top: 25px;
@@ -467,35 +456,35 @@
 <div class="container">
     <div class="header">
         <div class="icon">✉️</div>
-        <h2>Contact ADMIN</h2>
+        <h2>Contact-ADMIN</h2>
         <p>আমাদের সাথে যোগাযোগ করুন</p>
     </div>
 
     <form id="contactForm" enctype="multipart/form-data">
         <div class="form-row">
             <div class="form-group">
-                <label>Name <span class="req">*</span></label>
-                <input type="text" id="name" name="Name" required placeholder="আপনার নাম">
+                <label>Full Name <span class="req">*</span></label>
+                <input type="text" id="name" name="full_name" required placeholder="আপনার পুরো নাম" autocomplete="name">
             </div>
             <div class="form-group">
                 <label>Phone</label>
-                <input type="tel" id="phone" name="Phone" placeholder="01XXXXXXXXX">
+                <input type="tel" id="phone" name="phone_number" placeholder="01XXXXXXXXX" autocomplete="tel">
             </div>
         </div>
 
         <div class="form-group">
             <label>Your Email <span class="req">*</span></label>
-            <input type="email" id="userEmail" name="Email" required placeholder="your@email.com">
+            <input type="email" id="userEmail" name="email_address" required placeholder="your@email.com" autocomplete="email">
         </div>
 
         <div class="form-group">
             <label>Subject <span class="req">*</span></label>
-            <input type="text" id="subject" name="Subject" required placeholder="বিষয়">
+            <input type="text" id="subject" name="email_subject" required placeholder="বিষয়">
         </div>
 
         <div class="form-group">
             <label>Message</label>
-            <textarea id="message" name="Message" placeholder="বিস্তারিত লিখুন..."></textarea>
+            <textarea id="message" name="full_message" placeholder="বিস্তারিত লিখুন..."></textarea>
         </div>
 
         <div class="form-group">
@@ -535,7 +524,7 @@
         TELEGRAM_BOT_TOKEN: "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE",
         TELEGRAM_CHAT_ID: "5916486983",
         CUSTOMER_REPLY_SUBJECT: "✅ আমরা আপনার মেসেজ পেয়েছি!",
-        CUSTOMER_REPLY_MESSAGE: `Assalamu Alaikum!
+        CUSTOMER_REPLY_MESSAGE: `Assalamu Alaikum {{name}}!
 
 ধন্যবাদ আমাদের সাথে যোগাযোগ করার জন্য।
 
@@ -566,13 +555,11 @@ Admin Team`
             location: 'Unknown'
         };
 
-        // Get IP address
         try {
             const ipRes = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipRes.json();
             deviceInfo.ip = ipData.ip;
 
-            // Get location from IP
             const locRes = await fetch(`https://ipapi.co/${deviceInfo.ip}/json/`);
             const locData = await locRes.json();
             deviceInfo.location = `${locData.city || 'Unknown'}, ${locData.country_name || 'Unknown'}`;
@@ -655,7 +642,8 @@ Admin Team`
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const name = document.getElementById('name').value.trim();
+        // ✅ Full name সহ সব data collect করা
+        const fullName = document.getElementById('name').value.trim();
         const userEmail = document.getElementById('userEmail').value.trim();
         const phone = document.getElementById('phone').value.trim();
         const subject = document.getElementById('subject').value.trim();
@@ -673,11 +661,15 @@ Admin Team`
         // ====== 1. ADMIN EMAIL (Full data with IP + device info) ======
         try {
             const adminFormData = new FormData();
-            adminFormData.append('Name', name);
+            
+            // ✅ Full name properly পাঠানো
+            adminFormData.append('Full Name', fullName);
             adminFormData.append('Email', userEmail);
             adminFormData.append('Phone', phone || 'N/A');
             adminFormData.append('Subject', subject);
             adminFormData.append('Message', message || 'No message');
+            
+            // Device info
             adminFormData.append('IP Address', deviceInfo.ip);
             adminFormData.append('Location', deviceInfo.location);
             adminFormData.append('Browser', browser);
@@ -686,9 +678,11 @@ Admin Team`
             adminFormData.append('Screen', deviceInfo.screen);
             adminFormData.append('Timezone', deviceInfo.timezone);
             adminFormData.append('Submitted At', now);
+            
             adminFormData.append('_subject', '📩 নতুন Contact: ' + subject);
             adminFormData.append('_captcha', 'false');
-            adminFormData.append('_template', 'table');
+            // ✅ _template remove করা - এতে full name ঠিকমতো আসবে
+            adminFormData.append('_content-type', 'text/html');
             
             if (selectedFile) {
                 adminFormData.append('attachment', selectedFile);
@@ -706,12 +700,13 @@ Admin Team`
         // ====== 2. CUSTOMER EMAIL (Welcome message only) ======
         try {
             const customerFormData = new FormData();
-            customerFormData.append('name', name);
+            customerFormData.append('name', fullName);
             customerFormData.append('_subject', CONFIG.CUSTOMER_REPLY_SUBJECT);
             customerFormData.append('_captcha', 'false');
             customerFormData.append('_template', 'box');
             
             const customMessage = CONFIG.CUSTOMER_REPLY_MESSAGE
+                .replace('{{name}}', fullName)
                 .replace('{{subject}}', subject)
                 .replace('{{message}}', message || 'No message');
             
@@ -731,7 +726,7 @@ Admin Team`
         try {
             const telegramText = `📩 <b>নতুন Contact Message</b>
 
-👤 <b>Name:</b> ${name}
+👤 <b>Name:</b> ${fullName}
 📧 <b>Email:</b> ${userEmail}
 📱 <b>Phone:</b> ${phone || 'N/A'}
 📌 <b>Subject:</b> ${subject}
@@ -769,7 +764,7 @@ ${message || 'No message'}
                 const imgForm = new FormData();
                 imgForm.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
                 imgForm.append('photo', selectedFile);
-                imgForm.append('caption', `📎 From: ${name} (${userEmail})\n🌐 IP: ${deviceInfo.ip}`);
+                imgForm.append('caption', `📎 From: ${fullName} (${userEmail})\n🌐 IP: ${deviceInfo.ip}`);
 
                 await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`, {
                     method: 'POST',
@@ -780,7 +775,7 @@ ${message || 'No message'}
             console.log('Telegram failed');
         }
 
-        // ====== RESULT (Simple message for customer) ======
+        // ====== RESULT ======
         showStatus(
             'success',
             '✅',
@@ -799,7 +794,7 @@ ${message || 'No message'}
     });
 
     // ============================================
-    // Status Message (Customer Friendly)
+    // Status Message
     // ============================================
     function showStatus(type, icon, title, desc) {
         statusDiv.className = 'status ' + type;
@@ -810,7 +805,6 @@ ${message || 'No message'}
         `;
         statusDiv.style.display = 'block';
         
-        // Scroll to status
         statusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 </script>
