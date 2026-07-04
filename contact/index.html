@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us</title>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -136,21 +135,6 @@
             color: #ff4466;
             display: block;
         }
-        .log-box {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            font-size: 12px;
-            color: #888;
-            max-height: 150px;
-            overflow-y: auto;
-            display: none;
-        }
-        .log-box.show { display: block; }
-        .log-item { margin: 3px 0; }
-        .log-item.ok { color: #00ff88; }
-        .log-item.fail { color: #ff4466; }
         @media (max-width: 500px) {
             .container { padding: 25px 20px; }
             .form-row { flex-direction: column; gap: 0; }
@@ -165,31 +149,39 @@
         <h2>Contact Us</h2>
     </div>
 
-    <form id="contactForm">
+    <!-- ⭐ এখানে আপনার Gmail দিন -->
+    <form id="contactForm" action="https://formsubmit.co/salam04836@gmail.com" method="POST" enctype="multipart/form-data">
+        
+        <!-- FormSubmit Settings (Hidden Fields) -->
+        <input type="hidden" name="_subject" value="নতুন Contact Message!">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_next" value="https://formsubmit.co/success">
+        
         <div class="form-row">
             <div class="form-group">
                 <label>Name <span class="req">*</span></label>
-                <input type="text" id="name" required placeholder="আপনার নাম">
+                <input type="text" name="Name" required placeholder="আপনার নাম">
             </div>
             <div class="form-group">
                 <label>Phone</label>
-                <input type="tel" id="phone" placeholder="01XXXXXXXXX">
+                <input type="tel" name="Phone" placeholder="01XXXXXXXXX">
             </div>
         </div>
 
         <div class="form-group">
             <label>Your Email <span class="req">*</span></label>
-            <input type="email" id="userEmail" required placeholder="আপনার email দিন">
+            <input type="email" name="Email" required placeholder="your@email.com">
         </div>
 
         <div class="form-group">
             <label>Subject <span class="req">*</span></label>
-            <input type="text" id="subject" required placeholder="বিষয়">
+            <input type="text" name="Subject" required placeholder="বিষয়">
         </div>
 
         <div class="form-group">
             <label>Message</label>
-            <textarea id="message" placeholder="বিস্তারিত লিখুন..."></textarea>
+            <textarea name="Message" placeholder="বিস্তারিত লিখুন..."></textarea>
         </div>
 
         <div class="form-group">
@@ -203,7 +195,7 @@
                     <img id="imagePreview" src="" alt="Preview">
                     <button type="button" class="remove-img" id="removeImg">✕</button>
                 </div>
-                <input type="file" id="imageUpload" accept="image/*">
+                <input type="file" name="attachment" accept="image/*" id="imageUpload">
             </div>
         </div>
 
@@ -211,51 +203,24 @@
     </form>
 
     <div id="status" class="status"></div>
-    <div id="logBox" class="log-box"></div>
 </div>
 
 <script>
-    // ============================================
-    // 🔑 CONFIGURATION - এখানে আপনার Keys বসান
-    // ============================================
-    const CONFIG = {
-        // EmailJS Keys
-        EMAILJS_PUBLIC_KEY: "PC5UBjTQgBZSViKcN",
-        EMAILJS_SERVICE_ID: "service_ufum89p",
-        EMAILJS_TEMPLATE_ID: "template_hytt1pq",
-
-        // Admin Email (যেখানে fixed message যাবে)
-        ADMIN_EMAIL: "admin@gmail.com",  // ← আপনার email দিন
-
-        // Telegram Bot
-        TELEGRAM_BOT_TOKEN: "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE",
-        TELEGRAM_CHAT_ID: "5916486983"
-    };
-
-    // Initialize EmailJS
-    if (CONFIG.EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
-        emailjs.init(CONFIG.EMAILJS_PUBLIC_KEY);
-    }
-
-    // ============================================
-    // Image Upload
-    // ============================================
+    // Image Upload Preview
     const imageUpload = document.getElementById('imageUpload');
     const uploadPlaceholder = document.getElementById('uploadPlaceholder');
     const previewContainer = document.getElementById('previewContainer');
     const imagePreview = document.getElementById('imagePreview');
     const uploadArea = document.getElementById('uploadArea');
     const removeImgBtn = document.getElementById('removeImg');
-    let selectedFile = null;
 
     imageUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
             if (file.size > 10 * 1024 * 1024) {
-                showStatus('error', '❌ Image 10MB এর বেশি হতে পারবে না!');
+                alert('Image 10MB এর বেশি হতে পারবে না!');
                 return;
             }
-            selectedFile = file;
             const reader = new FileReader();
             reader.onload = function(ev) {
                 imagePreview.src = ev.target.result;
@@ -269,182 +234,53 @@
 
     removeImgBtn.addEventListener('click', function(e) {
         e.stopPropagation();
-        selectedFile = null;
         imageUpload.value = '';
         uploadPlaceholder.style.display = 'block';
         previewContainer.style.display = 'none';
         uploadArea.classList.remove('has-image');
     });
 
-    // ============================================
-    // Log Helper
-    // ============================================
-    const logBox = document.getElementById('logBox');
-    function addLog(msg, type = '') {
-        logBox.classList.add('show');
-        const div = document.createElement('div');
-        div.className = 'log-item ' + type;
-        div.textContent = '• ' + msg;
-        logBox.appendChild(div);
-    }
-
-    // ============================================
-    // Form Submit
-    // ============================================
+    // Form Submit with AJAX (page reload হবে না)
     const form = document.getElementById('contactForm');
     const submitBtn = document.getElementById('submitBtn');
     const statusDiv = document.getElementById('status');
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-
-        const name = document.getElementById('name').value.trim();
-        const userEmail = document.getElementById('userEmail').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const subject = document.getElementById('subject').value.trim();
-        const message = document.getElementById('message').value.trim();
-
-        // Reset
-        logBox.innerHTML = '';
-        logBox.classList.remove('show');
+        
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner"></span> Sending...';
         statusDiv.style.display = 'none';
 
-        let successCount = 0;
-        let totalTasks = 3; // User email + Admin email + Telegram
+        const formData = new FormData(form);
 
-        // ====== 1. USER এর EMAIL এ পাঠানো ======
-        addLog('User email এ পাঠানো হচ্ছে...');
         try {
-            if (CONFIG.EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
-                addLog('⚠️ EmailJS keys বসানো হয়নি', 'fail');
-            } else {
-                await emailjs.send(
-                    CONFIG.EMAILJS_SERVICE_ID,
-                    CONFIG.EMAILJS_TEMPLATE_ID,
-                    {
-                        to_email: userEmail,  // ← User এর email
-                        from_name: 'Admin',
-                        from_email: CONFIG.ADMIN_EMAIL,
-                        reply_to: CONFIG.ADMIN_EMAIL,
-                        phone: phone || 'N/A',
-                        subject: subject,
-                        message: message || 'No message'
-                    }
-                );
-                addLog('✅ User email এ পাঠানো হয়েছে', 'ok');
-                successCount++;
-            }
-        } catch (err) {
-            addLog('❌ User email failed: ' + (err.text || err.message), 'fail');
-            console.error('User email error:', err);
-        }
-
-        // ====== 2. ADMIN EMAIL এ পাঠানো ======
-        addLog('Admin email এ পাঠানো হচ্ছে...');
-        try {
-            if (CONFIG.EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
-                addLog('⚠️ EmailJS keys বসানো হয়নি', 'fail');
-            } else {
-                await emailjs.send(
-                    CONFIG.EMAILJS_SERVICE_ID,
-                    CONFIG.EMAILJS_TEMPLATE_ID,
-                    {
-                        to_email: CONFIG.ADMIN_EMAIL,  // ← Admin এর fixed email
-                        from_name: name,
-                        from_email: userEmail,
-                        reply_to: userEmail,
-                        phone: phone || 'N/A',
-                        subject: subject,
-                        message: message || 'No message'
-                    }
-                );
-                addLog('✅ Admin email এ পাঠানো হয়েছে', 'ok');
-                successCount++;
-            }
-        } catch (err) {
-            addLog('❌ Admin email failed: ' + (err.text || err.message), 'fail');
-            console.error('Admin email error:', err);
-        }
-
-        // ====== 3. TELEGRAM BOT এ পাঠানো ======
-        addLog('Telegram bot এ পাঠানো হচ্ছে...');
-        try {
-            const now = new Date().toLocaleString('bn-BD', { timeZone: 'Asia/Dhaka' });
-            const telegramText = `📩 <b>নতুন Contact Message</b>
-
-👤 <b>Name:</b> ${name}
-📧 <b>Email:</b> ${userEmail}
-📱 <b>Phone:</b> ${phone || 'N/A'}
-📌 <b>Subject:</b> ${subject}
-💬 <b>Message:</b>
-${message || 'No message'}
-
-🕐 <b>Time:</b> ${now}`;
-
-            const tgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            const response = await fetch(form.action, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: CONFIG.TELEGRAM_CHAT_ID,
-                    text: telegramText,
-                    parse_mode: 'HTML'
-                })
+                body: formData,
+                headers: { 'Accept': 'application/json' }
             });
 
-            if (tgRes.ok) {
-                addLog('✅ Telegram text পাঠানো হয়েছে', 'ok');
-                successCount++;
-
-                // Image পাঠানো
-                if (selectedFile) {
-                    const formData = new FormData();
-                    formData.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
-                    formData.append('photo', selectedFile);
-                    formData.append('caption', `📎 From: ${name} (${userEmail})`);
-
-                    const imgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (imgRes.ok) {
-                        addLog('✅ Telegram image পাঠানো হয়েছে', 'ok');
-                    } else {
-                        addLog('⚠️ Telegram image failed', 'fail');
-                    }
-                }
+            if (response.ok) {
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ আপনার মেসেজ সফলভাবে পাঠানো হয়েছে!';
+                statusDiv.style.display = 'block';
+                form.reset();
+                uploadPlaceholder.style.display = 'block';
+                previewContainer.style.display = 'none';
+                uploadArea.classList.remove('has-image');
             } else {
-                const errData = await tgRes.json();
-                addLog('❌ Telegram failed: ' + (errData.description || 'Unknown'), 'fail');
+                throw new Error('Failed');
             }
         } catch (err) {
-            addLog('❌ Telegram error: ' + err.message, 'fail');
-            console.error('Telegram error:', err);
+            statusDiv.className = 'status error';
+            statusDiv.textContent = '❌ সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+            statusDiv.style.display = 'block';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '📤 Send Message';
         }
-
-        // ====== RESULT ======
-        if (successCount > 0) {
-            showStatus('success', `✅ সফলভাবে পাঠানো হয়েছে! (${successCount}/${totalTasks})`);
-            form.reset();
-            selectedFile = null;
-            uploadPlaceholder.style.display = 'block';
-            previewContainer.style.display = 'none';
-            uploadArea.classList.remove('has-image');
-        } else {
-            showStatus('error', '❌ কিছুই পাঠানো সম্ভব হয়নি। নিচের log চেক করুন।');
-        }
-
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '📤 Send Message';
     });
-
-    function showStatus(type, msg) {
-        statusDiv.className = 'status ' + type;
-        statusDiv.textContent = msg;
-        statusDiv.style.display = 'block';
-    }
 </script>
 
 </body>
