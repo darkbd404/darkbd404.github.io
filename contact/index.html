@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Contact•ADMIN GOV.BD</title>
+    <title>Contact Us</title>
     
-    <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#667eea">
-    <meta name="description" content="Contact Us - Premium Web App">
+    <meta name="description" content="Contact Us Web App">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Contact">
@@ -16,61 +15,49 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
-    <!-- Icons for PWA -->
-    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg-gradient-1: #667eea;
-            --bg-gradient-2: #764ba2;
-            --bg-gradient-3: #f093fb;
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.9);
-            --text-muted: rgba(255, 255, 255, 0.7);
-            --input-bg: rgba(255, 255, 255, 0.15);
-            --input-border: rgba(255, 255, 255, 0.2);
-            --input-focus: rgba(255, 255, 255, 0.3);
+            --bg-1: #667eea;
+            --bg-2: #764ba2;
+            --bg-3: #f093fb;
+            --text-1: #ffffff;
+            --text-2: rgba(255,255,255,0.9);
+            --text-3: rgba(255,255,255,0.7);
+            --input-bg: rgba(255,255,255,0.15);
+            --input-focus: rgba(255,255,255,0.25);
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-gradient-1: #1a1a2e;
-                --bg-gradient-2: #16213e;
-                --bg-gradient-3: #0f3460;
-                --input-bg: rgba(255, 255, 255, 0.08);
-                --input-border: rgba(255, 255, 255, 0.15);
-                --input-focus: rgba(255, 255, 255, 0.25);
+                --bg-1: #1a1a2e;
+                --bg-2: #16213e;
+                --bg-3: #0f3460;
+                --input-bg: rgba(255,255,255,0.08);
+                --input-focus: rgba(255,255,255,0.18);
             }
         }
 
-        html, body {
-            height: 100%;
-            overflow-x: hidden;
-        }
+        html, body { height: 100%; overflow-x: hidden; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+            background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
             min-height: 100vh;
-            color: var(--text-primary);
+            color: var(--text-1);
             position: relative;
-            transition: all 0.5s ease;
+            padding-bottom: 100px;
         }
 
-        /* 3D Floating Orbs - Background Only */
+        /* 3D Orbs - Background Only */
         .orbs {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             overflow: hidden;
             z-index: 0;
             pointer-events: none;
@@ -80,28 +67,18 @@
         .orb {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), transparent);
-            box-shadow: 0 0 80px rgba(102, 126, 234, 0.2);
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent);
+            box-shadow: 0 0 80px rgba(102,126,234,0.3);
             animation: float3D 20s infinite ease-in-out;
-            transform-style: preserve-3d;
         }
 
         @keyframes float3D {
-            0%, 100% {
-                transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
-            }
-            25% {
-                transform: translate3d(100px, -100px, 50px) rotateX(90deg) rotateY(90deg);
-            }
-            50% {
-                transform: translate3d(-50px, 100px, -50px) rotateX(180deg) rotateY(180deg);
-            }
-            75% {
-                transform: translate3d(-100px, -50px, 100px) rotateX(270deg) rotateY(270deg);
-            }
+            0%, 100% { transform: translate3d(0,0,0) rotate(0deg); }
+            25% { transform: translate3d(100px,-100px,50px) rotate(90deg); }
+            50% { transform: translate3d(-50px,100px,-50px) rotate(180deg); }
+            75% { transform: translate3d(-100px,-50px,100px) rotate(270deg); }
         }
 
-        /* Main Container - No Card, No Border */
         .main-container {
             position: relative;
             z-index: 1;
@@ -109,118 +86,85 @@
             max-width: 600px;
             margin: 0 auto;
             padding: 40px 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            animation: headerEntry 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+            margin-bottom: 35px;
+            animation: fadeDown 0.8s ease;
         }
 
-        @keyframes headerEntry {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .header .icon-wrapper {
-            width: 100px;
-            height: 100px;
+        .icon-wrapper {
+            width: 90px;
+            height: 90px;
             margin: 0 auto 20px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255,255,255,0.15);
             backdrop-filter: blur(10px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: icon3D 3s ease-in-out infinite;
+            animation: iconPulse 3s ease-in-out infinite;
         }
 
-        @keyframes icon3D {
-            0%, 100% {
-                transform: rotateY(0deg) scale(1);
-            }
-            50% {
-                transform: rotateY(15deg) scale(1.05);
-            }
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.05) rotate(10deg); }
         }
 
-        .header .icon {
-            font-size: 50px;
-        }
+        .icon-wrapper .icon { font-size: 45px; }
 
         .header h2 {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--text-primary);
+            margin-bottom: 8px;
         }
 
         .header p {
-            color: var(--text-secondary);
-            font-size: 15px;
+            color: var(--text-2);
+            font-size: 14px;
         }
 
-        /* Form - No Card, Transparent */
-        .form-container {
-            flex: 1;
+        .form-group {
+            margin-bottom: 18px;
+            animation: slideIn 0.6s ease both;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .form-row {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 12px;
         }
 
-        .form-row .form-group {
-            flex: 1;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            animation: fieldEntry 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        }
-
-        .form-group:nth-child(1) { animation-delay: 0.3s; }
-        .form-group:nth-child(2) { animation-delay: 0.4s; }
-        .form-group:nth-child(3) { animation-delay: 0.5s; }
-        .form-group:nth-child(4) { animation-delay: 0.6s; }
-        .form-group:nth-child(5) { animation-delay: 0.7s; }
-
-        @keyframes fieldEntry {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
+        .form-row .form-group { flex: 1; }
 
         label {
             display: block;
             margin-bottom: 8px;
-            color: var(--text-secondary);
-            font-size: 13px;
+            color: var(--text-2);
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.8px;
         }
 
-        label .req {
-            color: #ff6b6b;
-        }
+        label .req { color: #ff6b6b; }
 
-        /* Input Fields - No Border, Transparent */
         input, textarea {
             width: 100%;
             padding: 14px 18px;
@@ -228,15 +172,13 @@
             border-radius: 12px;
             background: var(--input-bg);
             backdrop-filter: blur(10px);
-            color: var(--text-primary);
+            color: var(--text-1);
             font-size: 15px;
             font-family: inherit;
             transition: all 0.3s ease;
         }
 
-        input::placeholder, textarea::placeholder {
-            color: var(--text-muted);
-        }
+        input::placeholder, textarea::placeholder { color: var(--text-3); }
 
         input:focus, textarea:focus {
             outline: none;
@@ -245,16 +187,14 @@
         }
 
         textarea {
-            min-height: 120px;
+            min-height: 110px;
             resize: vertical;
             line-height: 1.6;
         }
 
-        /* Upload Area - No Border */
         .upload-area {
-            border: none;
             border-radius: 12px;
-            padding: 30px;
+            padding: 28px;
             text-align: center;
             cursor: pointer;
             position: relative;
@@ -270,23 +210,17 @@
 
         .upload-area.has-image {
             padding: 15px;
-            background: rgba(72, 187, 120, 0.2);
+            background: rgba(72,187,120,0.2);
         }
 
         .upload-area input[type="file"] {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             opacity: 0;
             cursor: pointer;
         }
 
-        .preview-container {
-            display: none;
-            position: relative;
-        }
+        .preview-container { display: none; position: relative; }
 
         .preview-container img {
             max-width: 100%;
@@ -299,24 +233,20 @@
             position: absolute;
             top: 8px;
             right: 8px;
-            background: rgba(229, 62, 62, 0.9);
+            background: rgba(229,62,62,0.9);
             border: none;
             color: #fff;
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 13px;
         }
 
-        /* Submit Button */
         .btn {
             width: 100%;
             padding: 16px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.2);
             backdrop-filter: blur(10px);
             border: none;
             border-radius: 12px;
@@ -329,20 +259,17 @@
         }
 
         .btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255,255,255,0.3);
             transform: translateY(-3px);
         }
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .spinner {
             display: inline-block;
             width: 18px;
             height: 18px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255,255,255,0.3);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -350,57 +277,48 @@
             margin-right: 10px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Status Message */
         .status {
-            margin-top: 25px;
-            padding: 20px;
+            margin-top: 20px;
+            padding: 18px;
             border-radius: 12px;
             text-align: center;
             display: none;
-            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
         }
 
         .status.success {
             display: block;
-            background: rgba(72, 187, 120, 0.2);
+            background: rgba(72,187,120,0.2);
         }
 
         .status.error {
             display: block;
-            background: rgba(229, 62, 62, 0.2);
+            background: rgba(229,62,62,0.2);
         }
 
-        .status .status-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-            display: block;
+        .status .status-icon { font-size: 36px; margin-bottom: 8px; display: block; }
+        .status .status-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        .status .status-desc { font-size: 13px; opacity: 0.9; }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-3);
+            font-size: 12px;
         }
 
-        .status .status-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .status .status-desc {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* Install Button */
-        .install-btn {
+        /* Install Banner */
+        .install-banner {
             position: fixed;
             bottom: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: none;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.3);
             border-radius: 50px;
             color: #fff;
             font-size: 14px;
@@ -408,36 +326,24 @@
             cursor: pointer;
             display: none;
             z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            animation: slideUp 0.5s ease;
         }
 
-        .install-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
+        @keyframes slideUp {
+            from { opacity: 0; transform: translate(-50%, 50px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
         }
 
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: var(--text-muted);
-            font-size: 12px;
+        .install-banner:hover {
+            background: rgba(255,255,255,0.3);
         }
 
         @media (max-width: 550px) {
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-            .header h2 {
-                font-size: 26px;
-            }
-            .header .icon-wrapper {
-                width: 80px;
-                height: 80px;
-            }
-            .header .icon {
-                font-size: 40px;
-            }
+            .form-row { flex-direction: column; gap: 0; }
+            .header h2 { font-size: 24px; }
+            .icon-wrapper { width: 75px; height: 75px; }
+            .icon-wrapper .icon { font-size: 38px; }
         }
     </style>
 </head>
@@ -448,90 +354,82 @@
     <div class="main-container">
         <div class="header">
             <div class="icon-wrapper">
-                <div class="icon">📬</div>
+                <div class="icon">✉️</div>
             </div>
-            <h2>Contact•ADMIN</h2>
+            <h2>Get In Touch</h2>
             <p>We'd love to hear from you</p>
         </div>
 
-        <div class="form-container">
-            <form id="contactForm" enctype="multipart/form-data">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Full Name <span class="req">*</span></label>
-                        <input type="text" id="name" name="full_name" required placeholder="Your Name" autocomplete="name">
+        <form id="contactForm" enctype="multipart/form-data">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Full Name <span class="req">*</span></label>
+                    <input type="text" id="name" name="full_name" required placeholder="Abdus Salam" autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="phone" name="phone_number" placeholder="01XXXXXXXXX" autocomplete="tel">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email <span class="req">*</span></label>
+                <input type="email" id="userEmail" name="email_address" required placeholder="your@email.com" autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label>Subject <span class="req">*</span></label>
+                <input type="text" id="subject" name="email_subject" required placeholder="How can we help?">
+            </div>
+
+            <div class="form-group">
+                <label>Message</label>
+                <textarea id="message" name="full_message" placeholder="Tell us more..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Attach Image</label>
+                <div class="upload-area" id="uploadArea">
+                    <div id="uploadPlaceholder">
+                        <div style="font-size: 36px; margin-bottom: 8px;">📎</div>
+                        <div style="font-size: 14px; font-weight: 600;">Click to upload</div>
+                        <div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Max 10MB</div>
                     </div>
-                    <div class="form-group">
-                        <label>Phone</label>
-                        <input type="tel" id="phone" name="phone_number" placeholder="01XXXXXXXXX" autocomplete="tel">
+                    <div class="preview-container" id="previewContainer">
+                        <img id="imagePreview" src="" alt="Preview">
+                        <button type="button" class="remove-img" id="removeImg">✕</button>
                     </div>
+                    <input type="file" name="attachment" accept="image/*" id="imageUpload">
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label>Email <span class="req">*</span></label>
-                    <input type="email" id="userEmail" name="email_address" required placeholder="your@email.com" autocomplete="email">
-                </div>
+            <button type="submit" class="btn" id="submitBtn">🚀 Send Message</button>
+        </form>
 
-                <div class="form-group">
-                    <label>Subject <span class="req">*</span></label>
-                    <input type="text" id="subject" name="email_subject" required placeholder="How can we help?">
-                </div>
+        <div id="status" class="status"></div>
 
-                <div class="form-group">
-                    <label>Message</label>
-                    <textarea id="message" name="full_message" placeholder="Tell us more..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Attach Image</label>
-                    <div class="upload-area" id="uploadArea">
-                        <div id="uploadPlaceholder">
-                            <div style="font-size: 40px; margin-bottom: 10px;">📎</div>
-                            <div style="font-size: 14px; font-weight: 600;">Click to upload</div>
-                            <div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Max 10MB</div>
-                        </div>
-                        <div class="preview-container" id="previewContainer">
-                            <img id="imagePreview" src="" alt="Preview">
-                            <button type="button" class="remove-img" id="removeImg">✕</button>
-                        </div>
-                        <input type="file" name="attachment" accept="image/*" id="imageUpload">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn" id="submitBtn">
-                    🚀 Send Message
-                </button>
-            </form>
-
-            <div id="status" class="status"></div>
-        </div>
-
-        <div class="footer">
-            Developer By Andus•Salam
-        </div>
+        <div class="footer">🔒 Secure & Encrypted</div>
     </div>
 
-    <!-- Install Button -->
-    <button class="install-btn" id="installBtn">📱 Install App</button>
+    <button class="install-banner" id="installBtn">📱 Install App</button>
 
 <script>
-    // Create orbs
-    function createOrbs() {
-        const container = document.getElementById('orbs');
+    // Orbs
+    (function(){
+        const c = document.getElementById('orbs');
         for (let i = 0; i < 6; i++) {
-            const orb = document.createElement('div');
-            orb.className = 'orb';
-            const size = Math.random() * 120 + 60;
-            orb.style.width = size + 'px';
-            orb.style.height = size + 'px';
-            orb.style.left = Math.random() * 100 + '%';
-            orb.style.top = Math.random() * 100 + '%';
-            orb.style.animationDelay = Math.random() * 20 + 's';
-            orb.style.animationDuration = (Math.random() * 15 + 15) + 's';
-            container.appendChild(orb);
+            const o = document.createElement('div');
+            o.className = 'orb';
+            const s = Math.random() * 120 + 60;
+            o.style.width = s + 'px';
+            o.style.height = s + 'px';
+            o.style.left = Math.random() * 100 + '%';
+            o.style.top = Math.random() * 100 + '%';
+            o.style.animationDelay = Math.random() * 20 + 's';
+            o.style.animationDuration = (Math.random() * 15 + 15) + 's';
+            c.appendChild(o);
         }
-    }
-    createOrbs();
+    })();
 
     // ============================================
     // PWA Install
@@ -546,30 +444,28 @@
     });
 
     installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                installBtn.style.display = 'none';
-            }
-            deferredPrompt = null;
-        }
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') installBtn.style.display = 'none';
+        deferredPrompt = null;
     });
 
     window.addEventListener('appinstalled', () => {
         installBtn.style.display = 'none';
-        console.log('PWA installed');
     });
 
-    // Register Service Worker
+    // Service Worker
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('SW registered'))
-            .catch(err => console.log('SW failed', err));
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(r => console.log('SW OK:', r.scope))
+                .catch(e => console.log('SW Error:', e));
+        });
     }
 
     // ============================================
-    // Configuration
+    // Config
     // ============================================
     const CONFIG = {
         ADMIN_EMAIL: "salam04836@gmail.com",
@@ -582,7 +478,7 @@
     // Device Info
     // ============================================
     async function collectDeviceInfo() {
-        const deviceInfo = {
+        const d = {
             userAgent: navigator.userAgent,
             platform: navigator.platform,
             screen: `${screen.width}x${screen.height}`,
@@ -590,36 +486,31 @@
             ip: 'Unknown',
             location: 'Unknown'
         };
-
         try {
-            const ipRes = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipRes.json();
-            deviceInfo.ip = ipData.ip;
-
-            const locRes = await fetch(`https://ipapi.co/${deviceInfo.ip}/json/`);
-            const locData = await locRes.json();
-            deviceInfo.location = `${locData.city || 'Unknown'}, ${locData.country_name || 'Unknown'}`;
-            deviceInfo.country = locData.country_name || 'Unknown';
-            deviceInfo.city = locData.city || 'Unknown';
-            deviceInfo.org = locData.org || 'Unknown';
-        } catch (err) {}
-
-        return deviceInfo;
+            const r1 = await fetch('https://api.ipify.org?format=json');
+            const d1 = await r1.json();
+            d.ip = d1.ip;
+            const r2 = await fetch(`https://ipapi.co/${d.ip}/json/`);
+            const d2 = await r2.json();
+            d.location = `${d2.city||'Unknown'}, ${d2.country_name||'Unknown'}`;
+            d.country = d2.country_name || 'Unknown';
+            d.city = d2.city || 'Unknown';
+            d.org = d2.org || 'Unknown';
+        } catch(e) {}
+        return d;
     }
 
-    function parseBrowser(userAgent) {
-        let browser = 'Unknown', os = 'Unknown';
-        if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) browser = 'Chrome';
-        else if (userAgent.includes('Firefox')) browser = 'Firefox';
-        else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari';
-        else if (userAgent.includes('Edg')) browser = 'Edge';
-
-        if (userAgent.includes('Windows')) os = 'Windows';
-        else if (userAgent.includes('Mac')) os = 'macOS';
-        else if (userAgent.includes('Android')) os = 'Android';
-        else if (userAgent.includes('iOS')) os = 'iOS';
-
-        return { browser, os };
+    function parseBrowser(ua) {
+        let b = 'Unknown', o = 'Unknown';
+        if (ua.includes('Chrome') && !ua.includes('Edg')) b = 'Chrome';
+        else if (ua.includes('Firefox')) b = 'Firefox';
+        else if (ua.includes('Safari') && !ua.includes('Chrome')) b = 'Safari';
+        else if (ua.includes('Edg')) b = 'Edge';
+        if (ua.includes('Windows')) o = 'Windows';
+        else if (ua.includes('Mac')) o = 'macOS';
+        else if (ua.includes('Android')) o = 'Android';
+        else if (ua.includes('iOS') || ua.includes('iPhone')) o = 'iOS';
+        return { browser: b, os: o };
     }
 
     // ============================================
@@ -635,21 +526,20 @@
 
     imageUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
-        if (file) {
-            if (file.size > 10 * 1024 * 1024) {
-                showStatus('error', '❌', 'File Too Large', 'Max 10MB');
-                return;
-            }
-            selectedFile = file;
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                imagePreview.src = ev.target.result;
-                uploadPlaceholder.style.display = 'none';
-                previewContainer.style.display = 'block';
-                uploadArea.classList.add('has-image');
-            };
-            reader.readAsDataURL(file);
+        if (!file) return;
+        if (file.size > 10 * 1024 * 1024) {
+            showStatus('error', '❌', 'File Too Large', 'Max 10MB');
+            return;
         }
+        selectedFile = file;
+        const r = new FileReader();
+        r.onload = ev => {
+            imagePreview.src = ev.target.result;
+            uploadPlaceholder.style.display = 'none';
+            previewContainer.style.display = 'block';
+            uploadArea.classList.add('has-image');
+        };
+        r.readAsDataURL(file);
     });
 
     removeImgBtn.addEventListener('click', function(e) {
@@ -687,75 +577,73 @@
 
         // Admin Email
         try {
-            const adminFormData = new FormData();
-            adminFormData.append('Full Name', fullName);
-            adminFormData.append('Email', userEmail);
-            adminFormData.append('Phone', phone || 'N/A');
-            adminFormData.append('Subject', subject);
-            adminFormData.append('Message', message || 'No message');
-            adminFormData.append('IP Address', deviceInfo.ip);
-            adminFormData.append('Location', deviceInfo.location);
-            adminFormData.append('Browser', browser);
-            adminFormData.append('OS', os);
-            adminFormData.append('Submitted At', now);
-            adminFormData.append('_subject', '📩 New Contact: ' + subject);
-            adminFormData.append('_captcha', 'false');
-            adminFormData.append('_template', 'table');
-            
-            if (selectedFile) adminFormData.append('attachment', selectedFile);
+            const fd = new FormData();
+            fd.append('Full Name', fullName);
+            fd.append('Email', userEmail);
+            fd.append('Phone', phone || 'N/A');
+            fd.append('Subject', subject);
+            fd.append('Message', message || 'No message');
+            fd.append('IP Address', deviceInfo.ip);
+            fd.append('Location', deviceInfo.location);
+            fd.append('Browser', browser);
+            fd.append('OS', os);
+            fd.append('Submitted At', now);
+            fd.append('_subject', '📩 New Contact: ' + subject);
+            fd.append('_captcha', 'false');
+            fd.append('_template', 'table');
+            if (selectedFile) fd.append('attachment', selectedFile);
 
             await fetch(`https://formsubmit.co/ajax/${CONFIG.ADMIN_EMAIL}`, {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
-                body: adminFormData
+                body: fd
             });
-        } catch (err) {}
+        } catch(e) {}
 
         // Customer Email
         try {
-            const customerFormData = new FormData();
-            customerFormData.append('name', fullName);
-            customerFormData.append('_subject', CONFIG.CUSTOMER_REPLY_SUBJECT);
-            customerFormData.append('_captcha', 'false');
-            customerFormData.append('_template', 'table');
-            customerFormData.append('message', `Assalamu Alaikum ${fullName}!\n\nThank you for contacting us. We'll get back to you soon.\n\nSubject: ${subject}\n\nBest regards,\nSalam`);
-            customerFormData.append('_replyto', CONFIG.ADMIN_EMAIL);
+            const fd = new FormData();
+            fd.append('name', fullName);
+            fd.append('_subject', CONFIG.CUSTOMER_REPLY_SUBJECT);
+            fd.append('_captcha', 'false');
+            fd.append('_template', 'table');
+            fd.append('message', `Assalamu Alaikum ${fullName}!\n\nThank you for contacting us. We'll get back to you soon.\n\nSubject: ${subject}\n\nBest regards,\nSalam`);
+            fd.append('_replyto', CONFIG.ADMIN_EMAIL);
 
             await fetch(`https://formsubmit.co/ajax/${userEmail}`, {
                 method: 'POST',
                 headers: { 'Accept': 'application/json' },
-                body: customerFormData
+                body: fd
             });
-        } catch (err) {}
+        } catch(e) {}
 
         // Telegram
         try {
-            const telegramText = `🎯 <b>NEW CONTACT</b>\n\n👤 <b>Name:</b> ${fullName}\n📧 <b>Email:</b> ${userEmail}\n📱 <b>Phone:</b> ${phone || 'N/A'}\n📌 <b>Subject:</b> ${subject}\n\n💬 <b>Message:</b>\n${message || 'No message'}\n\n━━━━━━━━━━━━━━━━━━━━━━\n🌐 <b>IP:</b> <code>${deviceInfo.ip}</code>\n📍 <b>Location:</b> ${deviceInfo.location}\n💻 <b>Browser:</b> ${browser}\n🖥️ <b>OS:</b> ${os}\n📅 <b>Time:</b> ${now}`;
+            const txt = `🎯 <b>NEW CONTACT</b>\n\n👤 <b>Name:</b> ${fullName}\n📧 <b>Email:</b> ${userEmail}\n📱 <b>Phone:</b> ${phone || 'N/A'}\n📌 <b>Subject:</b> ${subject}\n\n💬 <b>Message:</b>\n${message || 'No message'}\n\n━━━━━━━━━━━━━━━━━━━━━━\n🌐 <b>IP:</b> <code>${deviceInfo.ip}</code>\n📍 <b>Location:</b> ${deviceInfo.location}\n💻 <b>Browser:</b> ${browser}\n🖥️ <b>OS:</b> ${os}\n📅 <b>Time:</b> ${now}`;
 
-            const tgRes = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            const r = await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     chat_id: CONFIG.TELEGRAM_CHAT_ID,
-                    text: telegramText,
+                    text: txt,
                     parse_mode: 'HTML'
                 })
             });
 
-            if (tgRes.ok && selectedFile) {
-                const imgForm = new FormData();
-                imgForm.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
-                imgForm.append('photo', selectedFile);
-                imgForm.append('caption', `📎 From: ${fullName}`);
-
+            if (r.ok && selectedFile) {
+                const fd = new FormData();
+                fd.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
+                fd.append('photo', selectedFile);
+                fd.append('caption', `📎 From: ${fullName}`);
                 await fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendPhoto`, {
                     method: 'POST',
-                    body: imgForm
+                    body: fd
                 });
             }
-        } catch (err) {}
+        } catch(e) {}
 
-        showStatus('success', '🎉', 'Message Sent!', 'We\'ll get back to you soon!');
+        showStatus('success', '🎉', 'Message Sent!', "We'll get back to you soon!");
         
         form.reset();
         selectedFile = null;
