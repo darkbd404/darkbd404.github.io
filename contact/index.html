@@ -3,21 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Email Sender - Salam</title>
-    <meta name="description" content="Send custom emails directly from your browser">
-    
-    <!-- EmailJS Library -->
+    <title>Custom Email Sender V1</title>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             min-height: 100vh;
             display: flex;
@@ -26,7 +17,6 @@
             padding: 20px;
             color: #fff;
         }
-
         .container {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -36,33 +26,10 @@
             max-width: 600px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: fadeIn 0.5s ease-in;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #00d4ff;
-            font-size: 28px;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #b8b8b8;
-            font-weight: 500;
-        }
-
+        h2 { text-align: center; margin-bottom: 30px; color: #00d4ff; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #b8b8b8; }
         input, textarea {
             width: 100%;
             padding: 12px 15px;
@@ -71,22 +38,13 @@
             background: rgba(255, 255, 255, 0.05);
             color: #fff;
             font-size: 15px;
-            transition: all 0.3s ease;
         }
-
         input:focus, textarea:focus {
             outline: none;
             border-color: #00d4ff;
             background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
         }
-
-        textarea {
-            min-height: 150px;
-            resize: vertical;
-            font-family: inherit;
-        }
-
+        textarea { min-height: 150px; resize: vertical; }
         .btn {
             width: 100%;
             padding: 14px;
@@ -97,137 +55,65 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
             margin-top: 10px;
         }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .status {
             margin-top: 20px;
             padding: 15px;
             border-radius: 10px;
             text-align: center;
             display: none;
-            animation: slideIn 0.3s ease;
         }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .status.success {
             background: rgba(0, 255, 136, 0.1);
             border: 1px solid rgba(0, 255, 136, 0.3);
             color: #00ff88;
             display: block;
         }
-
         .status.error {
             background: rgba(255, 68, 68, 0.1);
             border: 1px solid rgba(255, 68, 68, 0.3);
             color: #ff4444;
             display: block;
         }
-
-        .loader {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #888;
-            font-size: 12px;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 25px;
-            }
-            h2 {
-                font-size: 24px;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>📧 Custom Email Sender</h2>
-        
         <form id="emailForm">
             <div class="form-group">
                 <label for="to_email">প্রাপকের ইমেইল *</label>
                 <input type="email" id="to_email" name="to_email" required placeholder="receiver@example.com">
             </div>
-
             <div class="form-group">
                 <label for="subject">বিষয় *</label>
                 <input type="text" id="subject" name="subject" required placeholder="Email Subject">
             </div>
-
             <div class="form-group">
                 <label for="message">মেসেজ *</label>
                 <textarea id="message" name="message" required placeholder="আপনার মেসেজ লিখুন..."></textarea>
             </div>
-
-            <button type="submit" class="btn" id="submitBtn">
-                📤 ইমেইল পাঠান
-            </button>
+            <button type="submit" class="btn" id="submitBtn">📤 ইমেইল পাঠান</button>
         </form>
-
         <div id="status" class="status"></div>
-        
-        <div class="footer">
-            Powered by EmailJS | Developed by Salam
-        </div>
     </div>
 
     <script type="text/javascript">
         // ============================================
-        // 🔑 EmailJS Configuration - আপনার Keys বসান
+        // 🔑 এখানে আপনার Keys বসান
         // ============================================
-        
         const EMAILJS_CONFIG = {
-            PUBLIC_KEY: "PC5UBjTQgBZSViKcN",      // ← আপনার Public Key বসান
-            SERVICE_ID: "service_ufum89p",      // ← আপনার Service ID বসান
-            TEMPLATE_ID: "template_hytt1pq"     // ← আপনার Template ID বসান
+            PUBLIC_KEY: "PC5UBjTQgBZSViKcN",
+            SERVICE_ID: "service_ufum89p",
+            TEMPLATE_ID: "template_hytt1pq"
         };
 
-        // EmailJS Initialize
-        (function() {
-            if (EMAILJS_CONFIG.PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
-                console.warn("⚠️ Please configure your EmailJS keys in EMAILJS_CONFIG object");
-            } else {
-                emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
-            }
-        })();
+        // Initialize EmailJS
+        emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
 
-        // ============================================
-        // Form Handling
-        // ============================================
-        
         const form = document.getElementById('emailForm');
         const submitBtn = document.getElementById('submitBtn');
         const statusDiv = document.getElementById('status');
@@ -235,18 +121,10 @@
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             
-            // Check if keys are configured
-            if (EMAILJS_CONFIG.PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
-                showStatus('error', '⚠️ Please configure EmailJS keys first! Check the code comments.');
-                return;
-            }
-            
-            // Disable button and show loading
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="loader"></span> পাঠানো হচ্ছে...';
+            submitBtn.textContent = 'পাঠানো হচ্ছে...';
             statusDiv.style.display = 'none';
 
-            // Prepare template parameters
             const templateParams = {
                 to_email: document.getElementById('to_email').value,
                 subject: document.getElementById('subject').value,
@@ -254,39 +132,28 @@
                 from_name: 'Salam'
             };
 
-            // Send email via EmailJS
             emailjs.send(
                 EMAILJS_CONFIG.SERVICE_ID,
                 EMAILJS_CONFIG.TEMPLATE_ID,
                 templateParams
             )
             .then(function(response) {
-                console.log('✅ SUCCESS!', response.status, response.text);
                 showStatus('success', '✅ ইমেইল সফলভাবে পাঠানো হয়েছে!');
                 form.reset();
             }, function(error) {
-                console.log('❌ FAILED...', error);
-                showStatus('error', '❌ ইমেইল পাঠাতে সমস্যা: ' + (error.text || 'Unknown error'));
+                showStatus('error', '❌ সমস্যা: ' + (error.text || 'Unknown error'));
             })
             .finally(function() {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '📤 ইমেইল পাঠান';
+                submitBtn.textContent = '📤 ইমেইল পাঠান';
             });
         });
 
-        // ============================================
-        // Status Message Handler
-        // ============================================
-        
         function showStatus(type, message) {
             statusDiv.className = 'status ' + type;
             statusDiv.textContent = message;
             statusDiv.style.display = 'block';
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
         }
     </script>
 </body>
