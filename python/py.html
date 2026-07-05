@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Py Studio-Salam</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiUHlTdHVkaW8gUHJvIiwic2hvcnRfbmFtZSI6IlB5U3R1ZGlvIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzA5MDkwYSIsInRoZW1lX2NvbG9yIjoiIzYzNjZmMSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2Nkbi5qc2RlbGl2ci5uZXQvZ2gvbW96aWxsYS9TZXJ2aWNlV29ya2Vycy9tYXN0ZXIvZGVtb3MvaWNvbnMvcHJvbWlzZS8xOTIucG5nIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
+    <meta name="theme-color" content="#09090b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --panel-bg: rgba(24, 24, 27, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --text-main: #fafafa;
+            --text-muted: #a1a1aa;
+            --code-green: #4ade80;
+            --code-red: #f87171;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Prevent body scroll, handle inside panels */
+        }
+
+        /* Header */
+        header {
+            padding: 15px 20px;
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .logo { 
+            width: 32px; height: 32px; background: linear-gradient(135deg, #6366f1, #ec4899); 
+            border-radius: 8px; display: grid; place-items: center; font-weight: bold; font-size: 14px;
+        }
+        h1 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.5px; }
+
+        .btn-group { display: flex; gap: 8px; }
+        button {
+            padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: 0.2s;
+        }
+        .btn-run { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+        .btn-run:active { transform: scale(0.95); }
+        .btn-clear { background: rgba(255,255,255,0.1); color: var(--text-main); }
+
+        /* Main Layout - Mobile First (Stacked) */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column; /* Default: Stack vertically for mobile */
+            gap: 1px;
+            background: var(--border); /* Creates the divider line */
+            overflow-y: auto; /* Allow scrolling if needed on very small screens */
+        }
+
+        /* Desktop/Tablet: Side by Side */
+        @media (min-width: 768px) {
+            main {
+                flex-direction: row;
+                overflow: hidden;
+            }
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 50%; /* Ensure each takes half height on mobile */
+        }
+
+        .panel-header {
+            padding: 12px 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+        }
+
+        /* Editor */
+        textarea {
+            flex: 1;
+            width: 100%;
+            background: #0f0f11;
+            color: #e4e4e7;
+            border: none;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+
+        /* Output Terminal */
+        .output-container {
+            flex: 1;
+            background: #000;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--code-green);
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            padding: 8px 20px;
+            background: #09090b;
+            border-top: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .loader {
+            width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;
+            display: none; margin-left: 8px; vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <div class="logo">Python</div>
+            <h1>Py Studio Preview </h1>
+        </div>
+        <div class="btn-group">
+            <button class="btn-clear" onclick="clearCode()">Clear</button>
+            <button class="btn-run" onclick="runPython()" id="runBtn">
+                Run <span class="loader" id="loader"></span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Input Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <span>📝 INPUT.PY</span>
+                <span style="opacity:0.5">PYTHON 3.11</span>
+            </div>
+            <textarea id="codeEditor" spellcheck="false"># Contact Form Display
+contact_info = {
+    'name': 'Abdus Salam',
+    'email': 'salam04836@gmail.com',
+    'phone': '09696590864',
+    'subject': 'General Inquiry',
+    'message': 'This is a sample contact form display.'
+}
+
+print("=" * 60)
+print("📧 CONTACT FORM")
+print("=" * 60)
+print()
+print(f"👤 Name:\n   {contact_info['name']}")
+print()
+print(f"📧 Email:\n   {contact_info['email']}")
+print()
+print(f"📱 Phone:\n   {contact_info['phone']}")
+print()
+print(f"📝 Subject:\n   {contact_info['subject']}")
+print()
+print(f"💬 Message:\n   {contact_info['message']}")
+print()
+print("=" * 60)
+print("✅ All fields are read-only (disabled)")
+print("=" * 60)</textarea>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <span>💻 TERMINAL OUTPUT</span>
+                <button class="btn-clear" style="padding:2px 8px; font-size:10px;" onclick="clearOutput()">CLR</button>
+            </div>
+            <div class="output-container" id="output">
+                <span style="color: #52525b">// Initializing Python Engine...</span>
+            </div>
+        </div>
+    </main>
+
+    <div class="status-bar">
+        <span id="statusText">Ready</span>
+        <span>v2.0 Mobile Optimized</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+    <script>
+        let pyodide = null;
+        const outputDiv = document.getElementById('output');
+        const statusText = document.getElementById('statusText');
+        const loader = document.getElementById('loader');
+        const runBtn = document.getElementById('runBtn');
+
+        async function init() {
+            try {
+                pyodide = await loadPyodide();
+                statusText.innerText = "Engine Ready";
+                statusText.style.color = "#4ade80";
+                outputDiv.innerHTML = '<span style="color: #52525b">// System Ready. Tap Run.</span>';
+            } catch (err) {
+                statusText.innerText = "Load Failed";
+                outputDiv.innerHTML = `<span style="color: #f87171">Error: ${err}</span>`;
+            }
+        }
+
+        async function runPython() {
+            if (!pyodide) return;
+            const code = document.getElementById('codeEditor').value;
+            
+            runBtn.disabled = true;
+            loader.style.display = 'inline-block';
+            outputDiv.innerHTML = '';
+
+            try {
+                pyodide.setStdout({ batched: (msg) => outputDiv.innerHTML += msg + '\n' });
+                await pyodide.runPythonAsync(code);
+            } catch (err) {
+                outputDiv.innerHTML += `\n<span style="color: #f87171"> ${err.message}</span>`;
+            } finally {
+                runBtn.disabled = false;
+                loader.style.display = 'none';
+            }
+        }
+
+        function clearOutput() { outputDiv.innerHTML = ''; }
+        function clearCode() { document.getElementById('codeEditor').value = ''; }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
