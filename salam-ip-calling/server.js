@@ -136,7 +136,7 @@ app.post('/api/login', (req, res) => {
     
     fetchUsersFromGitHub((githubUsers) => {
         if (githubUsers[username] && githubUsers[username].password === password) {
-            sendTelegram(`🟢 *User Login Alert*\n👤 *Name:* ${githubUsers[username].name || 'N/A'}\n🆔 *Node ID:* ${username}\n *Balance:* BDT ${githubUsers[username].balance}`);
+            sendTelegram(`🟢 *User Login Alert*\n👤 *Name:* ${githubUsers[username].name || 'N/A'}\n🆔 *Node ID:* ${username}\n💰 *Balance:* BDT ${githubUsers[username].balance}`);
             return res.json({ success: true, role: "user", user: githubUsers[username] });
         }
         res.json({ success: false, message: "Invalid ID or Password!" });
