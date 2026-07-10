@@ -22,7 +22,7 @@
         <button class="btn-primary" onclick="executeAuthentication()">Authenticate & Connect</button>
     </div>
 
-    <div id="panel-admin" class="screen-panel">
+    <div id="panel-admin" class="screen-panel" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #edf2f7; padding-bottom:10px;">
             <h3 style="margin:0; color:#1a202c;">System Control Database</h3>
             <button class="btn-logout" onclick="location.reload()">Admin Logout</button>
@@ -37,6 +37,7 @@
                 <button class="btn-primary" style="background:#e53e3e; width:90px;" onclick="adminDeleteUser()">Delete</button>
             </div>
         </div>
+        <h4 style="color:#718096; font-size:13px; margin:10px 0 5px 0;">REALTIME USERS LIST</h4>
         <div id="admin-db-list-view"></div>
     </div>
 
@@ -139,9 +140,10 @@
             body: JSON.stringify({ username, password })
         }).then(res => res.json()).then(data => {
             if (data.success) {
-                document.getElementById('panel-login').classList.remove('active-panel');
+                document.getElementById('panel-login').style.display = 'none';
+                
                 if (data.role === "admin") {
-                    document.getElementById('panel-admin').classList.add('active-panel');
+                    document.getElementById('panel-admin').style.display = 'block';
                     renderAdminDatabaseTable(data.users);
                 } else {
                     currentSessionUid = username;
@@ -157,6 +159,80 @@
         });
     }
 
+    // ADMIN: DATABASE RENDER (Fixed Structure)
+    function renderAdminDatabaseTable(users) {
+        const box = document.getElementById('admin-db-list-view');
+        box.innerHTML = "";
+        if (!users || Object.keys(users).length === 0) {
+            box.innerHTML = `<p style="color:#718096; text-align:center;">No users registered yet.</p>`;
+            return;
+        }
+        for (let u in users) {
+            box.innerHTML += `<div style="padding:12px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:6px; font-size:14px; display:flex; justify-content:space-between; align-items:center;">
+                <div><strong>Node ID: ${u}</strong><br><span style="color:#718096;">Pass: ${users[u].password} | Bal: BDT ${users[u].balance}</span></div>
+                <button class="btn-logout" style="background:#0066cc; color:#fff; padding:4px 10px; border-radius:5px;" onclick="populateAdminForm('${u}','${users[u].password}','${users[u].balance}')">Modify</button>
+            </div>`;
+        }
+    }
+
+    function populateAdminForm(u, p, b) {
+        document.getElementById('adm-uid').value = u;
+        document.getElementById('adm-pass').value = p;
+        document.getElementById('adm-bal').value = b;
+    }
+
+    // ADMIN: SAVE / UPDATE INTERACTION (Fixed API routing payload)
+    function adminCommitUser() {
+        const adminUser = document.getElementById('login-user').value.trim();
+        const adminPass = document.getElementById('login-pass').value.trim();
+        const targetUser = document.getElementById('adm-uid').value.trim();
+        const password = document.getElementById('adm-pass').value.trim();
+        const balance = document.getElementById('adm-bal').value.trim();
+
+        if(!targetUser || !password) return alert("User ID and Password required.");
+
+        fetch('/api/admin/save-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminUser, adminPass, targetUser, password, balance })
+        }).then(res => res.json()).then(data => {
+            if (data.success) {
+                alert("Database update completed successfully!");
+                renderAdminDatabaseTable(data.users);
+                clearAdminInputs();
+            } else {
+                alert(data.message || "Failed to save user.");
+            }
+        }).catch(err => alert("Error communicating with server."));
+    }
+
+    function adminDeleteUser() {
+        const adminUser = document.getElementById('login-user').value.trim();
+        const adminPass = document.getElementById('login-pass').value.trim();
+        const targetUser = document.getElementById('adm-uid').value.trim();
+        if(!targetUser) return alert("Select a target user to delete.");
+
+        if(confirm("Delete User ID " + targetUser + " permanently?")) {
+            fetch('/api/admin/delete-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminUser, adminPass, targetUser })
+            }).then(res => res.json()).then(data => {
+                if(data.success) {
+                    alert("User removed.");
+                    renderAdminDatabaseTable(data.users);
+                    clearAdminInputs();
+                } else { alert(data.message); }
+            });
+        }
+    }
+
+    function clearAdminInputs() {
+        document.getElementById('adm-uid').value = "";
+        document.getElementById('adm-pass').value = "";
+        document.getElementById('adm-bal').value = "";
+    }
+
     function userRoute(p) {
         document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
         document.getElementById('panel-user-app').querySelectorAll('.screen-panel').forEach(p => p.classList.remove('active-panel'));
@@ -169,18 +245,15 @@
     function dialBackspace() { typedCallString = typedCallString.slice(0, -1); renderDialScreen(); }
     function renderDialScreen() { document.getElementById('dial-display-box').innerText = typedCallString; }
 
-    // WebRTC পিয়ার কানেকশন তৈরি ও স্ট্রিম হ্যান্ডলিং (ভয়েস ফিক্স)
     function setupWebRTCPeer(targetUser) {
         webrtcPeerConnection = new RTCPeerConnection(iceConfiguration);
         
-        // নেটওয়ার্ক ক্যান্ডিডেট রুট পাঠানো
         webrtcPeerConnection.onicecandidate = (event) => {
             if (event.candidate) {
                 socket.emit('ice-candidate', { target: targetUser, candidate: event.candidate });
             }
         };
 
-        // ওপাশ থেকে আসা অডিও ট্র্যাক রিসিভ করে স্পিকারে বাজানো
         webrtcPeerConnection.ontrack = (event) => {
             const remoteAudio = document.getElementById('remoteAudioNode');
             if (remoteAudio) {
@@ -193,7 +266,6 @@
         }
     }
 
-    // আউটবাউন্ড কল (কল করা)
     function initiateVoiceOutbound() {
         if(!typedCallString) return;
         currentRemoteActiveTarget = typedCallString;
@@ -212,11 +284,10 @@
                 socket.emit('call-node', { target: currentRemoteActiveTarget, from: currentSessionUid, offer: webrtcPeerConnection.localDescription });
             });
         }).catch(err => {
-            alert("Microphone permission denied! Cannot call.");
+            alert("Microphone permission required to call.");
         });
     }
 
-    // ইনকামিং কল (কল আসা)
     socket.on('incoming-call', (data) => {
         currentRemoteActiveTarget = data.from;
         navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
@@ -241,7 +312,7 @@
                 socket.emit('hangup-call', { target: currentRemoteActiveTarget });
             }
         }).catch(() => {
-            alert("Microphone hardware error.");
+            alert("Microphone error on receiver end.");
         });
     });
 
@@ -257,10 +328,10 @@
     });
 
     socket.on('call-terminated', () => { terminateActiveSession(false); });
-    socket.on('force-hangup', () => { terminateActiveSession(false); alert("Insufficient balance! Call cut."); });
+    socket.on('force-hangup', () => { terminateActiveSession(false); alert("Insufficient balance!"); });
 
     socket.on('call-error', (d) => { 
-        alert(d.message === "offline" ? "User is currently Offline." : "Insufficient Balance!");
+        alert(d.message === "offline" ? "User is offline." : "Insufficient balance!");
         terminateActiveSession(false);
     });
 
@@ -275,7 +346,6 @@
         if (remoteAudio) remoteAudio.srcObject = null;
     }
 
-    // নিচের বাকি ফাংশনগুলো (Admin Management, Sync, Messages) আগের মতোই থাকবে...
     function syncUserDatabaseState(bal, logs, msgs) {
         document.getElementById('usr-live-balance').innerText = "BDT " + bal;
         const logBox = document.getElementById('logs-list-render');
