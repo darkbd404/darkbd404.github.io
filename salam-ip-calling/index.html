@@ -3,360 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alaap Style IP Calling App</title>
+    <title>IP Calling Pro Application</title>
+    <link rel="stylesheet" href="style.css">
     <script src="/socket.io/socket.io.js"></script>
-    <style>
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-        body { background-color: #f4f5f7; color: #333; margin: 0; padding: 0; display: flex; justify-content: center; }
-        
-        .phone-container { width: 100%; max-width: 420px; height: 100vh; background: #ffffff; display: flex; flex-direction: column; position: relative; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        
-        /* Login Screen */
-        #login-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; padding: 30px; background: #ffffff; z-index: 1000; }
-        .login-input { width: 100%; padding: 14px; margin: 10px 0; background: #f0f2f5; border: 1px solid #ccd0d5; color: #333; border-radius: 8px; font-size: 16px; outline: none; }
-        .login-btn { width: 100%; padding: 14px; background: #004b93; border: none; color: white; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
-
-        /* App Header (Screen-2 style) */
-        .app-header { background: #ffffff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e1e4e8; }
-        .app-header .title { font-size: 22px; font-weight: bold; color: #004b93; }
-        .app-header .header-icons { color: #004b93; font-size: 20px; cursor: pointer; }
-        
-        /* Top Navigation Tabs (Alaap exact order & style) */
-        .nav-tabs { display: flex; background: #ffffff; border-bottom: 1px solid #e1e4e8; justify-content: space-around; padding: 5px 0; }
-        .tab-item { text-align: center; padding: 10px; cursor: pointer; color: #757f8a; font-size: 22px; width: 20%; transition: 0.2s; position: relative; }
-        .tab-item.active-tab { color: #004b93; }
-        .tab-item.active-tab::after { content: ''; position: absolute; bottom: -6px; left: 0; width: 100%; height: 3px; background: #004b93; }
-        
-        /* Content Area */
-        .content-panel { flex: 1; overflow-y: auto; display: none; background: #ffffff; }
-        .content-panel.active-panel { display: block; }
-        
-        /* Sub Tabs (All / Missed or Chat / SMS) */
-        .sub-tabs { display: flex; justify-content: flex-end; padding: 10px 20px; background: #ffffff; border-bottom: 1px solid #f0f2f5; gap: 20px; }
-        .sub-tab-item { color: #757f8a; font-size: 14px; font-weight: bold; cursor: pointer; padding-bottom: 2px; }
-        .sub-tab-item.active-sub { color: #004b93; border-bottom: 2px solid #004b93; }
-
-        /* Lists Styling (Recent/Contacts/Chat) */
-        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f0f2f5; }
-        .list-info { display: flex; align-items: center; gap: 15px; }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #004b93; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; }
-        .item-name { font-size: 16px; font-weight: 600; color: #222; }
-        .item-sub { font-size: 12px; color: #757f8a; margin-top: 3px; }
-        .call-icon { color: #004b93; font-size: 20px; cursor: pointer; }
-
-        /* Floating Action Button (+) */
-        .fab { position: absolute; bottom: 30px; right: 20px; background: #004b93; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; }
-
-        /* Dialpad Area (Screen-5 style) */
-        .dial-header { display: flex; justify-content: space-between; padding: 15px 20px; font-size: 16px; font-weight: bold; color: #004b93; border-bottom: 1px solid #f0f2f5; }
-        .dialpad-container { background: #f8f9fa; padding-top: 30px; padding-bottom: 20px; border-top: 1px solid #e1e4e8; }
-        .dial-display { width: 100%; text-align: center; font-size: 34px; color: #004b93; min-height: 60px; letter-spacing: 1px; word-break: break-all; padding: 0 20px; }
-        .dialpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 320px; margin: 20px auto; }
-        .dial-btn { background: transparent; color: #004b93; border: none; font-size: 30px; font-weight: 400; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .dial-btn span { font-size: 11px; color: #757f8a; text-transform: uppercase; font-weight: bold; margin-top: -2px; }
-        .call-trigger-btn { background: #2ecc71; color: white; width: 70px; height: 70px; border-radius: 50%; border: none; font-size: 28px; display: flex; align-items: center; justify-content: center; margin: 10px auto; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-
-        /* More Menu Grid (Screen-6 style) */
-        .more-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; background: #f4f5f7; height: 100%; }
-        .more-card { background: #ffffff; padding: 20px 10px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; color: #444; font-size: 14px; font-weight: 500; }
-        .more-card .icon { font-size: 26px; }
-        .card-blue { color: #3498db; } .card-pink { color: #e91e63; } .card-orange { color: #f39c12; } .card-teal { color: #1abc9c; } .card-purple { color: #9b59b6; }
-
-        /* Calling Screen Overlay (Screen-1 Dark style) */
-        .calling-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1a1e23; color: white; display: none; flex-direction: column; align-items: center; justify-content: space-between; padding: 50px 30px; z-index: 2000; }
-        .caller-num { font-size: 28px; font-weight: bold; letter-spacing: 1px; }
-        .call-status { font-size: 16px; color: #3498db; margin-top: 5px; }
-        .call-avatar-large { width: 120px; height: 120px; background: #ffffff; color: #1a1e23; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 50px; box-shadow: 0 0 20px rgba(255,255,255,0.1); margin: 30px 0; }
-        .caller-name-label { font-size: 24px; font-weight: 600; }
-        .call-controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 100%; max-width: 300px; text-align: center; margin-bottom: 20px; }
-        .control-item { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; color: #a0aab5; cursor: pointer; }
-        .control-icon-btn { width: 55px; height: 55px; border-radius: 50%; border: 1px solid #3a444e; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; }
-        .hangup-btn { background: #e74c3c; width: 70px; height: 70px; border-radius: 50%; border: none; font-size: 28px; color: white; cursor: pointer; margin-top: 20px; display: flex; align-items: center; justify-content: center; }
-    </style>
 </head>
 <body>
 
 <div class="phone-container">
     
-    <!-- 1. LOGIN SCREEN -->
+    <!-- AUTH SCREEN -->
     <div id="login-screen">
-        <h2 style="color: #004b93; margin-bottom: 5px;">Alaap IP Calling</h2>
-        <p style="color: #757f8a; font-size: 14px; margin-top: 0; margin-bottom: 25px;">Enter details to sync account</p>
-        <input type="text" id="username" class="login-input" placeholder="User Number (e.g. 08640000001)">
+        <h2 style="color: #0066cc; margin:0 0 10px 0;">IP Call Connect</h2>
+        <p style="color: #6c757d; font-size: 14px; margin:0 0 20px 0;">Secure Real-time Communications Engine</p>
+        <input type="text" id="username" class="login-input" placeholder="Enter Your Number ID">
         <input type="password" id="password" class="login-input" placeholder="Password">
-        <button class="login-btn" onclick="performLogin()">Login Account</button>
+        <button class="login-btn" onclick="appAuth()">Log In / Create Account</button>
     </div>
 
-    <!-- MAIN APP SCREEN -->
+    <!-- MAIN DASHBOARD APPLICATION -->
     <div id="main-app" style="display: none; flex-direction: column; height: 100%;">
-        <!-- Dynamic Header -->
         <div class="app-header">
-            <span class="title" id="page-title">Recent</span>
-            <span class="header-icons">🔍</span>
+            <span class="title" id="header-txt">Dialer</span>
+            <span style="font-size: 13px; opacity: 0.9;" id="my-profile-id"></span>
         </div>
         
-        <!-- Navigation Top Tabs (Icons Matching Screen Layout) -->
         <div class="nav-tabs">
-            <div class="tab-item" id="tab-recent" onclick="navigate('recent')">🕒</div>
-            <div class="tab-item" id="tab-contacts" onclick="navigate('contacts')">👤</div>
-            <div class="tab-item" id="tab-chat" onclick="navigate('chat')">💬</div>
-            <div class="tab-item" id="tab-dialpad" onclick="navigate('dialpad')">⣿</div>
-            <div class="tab-item" id="tab-more" onclick="navigate('more')">㗊</div>
+            <div class="tab-item active-tab" id="nav-dialpad" onclick="routeTo('dialpad')">📞</div>
+            <div class="tab-item" id="nav-recent" onclick="routeTo('recent')">🕒</div>
+            <div class="tab-item" id="nav-contacts" onclick="routeTo('contacts')">👤</div>
+            <div class="tab-item" id="nav-chat" onclick="routeTo('chat')">💬</div>
+            <div class="tab-item" id="nav-settings" onclick="routeTo('settings')">⚙</div>
         </div>
 
-        <!-- PANEL 1: RECENT CALLS (Screen-2 Design) -->
-        <div id="panel-recent" class="content-panel">
-            <div class="sub-tabs">
-                <div class="sub-tab-item active-sub">All</div>
-                <div class="sub-tab-item">Missed</div>
-            </div>
-            <div class="list-item">
-                <div class="list-info">
-                    <div class="avatar">O</div>
-                    <div>
-                        <div class="item-name">01632331864</div>
-                        <div class="item-sub">📞 Today, 8:53 AM</div>
-                    </div>
-                </div>
-                <span class="call-icon" onclick="autoCall('01632331864')">📞</span>
-            </div>
-            <div class="list-item">
-                <div class="list-info">
-                    <div class="avatar">B</div>
-                    <div>
-                        <div class="item-name">Bow</div>
-                        <div class="item-sub">📞 Yesterday, 9:30 AM</div>
-                    </div>
-                </div>
-                <span class="call-icon" onclick="autoCall('01876453275')">📞</span>
-            </div>
-        </div>
-
-        <!-- PANEL 2: CONTACTS (Screen-3 Design) -->
-        <div id="panel-contacts" class="content-panel">
-            <div class="sub-tabs">
-                <div class="sub-tab-item active-sub">Alaap</div>
-                <div class="sub-tab-item">All</div>
-            </div>
-            <div class="list-item">
-                <div class="list-info">
-                    <div class="avatar" style="background:#2ecc71;">B</div>
-                    <div>
-                        <div class="item-name">BKash Helpline</div>
-                        <div class="item-sub">16247</div>
-                    </div>
-                </div>
-                <span class="call-icon" onclick="autoCall('16247')">📞</span>
-            </div>
-            <div class="list-item">
-                <div class="list-info">
-                    <div class="avatar">M</div>
-                    <div>
-                        <div class="item-name">Mina Ar Ammu</div>
-                        <div class="item-sub">018-370-27284</div>
-                    </div>
-                </div>
-                <span class="call-icon" onclick="autoCall('01837027284')">📞</span>
-            </div>
-            <div class="fab">＋</div>
-        </div>
-
-        <!-- PANEL 3: CHAT (Screen-4 Design) -->
-        <div id="panel-chat" class="content-panel">
-            <div class="sub-tabs">
-                <div class="sub-tab-item active-sub">Chat</div>
-                <div class="sub-tab-item">SMS</div>
-            </div>
-            <div class="list-item">
-                <div class="list-info">
-                    <div class="avatar" style="background:#004b93;">A</div>
-                    <div>
-                        <div class="item-name">alaap.btcl 🗸</div>
-                        <div class="item-sub">Your otp is: 974188</div>
-                    </div>
-                </div>
-                <span style="font-size:12px; color:#757f8a;">Wednesday</span>
-            </div>
-            <div class="fab">✉</div>
-        </div>
-
-        <!-- PANEL 4: DIALPAD (Screen-5 Design) -->
-        <div id="panel-dialpad" class="content-panel">
+        <!-- TABS PANELS CONTENT -->
+        <!-- 1. DIALPAD PANEL -->
+        <div id="panel-dialpad" class="content-panel active-panel">
             <div class="dial-header">
-                <span>Dialpad</span>
-                <span id="balance-badge">BDT 0.00</span>
+                <span>Account Balance</span>
+                <strong id="balance-lbl" style="color: #2b8a3e;">BDT 0.00</strong>
             </div>
-            <div class="dial-display" id="display-digits"></div>
-            
-            <div class="dialpad-container">
-                <div class="dialpad-grid">
-                    <button class="dial-btn" onclick="dial('1')">1<span>&nbsp;</span></button>
-                    <button class="dial-btn" onclick="dial('2')">2<span>ABC</span></button>
-                    <button class="dial-btn" onclick="dial('3')">3<span>DEF</span></button>
-                    <button class="dial-btn" onclick="dial('4')">4<span>GHI</span></button>
-                    <button class="dial-btn" onclick="dial('5')">5<span>JKL</span></button>
-                    <button class="dial-btn" onclick="dial('6')">6<span>MNO</span></button>
-                    <button class="dial-btn" onclick="dial('7')">7<span>PQRS</span></button>
-                    <button class="dial-btn" onclick="dial('8')">8<span>TUV</span></button>
-                    <button class="dial-btn" onclick="dial('9')">9<span>WXYZ</span></button>
-                    <button class="dial-btn" onclick="dial('*')">*<span>&nbsp;</span></button>
-                    <button class="dial-btn" onclick="dial('0')">0<span>+</span></button>
-                    <button class="dial-btn" onclick="dial('#')">#<span>&nbsp;</span></button>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: center; position: relative; max-width: 320px; margin: 0 auto;">
-                    <button class="call-trigger-btn" onclick="runOutgoingCall()">📞</button>
-                    <span style="position: absolute; right: 30px; font-size: 24px; cursor: pointer; color: #757f8a;" onclick="backspace()">⌫</span>
-                </div>
+            <div class="dial-display" id="dial-screen-view"></div>
+            <div class="dialpad-grid">
+                <button class="dial-btn" onclick="pressKey('1')">1</button>
+                <button class="dial-btn" onclick="pressKey('2')">2<span>abc</span></button>
+                <button class="dial-btn" onclick="pressKey('3')">3<span>def</span></button>
+                <button class="dial-btn" onclick="pressKey('4')">4<span>ghi</span></button>
+                <button class="dial-btn" onclick="pressKey('5')">5<span>jkl</span></button>
+                <button class="dial-btn" onclick="pressKey('6')">6<span>mno</span></button>
+                <button class="dial-btn" onclick="pressKey('7')">7<span>pqrs</span></button>
+                <button class="dial-btn" onclick="pressKey('8')">8<span>tuv</span></button>
+                <button class="dial-btn" onclick="pressKey('9')">9<span>wxyz</span></button>
+                <button class="dial-btn" onclick="pressKey('*')">*</button>
+                <button class="dial-btn" onclick="pressKey('0')">0<span>+</span></button>
+                <button class="dial-btn" onclick="pressKey('#')">#</button>
+            </div>
+            <div style="display: flex; justify-content: center; align-items: center; position: relative;">
+                <button class="call-trigger-btn" onclick="dialCall()">📞</button>
+                <span style="position: absolute; right: 40px; top: 40px; font-size: 22px; cursor: pointer; color: #868e96;" onclick="delDigit()">⌫</span>
             </div>
         </div>
 
-        <!-- PANEL 5: MORE / GRID SETTINGS (Screen-6 Design) -->
-        <div id="panel-more" class="content-panel">
-            <div class="more-grid">
-                <div class="more-card" style="grid-column: span 2; padding: 15px;">
-                    <span style="font-size:12px; color:#757f8a;">Main Balance</span>
-                    <strong style="font-size:24px; color:#004b93;" id="more-balance-view">BDT 0.00</strong>
-                </div>
-                <div class="more-card card-blue"><span class="icon">👤</span>My Account</div>
-                <div class="more-card card-pink"><span class="icon">⚙</span>Settings</div>
-                <div class="more-card card-orange"><span class="icon">💳</span>Recharge</div>
-                <div class="more-card card-teal"><span class="icon">📲</span>Balance Transfer</div>
-                <div class="more-card card-purple"><span class="icon">🎁</span>Voice Package</div>
-                <div class="more-card card-blue"><span class="icon">📊</span>Rates</div>
+        <!-- 2. RECENT LOGS PANEL -->
+        <div id="panel-recent" class="content-panel">
+            <div id="logs-container-list"></div>
+        </div>
+
+        <!-- 3. CONTACTS ACCESS PANEL -->
+        <div id="panel-contacts" class="content-panel">
+            <button class="login-btn" onclick="requestContactAccess()" id="permission-btn">Sync Mobile Contacts List</button>
+            <div id="native-contacts-box" style="margin-top:15px;"></div>
+        </div>
+
+        <!-- 4. CHAT MESSAGING PANEL -->
+        <div id="panel-chat" class="content-panel">
+            <input type="text" id="chat-target-id" class="login-input" placeholder="Recipient Account Number">
+            <div class="chat-box" id="msg-container-box"></div>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="msg-input-field" class="login-input" style="margin:0;" placeholder="Type text packet...">
+                <button class="login-btn" style="width:70px; margin:0;" onclick="dispatchMsg()">Send</button>
+            </div>
+        </div>
+
+        <!-- 5. SETTINGS COMPONENTS -->
+        <div id="panel-settings" class="content-panel">
+            <div class="settings-group">
+                <div class="settings-label">Wallet Balance Engine</div>
+                <div class="settings-val" id="settings-balance-lbl">BDT 0.00</div>
+                <input type="number" id="recharge-amount-val" class="input-field" placeholder="Enter BDT Amount">
+                <button class="login-btn" style="background:#2b8a3e; padding:8px;" onclick="addBalance()">Instant Add Credit</button>
+            </div>
+            <div class="settings-group">
+                <div class="settings-label">Profile Security Check</div>
+                <div class="settings-val" style="font-size:14px; color:#495057;">Account Status: <span style="color:#2b8a3e;">Verified Active Node</span></div>
             </div>
         </div>
     </div>
 
-    <!-- ACTIVE CALL OVERLAY (Screen-1 Dark Layout) -->
-    <div id="calling-overlay-screen" class="calling-overlay">
+    <!-- CALL SCREEN MODAL -->
+    <div id="call-overlay-window" class="calling-overlay">
         <div style="text-align: center;">
-            <div class="caller-num" id="active-screen-number">1234 5678</div>
-            <div class="call-status" id="active-screen-status">Calling...</div>
+            <div style="font-size: 26px; font-weight: bold;" id="call-window-num">0000</div>
+            <div style="font-size: 14px; color: #339af0; margin-top: 8px;" id="call-window-status">Connecting Endpoint...</div>
         </div>
-        
-        <div class="call-avatar-large">👤</div>
-        <div class="caller-name-label" id="active-screen-name">Johny Doe</div>
-        
-        <!-- Controls exactly matching Screen-1 -->
-        <div class="call-controls-grid">
-            <div class="control-item"><div class="control-icon-btn">🎙️</div>Mute</div>
-            <div class="control-item"><div class="control-icon-btn">⣿</div>Keypad</div>
-            <div class="control-item"><div class="control-icon-btn">⏰</div>Reminder</div>
-            <div class="control-item"><div class="control-icon-btn">📹</div>Video call</div>
-            <div class="control-item"><div class="control-icon-btn">➕</div>Add call</div>
-            <div class="control-item"><div class="control-icon-btn">🔊</div>Speaker</div>
-        </div>
-
-        <button class="hangup-btn" onclick="endCurrentCall()">❌</button>
+        <div style="width:110px; height:110px; background:#212529; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:44px;">👤</div>
+        <button class="hangup-btn" onclick="disconnectCall()">❌</button>
     </div>
 
 </div>
 
 <script>
     const socket = io();
-    let typedDigits = "";
-    let userAccount = "";
-    let peerConn;
-    let localAudioStream;
+    let currentInput = "";
+    let activeClientUser = null;
+    let peerConnection;
+    let localStream;
 
-    function performLogin() {
-        const u = document.getElementById('username').value.trim();
-        const p = document.getElementById('password').value.trim();
-        if(!u || !p) return alert("Fill fields!");
+    function appAuth() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        if(!username || !password) return alert("All fields are vital.");
 
         fetch('/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: u, password: p })
+            body: JSON.stringify({ username, password })
         })
         .then(res => res.json())
-        .then(resData => {
-            if(resData.success) {
-                userAccount = u;
+        .then(data => {
+            if(data.success) {
+                activeClientUser = data.user;
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-app').style.display = 'flex';
-                document.getElementById('balance-badge').innerText = "BDT " + resData.balance;
-                document.getElementById('more-balance-view').innerText = "BDT " + resData.balance;
-                
-                socket.emit('register-active-user', userAccount);
-                navigate('dialpad'); // Default view like setup
-            } else {
-                alert(resData.message);
+                document.getElementById('my-profile-id').innerText = "Node: " + username;
+                syncBalanceUI(activeClientUser.balance);
+                renderLogs(activeClientUser.logs);
+                renderMessages(activeClientUser.messages);
+
+                socket.emit('register-active-user', username);
+                routeTo('dialpad');
+            } else { alert(data.message); }
+        });
+    }
+
+    function routeTo(panel) {
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
+        document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active-panel'));
+        document.getElementById('nav-' + panel).classList.add('active-tab');
+        document.getElementById('panel-' + panel).classList.add('active-panel');
+        document.getElementById('header-txt').innerText = panel.toUpperCase();
+    }
+
+    function pressKey(k) { currentInput += k; updateDialUI(); }
+    function delDigit() { currentInput = currentInput.slice(0, -1); updateDialUI(); }
+    function updateDialUI() { document.getElementById('dial-screen-view').innerText = currentInput; }
+
+    function syncBalanceUI(bal) {
+        document.getElementById('balance-lbl').innerText = "BDT " + bal;
+        document.getElementById('settings-balance-lbl').innerText = "BDT " + bal;
+    }
+
+    function addBalance() {
+        const amount = document.getElementById('recharge-amount-val').value;
+        if(!amount || amount <= 0) return alert("Invalid entry.");
+        fetch('/api/recharge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: document.getElementById('username').value.trim(), amount: amount })
+        }).then(res => res.json()).then(data => {
+            if(data.success) {
+                syncBalanceUI(data.balance);
+                document.getElementById('recharge-amount-val').value = "";
+                alert("Credit refilled successfully.");
             }
         });
     }
 
-    function navigate(panelId) {
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
-        document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active-panel'));
-        
-        document.getElementById('tab-' + panelId).classList.add('active-tab');
-        document.getElementById('panel-' + panelId).classList.add('active-panel');
-        document.getElementById('page-title').innerText = panelId.charAt(0).toUpperCase() + panelId.slice(1);
-    }
-
-    function dial(char) { typedDigits += char; updateDigitsDisplay(); }
-    function backspace() { typedDigits = typedDigits.slice(0, -1); updateDigitsDisplay(); }
-    function autoCall(num) { typedDigits = num; updateDigitsDisplay(); runOutgoingCall(); }
-    function updateDigitsDisplay() { document.getElementById('display-digits').innerText = typedDigits; }
-
-    function runOutgoingCall() {
-        if(!typedDigits) return;
-        
-        document.getElementById('active-screen-number').innerText = typedDigits;
-        document.getElementById('active-screen-name').innerText = "Unknown Network";
-        document.getElementById('calling-overlay-screen').style.display = 'flex';
-
-        if(typedDigits.startsWith("0864")) {
-            document.getElementById('active-screen-status').innerText = "Calling App Account...";
-            
-            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-                localAudioStream = stream;
-                peerConn = new RTCPeerConnection();
-                stream.getTracks().forEach(t => peerConn.addTrack(t, stream));
-
-                peerConn.createOffer().then(o => peerConn.setLocalDescription(o)).then(() => {
-                    socket.emit('call-request', { target: typedDigits, from: userAccount, offer: peerConn.localDescription });
-                });
-            });
-        } else {
-            document.getElementById('active-screen-status').innerText = "Routing to Mobile Gateway...";
-            socket.emit('initiate-voip-mobile-call', { mobileNumber: typedDigits });
+    async function requestContactAccess() {
+        // Double security prompt structure requested
+        try {
+            await navigator.mediaDevices.getUserMedia({ audio: true }); // Mic capture
+            if ('contacts' in navigator && 'select' in navigator.contacts) {
+                const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
+                displayContacts(contacts);
+            } else {
+                // Fallback simulation layout
+                const demoList = [{name: "Father (Ahammudul Hoque)", tel:"01712345678"}, {name: "Brother (Minhaj)", tel:"01698765432"}];
+                displayContacts(demoList);
+            }
+            document.getElementById('permission-btn').style.display = 'none';
+        } catch(e) {
+            alert("Microphone & Contacts Access Permissions Mandatory to execute System Node Pipeline.");
         }
     }
 
-    socket.on('incoming-call', async (incoming) => {
-        let ok = confirm("Call from " + incoming.from + ". Answer?");
-        if(ok) {
-            document.getElementById('active-screen-number').innerText = incoming.from;
-            document.getElementById('active-screen-name').innerText = "App Contact";
-            document.getElementById('calling-overlay-screen').style.display = 'flex';
-            document.getElementById('active-screen-status').innerText = "Connected";
+    function displayContacts(arr) {
+        const box = document.getElementById('native-contacts-box');
+        box.innerHTML = "";
+        arr.forEach(c => {
+            box.innerHTML += `<div class="list-item" onclick="currentInput='${c.tel.replace(/[^0-9]/g, '')}'; updateDialUI(); routeTo('dialpad');">
+                <div class="list-info"><div class="avatar">${c.name[0]}</div><div><div class="item-name">${c.name}</div><div class="item-sub">${c.tel}</div></div></div>
+                <span>📞</span>
+            </div>`;
+        });
+    }
+
+    function dialCall() {
+        if(!currentInput) return;
+        document.getElementById('call-window-num').innerText = currentInput;
+        document.getElementById('call-overlay-window').style.display = 'flex';
+        
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            localStream = stream;
+            peerConnection = new RTCPeerConnection();
+            stream.getTracks().forEach(t => peerConnection.addTrack(t, stream));
+
+            peerConnection.createOffer().then(o => peerConn.setLocalDescription(o)).then(() => {
+                socket.emit('call-request', { target: currentInput, from: document.getElementById('username').value.trim(), offer: peerConnection.localDescription });
+            });
+        }).catch(() => {
+            document.getElementById('call-window-status').innerText = "Hardware Mic Error.";
+        });
+    }
+
+    socket.on('incoming-call', async (data) => {
+        let accept = confirm("Incoming node trace from " + data.from + ". Accept?");
+        if(accept) {
+            document.getElementById('call-window-num').innerText = data.from;
+            document.getElementById('call-overlay-window').style.display = 'flex';
+            document.getElementById('call-window-status').innerText = "Active Node Hooked";
 
             navigator.mediaDevices.getUserMedia({ audio: true }).then(async (stream) => {
-                localAudioStream = stream;
-                peerConn = new RTCPeerConnection();
-                stream.getTracks().forEach(t => peerConn.addTrack(t, stream));
-
-                await peerConn.setRemoteDescription(new RTCSessionDescription(incoming.offer));
-                const ans = await peerConn.createAnswer();
-                await peerConn.setLocalDescription(ans);
-                socket.emit('call-accept', { target: incoming.from, answer: ans });
+                localStream = stream;
+                peerConnection = new RTCPeerConnection();
+                stream.getTracks().forEach(t => peerConnection.addTrack(t, stream));
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                const ans = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(ans);
+                socket.emit('call-accept', { target: data.from, answer: ans });
             });
         }
     });
 
-    socket.on('call-connected', async (connData) => {
-        document.getElementById('active-screen-status').innerText = "Call Active";
-        await peerConn.setRemoteDescription(new RTCSessionDescription(connData.answer));
+    socket.on('call-connected', async (data) => {
+        document.getElementById('call-window-status').innerText = "Call Active • Billing On";
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
     });
 
-    function endCurrentCall() {
-        if (peerConn) { peerConn.close(); peerConn = null; }
-        if (localAudioStream) { localAudioStream.getTracks().forEach(t => t.stop()); }
-        document.getElementById('calling-overlay-screen').style.display = 'none';
-        typedDigits = "";
-        updateDigitsDisplay();
+    socket.on('balance-update', (data) => { syncBalanceUI(data.balance); });
+    socket.on('force-hangup', () => { disconnectCall(); alert("Deduction Terminated due to low credits."); });
+    socket.on('call-error', (data) => { document.getElementById('call-window-status').innerText = data.message; });
+
+    function disconnectCall() {
+        if(peerConnection) { peerConnection.close(); peerConnection = null; }
+        if(localStream) { localStream.getTracks().forEach(t => t.stop()); }
+        document.getElementById('call-overlay-window').style.display = 'none';
+    }
+
+    function dispatchMsg() {
+        const to = document.getElementById('chat-target-id').value.trim();
+        const text = document.getElementById('msg-input-field').value.trim();
+        const from = document.getElementById('username').value.trim();
+        if(!to || !text) return;
+
+        socket.emit('send-msg', { to, from, text });
+        const box = document.getElementById('msg-container-box');
+        box.innerHTML += `<div class="msg sent">${text}</div>`;
+        document.getElementById('msg-input-field').value = "";
+        box.scrollTop = box.scrollHeight;
+    }
+
+    socket.on('receive-msg', (data) => {
+        const box = document.getElementById('msg-container-box');
+        box.innerHTML += `<div class="msg rcv"><strong>${data.from}:</strong> ${data.text}</div>`;
+        box.scrollTop = box.scrollHeight;
+    });
+
+    function renderLogs(logs) {
+        const container = document.getElementById('logs-container-list');
+        container.innerHTML = logs.length === 0 ? '<p style="color:#868e96;text-align:center;">No activity logged yet.</p>' : '';
+        logs.forEach(l => {
+            container.innerHTML += `<div class="list-item"><div><strong>${l.number}</strong><br><small>${l.time}</small></div><span style="color:#fa5252;">-BDT ${l.cost}</span></div>`;
+        });
+    }
+
+    function renderMessages(msgs) {
+        const box = document.getElementById('msg-container-box');
+        msgs.forEach(m => { box.innerHTML += `<div class="msg rcv"><strong>${m.from}:</strong> ${m.text}</div>`; });
     }
 </script>
 </body>
