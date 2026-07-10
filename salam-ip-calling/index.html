@@ -63,7 +63,6 @@
 </head>
 <body>
 
-    <!-- ১. লগইন স্ক্রিন -->
     <div id="loginScreen">
         <h2 style="text-align:center; margin-bottom:30px; font-weight:400; color:var(--primary);">Salam IP Phone Log In</h2>
         <div class="input-group"><input type="text" id="logUser" placeholder="Extension Number"></div>
@@ -72,10 +71,8 @@
         <p id="logErr" style="color:var(--red); text-align:center; margin-top:10px; font-size:13px;"></p>
     </div>
 
-    <!-- ২. মেইন অ্যাপ কন্টেইনার (৪টি ট্যাব সংবলিত) -->
     <div class="app-container" id="appMain">
         
-        <!-- ডায়ালপ্যাড ট্যাব -->
         <div id="dialerScreen" class="screen active-screen">
             <div class="display-box">
                 <h2 id="dialDisplay"></h2>
@@ -103,7 +100,6 @@
             </div>
         </div>
 
-        <!-- কন্টাক্ট ও ইউজার এডিট ট্যাব -->
         <div id="contactsScreen" class="screen">
             <div id="adminForm" style="display:none; background:var(--surface); padding:15px; border-radius:10px; margin-bottom:20px; border: 1px solid #21262d;">
                 <h4 id="formTitle" style="margin-bottom:12px; font-weight: 500;">Create New Extension</h4>
@@ -118,7 +114,6 @@
             <div id="contactListRender"></div>
         </div>
 
-        <!-- সিকিউর মেসেজিং ট্যাব -->
         <div id="messagesScreen" class="screen">
             <div class="chat-container">
                 <div class="input-group">
@@ -132,7 +127,6 @@
             </div>
         </div>
 
-        <!-- প্রোফাইল ও কল লগ ট্যাব -->
         <div id="profileScreen" class="screen">
             <div style="background:var(--surface); padding:15px; border-radius:12px; border:1px solid #21262d; margin-bottom:20px;">
                 <p style="color:var(--gray); font-size:13px;">Name: <span id="profName" style="color:#fff; font-weight:500; font-size:15px; margin-left:5px;">-</span></p>
@@ -146,7 +140,6 @@
 
     </div>
 
-    <!-- ৩. অ্যান্ড্রয়েড ডিফল্ট বটম নেভিগেশন বার বার -->
     <div class="android-nav-bar" id="appNavBar">
         <button class="nav-item active-nav" onclick="switchTab('dialerScreen', this)">
             <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
@@ -166,7 +159,6 @@
         </button>
     </div>
 
-    <!-- ৪. লাইভ কল স্ক্রিন ওভারলে -->
     <div id="callScreen">
         <div style="text-align:center;">
             <h2 id="cScreenName" style="font-size:32px; font-weight:400; margin-bottom:5px;">Connected</h2>
@@ -202,13 +194,19 @@
         let muteStatus = false, speakerStatus = false;
         let clientIp = 'Fetching...';
 
-        // 🛡️ অটো-লগইন প্রোটেকশন: ব্রাউজার রিফ্রেশ করলেও সেশন যাবে না
+        // 🛡️ ব্রাউজার রিফ্রেশ করলে অটো-লগআউট প্রোটেকশন সেশন (sessionStorage ব্যবহার করা হয়েছে)
         window.addEventListener('DOMContentLoaded', async () => {
             await fetchIp();
-            const savedUser = localStorage.getItem('salam_session');
+            
+            // পূর্বের স্টোরেজ সম্পূর্ণ ক্লিয়ার করে নতুন সেশন চেক করা হচ্ছে
+            localStorage.removeItem('salam_session'); 
+            
+            const savedUser = sessionStorage.getItem('salam_session');
             if (savedUser) {
                 activeSession = JSON.parse(savedUser);
                 launchAppDashboard();
+            } else {
+                triggerLogout(); // রিফ্রেশ করলে সরাসরি লগআউট পেজে নিয়ে যাবে
             }
         });
 
@@ -232,7 +230,8 @@
             const data = await res.json();
             if(data.success) {
                 activeSession = data;
-                localStorage.setItem('salam_session', JSON.stringify(data));
+                // সেশনস্টোরেজে রাখা হলো যাতে পেজ রিলোড দিলে মুছে যায়
+                sessionStorage.setItem('salam_session', JSON.stringify(data));
                 launchAppDashboard();
             } else {
                 document.getElementById('logErr').innerText = data.message;
@@ -352,9 +351,6 @@
             const box = document.getElementById('chatBoxRender');
             box.innerHTML += `<div class="msg-line msg-recv"><b>${data.sender}:</b> ${data.text}</div>`;
             box.scrollTop = box.scrollHeight;
-            if(document.getElementById('messagesScreen').style.display !== 'flex') {
-                alert(`New message from ${data.sender}`);
-            }
         });
 
         // --- WebRTC HD VOIP (EARPIECE DEFAULT FIX) ---
@@ -368,7 +364,7 @@
             rtcPeerConnection.ontrack = e => {
                 const aud = document.getElementById('earpieceAudio');
                 aud.srcObject = e.streams[0];
-                // 🎧 ডিফল্ট লো ভলিউম যাতে সবাই শুনতে না পায় (কানে দিয়ে শোনার জন্য পারফেক্ট)
+                // 🎧 ডিফল্ট কানের স্পিকার সাউন্ড লেভেল সেটআপ (0.2)
                 aud.volume = 0.2; 
             };
         }
@@ -429,7 +425,6 @@
         function callToggleSpeaker() {
             speakerStatus = !speakerStatus;
             const aud = document.getElementById('earpieceAudio');
-            // ট্রু হলে ১.০ লাউড স্পিকার, ফলস হলে ডিফল্ট কানের স্পিকার (০.২)
             aud.volume = speakerStatus ? 1.0 : 0.2;
             document.getElementById('sBtn').classList.toggle('active', speakerStatus);
         }
@@ -451,17 +446,16 @@
             socket.emit('hangup', { targetUsername: currentRemoteExt });
             socket.emit('log_call_telegram', { caller: activeSession.username, receiver: currentRemoteExt, duration: callDurationSeconds });
             
-            // লোকাল স্টোরেজে কল লগ সেভ
-            let localLogs = JSON.parse(localStorage.getItem('salam_call_logs') || '[]');
+            let localLogs = JSON.parse(sessionStorage.getItem('salam_call_logs') || '[]');
             localLogs.unshift({ target: currentRemoteExt, duration: callDurationSeconds, time: new Date().toLocaleTimeString() });
-            localStorage.setItem('salam_call_logs', JSON.stringify(localLogs));
+            sessionStorage.setItem('salam_call_logs', JSON.stringify(localLogs));
             
             renderLocalCallLogs();
             resetCallContext();
         }
 
         function renderLocalCallLogs() {
-            let localLogs = JSON.parse(localStorage.getItem('salam_call_logs') || '[]');
+            let localLogs = JSON.parse(sessionStorage.getItem('salam_call_logs') || '[]');
             let html = localLogs.slice(0, 15).map(l => `
                 <div class="card-list" style="font-size:13px;">
                     <span style="color:var(--green)">● Outgoing</span> to <b>${l.target}</b> - Duration: ${l.duration}s <span style="float:right; color:var(--gray);">${l.time}</span>
@@ -481,8 +475,12 @@
         }
 
         function triggerLogout() {
-            localStorage.removeItem('salam_session');
-            location.reload();
+            sessionStorage.removeItem('salam_session');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('appMain').style.display = 'none';
+            document.getElementById('appNavBar').style.display = 'none';
+            document.getElementById('logUser').value = "";
+            document.getElementById('logPass').value = "";
         }
     </script>
 </body>
