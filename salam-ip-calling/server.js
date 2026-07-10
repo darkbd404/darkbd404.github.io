@@ -4,7 +4,6 @@ const socketIo = require('socket.io');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
-const webpush = require('web-push'); // npm install web-push
 
 const app = express();
 const server = http.createServer(app);
@@ -22,16 +21,6 @@ const GITHUB_TOKEN = "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";
 const GITHUB_OWNER = "darkbd404";
 const GITHUB_REPO = "darkbd404.github.io";
 const GITHUB_PATH = "users.json";
-
-// VAPID Keys for Push Notifications (Generate your own using web-push library if needed)
-const vapidKeys = {
-    publicKey: 'BNxw7ZmzFqHqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJq......', // Replace with real public key
-    privateKey: '......' // Replace with real private key
-};
-
-// webpush.setVapidDetails('mailto:salam@example.com', vapidKeys.publicKey, vapidKeys.privateKey);
-
-let pushSubscriptions = [];
 
 function sendTelegram(msg) {
     const data = JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" });
@@ -147,7 +136,7 @@ app.post('/api/login', (req, res) => {
     
     fetchUsersFromGitHub((githubUsers) => {
         if (githubUsers[username] && githubUsers[username].password === password) {
-            sendTelegram(`🟢 *User Login Alert*\n *Name:* ${githubUsers[username].name || 'N/A'}\n🆔 *Node ID:* ${username}\n💰 *Balance:* BDT ${githubUsers[username].balance}`);
+            sendTelegram(`🟢 *User Login Alert*\n👤 *Name:* ${githubUsers[username].name || 'N/A'}\n🆔 *Node ID:* ${username}\n💰 *Balance:* BDT ${githubUsers[username].balance}`);
             return res.json({ success: true, role: "user", user: githubUsers[username] });
         }
         res.json({ success: false, message: "Invalid ID or Password!" });
@@ -204,7 +193,7 @@ app.post('/api/admin/delete-user', (req, res) => {
     });
 });
 
-// ADMIN: SEND NOTIFICATION TO ALL
+// ADMIN: SEND NOTIFICATION TO ALL (SOCKET.IO BASED - NO WEB-PUSH NEEDED)
 app.post('/api/admin/send-notification', (req, res) => {
     const { adminUser, adminPass, title, message } = req.body;
     
@@ -213,31 +202,18 @@ app.post('/api/admin/send-notification', (req, res) => {
     }
     
     // Send to Telegram
-    sendTelegram(`📢 *System Notification*\n *Title:* ${title}\n💬 *Message:* ${message}`);
+    sendTelegram(`📢 *System Notification*\n📌 *Title:* ${title}\n💬 *Message:* ${message}`);
     
     // Broadcast to all connected clients via Socket.IO
     io.emit('system-notification', { title, message });
     
-    // Send Push Notification to subscribed devices
-    const payload = JSON.stringify({ title, message });
-    pushSubscriptions.forEach(subscription => {
-        webpush.sendNotification(subscription, payload).catch(console.error);
-    });
-    
     res.json({ success: true });
-});
-
-// Register Push Subscription
-app.post('/api/register-push', (req, res) => {
-    const subscription = req.body;
-    pushSubscriptions.push(subscription);
-    res.status(201).json({});
 });
 
 // USER PANEL: REFILL REQUEST
 app.post('/api/user/request-balance', (req, res) => {
     const { username, name, currentBalance, amount } = req.body;
-    sendTelegram(`⚠️ *Refill Request Packet*\n👤 *Customer Name:* ${name}\n *IP / Username:* ${username}\n *Current Balance:* BDT ${currentBalance}\n💵 *Requested Amount:* BDT ${amount}`);
+    sendTelegram(`️ *Refill Request Packet*\n👤 *Customer Name:* ${name}\n🆔 *IP / Username:* ${username}\n💰 *Current Balance:* BDT ${currentBalance}\n💵 *Requested Amount:* BDT ${amount}`);
     res.json({ success: true });
 });
 
