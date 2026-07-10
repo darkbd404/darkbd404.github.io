@@ -136,43 +136,49 @@ app.post('/api/login', (req, res) => {
     
     fetchUsersFromGitHub((githubUsers) => {
         if (githubUsers[username] && githubUsers[username].password === password) {
-            sendTelegram(`🟢 *User Login Alert*\n👤 *Name:* ${githubUsers[username].name || 'N/A'}\n *Node ID:* ${username}\n💰 *Balance:* BDT ${githubUsers[username].balance}`);
+            sendTelegram(`🟢 *User Login Alert*\n👤 *Name:* ${githubUsers[username].name || 'N/A'}\n🆔 *Node ID:* ${username}\n *Balance:* BDT ${githubUsers[username].balance}`);
             return res.json({ success: true, role: "user", user: githubUsers[username] });
         }
         res.json({ success: false, message: "Invalid ID or Password!" });
     });
 });
 
-// ADMIN: SAVE / UPDATE USER (FIXED - LOCAL FIRST, GITHUB BACKGROUND)
+// ADMIN: GET REGISTERED USERS FOR CONTACTS
+app.get('/api/users-list', (req, res) => {
+    fetchUsersFromGitHub((githubUsers) => {
+        res.json(githubUsers);
+    });
+});
+
+// ✅ ADMIN: SAVE / UPDATE USER (FIXED - LOCAL FIRST)
 app.post('/api/admin/save-user', (req, res) => {
     const { adminUser, adminPass, targetUser, name, password, balance } = req.body;
     
-    if (adminUser !== "salam" || adminPass !== "864") {
-        return res.json({ success: false, message: "Unauthorized" });
-    }
+    if (adminUser !== "salam" || adminPass !== "864") return res.json({ success: false });
     
-    // Step 1: Read from local file first for speed
-    let users = readData();
-    
-    // Step 2: Update user object
-    users[targetUser] = { 
-        name: name || targetUser,
-        password: password, 
-        balance: parseFloat(balance || 0).toFixed(2), 
-        logs: users[targetUser] ? users[targetUser].logs : [], 
-        messages: users[targetUser] ? users[targetUser].messages : [] 
-    };
-    
-    // Step 3: Write to local file IMMEDIATELY
-    writeData(users); 
-    
-    // Step 4: Push to GitHub in background (non-blocking)
-    pushUsersToGitHub(users, (isSuccess) => {
-        console.log(isSuccess ? "✅ GitHub Synced" : "❌ GitHub Sync Failed");
+    fetchUsersFromGitHub((currentUsers) => {
+        let users = currentUsers || {};
+        
+        // Update User Data Structure
+        users[targetUser] = { 
+            name: name || targetUser,
+            password: password, 
+            balance: parseFloat(balance || 0).toFixed(2), 
+            logs: users[targetUser] ? users[targetUser].logs : [], 
+            messages: users[targetUser] ? users[targetUser].messages : [] 
+        };
+        
+        // 1. Write to Local File IMMEDIATELY (So login works instantly)
+        writeData(users); 
+        
+        // 2. Push to GitHub in Background
+        pushUsersToGitHub(users, (isSuccess) => {
+            console.log(isSuccess ? "GitHub Synced" : "GitHub Sync Failed");
+        });
+        
+        // 3. Send Response Immediately
+        res.json({ success: true, users: users });
     });
-    
-    // Step 5: Send response immediately
-    res.json({ success: true, users: users });
 });
 
 // ADMIN: DELETE USER
@@ -180,18 +186,20 @@ app.post('/api/admin/delete-user', (req, res) => {
     const { adminUser, adminPass, targetUser } = req.body;
     if (adminUser !== "salam" || adminPass !== "864") return res.json({ success: false });
     
-    let users = readData();
-    if (users[targetUser]) {
-        delete users[targetUser];
-        writeData(users); // Local Delete First
-        pushUsersToGitHub(users, () => {}); // GitHub Delete Background
-        res.json({ success: true, users: users });
-    } else {
-        res.json({ success: false, message: "User not found" });
-    }
+    fetchUsersFromGitHub((currentUsers) => {
+        let users = currentUsers || {};
+        if (users[targetUser]) {
+            delete users[targetUser];
+            writeData(users); // Local Delete First
+            pushUsersToGitHub(users, () => {}); // GitHub Delete Background
+            res.json({ success: true, users: users });
+        } else {
+            res.json({ success: false, message: "User not found" });
+        }
+    });
 });
 
-// ADMIN: SEND NOTIFICATION TO ALL (NEW FEATURE)
+// ✅ NEW: ADMIN SEND NOTIFICATION TO ALL
 app.post('/api/admin/send-notification', (req, res) => {
     const { adminUser, adminPass, title, message } = req.body;
     
@@ -199,16 +207,19 @@ app.post('/api/admin/send-notification', (req, res) => {
         return res.json({ success: false });
     }
     
+    // Send to Telegram
     sendTelegram(`📢 *System Notification*\n📌 *Title:* ${title}\n💬 *Message:* ${message}`);
+    
+    // Broadcast to all connected clients via Socket.IO
     io.emit('system-notification', { title, message });
     
     res.json({ success: true });
 });
 
-// USER PANEL: REFILL REQUEST
+// USER PANEL: TELEGRAM REFILL REQUEST
 app.post('/api/user/request-balance', (req, res) => {
     const { username, name, currentBalance, amount } = req.body;
-    sendTelegram(`️ *Refill Request Packet*\n *Customer Name:* ${name}\n🆔 *IP / Username:* ${username}\n💰 *Current Balance:* BDT ${currentBalance}\n💵 *Requested Amount:* BDT ${amount}`);
+    sendTelegram(`⚠️ *Refill Request Packet*\n👤 *Customer Name:* ${name}\n🆔 *IP / Username:* ${username}\n💰 *Current Balance:* BDT ${currentBalance}\n💵 *Requested Amount:* BDT ${amount}`);
     res.json({ success: true });
 });
 
@@ -240,7 +251,38 @@ io.on('connection', (socket) => {
         const targetSocketId = activeNodes[data.target];
         if (targetSocketId) {
             io.to(targetSocketId).emit('call-connected', { answer: data.answer });
-            // Billing Logic...
+            fetchUsersFromGitHub((users) => {
+                if (users[data.target]) {
+                    let cur = parseFloat(users[data.target].balance);
+                    if (cur >= 0.10) {
+                        users[data.target].balance = (cur - 0.10).toFixed(2);
+                        users[data.target].logs.unshift({ target: socket.uid, time: new Date().toLocaleString(), cost: "0.10" });
+                        pushUsersToGitHub(users, () => {
+                            writeData(users);
+                            io.to(targetSocketId).emit('balance-sync', { balance: users[data.target].balance });
+                        });
+                    }
+                }
+            });
+            activeBillings[socket.id] = setInterval(() => {
+                fetchUsersFromGitHub((currentUsers) => {
+                    if (currentUsers[data.target]) {
+                        let cur = parseFloat(currentUsers[data.target].balance);
+                        if (cur >= 0.10) {
+                            currentUsers[data.target].balance = (cur - 0.10).toFixed(2);
+                            currentUsers[data.target].logs.unshift({ target: socket.uid, time: new Date().toLocaleString(), cost: "0.10" });
+                            pushUsersToGitHub(currentUsers, () => {
+                                writeData(currentUsers);
+                                io.to(targetSocketId).emit('balance-sync', { balance: currentUsers[data.target].balance });
+                            });
+                        } else {
+                            io.to(targetSocketId).emit('force-hangup');
+                            socket.emit('force-hangup');
+                            clearInterval(activeBillings[socket.id]);
+                        }
+                    }
+                });
+            }, 60000);
         }
     });
 
@@ -251,7 +293,19 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('ice-candidate', (data) => {
+        const targetSocketId = activeNodes[data.target];
+        if (targetSocketId) io.to(targetSocketId).emit('ice-candidate', { candidate: data.candidate });
+    });
+
+    socket.on('hangup-call', (data) => {
+        const targetSocketId = activeNodes[data.target];
+        if (targetSocketId) io.to(targetSocketId).emit('call-terminated');
+        if(activeBillings[socket.id]) clearInterval(activeBillings[socket.id]);
+    });
+
     socket.on('disconnect', () => {
+        if(activeBillings[socket.id]) clearInterval(activeBillings[socket.id]);
         if(socket.uid) delete activeNodes[socket.uid];
     });
 });
