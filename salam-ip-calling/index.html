@@ -3,293 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IP Calling Pro Application</title>
+    <title>IP Calling Engine Pro</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
 <div class="phone-container">
     
-    <!-- AUTH SCREEN -->
-    <div id="login-screen">
-        <h2 style="color: #0066cc; margin:0 0 10px 0;">IP Call Connect</h2>
-        <p style="color: #6c757d; font-size: 14px; margin:0 0 20px 0;">Secure Real-time Communications Engine</p>
-        <input type="text" id="username" class="login-input" placeholder="Enter Your Number ID">
-        <input type="password" id="password" class="login-input" placeholder="Password">
-        <button class="login-btn" onclick="appAuth()">Log In / Create Account</button>
+    <div id="panel-gate" class="screen-panel active-panel" style="justify-content: center; align-items: center;">
+        <h2 style="color:#0066cc; margin-bottom: 30px;">IP Call Dashboard</h2>
+        <button class="btn-primary" style="margin-bottom: 15px;" onclick="showAuth('user')">User Access Portal</button>
+        <button class="btn-primary" style="background:#495057;" onclick="showAuth('admin')">Admin Control Unit</button>
     </div>
 
-    <!-- MAIN DASHBOARD APPLICATION -->
-    <div id="main-app" style="display: none; flex-direction: column; height: 100%;">
+    <div id="panel-auth" class="screen-panel" style="justify-content: center;">
+        <h2 id="auth-title" style="color: #0066cc; margin-bottom: 15px;">Login</h2>
+        <input type="text" id="auth-user" class="input-field" placeholder="Username / ID">
+        <input type="password" id="auth-pass" class="input-field" placeholder="Password">
+        <button class="btn-primary" onclick="submitAuth()">Validate Access Node</button>
+        <button class="btn-primary" style="background:transparent; color:#6c757d; margin-top:10px;" onclick="location.reload()">← Back</button>
+    </div>
+
+    <div id="panel-admin" class="screen-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3>Database Control</h3>
+            <button class="btn-logout" onclick="location.reload()">Logout Admin</button>
+        </div>
+        <div style="background:#f1f3f5; padding:15px; border-radius:8px; margin-bottom:20px;">
+            <h4>Create / Edit User Profile</h4>
+            <input type="text" id="adm-target-user" class="input-field" placeholder="Target User Number ID">
+            <input type="text" id="adm-target-pass" class="input-field" placeholder="Set Password">
+            <input type="number" id="adm-target-bal" class="input-field" placeholder="Set Balance (BDT)">
+            <button class="btn-primary" style="background:#2b8a3e;" onclick="adminSaveUser()">Commit Changes to JSON</button>
+        </div>
+        <h4>Registered Users in JSON Database</h4>
+        <div id="admin-db-view"></div>
+    </div>
+
+    <div id="panel-main-app" style="display: none; flex-direction: column; height: 100%;">
         <div class="app-header">
-            <span class="title" id="header-txt">Dialer</span>
-            <span style="font-size: 13px; opacity: 0.9;" id="my-profile-id"></span>
+            <span id="app-header-view">Dialer</span>
+            <button class="btn-logout" onclick="location.reload()">Logout</button>
         </div>
-        
         <div class="nav-tabs">
-            <div class="tab-item active-tab" id="nav-dialpad" onclick="routeTo('dialpad')">📞</div>
-            <div class="tab-item" id="nav-recent" onclick="routeTo('recent')">🕒</div>
-            <div class="tab-item" id="nav-contacts" onclick="routeTo('contacts')">👤</div>
-            <div class="tab-item" id="nav-chat" onclick="routeTo('chat')">💬</div>
-            <div class="tab-item" id="nav-settings" onclick="routeTo('settings')">⚙</div>
+            <div class="tab-item active-tab" id="tab-dialpad" onclick="userNavigate('dialpad')">📞</div>
+            <div class="tab-item" id="tab-logs" onclick="userNavigate('logs')">🕒</div>
+            <div class="tab-item" id="tab-contacts" onclick="userNavigate('contacts')">👤</div>
+            <div class="tab-item" id="tab-chat" onclick="userNavigate('chat')">💬</div>
+            <div class="tab-item" id="tab-settings" onclick="userNavigate('settings')">⚙</div>
         </div>
 
-        <!-- TABS PANELS CONTENT -->
-        <!-- 1. DIALPAD PANEL -->
-        <div id="panel-dialpad" class="content-panel active-panel">
-            <div class="dial-header">
-                <span>Account Balance</span>
-                <strong id="balance-lbl" style="color: #2b8a3e;">BDT 0.00</strong>
+        <div id="user-dialpad" class="screen-panel active-panel" style="padding:15px 0;">
+            <div style="display:flex; justify-content:space-between; padding:0 20px; color:#6c757d; font-size:14px;">
+                <span>Wallet Balance</span><strong id="usr-bal-lbl" style="color:#2b8a3e;">BDT 0.00</strong>
             </div>
-            <div class="dial-display" id="dial-screen-view"></div>
-            <div class="dialpad-grid">
-                <button class="dial-btn" onclick="pressKey('1')">1</button>
-                <button class="dial-btn" onclick="pressKey('2')">2<span>abc</span></button>
-                <button class="dial-btn" onclick="pressKey('3')">3<span>def</span></button>
-                <button class="dial-btn" onclick="pressKey('4')">4<span>ghi</span></button>
-                <button class="dial-btn" onclick="pressKey('5')">5<span>jkl</span></button>
-                <button class="dial-btn" onclick="pressKey('6')">6<span>mno</span></button>
-                <button class="dial-btn" onclick="pressKey('7')">7<span>pqrs</span></button>
-                <button class="dial-btn" onclick="pressKey('8')">8<span>tuv</span></button>
-                <button class="dial-btn" onclick="pressKey('9')">9<span>wxyz</span></button>
-                <button class="dial-btn" onclick="pressKey('*')">*</button>
-                <button class="dial-btn" onclick="pressKey('0')">0<span>+</span></button>
-                <button class="dial-btn" onclick="pressKey('#')">#</button>
+            <div class="dial-view" id="dial-screen-digits"></div>
+            <div class="dial-grid">
+                <button class="dial-btn" onclick="press('1')">1</button>
+                <button class="dial-btn" onclick="press('2')">2</button>
+                <button class="dial-btn" onclick="press('3')">3</button>
+                <button class="dial-btn" onclick="press('4')">4</button>
+                <button class="dial-btn" onclick="press('5')">5</button>
+                <button class="dial-btn" onclick="press('6')">6</button>
+                <button class="dial-btn" onclick="press('7')">7</button>
+                <button class="dial-btn" onclick="press('8')">8</button>
+                <button class="dial-btn" onclick="press('9')">9</button>
+                <button class="dial-btn" onclick="press('*')">*</button>
+                <button class="dial-btn" onclick="press('0')">0</button>
+                <button class="dial-btn" onclick="press('#')">#</button>
             </div>
-            <div style="display: flex; justify-content: center; align-items: center; position: relative;">
-                <button class="call-trigger-btn" onclick="dialCall()">📞</button>
-                <span style="position: absolute; right: 40px; top: 40px; font-size: 22px; cursor: pointer; color: #868e96;" onclick="delDigit()">⌫</span>
+            <div style="display:flex; justify-content:center; align-items:center; position:relative;">
+                <button class="call-btn-trigger" onclick="makeCall()">📞</button>
+                <span style="position:absolute; right:50px; font-size:24px; cursor:pointer; color:#868e96; top:40px;" onclick="bksp()">⌫</span>
             </div>
         </div>
 
-        <!-- 2. RECENT LOGS PANEL -->
-        <div id="panel-recent" class="content-panel">
-            <div id="logs-container-list"></div>
+        <div id="user-logs" class="screen-panel"><div id="logs-list-view"></div></div>
+
+        <div id="user-contacts" class="screen-panel">
+            <button class="btn-primary" onclick="syncNativeContacts()">Grant Contacts & Microphone Access</button>
+            <div id="contacts-list-view" style="margin-top:15px;"></div>
         </div>
 
-        <!-- 3. CONTACTS ACCESS PANEL -->
-        <div id="panel-contacts" class="content-panel">
-            <button class="login-btn" onclick="requestContactAccess()" id="permission-btn">Sync Mobile Contacts List</button>
-            <div id="native-contacts-box" style="margin-top:15px;"></div>
-        </div>
-
-        <!-- 4. CHAT MESSAGING PANEL -->
-        <div id="panel-chat" class="content-panel">
-            <input type="text" id="chat-target-id" class="login-input" placeholder="Recipient Account Number">
-            <div class="chat-box" id="msg-container-box"></div>
-            <div style="display: flex; gap: 8px;">
-                <input type="text" id="msg-input-field" class="login-input" style="margin:0;" placeholder="Type text packet...">
-                <button class="login-btn" style="width:70px; margin:0;" onclick="dispatchMsg()">Send</button>
+        <div id="user-chat" class="screen-panel">
+            <input type="text" id="chat-to-user" class="input-field" placeholder="Target Receiver ID">
+            <div class="chat-window" id="chat-msg-box"></div>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="chat-msg-input" class="input-field" style="margin:0;" placeholder="Write message...">
+                <button class="btn-primary" style="width:70px; margin:0;" onclick="sendChatMsg()">Send</button>
             </div>
         </div>
 
-        <!-- 5. SETTINGS COMPONENTS -->
-        <div id="panel-settings" class="content-panel">
-            <div class="settings-group">
-                <div class="settings-label">Wallet Balance Engine</div>
-                <div class="settings-val" id="settings-balance-lbl">BDT 0.00</div>
-                <input type="number" id="recharge-amount-val" class="input-field" placeholder="Enter BDT Amount">
-                <button class="login-btn" style="background:#2b8a3e; padding:8px;" onclick="addBalance()">Instant Add Credit</button>
+        <div id="user-settings" class="screen-panel">
+            <div style="background:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:15px;">
+                <small style="color:#868e96; font-weight:bold;">USER PROFILE INFORMATION (EDIT DISABLED)</small>
+                <div style="margin-top:10px; font-size:16px;">User ID: <span id="set-uid-lbl" style="font-weight:600;">-</span></div>
+                <div style="margin-top:5px; font-size:16px;">Password: <span style="font-weight:600; color:#868e96;">🔒 Encrypted</span></div>
             </div>
-            <div class="settings-group">
-                <div class="settings-label">Profile Security Check</div>
-                <div class="settings-val" style="font-size:14px; color:#495057;">Account Status: <span style="color:#2b8a3e;">Verified Active Node</span></div>
+            <div style="background:#f8f9fa; padding:15px; border-radius:8px;">
+                <small style="color:#868e96; font-weight:bold;">REFILL WALLET REQUEST</small>
+                <input type="number" id="req-bal-amount" class="input-field" placeholder="Enter Recharge Amount (BDT)">
+                <button class="btn-primary" style="background:#2b8a3e;" onclick="sendRefillReq()">Send Recharge Request to Admin</button>
             </div>
         </div>
     </div>
 
-    <!-- CALL SCREEN MODAL -->
-    <div id="call-overlay-window" class="calling-overlay">
+    <div id="call-screen-overlay" class="calling-overlay">
         <div style="text-align: center;">
-            <div style="font-size: 26px; font-weight: bold;" id="call-window-num">0000</div>
-            <div style="font-size: 14px; color: #339af0; margin-top: 8px;" id="call-window-status">Connecting Endpoint...</div>
+            <div style="font-size: 28px; font-weight: bold;" id="call-lbl-number">0000</div>
+            <div style="font-size: 14px; color: #339af0; margin-top: 5px;" id="call-lbl-status">Connecting Node Engine...</div>
         </div>
-        <div style="width:110px; height:110px; background:#212529; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:44px;">👤</div>
-        <button class="hangup-btn" onclick="disconnectCall()">❌</button>
+        <div style="width:110px; height:110px; background:#212529; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:48px;">👤</div>
+        
+        <div class="controls-grid">
+            <div onclick="this.querySelector('.control-bubble').classList.toggle('active-ctrl')"><div class="control-bubble">🎙️</div>Mute</div>
+            <div onclick="alert('Speaker Toggle Active')"><div class="control-bubble">🔊</div>Speaker</div>
+            <div onclick="alert('Earpiece Switching Active')"><div class="control-bubble">🎧</div>Earpiece</div>
+            <div onclick="alert('Video Call Request Sent')"><div class="control-bubble">📹</div>Video Call</div>
+        </div>
+        <button class="hangup-btn" onclick="hangupCall()">❌</button>
     </div>
 
 </div>
 
 <script>
     const socket = io();
-    let currentInput = "";
-    let activeClientUser = null;
-    let peerConnection;
-    let localStream;
+    let authMode = "user";
+    let currentUserData = null;
+    let myUid = "";
+    let dialedString = "";
+    let rtcPeer;
+    let localStreamTrack;
 
-    function appAuth() {
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value.trim();
-        if(!username || !password) return alert("All fields are vital.");
-
-        fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.success) {
-                activeClientUser = data.user;
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-app').style.display = 'flex';
-                document.getElementById('my-profile-id').innerText = "Node: " + username;
-                syncBalanceUI(activeClientUser.balance);
-                renderLogs(activeClientUser.logs);
-                renderMessages(activeClientUser.messages);
-
-                socket.emit('register-active-user', username);
-                routeTo('dialpad');
-            } else { alert(data.message); }
-        });
+    function showAuth(mode) {
+        authMode = mode;
+        document.getElementById('auth-title').innerText = mode === "admin" ? "Admin Control Gateway" : "User Access Portal";
+        document.getElementById('panel-gate').classList.remove('active-panel');
+        document.getElementById('panel-auth').classList.add('active-panel');
     }
 
-    function routeTo(panel) {
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
-        document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active-panel'));
-        document.getElementById('nav-' + panel).classList.add('active-tab');
-        document.getElementById('panel-' + panel).classList.add('active-panel');
-        document.getElementById('header-txt').innerText = panel.toUpperCase();
-    }
+    function submitAuth() {
+        const username = document.getElementById('auth-user').value.trim();
+        const password = document.getElementById('auth-pass').value.trim();
 
-    function pressKey(k) { currentInput += k; updateDialUI(); }
-    function delDigit() { currentInput = currentInput.slice(0, -1); updateDialUI(); }
-    function updateDialUI() { document.getElementById('dial-screen-view').innerText = currentInput; }
-
-    function syncBalanceUI(bal) {
-        document.getElementById('balance-lbl').innerText = "BDT " + bal;
-        document.getElementById('settings-balance-lbl').innerText = "BDT " + bal;
-    }
-
-    function addBalance() {
-        const amount = document.getElementById('recharge-amount-val').value;
-        if(!amount || amount <= 0) return alert("Invalid entry.");
-        fetch('/api/recharge', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: document.getElementById('username').value.trim(), amount: amount })
-        }).then(res => res.json()).then(data => {
-            if(data.success) {
-                syncBalanceUI(data.balance);
-                document.getElementById('recharge-amount-val').value = "";
-                alert("Credit refilled successfully.");
-            }
-        });
-    }
-
-    async function requestContactAccess() {
-        // Double security prompt structure requested
-        try {
-            await navigator.mediaDevices.getUserMedia({ audio: true }); // Mic capture
-            if ('contacts' in navigator && 'select' in navigator.contacts) {
-                const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true });
-                displayContacts(contacts);
-            } else {
-                // Fallback simulation layout
-                const demoList = [{name: "Father (Ahammudul Hoque)", tel:"01712345678"}, {name: "Brother (Minhaj)", tel:"01698765432"}];
-                displayContacts(demoList);
-            }
-            document.getElementById('permission-btn').style.display = 'none';
-        } catch(e) {
-            alert("Microphone & Contacts Access Permissions Mandatory to execute System Node Pipeline.");
+        if (authMode === "admin") {
+            fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    document.getElementById('panel-auth').classList.remove('active-panel');
+                    document.getElementById('panel-admin').classList.add('active-panel');
+                    renderAdminDB(data.users);
+                } else { alert(data.message); }
+            });
+        } else {
+            fetch('/api/user/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    myUid = username;
+                    currentUserData = data.user;
+                    document.getElementById('panel-auth').classList.remove('active-panel');
+                    document.getElementById('panel-main-app').style.display = 'flex';
+                    document.getElementById('set-uid-lbl').innerText = myUid;
+                    
+                    updateUserGlobals(currentUserData.balance, currentUserData.logs, currentUserData.messages);
+                    socket.emit('register-node', myUid);
+                    userNavigate('dialpad');
+                } else { alert(data.message); }
+            });
         }
     }
 
-    function displayContacts(arr) {
-        const box = document.getElementById('native-contacts-box');
+    function renderAdminDB(users) {
+        const box = document.getElementById('admin-db-view');
         box.innerHTML = "";
-        arr.forEach(c => {
-            box.innerHTML += `<div class="list-item" onclick="currentInput='${c.tel.replace(/[^0-9]/g, '')}'; updateDialUI(); routeTo('dialpad');">
-                <div class="list-info"><div class="avatar">${c.name[0]}</div><div><div class="item-name">${c.name}</div><div class="item-sub">${c.tel}</div></div></div>
-                <span>📞</span>
+        for (let u in users) {
+            box.innerHTML += `<div style="padding:10px; background:#fff; border:1px solid #dee2e6; border-radius:6px; margin-bottom:5px; font-size:14px; display:flex; justify-content:space-between; align-items:center;">
+                <div><strong>User ID: ${u}</strong><br>Pass: ${users[u].password} | Balance: BDT ${users[u].balance}</div>
+                <button class="btn-logout" style="background:#0066cc;" onclick="fillAdminEdit('${u}','${users[u].password}','${users[u].balance}')">Edit</button>
             </div>`;
+        }
+    }
+
+    function fillAdminEdit(u, p, b) {
+        document.getElementById('adm-target-user').value = u;
+        document.getElementById('adm-target-pass').value = p;
+        document.getElementById('adm-target-bal').value = b;
+    }
+
+    function adminSaveUser() {
+        const adminUser = document.getElementById('auth-user').value.trim();
+        const adminPass = document.getElementById('auth-pass').value.trim();
+        const targetUser = document.getElementById('adm-target-user').value.trim();
+        const password = document.getElementById('adm-target-pass').value.trim();
+        const balance = document.getElementById('adm-target-bal').value.trim();
+
+        if(!targetUser || !password || !balance) return alert("All target info mandatory.");
+
+        fetch('/api/admin/save-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminUser, adminPass, targetUser, password, balance })
+        }).then(res => res.json()).then(data => {
+            if (data.success) {
+                alert("Database update synchronized successfully.");
+                renderAdminDB(data.users);
+                document.getElementById('adm-target-user').value = "";
+                document.getElementById('adm-target-pass').value = "";
+                document.getElementById('adm-target-bal').value = "";
+            }
         });
     }
 
-    function dialCall() {
-        if(!currentInput) return;
-        document.getElementById('call-window-num').innerText = currentInput;
-        document.getElementById('call-overlay-window').style.display = 'flex';
+    function userNavigate(panel) {
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
+        document.getElementById('panel-main-app').querySelectorAll('.screen-panel').forEach(p => p.classList.remove('active-panel'));
         
-        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-            localStream = stream;
-            peerConnection = new RTCPeerConnection();
-            stream.getTracks().forEach(t => peerConnection.addTrack(t, stream));
+        document.getElementById('tab-' + panel).classList.add('active-tab');
+        document.getElementById('user-' + panel).classList.add('active-panel');
+        document.getElementById('app-header-view').innerText = panel.toUpperCase();
+    }
 
-            peerConnection.createOffer().then(o => peerConn.setLocalDescription(o)).then(() => {
-                socket.emit('call-request', { target: currentInput, from: document.getElementById('username').value.trim(), offer: peerConnection.localDescription });
-            });
-        }).catch(() => {
-            document.getElementById('call-window-status').innerText = "Hardware Mic Error.";
+    function press(n) { dialedString += n; updateDialString(); }
+    function bksp() { dialedString = dialedString.slice(0, -1); updateDialString(); }
+    function updateDialString() { document.getElementById('dial-screen-digits').innerText = dialedString; }
+
+    function updateUserGlobals(bal, logs, msgs) {
+        document.getElementById('usr-bal-lbl').innerText = "BDT " + bal;
+        const lBox = document.getElementById('logs-list-view');
+        lBox.innerHTML = logs.length === 0 ? '<p style="color:#868e96;text-align:center;">No direct voice activities traced.</p>' : '';
+        logs.forEach(l => {
+            lBox.innerHTML += `<div style="padding:10px; border-bottom:1px solid #f1f3f5;">Routed to node <strong>${l.target}</strong> at ${l.time} <span style="color:red; float:right;">-BDT ${l.cost}</span></div>`;
         });
     }
 
-    socket.on('incoming-call', async (data) => {
-        let accept = confirm("Incoming node trace from " + data.from + ". Accept?");
-        if(accept) {
-            document.getElementById('call-window-num').innerText = data.from;
-            document.getElementById('call-overlay-window').style.display = 'flex';
-            document.getElementById('call-window-status').innerText = "Active Node Hooked";
+    function sendRefillReq() {
+        const amount = document.getElementById('req-bal-amount').value;
+        if (!amount || amount <= 0) return alert("Enter valid balance packet.");
+        fetch('/api/user/request-balance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: myUid, amount })
+        }).then(() => {
+            alert("Refill alert pinged to admin telegram dashboard node.");
+            document.getElementById('req-bal-amount').value = "";
+        });
+    }
+
+    async function syncNativeContacts() {
+        try {
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+            const list = [{name:"Assistant Salam Node", num:"123"}, {name:"Demo Terminal B", num:"864"}];
+            const box = document.getElementById('contacts-list-view');
+            box.innerHTML = "";
+            list.forEach(c => {
+                box.innerHTML += `<div class="list-item" onclick="dialedString='${c.num}'; updateDialString(); userNavigate('dialpad');">
+                    <div class="list-info"><div class="avatar">${c.name[0]}</div><div><div class="item-name">${c.name}</div><div class="item-sub">${c.num}</div></div></div>
+                    <span>📞</span>
+                </div>`;
+            });
+        } catch(e) { alert("Mic and Native Core Permissions requested."); }
+    }
+
+    function makeCall() {
+        if(!dialedString) return;
+        document.getElementById('call-lbl-number').innerText = dialedString;
+        document.getElementById('call-screen-overlay').style.display = 'flex';
+
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            localStreamTrack = stream;
+            rtcPeer = new RTCPeerConnection();
+            stream.getTracks().forEach(t => rtcPeer.addTrack(t, stream));
+
+            rtcPeer.createOffer().then(o => rtcPeer.setLocalDescription(o)).then(() => {
+                socket.emit('call-node', { target: dialedString, from: myUid, offer: rtcPeer.localDescription });
+            });
+        });
+    }
+
+    socket.on('incoming-call', (data) => {
+        let accept = confirm("Incoming call routing from node: " + data.from + ". Answer?");
+        if (accept) {
+            document.getElementById('call-lbl-number').innerText = data.from;
+            document.getElementById('call-screen-overlay').style.display = 'flex';
+            document.getElementById('call-lbl-status').innerText = "Call Connected • Session Active";
 
             navigator.mediaDevices.getUserMedia({ audio: true }).then(async (stream) => {
-                localStream = stream;
-                peerConnection = new RTCPeerConnection();
-                stream.getTracks().forEach(t => peerConnection.addTrack(t, stream));
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-                const ans = await peerConnection.createAnswer();
-                await peerConnection.setLocalDescription(ans);
+                localStreamTrack = stream;
+                rtcPeer = new RTCPeerConnection();
+                stream.getTracks().forEach(t => rtcPeer.addTrack(t, stream));
+                await rtcPeer.setRemoteDescription(new RTCSessionDescription(data.offer));
+                const ans = await rtcPeer.createAnswer();
+                await rtcPeer.setLocalDescription(ans);
                 socket.emit('call-accept', { target: data.from, answer: ans });
             });
         }
     });
 
     socket.on('call-connected', async (data) => {
-        document.getElementById('call-window-status').innerText = "Call Active • Billing On";
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        document.getElementById('call-lbl-status').innerText = "Call Active • 10 poysa/min";
+        await rtcPeer.setRemoteDescription(new RTCSessionDescription(data.answer));
     });
 
-    socket.on('balance-update', (data) => { syncBalanceUI(data.balance); });
-    socket.on('force-hangup', () => { disconnectCall(); alert("Deduction Terminated due to low credits."); });
-    socket.on('call-error', (data) => { document.getElementById('call-window-status').innerText = data.message; });
+    socket.on('balance-sync', (d) => { document.getElementById('usr-bal-lbl').innerText = "BDT " + d.balance; });
+    socket.on('force-hangup', () => { hangupCall(); alert("Deduction session ended."); });
+    socket.on('call-error', (d) => { document.getElementById('call-lbl-status').innerText = d.message; });
 
-    function disconnectCall() {
-        if(peerConnection) { peerConnection.close(); peerConnection = null; }
-        if(localStream) { localStream.getTracks().forEach(t => t.stop()); }
-        document.getElementById('call-overlay-window').style.display = 'none';
+    function hangupCall() {
+        if(rtcPeer) { rtcPeer.close(); rtcPeer = null; }
+        if(localStreamTrack) { localStreamTrack.getTracks().forEach(t => t.stop()); }
+        document.getElementById('call-screen-overlay').style.display = 'none';
     }
 
-    function dispatchMsg() {
-        const to = document.getElementById('chat-target-id').value.trim();
-        const text = document.getElementById('msg-input-field').value.trim();
-        const from = document.getElementById('username').value.trim();
+    function sendChatMsg() {
+        const to = document.getElementById('chat-to-user').value.trim();
+        const text = document.getElementById('chat-msg-input').value.trim();
         if(!to || !text) return;
-
-        socket.emit('send-msg', { to, from, text });
-        const box = document.getElementById('msg-container-box');
-        box.innerHTML += `<div class="msg sent">${text}</div>`;
-        document.getElementById('msg-input-field').value = "";
-        box.scrollTop = box.scrollHeight;
+        socket.emit('send-msg', { to, from: myUid, text });
+        document.getElementById('chat-msg-box').innerHTML += `<div class="msg-bubble sent">${text}</div>`;
+        document.getElementById('chat-msg-input').value = "";
     }
 
     socket.on('receive-msg', (data) => {
-        const box = document.getElementById('msg-container-box');
-        box.innerHTML += `<div class="msg rcv"><strong>${data.from}:</strong> ${data.text}</div>`;
-        box.scrollTop = box.scrollHeight;
+        if(userNavigate === 'chat') {
+            document.getElementById('chat-msg-box').innerHTML += `<div class="msg-bubble rcv"><strong>${data.from}:</strong> ${data.text}</div>`;
+        }
     });
-
-    function renderLogs(logs) {
-        const container = document.getElementById('logs-container-list');
-        container.innerHTML = logs.length === 0 ? '<p style="color:#868e96;text-align:center;">No activity logged yet.</p>' : '';
-        logs.forEach(l => {
-            container.innerHTML += `<div class="list-item"><div><strong>${l.number}</strong><br><small>${l.time}</small></div><span style="color:#fa5252;">-BDT ${l.cost}</span></div>`;
-        });
-    }
-
-    function renderMessages(msgs) {
-        const box = document.getElementById('msg-container-box');
-        msgs.forEach(m => { box.innerHTML += `<div class="msg rcv"><strong>${m.from}:</strong> ${m.text}</div>`; });
-    }
 </script>
 </body>
 </html>
