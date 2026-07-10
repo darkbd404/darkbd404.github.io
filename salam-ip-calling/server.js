@@ -3,6 +3,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 const fs = require('fs');
+const https = require('https');
 
 const app = express();
 const server = http.createServer(app);
@@ -15,14 +16,9 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 const TELEGRAM_TOKEN = "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE";
 const CHAT_ID = "5916486983";
 
-// Telegram Notification Handler
-function sendTelegramNotification(message) {
-    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
-    const payload = { chat_id: CHAT_ID, text: message, parse_mode: "Markdown" };
-    
-    // Asynchronous Fetch Alternative using standard global/https module safely without external packages
-    const https = require('https');
-    const data = JSON.stringify(payload);
+// Telegram Bot Alert Sender
+function sendTelegram(msg) {
+    const data = JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" });
     const options = {
         hostname: 'api.telegram.org',
         port: 443,
@@ -35,93 +31,111 @@ function sendTelegramNotification(message) {
     req.end();
 }
 
-function readUsers() {
+function readData() {
     if (!fs.existsSync(USERS_FILE)) return {};
     try { return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8')); } catch (e) { return {}; }
 }
 
-function writeUsers(data) {
+function writeData(data) {
     fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2));
 }
 
-let activeConnections = {};
-let activeCallIntervals = {};
-
-app.post('/api/login', (req, res) => {
+// 1. ADMIN LOGIN API
+app.post('/api/admin/login', (req, res) => {
     const { username, password } = req.body;
-    let users = readUsers();
+    if (username === "salam" && password === "864") {
+        sendTelegram(`👑 *Admin Logged In*\nAdmin has accessed the control panel.`);
+        return res.json({ success: true, users: readData() });
+    }
+    res.json({ success: false, message: "Invalid Admin Credentials!" });
+});
 
-    if (users[username]) {
-        if (users[username].password === password) {
-            sendTelegramNotification(`🟢 *Customer Active*\nUser: ${username} has just logged in.`);
-            return res.json({ success: true, user: users[username] });
-        } else {
-            return res.json({ success: false, message: "Wrong password!" });
-        }
+// 2. ADMIN: SAVE OR UPDATE USER
+app.post('/api/admin/save-user', (req, res) => {
+    const { adminUser, adminPass, targetUser, password, balance } = req.body;
+    if (adminUser !== "salam" || adminPass !== "864") return res.json({ success: false });
+
+    let users = readData();
+    const isNew = !users[targetUser];
+    
+    if (isNew) {
+        users[targetUser] = { password, balance: parseFloat(balance).toFixed(2), logs: [], messages: [] };
     } else {
-        users[username] = { password: password, balance: 10.00, logs: [], messages: [] };
-        writeUsers(users);
-        sendTelegramNotification(`🆕 *New Customer Registered*\nUser: ${username}\nInitial Balance: BDT 10.00`);
+        users[targetUser].password = password;
+        users[targetUser].balance = parseFloat(balance).toFixed(2);
+    }
+    writeData(users);
+    
+    sendTelegram(`⚙️ *Admin Database Update*\nUser: ${targetUser}\nAction: ${isNew ? "Created" : "Modified"}\nSet Balance: BDT ${balance}`);
+    res.json({ success: true, users });
+});
+
+// 3. USER LOGIN API (Strictly checking Admin entries)
+app.post('/api/user/login', (req, res) => {
+    const { username, password } = req.body;
+    let users = readData();
+
+    if (users[username] && users[username].password === password) {
+        sendTelegram(`🟢 *User Connected*\nID: ${username}\nCurrent Balance: BDT ${users[username].balance}`);
         return res.json({ success: true, user: users[username] });
     }
+    res.json({ success: false, message: "Access Denied! Ask Admin to create account." });
 });
 
-app.post('/api/recharge', (req, res) => {
+// 4. USER: BALANCE REQUEST ALERT
+app.post('/api/user/request-balance', (req, res) => {
     const { username, amount } = req.body;
-    let users = readUsers();
-    if(users[username]) {
-        users[username].balance = (parseFloat(users[username].balance) + parseFloat(amount)).toFixed(2);
-        writeUsers(users);
-        sendTelegramNotification(`💰 *Recharge Successful*\nUser: ${username}\nAmount: BDT ${amount}\nNew Balance: BDT ${users[username].balance}`);
-        return res.json({ success: true, balance: users[username].balance });
-    }
-    res.json({ success: false });
+    sendTelegram(`⚠️ *Refill Request Alert*\nUser ID: ${username}\nRequested Amount: BDT ${amount}\n_Please update balance via Admin Login._`);
+    res.json({ success: true });
 });
+
+// Realtime Call & Messaging Router
+let activeNodes = {};
+let activeBillings = {};
 
 io.on('connection', (socket) => {
-    socket.on('register-active-user', (username) => {
-        socket.username = username;
-        activeConnections[username] = socket.id;
+    socket.on('register-node', (uid) => {
+        socket.uid = uid;
+        activeNodes[uid] = socket.id;
     });
 
-    socket.on('call-request', (data) => {
-        const targetSocket = activeConnections[data.target];
-        let users = readUsers();
-        let callerBalance = users[data.from] ? parseFloat(users[data.from].balance) : 0;
+    // Targeted Call Routing (123 calls 123 only)
+    socket.on('call-node', (data) => {
+        const targetSocket = activeNodes[data.target];
+        let users = readData();
+        let balance = users[data.from] ? parseFloat(users[data.from].balance) : 0;
 
-        if (callerBalance < 0.10) {
-            socket.emit('call-error', { message: "Insufficient Balance! Minimum BDT 0.10 required." });
-            return;
+        if (balance < 0.10) {
+            return socket.emit('call-error', { message: "Insufficient Balance!" });
         }
 
         if (targetSocket) {
             io.to(targetSocket).emit('incoming-call', { from: data.from, offer: data.offer });
         } else {
-            socket.emit('call-error', { message: "Target user is currently offline." });
+            socket.emit('call-error', { message: "User is offline / unavailable." });
         }
     });
 
     socket.on('call-accept', (data) => {
-        const targetSocket = activeConnections[data.target];
+        const targetSocket = activeNodes[data.target];
         if (targetSocket) {
             io.to(targetSocket).emit('call-connected', { answer: data.answer });
-            sendTelegramNotification(`📞 *Call Connected*\nFrom: ${data.target}\nTo: ${socket.username}\nBilling initiated (10 poysa/min).`);
+            sendTelegram(`📞 *Active Call Activity*\nFrom: ${data.target}\nTo: ${socket.uid}\nDuration: Billing Started.`);
 
-            // Billing Clock Starter (Per Minute Cost Deduction)
-            activeCallIntervals[socket.id] = setInterval(() => {
-                let users = readUsers();
+            // 10 Poysa per min deduction loop
+            activeBillings[socket.id] = setInterval(() => {
+                let users = readData();
                 if (users[data.target]) {
-                    let currentBal = parseFloat(users[data.target].balance);
-                    if(currentBal >= 0.10) {
-                        users[data.target].balance = (currentBal - 0.10).toFixed(2);
-                        // Add to logs
-                        users[data.target].logs.unshift({ type: 'outgoing', number: socket.username, time: new Date().toLocaleString(), cost: "0.10" });
-                        writeUsers(users);
-                        io.to(targetSocket).emit('balance-update', { balance: users[data.target].balance });
+                    let cur = parseFloat(users[data.target].balance);
+                    if (cur >= 0.10) {
+                        users[data.target].balance = (cur - 0.10).toFixed(2);
+                        users[data.target].logs.unshift({ target: socket.uid, time: new Date().toLocaleTimeString(), cost: "0.10" });
+                        writeData(users);
+                        io.to(targetSocket).emit('balance-sync', { balance: users[data.target].balance });
                     } else {
                         io.to(targetSocket).emit('force-hangup');
-                        io.to(activeConnections[socket.username]).emit('force-hangup');
-                        clearInterval(activeCallIntervals[socket.id]);
+                        io.to(activeNodes[socket.uid]).emit('force-hangup');
+                        clearInterval(activeBillings[socket.id]);
                     }
                 }
             }, 60000);
@@ -129,23 +143,22 @@ io.on('connection', (socket) => {
     });
 
     socket.on('send-msg', (data) => {
-        let users = readUsers();
-        if(users[data.to]) {
+        let users = readData();
+        if (users[data.to]) {
             users[data.to].messages.push({ from: data.from, text: data.text, time: new Date().toLocaleTimeString() });
-            writeUsers(users);
-            const targetSocket = activeConnections[data.to];
-            if(targetSocket) {
-                io.to(targetSocket).emit('receive-msg', data);
+            writeData(users);
+            if (activeNodes[data.to]) {
+                io.to(activeNodes[data.to]).emit('receive-msg', data);
             }
-            sendTelegramNotification(`✉️ *Message Sent*\nFrom: ${data.from}\nTo: ${data.to}\nContent: ${data.text}`);
+            sendTelegram(`✉️ *Message Log*\nFrom: ${data.from}\nTo: ${data.to}\nMessage: ${data.text}`);
         }
     });
 
     socket.on('disconnect', () => {
-        if(activeCallIntervals[socket.id]) clearInterval(activeCallIntervals[socket.id]);
-        if (socket.username) delete activeConnections[socket.username];
+        if(activeBillings[socket.id]) clearInterval(activeBillings[socket.id]);
+        if(socket.uid) delete activeNodes[socket.uid];
     });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Gateway running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
