@@ -11,11 +11,11 @@
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; user-select: none; }
         body { background: var(--bg); color: var(--text); height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
         
-        .app-container { height: calc(100vh - 65px); width: 100%; position: relative; display: none; flex-direction: column; overflow: hidden; }
+        .app-container { height: 100%; width: 100%; position: relative; display: none; flex-direction: column; overflow: hidden; }
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; padding: 20px; overflow-y: auto; }
         .active-screen { display: flex !important; }
 
-        /* ডায়ালপ্যাড গ্রিড */
+        /* ডায়ালপ্যাড মোবাইল গ্রিড */
         #dialerScreen { justify-content: space-between; height: 100%; padding-bottom: 10px; }
         .display-box { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 70px; }
         .display-box h2 { font-size: 34px; letter-spacing: 2px; color: var(--text); font-weight: 400; min-height: 40px; }
@@ -57,7 +57,7 @@
 
     <div class="app-container" id="appMain">
         
-        <div id="dialerScreen" class="screen active-screen">
+        <div id="dialerScreen" class="screen">
             <div class="display-box"><h2 id="dialDisplay"></h2></div>
             <div class="dial-grid">
                 <div class="dial-key" onclick="appendDial('1')">1<span> </span></div>
@@ -93,6 +93,7 @@
                 <div class="input-group"><input type="text" id="custCallNum" placeholder="Call Number (Optional)"></div>
                 <button class="app-btn" onclick="submitUserForm()">Save Extension</button>
                 <button class="app-btn" id="cancelEditBtn" style="background:#2c2c2e; margin-top:8px; display:none;" onclick="resetUserForm()">Cancel</button>
+                <button class="app-btn" style="background:var(--red); margin-top:12px;" onclick="triggerLogout()">Logout Admin Panel</button>
             </div>
             <h3 style="margin-bottom:15px; font-weight:400; font-size: 14px; color: var(--gray);">ACTIVE EXTENSIONS</h3>
             <div id="contactListRender"></div>
@@ -117,11 +118,11 @@
     </div>
 
     <div class="android-nav-bar" id="appNavBar">
-        <button class="nav-item active-nav" onclick="switchTab('dialerScreen', this)">
+        <button class="nav-item" id="navDialBtn" onclick="switchTab('dialerScreen', this)">
             <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
             Dialer
         </button>
-        <button class="nav-item" onclick="switchTab('contactsScreen', this)">
+        <button class="nav-item" id="navContactBtn" onclick="switchTab('contactsScreen', this)">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
             Contacts
         </button>
@@ -180,22 +181,32 @@
         function launchAppDashboard() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appMain').style.display = 'flex';
-            document.getElementById('appNavBar').style.display = 'flex';
             
-            document.getElementById('profName').innerText = activeSession.name;
-            document.getElementById('profExt').innerText = activeSession.username;
-            document.getElementById('profIp').innerText = activeSession.ipNumber || 'N/A';
-            document.getElementById('profCallNum').innerText = activeSession.callNumber || 'N/A';
-            document.getElementById('profRole').innerText = activeSession.role;
-
-            socket.emit('register_user', { username: activeSession.username, name: activeSession.name });
-            
+            // রোল ভিত্তিক সম্পূর্ণ আলাদা রাউটিং কন্ডিশন (FIXED)
             if(activeSession.role === 'admin') {
+                // ১. এডমিন হলে নিচের মেনু বার পুরোপুরি গায়েব থাকবে
+                document.getElementById('appNavBar').style.display = 'none';
+                
+                // ২. এডমিন ফর্ম অন হবে এবং সরাসরি Contacts স্ক্রিন দেখাবে, ডায়ালপ্যাড আসবে না
                 document.getElementById('adminForm').style.display = 'block';
+                switchTab('contactsScreen', null);
             } else {
+                // ৩. ইউজার হলে বটম নেভিগেশন বার শো করবে
+                document.getElementById('appNavBar').style.display = 'flex';
                 document.getElementById('adminForm').style.display = 'none';
+                
+                // ৪. ইউজারের প্রোফাইল ইনফো লোড হবে
+                document.getElementById('profName').innerText = activeSession.name;
+                document.getElementById('profExt').innerText = activeSession.username;
+                document.getElementById('profIp').innerText = activeSession.ipNumber || 'N/A';
+                document.getElementById('profCallNum').innerText = activeSession.callNumber || 'N/A';
+                document.getElementById('profRole').innerText = activeSession.role;
+                
+                // ৫. ইউজার সরাসরি প্রথম ট্যাব অর্থাৎ ডায়ালপ্যাডে ল্যান্ড করবে
+                switchTab('dialerScreen', document.getElementById('navDialBtn'));
+                socket.emit('register_user', { username: activeSession.username, name: activeSession.name });
+                initHardwareMedia();
             }
-            initHardwareMedia();
             loadUsersDatabase();
         }
 
@@ -217,7 +228,7 @@
             const res = await fetch('/api/users'); const users = await res.json();
             let html = users.map(u => `
                 <div class="card-list" style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="flex:1;" onclick="document.getElementById('dialDisplay').innerText='${u.username}'; switchTab('dialerScreen', document.querySelectorAll('.nav-item')[0]);">
+                    <div style="flex:1;" onclick="if(activeSession.role!=='admin'){ document.getElementById('dialDisplay').innerText='${u.username}'; switchTab('dialerScreen', document.getElementById('navDialBtn')); }">
                         <p style="font-weight:500; color:#fff;">${u.name}</p>
                         <p style="font-size:12px; color:var(--gray);">IP Num: ${u.ipNumber || 'N/A'} | Call Num: ${u.callNumber || u.username}</p>
                     </div>
@@ -280,7 +291,6 @@
             }
         }
 
-        // --- WebRTC IP Calling Engine & Logs ---
         function addCallLog(name, num, type) {
             const time = new Date().toLocaleTimeString();
             localCallLogs.unshift({ name, num, type, time });
@@ -393,6 +403,7 @@
             document.getElementById('appNavBar').style.display = 'none';
             document.getElementById('logUser').value = "";
             document.getElementById('logPass').value = "";
+            resetUserForm();
         }
     </script>
 </body>
