@@ -1,0 +1,16 @@
+{
+  "short_name": "3D Dialer",
+  "name": "3D Next-Gen IP Calling Engine",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/5585/5585856.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#eef2f7",
+  "theme_color": "#0066cc",
+  "display": "standalone",
+  "orientation": "portrait"
+}
