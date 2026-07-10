@@ -1,0 +1,13 @@
+{
+  "name": "salam-ip-calling",
+  "version": "1.0.0",
+  "description": "Google Pixel Style 3D IP Calling Network Node",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
