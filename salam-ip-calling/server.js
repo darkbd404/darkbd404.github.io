@@ -16,7 +16,6 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 const TELEGRAM_TOKEN = "7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE";
 const CHAT_ID = "5916486983";
 
-// Telegram Bot Alert Sender
 function sendTelegram(msg) {
     const data = JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" });
     const options = {
@@ -40,17 +39,27 @@ function writeData(data) {
     fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2));
 }
 
-// 1. ADMIN LOGIN API
-app.post('/api/admin/login', (req, res) => {
+// SINGLE LOGIN API FOR BOTH USER AND ADMIN
+app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
+    
+    // Check if Admin
     if (username === "salam" && password === "864") {
-        sendTelegram(`👑 *Admin Logged In*\nAdmin has accessed the control panel.`);
-        return res.json({ success: true, users: readData() });
+        sendTelegram(`👑 *Admin Control Login*\nSalam has logged into the administration panel.`);
+        return res.json({ success: true, role: "admin", users: readData() });
     }
-    res.json({ success: false, message: "Invalid Admin Credentials!" });
+    
+    // Check if User
+    let users = readData();
+    if (users[username] && users[username].password === password) {
+        sendTelegram(`🟢 *User Login Alert*\nID: ${username}\nBalance: BDT ${users[username].balance}`);
+        return res.json({ success: true, role: "user", user: users[username] });
+    }
+    
+    res.json({ success: false, message: "Invalid ID or Password! Access Denied." });
 });
 
-// 2. ADMIN: SAVE OR UPDATE USER
+// ADMIN: SAVE / UPDATE USER (Realtime JSON syncing)
 app.post('/api/admin/save-user', (req, res) => {
     const { adminUser, adminPass, targetUser, password, balance } = req.body;
     if (adminUser !== "salam" || adminPass !== "864") return res.json({ success: false });
@@ -66,30 +75,31 @@ app.post('/api/admin/save-user', (req, res) => {
     }
     writeData(users);
     
-    sendTelegram(`⚙️ *Admin Database Update*\nUser: ${targetUser}\nAction: ${isNew ? "Created" : "Modified"}\nSet Balance: BDT ${balance}`);
+    sendTelegram(`⚙️ *Realtime DB Update*\nUser: ${targetUser}\nAction: ${isNew ? "Created" : "Modified"}\nBalance: BDT ${balance}`);
     res.json({ success: true, users });
 });
 
-// 3. USER LOGIN API (Strictly checking Admin entries)
-app.post('/api/user/login', (req, res) => {
-    const { username, password } = req.body;
-    let users = readData();
+// ADMIN: DELETE USER
+app.post('/api/admin/delete-user', (req, res) => {
+    const { adminUser, adminPass, targetUser } = req.body;
+    if (adminUser !== "salam" || adminPass !== "864") return res.json({ success: false });
 
-    if (users[username] && users[username].password === password) {
-        sendTelegram(`🟢 *User Connected*\nID: ${username}\nCurrent Balance: BDT ${users[username].balance}`);
-        return res.json({ success: true, user: users[username] });
+    let users = readData();
+    if (users[targetUser]) {
+        delete users[targetUser];
+        writeData(users);
+        sendTelegram(`🗑️ *User Deleted from DB*\nTarget ID: ${targetUser}`);
+        return res.json({ success: true, users });
     }
-    res.json({ success: false, message: "Access Denied! Ask Admin to create account." });
+    res.json({ success: false, message: "User not found!" });
 });
 
-// 4. USER: BALANCE REQUEST ALERT
 app.post('/api/user/request-balance', (req, res) => {
     const { username, amount } = req.body;
-    sendTelegram(`⚠️ *Refill Request Alert*\nUser ID: ${username}\nRequested Amount: BDT ${amount}\n_Please update balance via Admin Login._`);
+    sendTelegram(`⚠️ *Refill Request*\nUser ID: ${username}\nAmount: BDT ${amount}`);
     res.json({ success: true });
 });
 
-// Realtime Call & Messaging Router
 let activeNodes = {};
 let activeBillings = {};
 
@@ -99,40 +109,57 @@ io.on('connection', (socket) => {
         activeNodes[uid] = socket.id;
     });
 
-    // Targeted Call Routing (123 calls 123 only)
+    // কল করার শুরুতেই ব্যালেন্স গার্ড চেক
     socket.on('call-node', (data) => {
         const targetSocket = activeNodes[data.target];
         let users = readData();
         let balance = users[data.from] ? parseFloat(users[data.from].balance) : 0;
 
+        // ব্যালেন্স যদি ১০ পয়সা (0.10) এর কম থাকে, তবে কল যাবেই না
         if (balance < 0.10) {
-            return socket.emit('call-error', { message: "Insufficient Balance!" });
+            return socket.emit('call-error', { message: "insufficient" });
         }
 
         if (targetSocket) {
             io.to(targetSocket).emit('incoming-call', { from: data.from, offer: data.offer });
         } else {
-            socket.emit('call-error', { message: "User is offline / unavailable." });
+            socket.emit('call-error', { message: "offline" });
         }
     });
 
+    // কল রিসিভ হওয়ার পর প্রতি মিনিটে ১০ পয়সা কাটা
     socket.on('call-accept', (data) => {
         const targetSocket = activeNodes[data.target];
         if (targetSocket) {
             io.to(targetSocket).emit('call-connected', { answer: data.answer });
-            sendTelegram(`📞 *Active Call Activity*\nFrom: ${data.target}\nTo: ${socket.uid}\nDuration: Billing Started.`);
+            sendTelegram(`📞 *Call Connected*\nFrom: ${data.target} -> To: ${socket.uid}`);
 
-            // 10 Poysa per min deduction loop
+            // কল রিসিভ হওয়ার সাথে সাথেই প্রথম ১ মিনিটের টাকা (১০ পয়সা) কেটে নেওয়া
+            let users = readData();
+            if (users[data.target]) {
+                let cur = parseFloat(users[data.target].balance);
+                if (cur >= 0.10) {
+                    users[data.target].balance = (cur - 0.10).toFixed(2);
+                    users[data.target].logs.unshift({ target: socket.uid, time: new Date().toLocaleString(), cost: "0.10" });
+                    writeData(users);
+                    io.to(targetSocket).emit('balance-sync', { balance: users[data.target].balance });
+                }
+            }
+
+            // পরবর্তী প্রতি ১ মিনিট (৬০ সেকেন্ড) পর পর ব্যালেন্স কাটার লুপ
             activeBillings[socket.id] = setInterval(() => {
-                let users = readData();
-                if (users[data.target]) {
-                    let cur = parseFloat(users[data.target].balance);
+                let currentUsers = readData();
+                if (currentUsers[data.target]) {
+                    let cur = parseFloat(currentUsers[data.target].balance);
+                    
+                    // কল চলাকালীন ব্যালেন্স ১০ পয়সার নিচে নামলেই কল অটো কেটে যাবে
                     if (cur >= 0.10) {
-                        users[data.target].balance = (cur - 0.10).toFixed(2);
-                        users[data.target].logs.unshift({ target: socket.uid, time: new Date().toLocaleTimeString(), cost: "0.10" });
-                        writeData(users);
-                        io.to(targetSocket).emit('balance-sync', { balance: users[data.target].balance });
+                        currentUsers[data.target].balance = (cur - 0.10).toFixed(2);
+                        currentUsers[data.target].logs.unshift({ target: socket.uid, time: new Date().toLocaleString(), cost: "0.10" });
+                        writeData(currentUsers);
+                        io.to(targetSocket).emit('balance-sync', { balance: currentUsers[data.target].balance });
                     } else {
+                        // ব্যালেন্স শেষ, কল ফোর্স ডিসকানেক্ট
                         io.to(targetSocket).emit('force-hangup');
                         io.to(activeNodes[socket.uid]).emit('force-hangup');
                         clearInterval(activeBillings[socket.id]);
@@ -142,15 +169,23 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Realtime 2-Way Chat Syncing & Permanent JSON Storage
     socket.on('send-msg', (data) => {
         let users = readData();
-        if (users[data.to]) {
-            users[data.to].messages.push({ from: data.from, text: data.text, time: new Date().toLocaleTimeString() });
+        const timestamp = new Date().toLocaleString();
+        
+        if (users[data.to] && users[data.from]) {
+            // Save inside receiver data array
+            users[data.to].messages.push({ from: data.from, to: data.to, text: data.text, time: timestamp });
+            // Save inside sender data array
+            users[data.from].messages.push({ from: data.from, to: data.to, text: data.text, time: timestamp });
+            
             writeData(users);
+            
             if (activeNodes[data.to]) {
-                io.to(activeNodes[data.to]).emit('receive-msg', data);
+                io.to(activeNodes[data.to]).emit('receive-msg', { from: data.from, text: data.text });
             }
-            sendTelegram(`✉️ *Message Log*\nFrom: ${data.from}\nTo: ${data.to}\nMessage: ${data.text}`);
+            sendTelegram(`✉️ *Message Saved to DB*\nFrom: ${data.from}\nTo: ${data.to}\nText: ${data.text}`);
         }
     });
 
@@ -161,4 +196,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Engine live on ${PORT}`));
