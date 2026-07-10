@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Salam IP Phone</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --btn-bg: #333333;
+            --green-call: #34c759;
+            --red-end: #ff3b30;
+            --ios-gray: #1c1c1e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { background: var(--bg-color); color: var(--text-color); height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* --- LOGIN SCREEN --- */
+        #loginScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; }
+        .login-box { width: 100%; max-width: 320px; text-align: center; }
+        .login-title { font-size: 28px; font-weight: 700; margin-bottom: 40px; color: #fff; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-field { width: 100%; padding: 16px; background: #1c1c1e; border: 1px solid #333; border-radius: 12px; color: #fff; font-size: 17px; outline: none; transition: 0.3s; }
+        .input-field:focus { border-color: #0a84ff; }
+        .btn-primary { width: 100%; padding: 16px; background: #0a84ff; color: #fff; border: none; border-radius: 12px; font-weight: 600; font-size: 17px; cursor: pointer; margin-top: 10px; }
+        .error-msg { color: #ff453a; font-size: 14px; margin-top: 20px; min-height: 20px; }
+
+        /* --- ADMIN PANEL --- */
+        #adminPanel { display: none; padding: 20px; height: 100%; overflow-y: auto; background: #000; z-index: 50; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #333; }
+        .user-list-item { background: #1c1c1e; padding: 15px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .user-info h4 { font-size: 16px; color: #fff; font-weight: 500; }
+        .user-info p { font-size: 13px; color: #8e8e93; margin-top: 4px; }
+        .action-btns button { background: none; border: none; color: #0a84ff; font-size: 14px; font-weight: 500; margin-left: 10px; cursor: pointer; }
+        .action-btns button.delete { color: #ff453a; }
+
+        /* --- DIALER UI (iOS STYLE) --- */
+        #dialerUI { display: none; height: 100%; flex-direction: column; position: relative; }
+        
+        /* Top Display Area */
+        .display-area { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 20px; }
+        .dialed-number { font-size: 36px; font-weight: 400; color: #fff; min-height: 45px; letter-spacing: 1px; text-align: center; margin-bottom: 5px; }
+        .caller-name-display { font-size: 18px; color: #8e8e93; font-weight: 500; min-height: 25px; text-align: center; }
+
+        /* Keypad Grid */
+        .dial-pad-container { padding: 0 40px 40px; }
+        .dial-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; justify-items: center; margin-bottom: 30px; }
+        
+        .dial-btn { 
+            width: 75px; height: 75px; 
+            background: var(--btn-bg); 
+            border-radius: 50%; 
+            color: #fff; 
+            font-size: 32px; font-weight: 400; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+        }
+        .dial-btn:active { background: #555; }
+        .dial-btn span { font-size: 11px; color: #fff; font-weight: 600; margin-top: -2px; letter-spacing: 2px; opacity: 0.8; }
+        .dial-btn.empty { background: transparent; cursor: default; }
+        .dial-btn.empty:active { background: transparent; }
+
+        /* Bottom Actions */
+        .action-row { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-top: 10px; }
+        .call-btn { width: 75px; height: 75px; background: var(--green-call); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .call-btn svg { width: 35px; height: 35px; fill: #fff; }
+        .delete-btn { width: 75px; height: 75px; background: transparent; border: none; color: #8e8e93; font-size: 24px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .placeholder { width: 75px; }
+
+        /* --- INCOMING/OUTGOING CALL SCREEN --- */
+        #callScreen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; flex-direction: column; align-items: center; padding-top: 80px; backdrop-filter: blur(10px); }
+        .call-avatar { width: 120px; height: 120px; background: #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
+        .call-avatar svg { width: 60px; height: 60px; fill: #8e8e93; }
+        .call-status-name { font-size: 32px; font-weight: 600; color: #fff; margin-bottom: 10px; text-align: center; }
+        .call-status-num { font-size: 18px; color: #0a84ff; margin-bottom: 5px; }
+        .call-timer { font-size: 16px; color: #8e8e93; margin-bottom: 60px; }
+        
+        .call-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 350px; padding: 0 20px; }
+        .control-btn { display: flex; flex-direction: column; align-items: center; color: #fff; background: none; border: none; cursor: pointer; }
+        .control-icon { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; }
+        .control-icon svg { width: 28px; height: 28px; fill: #fff; }
+        .control-label { font-size: 12px; color: #fff; }
+        
+        .end-call-btn { width: 75px; height: 75px; background: var(--red-end); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; margin-top: 40px; cursor: pointer; }
+        .end-call-btn svg { width: 35px; height: 35px; fill: #fff; transform: rotate(135deg); }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen">
+        <div class="login-box">
+            <div class="login-title">Salam IP</div>
+            <div class="input-group"><input type="text" id="loginUser" class="input-field" placeholder="Username"></div>
+            <div class="input-group"><input type="password" id="loginPass" class="input-field" placeholder="Password"></div>
+            <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+            <div class="error-msg" id="loginError"></div>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel">
+        <div class="panel-header">
+            <div><div style="font-size:24px; font-weight:700;">Admin Panel</div><div style="font-size:13px; color:#8e8e93;">Manage Users</div></div>
+            <button class="btn-primary" style="width:auto; padding:10px 20px; font-size:14px;" onclick="logout()">Logout</button>
+        </div>
+
+        <div style="background:#1c1c1e; padding:20px; border-radius:16px; margin-bottom:25px;">
+            <div style="font-size:16px; font-weight:600; margin-bottom:15px; color:#0a84ff;" id="formTitle">ADD NEW USER</div>
+            <input type="hidden" id="editOldUser">
+            <div class="input-group"><input type="text" id="newUserName" class="input-field" placeholder="Full Name (e.g. John Doe)"></div>
+            <div class="input-group"><input type="text" id="newUserUser" class="input-field" placeholder="Username (e.g. 08640000001)"></div>
+            <div class="input-group"><input type="password" id="newUserPass" class="input-field" placeholder="Password"></div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-primary" onclick="saveUser()" id="saveBtn">Create User</button>
+                <button class="btn-primary" style="background:#333;" onclick="resetForm()" id="cancelBtn" style="display:none;">Cancel</button>
+            </div>
+            <div id="adminMsg" style="font-size:13px; margin-top:10px; color:#34c759;"></div>
+        </div>
+
+        <div style="font-size:16px; font-weight:600; margin-bottom:15px; color:#8e8e93;">USER LIST</div>
+        <div id="usersListContainer"></div>
+    </div>
+
+    <!-- USER DIALER INTERFACE -->
+    <div id="dialerUI">
+        <div class="display-area">
+            <div class="caller-name-display" id="displayName"></div>
+            <div class="dialed-number" id="numberDisplay"></div>
+        </div>
+        
+        <div class="dial-pad-container">
+            <div class="dial-pad">
+                <div class="dial-btn" onclick="pressKey('1')">1<span>&nbsp;</span></div>
+                <div class="dial-btn" onclick="pressKey('2')">2<span>ABC</span></div>
+                <div class="dial-btn" onclick="pressKey('3')">3<span>DEF</span></div>
+                <div class="dial-btn" onclick="pressKey('4')">4<span>GHI</span></div>
+                <div class="dial-btn" onclick="pressKey('5')">5<span>JKL</span></div>
+                <div class="dial-btn" onclick="pressKey('6')">6<span>MNO</span></div>
+                <div class="dial-btn" onclick="pressKey('7')">7<span>PQRS</span></div>
+                <div class="dial-btn" onclick="pressKey('8')">8<span>TUV</span></div>
+                <div class="dial-btn" onclick="pressKey('9')">9<span>WXYZ</span></div>
+                <div class="dial-btn" onclick="pressKey('*')">*</div>
+                <div class="dial-btn" onclick="pressKey('0')">0<span>+</span></div>
+                <div class="dial-btn" onclick="pressKey('#')">#</div>
+            </div>
+
+            <div class="action-row">
+                <div class="placeholder"></div>
+                <button class="call-btn" onclick="initiateCall()">
+                    <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.44-5.15-3.75-6.59-6.59l1.97-1.57c.26-.26.35-.65.24-1.01A11.36 11.36 0 008.96 4.3c0-.55-.45-1-1-1H4.3c-.55 0-1 .45-1 1 13.81 13.81 0 0016 16c.55 0 1-.45 1-1v-3.66c0-.55-.45-1-1-1z"/></svg>
+                </button>
+                <button class="delete-btn" onclick="deleteKey()"></button>
+            </div>
+        </div>
+        
+        <div style="position:absolute; top:20px; right:20px; z-index:10;">
+             <button onclick="logout()" style="background:none; border:none; color:#8e8e93; font-size:14px; font-weight:600;">LOGOUT</button>
+        </div>
+    </div>
+
+    <!-- CALL SCREEN (Overlay) -->
+    <div id="callScreen">
+        <div class="call-avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+        <div class="call-status-name" id="callScreenName">Unknown</div>
+        <div class="call-status-num" id="callScreenNum">Connecting...</div>
+        <div class="call-timer" id="callTimer">00:00</div>
+
+        <div class="call-controls">
+            <button class="control-btn"><div class="control-icon"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></div><span class="control-label">Mute</span></button>
+            <button class="control-btn"><div class="control-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg></div><span class="control-label">Keypad</span></button>
+            <button class="control-btn"><div class="control-icon"><svg viewBox="0 0 24 24"><path d="M22 5.72l-4.6-3.86-1.29 1.53 4.6 3.86L22 5.72zM7.88 3.39L6.6 1.86 2 5.71l1.29 1.53 4.59-3.85zM12.5 8H11v6l4.75 2.85.75-1.23-4-2.37V8zM12 4c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"/></svg></div><span class="control-label">Speaker</span></button>
+            <button class="control-btn"><div class="control-icon"><svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></div><span class="control-label">Video</span></button>
+            <button class="control-btn"><div class="control-icon"><svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><span class="control-label">Add Call</span></button>
+            <button class="control-btn"><div class="control-icon"><svg viewBox="0 0 24 24"><path d="M3 5v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm12 4c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3zm-9 8c0-2 4-3.1 6-3.1s6 1.1 6 3.1H6z"/></svg></div><span class="control-label">Contacts</span></button>
+        </div>
+
+        <button class="end-call-btn" onclick="endCall()">
+            <svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.36 7.46 6 12 6s8.66 2.36 11.71 5.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+        </button>
+    </div>
+
+    <audio id="localAudio" autoplay muted></audio>
+    <audio id="remoteAudio" autoplay></audio>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let currentUser = null;
+        let localStream, peerConnection;
+        let callStartTime;
+        let timerInterval;
+        let myCallerSocketId = null; // To receive answer
+        
+        const config = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+
+        // --- AUTHENTICATION ---
+        async function handleLogin() {
+            const u = document.getElementById('loginUser').value.trim();
+            const p = document.getElementById('loginPass').value.trim();
+            const err = document.getElementById('loginError');
+            
+            if(!u || !p) { err.innerText = "Please fill all fields"; return; }
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const data = await res.json();
+
+                if(data.success) {
+                    currentUser = data;
+                    document.getElementById('loginScreen').style.display = 'none';
+                    err.innerText = "";
+                    
+                    // Register with socket for routing
+                    socket.emit('register_user', { username: data.username, name: data.name });
+
+                    if(data.role === 'admin') {
+                        document.getElementById('adminPanel').style.display = 'block';
+                        loadUserList();
+                    } else {
+                        document.getElementById('dialerUI').style.display = 'flex';
+                        initAudio();
+                    }
+                } else {
+                    err.innerText = data.message;
+                }
+            } catch(e) { err.innerText = "Network Error."; }
+        }
+
+        function logout() { location.reload(); }
+
+        // --- ADMIN FUNCTIONS ---
+        async function loadUserList() {
+            const res = await fetch('/api/users');
+            const users = await res.json();
+            const container = document.getElementById('usersListContainer');
+            container.innerHTML = users.map(u => `
+                <div class="user-list-item">
+                    <div class="user-info"><h4>${u.name}</h4><p>@${u.username}</p></div>
+                    <div class="action-btns">
+                        <button onclick="editUser('${u.username}', '${u.name}')">Edit</button>
+                        <button class="delete" onclick="deleteUser('${u.username}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function resetForm() {
+            document.getElementById('formTitle').innerText = "ADD NEW USER";
+            document.getElementById('saveBtn').innerText = "Create User";
+            document.getElementById('saveBtn').setAttribute('onclick', 'saveUser()');
+            document.getElementById('newUserName').value = '';
+            document.getElementById('newUserUser').value = '';
+            document.getElementById('newUserPass').value = '';
+            document.getElementById('editOldUser').value = '';
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.getElementById('adminMsg').innerText = '';
+        }
+
+        function editUser(oldUser, name) {
+            document.getElementById('formTitle').innerText = "EDIT USER";
+            document.getElementById('saveBtn').innerText = "Save Changes";
+            document.getElementById('saveBtn').setAttribute('onclick', 'saveUser(true)');
+            document.getElementById('newUserName').value = name;
+            document.getElementById('newUserUser').value = oldUser;
+            document.getElementById('editOldUser').value = oldUser;
+            document.getElementById('cancelBtn').style.display = 'inline-block';
+        }
+
+        async function saveUser(isEdit = false) {
+            const name = document.getElementById('newUserName').value.trim();
+            const user = document.getElementById('newUserUser').value.trim();
+            const pass = document.getElementById('newUserPass').value.trim();
+            const oldUser = document.getElementById('editOldUser').value.trim();
+            const msg = document.getElementById('adminMsg');
+
+            if(!name || !user || (!isEdit && !pass)) { msg.style.color='#ff453a'; msg.innerText="Fill all fields"; return; }
+
+            const res = await fetch('/api/manage-user', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    action: isEdit ? 'edit' : 'add', 
+                    username: user, password: pass, name, oldUsername: oldUser 
+                })
+            });
+            const data = await res.json();
+            msg.style.color = data.success ? '#34c759' : '#ff453a';
+            msg.innerText = data.message;
+            if(data.success) resetForm();
+            loadUserList();
+        }
+
+        async function deleteUser(user) {
+            if(confirm('Delete this user?')) {
+                await fetch('/api/manage-user', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ action: 'delete', username: user })
+                });
+                loadUserList();
+            }
+        }
+
+        // --- DIALER LOGIC ---
+        function pressKey(num) {
+            const d = document.getElementById('numberDisplay');
+            if(d.innerText.length < 15) {
+                d.innerText += num;
+                checkNumberForName(num);
+            }
+        }
+        function deleteKey() {
+            const d = document.getElementById('numberDisplay');
+            d.innerText = d.innerText.slice(0, -1);
+            document.getElementById('displayName').innerText = "";
+        }
+
+        // Simulate checking number against admin list (In real app, fetch from server)
+        // For demo, we just show the number being dialed
+        function checkNumberForName(num) {
+            // You could add logic here to fetch name from server as user types
+        }
+
+        function initAudio() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                localStream = stream;
+                document.getElementById('localAudio').srcObject = stream;
+            }).catch(e => alert("Microphone access denied"));
+        }
+
+        // --- CALLING LOGIC (SPECIFIC USER) ---
+        async function initiateCall() {
+            const targetUsername = document.getElementById('numberDisplay').innerText;
+            if(!targetUsername) return;
+
+            // Show Call Screen
+            document.getElementById('callScreen').style.display = 'flex';
+            document.getElementById('callScreenName').innerText = "Calling...";
+            document.getElementById('callScreenNum').innerText = targetUsername;
+            startTimer();
+
+            // Create Peer Connection
+            createPeerConnection();
+            localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
+            
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            
+            // Send offer to specific user via server
+            socket.emit('call_offer', {
+                targetUsername: targetUsername, // The key logic: routing by username
+                callerName: currentUser.name,
+                callerUsername: currentUser.username,
+                offer: offer
+            });
+        }
+
+        function createPeerConnection() {
+            peerConnection = new RTCPeerConnection(config);
+            
+            peerConnection.onicecandidate = event => {
+                if (event.candidate) {
+                    // We need to send candidate to the specific socket
+                    // In a real app, you'd wait for the answer to get the socket ID
+                    // For simplicity here, we assume direct mapping or broadcast if needed
+                    // But better to store targetSocketId from incoming_call event
+                }
+            };
+
+            peerConnection.ontrack = event => {
+                document.getElementById('remoteAudio').srcObject = event.streams[0];
+                document.getElementById('callScreenName').innerText = currentUser.name || "Connected";
+                document.getElementById('callScreenNum').innerText = "In Call";
+            };
+        }
+
+        // Handle Incoming Call
+        socket.on('incoming_call', async (data) => {
+            if(confirm(`Incoming call from ${data.callerName} (${data.callerUsername})`)) {
+                document.getElementById('callScreen').style.display = 'flex';
+                document.getElementById('callScreenName').innerText = data.callerName;
+                document.getElementById('callScreenNum').innerText = data.callerUsername;
+                startTimer();
+
+                createPeerConnection();
+                localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
+                
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                
+                // Send answer back
+                socket.emit('call_answer', {
+                    callerSocketId: data.callerSocketId || 'unknown', // Need to track this
+                    answer: answer
+                });
+            }
+        });
+
+        socket.on('call_accepted', async (data) => {
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        });
+
+        socket.on('call_error', (data) => {
+            alert(data.message);
+            endCall();
+        });
+
+        function endCall() {
+            if(peerConnection) { peerConnection.close(); peerConnection = null; }
+            socket.emit('hangup');
+            document.getElementById('callScreen').style.display = 'none';
+            document.getElementById('numberDisplay').innerText = "";
+            document.getElementById('displayName').innerText = "";
+            stopTimer();
+        }
+
+        // Timer Logic
+        function startTimer() {
+            callStartTime = Date.now();
+            timerInterval = setInterval(() => {
+                const diff = Math.floor((Date.now() - callStartTime) / 1000);
+                const m = Math.floor(diff / 60).toString().padStart(2, '0');
+                const s = (diff % 60).toString().padStart(2, '0');
+                document.getElementById('callTimer').innerText = `${m}:${s}`;
+            }, 1000);
+        }
+        function stopTimer() { clearInterval(timerInterval); document.getElementById('callTimer').innerText = "00:00"; }
+
+    </script>
+</body>
+</html>
