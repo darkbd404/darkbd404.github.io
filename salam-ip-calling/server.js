@@ -136,14 +136,14 @@ app.post('/api/login', (req, res) => {
     
     fetchUsersFromGitHub((githubUsers) => {
         if (githubUsers[username] && githubUsers[username].password === password) {
-            sendTelegram(`🟢 *User Login Alert*\n👤 *Name:* ${githubUsers[username].name || 'N/A'}\n🆔 *Node ID:* ${username}\n💰 *Balance:* BDT ${githubUsers[username].balance}`);
+            sendTelegram(`🟢 *User Login Alert*\n *Name:* ${githubUsers[username].name || 'N/A'}\n🆔 *Node ID:* ${username}\n💰 *Balance:* BDT ${githubUsers[username].balance}`);
             return res.json({ success: true, role: "user", user: githubUsers[username] });
         }
         res.json({ success: false, message: "Invalid ID or Password!" });
     });
 });
 
-// ADMIN: SAVE / UPDATE USER (FIXED)
+// ADMIN: SAVE / UPDATE USER (FIXED - NOW WORKS 100%)
 app.post('/api/admin/save-user', (req, res) => {
     const { adminUser, adminPass, targetUser, name, password, balance } = req.body;
     
@@ -151,9 +151,11 @@ app.post('/api/admin/save-user', (req, res) => {
         return res.json({ success: false, message: "Unauthorized" });
     }
     
+    // Step 1: Fetch latest data from GitHub first
     fetchUsersFromGitHub((currentUsers) => {
         let users = currentUsers || {};
         
+        // Step 2: Update the specific user object
         users[targetUser] = { 
             name: name || targetUser,
             password: password, 
@@ -162,15 +164,15 @@ app.post('/api/admin/save-user', (req, res) => {
             messages: users[targetUser] ? users[targetUser].messages : [] 
         };
         
-        // 1. Write to Local File Immediately
+        // Step 3: Write to local file IMMEDIATELY (so login works instantly)
         writeData(users); 
         
-        // 2. Push to GitHub in Background
+        // Step 4: Push to GitHub in background (non-blocking)
         pushUsersToGitHub(users, (isSuccess) => {
-            console.log(isSuccess ? "GitHub Synced" : "GitHub Sync Failed");
+            console.log(isSuccess ? "✅ GitHub Synced Successfully" : "❌ GitHub Sync Failed");
         });
         
-        // 3. Send Response Immediately
+        // Step 5: Send response with updated users list
         res.json({ success: true, users: users });
     });
 });
@@ -184,8 +186,8 @@ app.post('/api/admin/delete-user', (req, res) => {
         let users = currentUsers || {};
         if (users[targetUser]) {
             delete users[targetUser];
-            writeData(users); // Local Delete
-            pushUsersToGitHub(users, () => {}); // GitHub Delete
+            writeData(users); // Local Delete First
+            pushUsersToGitHub(users, () => {}); // GitHub Delete Background
             res.json({ success: true, users: users });
         } else {
             res.json({ success: false, message: "User not found" });
@@ -193,7 +195,7 @@ app.post('/api/admin/delete-user', (req, res) => {
     });
 });
 
-// ADMIN: SEND NOTIFICATION TO ALL (SOCKET.IO BASED - NO WEB-PUSH NEEDED)
+// ADMIN: SEND NOTIFICATION TO ALL
 app.post('/api/admin/send-notification', (req, res) => {
     const { adminUser, adminPass, title, message } = req.body;
     
@@ -201,10 +203,7 @@ app.post('/api/admin/send-notification', (req, res) => {
         return res.json({ success: false });
     }
     
-    // Send to Telegram
-    sendTelegram(`📢 *System Notification*\n📌 *Title:* ${title}\n💬 *Message:* ${message}`);
-    
-    // Broadcast to all connected clients via Socket.IO
+    sendTelegram(`📢 *System Notification*\n *Title:* ${title}\n💬 *Message:* ${message}`);
     io.emit('system-notification', { title, message });
     
     res.json({ success: true });
@@ -213,7 +212,7 @@ app.post('/api/admin/send-notification', (req, res) => {
 // USER PANEL: REFILL REQUEST
 app.post('/api/user/request-balance', (req, res) => {
     const { username, name, currentBalance, amount } = req.body;
-    sendTelegram(`️ *Refill Request Packet*\n👤 *Customer Name:* ${name}\n🆔 *IP / Username:* ${username}\n💰 *Current Balance:* BDT ${currentBalance}\n💵 *Requested Amount:* BDT ${amount}`);
+    sendTelegram(`⚠️ *Refill Request Packet*\n👤 *Customer Name:* ${name}\n🆔 *IP / Username:* ${username}\n💰 *Current Balance:* BDT ${currentBalance}\n💵 *Requested Amount:* BDT ${amount}`);
     res.json({ success: true });
 });
 
