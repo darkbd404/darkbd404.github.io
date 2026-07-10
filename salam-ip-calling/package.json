@@ -1,7 +1,7 @@
 {
   "name": "salam-ip-calling",
   "version": "1.0.0",
-  "description": "VoIP and WebRTC Calling Application",
+  "description": "Professional 100% Working IP Calling Application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
