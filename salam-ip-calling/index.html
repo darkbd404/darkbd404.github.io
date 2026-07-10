@@ -70,7 +70,7 @@
         .action-row { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-top: 10px; }
         .call-btn { width: 75px; height: 75px; background: var(--green-call); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .call-btn svg { width: 35px; height: 35px; fill: #fff; }
-        .delete-btn { width: 75px; height: 75px; background: transparent; border: none; color: #8e8e93; font-size: 24px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .delete-btn { width: 75px; height: 75px; background: transparent; border: none; color: #8e8e93; font-size: 16px; font-weight: 500; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .placeholder { width: 75px; }
 
         /* --- INCOMING/OUTGOING CALL SCREEN --- */
@@ -89,9 +89,6 @@
         
         .end-call-btn { width: 75px; height: 75px; background: var(--red-end); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; margin-top: 40px; cursor: pointer; }
         .end-call-btn svg { width: 35px; height: 35px; fill: #fff; transform: rotate(135deg); }
-
-        /* Utilities */
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -99,7 +96,7 @@
     <!-- LOGIN SCREEN -->
     <div id="loginScreen">
         <div class="login-box">
-            <div class="login-title">Salam IP</div>
+            <div class="login-title">Salam IP Phone</div>
             <div class="input-group"><input type="text" id="loginUser" class="input-field" placeholder="Username"></div>
             <div class="input-group"><input type="password" id="loginPass" class="input-field" placeholder="Password"></div>
             <button class="btn-primary" onclick="handleLogin()">Sign In</button>
@@ -117,12 +114,12 @@
         <div style="background:#1c1c1e; padding:20px; border-radius:16px; margin-bottom:25px;">
             <div style="font-size:16px; font-weight:600; margin-bottom:15px; color:#0a84ff;" id="formTitle">ADD NEW USER</div>
             <input type="hidden" id="editOldUser">
-            <div class="input-group"><input type="text" id="newUserName" class="input-field" placeholder="Full Name (e.g. John Doe)"></div>
-            <div class="input-group"><input type="text" id="newUserUser" class="input-field" placeholder="Username (e.g. 08640000001)"></div>
+            <div class="input-group"><input type="text" id="newUserName" class="input-field" placeholder="Full Name (e.g. Abdus Salam)"></div>
+            <div class="input-group"><input type="text" id="newUserUser" class="input-field" placeholder="Extension (e.g. 101)"></div>
             <div class="input-group"><input type="password" id="newUserPass" class="input-field" placeholder="Password"></div>
             <div style="display:flex; gap:10px;">
                 <button class="btn-primary" onclick="saveUser()" id="saveBtn">Create User</button>
-                <button class="btn-primary" style="background:#333;" onclick="resetForm()" id="cancelBtn" style="display:none;">Cancel</button>
+                <button class="btn-primary" style="background:#333; display:none;" onclick="resetForm()" id="cancelBtn">Cancel</button>
             </div>
             <div id="adminMsg" style="font-size:13px; margin-top:10px; color:#34c759;"></div>
         </div>
@@ -159,16 +156,16 @@
                 <button class="call-btn" onclick="initiateCall()">
                     <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.44-5.15-3.75-6.59-6.59l1.97-1.57c.26-.26.35-.65.24-1.01A11.36 11.36 0 008.96 4.3c0-.55-.45-1-1-1H4.3c-.55 0-1 .45-1 1 13.81 13.81 0 0016 16c.55 0 1-.45 1-1v-3.66c0-.55-.45-1-1-1z"/></svg>
                 </button>
-                <button class="delete-btn" onclick="deleteKey()"></button>
+                <button class="delete-btn" onclick="deleteKey()">Clear</button>
             </div>
         </div>
         
         <div style="position:absolute; top:20px; right:20px; z-index:10;">
-             <button onclick="logout()" style="background:none; border:none; color:#8e8e93; font-size:14px; font-weight:600;">LOGOUT</button>
+             <button onclick="logout()" style="background:none; border:none; color:#8e8e93; font-size:14px; font-weight:600; cursor:pointer;">LOGOUT</button>
         </div>
     </div>
 
-    <!-- CALL SCREEN (Overlay) -->
+    <!-- CALL SCREEN -->
     <div id="callScreen">
         <div class="call-avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
         <div class="call-status-name" id="callScreenName">Unknown</div>
@@ -189,20 +186,22 @@
         </button>
     </div>
 
+    <!-- অডিও এলিমেন্ট ট্র্যাকিং -->
     <audio id="localAudio" autoplay muted></audio>
     <audio id="remoteAudio" autoplay></audio>
+    
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
         let currentUser = null;
         let localStream, peerConnection;
-        let callStartTime;
-        let timerInterval;
-        let myCallerSocketId = null; // To receive answer
+        let callStartTime, timerInterval;
+        let activeTargetUsername = null; 
+        let activeCallerSocketId = null;
         
         const config = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
-        // --- AUTHENTICATION ---
+        // লগইন লজিক
         async function handleLogin() {
             const u = document.getElementById('loginUser').value.trim();
             const p = document.getElementById('loginPass').value.trim();
@@ -222,7 +221,6 @@
                     document.getElementById('loginScreen').style.display = 'none';
                     err.innerText = "";
                     
-                    // Register with socket for routing
                     socket.emit('register_user', { username: data.username, name: data.name });
 
                     if(data.role === 'admin') {
@@ -232,15 +230,13 @@
                         document.getElementById('dialerUI').style.display = 'flex';
                         initAudio();
                     }
-                } else {
-                    err.innerText = data.message;
-                }
+                } else { err.innerText = data.message; }
             } catch(e) { err.innerText = "Network Error."; }
         }
 
         function logout() { location.reload(); }
 
-        // --- ADMIN FUNCTIONS ---
+        // অ্যাডমিন প্যানেল ইউজার লোড
         async function loadUserList() {
             const res = await fetch('/api/users');
             const users = await res.json();
@@ -264,6 +260,7 @@
             document.getElementById('newUserUser').value = '';
             document.getElementById('newUserPass').value = '';
             document.getElementById('editOldUser').value = '';
+            document.getElementById('cancelBtn').style.background = 'none';
             document.getElementById('cancelBtn').style.display = 'none';
             document.getElementById('adminMsg').innerText = '';
         }
@@ -289,10 +286,7 @@
 
             const res = await fetch('/api/manage-user', {
                 method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    action: isEdit ? 'edit' : 'add', 
-                    username: user, password: pass, name, oldUsername: oldUser 
-                })
+                body: JSON.stringify({ action: isEdit ? 'edit' : 'add', username: user, password: pass, name, oldUsername: oldUser })
             });
             const data = await res.json();
             msg.style.color = data.success ? '#34c759' : '#ff453a';
@@ -311,24 +305,15 @@
             }
         }
 
-        // --- DIALER LOGIC ---
+        // ডায়ালপ্যাড ইনপুট লজিক
         function pressKey(num) {
             const d = document.getElementById('numberDisplay');
-            if(d.innerText.length < 15) {
-                d.innerText += num;
-                checkNumberForName(num);
-            }
+            if(d.innerText.length < 15) { d.innerText += num; }
         }
+        
         function deleteKey() {
             const d = document.getElementById('numberDisplay');
             d.innerText = d.innerText.slice(0, -1);
-            document.getElementById('displayName').innerText = "";
-        }
-
-        // Simulate checking number against admin list (In real app, fetch from server)
-        // For demo, we just show the number being dialed
-        function checkNumberForName(num) {
-            // You could add logic here to fetch name from server as user types
         }
 
         function initAudio() {
@@ -339,55 +324,56 @@
             }).catch(e => alert("Microphone access denied"));
         }
 
-        // --- CALLING LOGIC (SPECIFIC USER) ---
+        // কল শুরু করার প্রধান ফাংশন
         async function initiateCall() {
             const targetUsername = document.getElementById('numberDisplay').innerText;
             if(!targetUsername) return;
+            activeTargetUsername = targetUsername;
 
-            // Show Call Screen
             document.getElementById('callScreen').style.display = 'flex';
             document.getElementById('callScreenName').innerText = "Calling...";
             document.getElementById('callScreenNum').innerText = targetUsername;
             startTimer();
 
-            // Create Peer Connection
             createPeerConnection();
             localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
             
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
             
-            // Send offer to specific user via server
             socket.emit('call_offer', {
-                targetUsername: targetUsername, // The key logic: routing by username
+                targetUsername: targetUsername,
                 callerName: currentUser.name,
                 callerUsername: currentUser.username,
                 offer: offer
             });
         }
 
+        // Peer Connection তৈরি
         function createPeerConnection() {
             peerConnection = new RTCPeerConnection(config);
             
             peerConnection.onicecandidate = event => {
-                if (event.candidate) {
-                    // We need to send candidate to the specific socket
-                    // In a real app, you'd wait for the answer to get the socket ID
-                    // For simplicity here, we assume direct mapping or broadcast if needed
-                    // But better to store targetSocketId from incoming_call event
+                if (event.candidate && activeTargetUsername) {
+                    socket.emit('ice_candidate', {
+                        targetUsername: activeTargetUsername,
+                        candidate: event.candidate
+                    });
                 }
             };
 
             peerConnection.ontrack = event => {
                 document.getElementById('remoteAudio').srcObject = event.streams[0];
-                document.getElementById('callScreenName').innerText = currentUser.name || "Connected";
-                document.getElementById('callScreenNum').innerText = "In Call";
+                document.getElementById('callScreenName').innerText = "Connected";
             };
         }
 
-        // Handle Incoming Call
+        // ইনকামিং কল রিসিভ করা
         socket.on('incoming_call', async (data) => {
-            if(confirm(`Incoming call from ${data.callerName} (${data.callerUsername})`)) {
+            activeCallerSocketId = data.callerSocketId;
+            activeTargetUsername = data.callerUsername;
+
+            if(confirm(`Incoming call from ${data.callerName}`)) {
                 document.getElementById('callScreen').style.display = 'flex';
                 document.getElementById('callScreenName').innerText = data.callerName;
                 document.getElementById('callScreenNum').innerText = data.callerUsername;
@@ -400,11 +386,12 @@
                 const answer = await peerConnection.createAnswer();
                 await peerConnection.setLocalDescription(answer);
                 
-                // Send answer back
                 socket.emit('call_answer', {
-                    callerSocketId: data.callerSocketId || 'unknown', // Need to track this
+                    callerSocketId: activeCallerSocketId,
                     answer: answer
                 });
+            } else {
+                socket.emit('hangup');
             }
         });
 
@@ -412,8 +399,18 @@
             await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
         });
 
+        socket.on('ice_candidate_received', async (data) => {
+            if(peerConnection) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            }
+        });
+
         socket.on('call_error', (data) => {
             alert(data.message);
+            endCall();
+        });
+
+        socket.on('call_disconnected', () => {
             endCall();
         });
 
@@ -422,22 +419,22 @@
             socket.emit('hangup');
             document.getElementById('callScreen').style.display = 'none';
             document.getElementById('numberDisplay').innerText = "";
-            document.getElementById('displayName').innerText = "";
             stopTimer();
         }
 
-        // Timer Logic
+        // কল টাইমার লজিক
         function startTimer() {
             callStartTime = Date.now();
             timerInterval = setInterval(() => {
                 const diff = Math.floor((Date.now() - callStartTime) / 1000);
                 const m = Math.floor(diff / 60).toString().padStart(2, '0');
                 const s = (diff % 60).toString().padStart(2, '0');
-                document.getElementById('callTimer').innerText = `${m}:${s}`;
+                if(document.getElementById('callTimer')) {
+                    document.getElementById('callTimer').innerText = `${m}:${s}`;
+                }
             }, 1000);
         }
-        function stopTimer() { clearInterval(timerInterval); document.getElementById('callTimer').innerText = "00:00"; }
-
+        function stopTimer() { clearInterval(timerInterval); if(document.getElementById('callTimer')) document.getElementById('callTimer').innerText = "00:00"; }
     </script>
 </body>
 </html>
