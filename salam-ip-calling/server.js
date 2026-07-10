@@ -78,11 +78,10 @@ function fetchUsersFromGitHub(callback) {
     }).on('error', () => callback(readData()));
 }
 
-// গিটহাবে অটোমেটিক ডাটা পুশ/রাইট (Write) করার কোর ফাংশন
+// গิตহাবে অটোমেটিক ডাটা পুশ/রাইট (Write) করার কোর ফাংশন
 function pushUsersToGitHub(updatedData, callback) {
     const fileContent = JSON.stringify(updatedData, null, 2);
     
-    // প্রথমে গিটহাব থেকে ফাইলটির বর্তমান SHA কি (ID) জেনে নেওয়া হচ্ছে
     const getOptions = {
         hostname: 'api.github.com',
         path: `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`,
@@ -102,7 +101,6 @@ function pushUsersToGitHub(updatedData, callback) {
                 sha = resData.sha;
             } catch(e) {}
 
-            // গিটহাবে নতুন ডাটা ওভাররাইট করার রিকোয়েস্ট পেলোড
             const putData = JSON.stringify({
                 message: "Admin updated users.json via 3D Dashboard Engine",
                 content: Buffer.from(fileContent).toString('base64'),
@@ -134,6 +132,7 @@ function pushUsersToGitHub(updatedData, callback) {
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     
+    // অ্যাডমিন ভেরিফিকেশন (salam / 864)
     if (username === "salam" && password === "864") {
         fetchUsersFromGitHub((githubUsers) => {
             return res.json({ success: true, role: "admin", users: githubUsers });
@@ -141,6 +140,7 @@ app.post('/api/login', (req, res) => {
         return;
     }
     
+    // ইউজার ভেরিফিকেশন
     fetchUsersFromGitHub((githubUsers) => {
         if (githubUsers[username] && githubUsers[username].password === password) {
             sendTelegram(`🟢 *User Login Alert*\n👤 *Name:* ${githubUsers[username].name || 'N/A'}\n🆔 *Node ID:* ${username}\n💰 *Balance:* BDT ${githubUsers[username].balance}`);
@@ -157,7 +157,7 @@ app.get('/api/users-list', (req, res) => {
     });
 });
 
-// ADMIN: SAVE / UPDATE USER (লোকাল রাইট + গিটহাবে অটোমেটিক পুশ)
+// ADMIN: SAVE / UPDATE USER
 app.post('/api/admin/save-user', (req, res) => {
     const { adminUser, adminPass, targetUser, name, password, balance } = req.body;
     if (adminUser !== "salam" || adminPass !== "864") return res.json({ success: false });
@@ -173,13 +173,13 @@ app.post('/api/admin/save-user', (req, res) => {
         };
         
         pushUsersToGitHub(users, (isSuccess) => {
-            writeData(users); // লোকাল ব্যাকআপ
+            writeData(users); 
             res.json({ success: true, users: users });
         });
     });
 });
 
-// ADMIN: DELETE USER (লোকাল ডিলিট + গিটহাবে অটোমেটিক পুশ)
+// ADMIN: DELETE USER
 app.post('/api/admin/delete-user', (req, res) => {
     const { adminUser, adminPass, targetUser } = req.body;
     if (adminUser !== "salam" || adminPass !== "864") return res.json({ success: false });
@@ -190,7 +190,7 @@ app.post('/api/admin/delete-user', (req, res) => {
             delete users[targetUser];
             
             pushUsersToGitHub(users, (isSuccess) => {
-                writeData(users); // লোকাল ব্যাকআপ
+                writeData(users); 
                 res.json({ success: true, users: users });
             });
         } else {
@@ -199,7 +199,7 @@ app.post('/api/admin/delete-user', (req, res) => {
     });
 });
 
-// USER PANEL: TELEGRAM SIGNAL TRANSMITTER
+// USER PANEL: TELEGRAM REFILL REQUEST
 app.post('/api/user/request-balance', (req, res) => {
     const { username, name, currentBalance, amount } = req.body;
     sendTelegram(`⚠️ *Refill Request Packet*\n👤 *Customer Name:* ${name}\n🆔 *IP / Username:* ${username}\n💰 *Current Balance:* BDT ${currentBalance}\n💵 *Requested Amount:* BDT ${amount}`);
@@ -252,7 +252,6 @@ io.on('connection', (socket) => {
                 }
             });
 
-            // প্রতি ১ মিনিটে ব্যালেন্স কাটার লুপ ও গিটহাব সিঙ্ক
             activeBillings[socket.id] = setInterval(() => {
                 fetchUsersFromGitHub((currentUsers) => {
                     if (currentUsers[data.target]) {
@@ -276,7 +275,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // রিয়েল-টাইম টেক্সট মেসেজিং সকেট ইভেন্ট
     socket.on('send-msg', (data) => {
         const targetSocketId = activeNodes[data.to];
         if (targetSocketId) {
@@ -295,7 +293,6 @@ io.on('connection', (socket) => {
         if(activeBillings[socket.id]) clearInterval(activeBillings[socket.id]);
     });
 
-    document.on = function(){}; // ডামি হ্যান্ডলার
     socket.on('disconnect', () => {
         if(activeBillings[socket.id]) clearInterval(activeBillings[socket.id]);
         if(socket.uid) delete activeNodes[socket.uid];
