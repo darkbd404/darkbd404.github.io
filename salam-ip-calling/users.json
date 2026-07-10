@@ -1,1 +1,9 @@
-{}
+{
+  "1": {
+    "name": "Abdus Salam",
+    "password": "123",
+    "balance": "100.00",
+    "logs": [],
+    "messages": []
+  }
+}
