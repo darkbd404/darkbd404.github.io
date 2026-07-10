@@ -1,120 +1,106 @@
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
-const io = require('socket.io')(http, { cors: { origin: "*", methods: ["GET", "POST"] } });
-const axios = require('axios');
+const io = require('socket.io')(http, { cors: { origin: "*" } });
+const fs = require('fs');
+const path = require('path');
 
-const PORT = process.env.PORT || 3000; 
-
-// 🛡️ [MANDATORY] আপনার টেলিগ্রাম বটের ডাটা এখানে আপডেট করুন
-const TELEGRAM_BOT_TOKEN = "7963380066:AAHI12Dshw2H4-ZcZof6v2D8H6w3E_A6kS8"; 
-const TELEGRAM_CHAT_ID = "6377519390"; 
+const PORT = process.env.PORT || 3000;
+const USERS_FILE = path.join(__dirname, 'users.json');
 
 const ADMIN_USER = "salam";
 const ADMIN_PASS = "864";
 
-// 🌐 Render ক্লাউড রানটাইম মেমোরি স্টোরেজ (ফাইল ক্র্যাশ এড়াতে গ্লোবাল অ্যারে)
-let GLOBAL_MEMORY_USERS = [
-    { username: "08640000001", password: "521021", name: "Abdus Salam" },
-    { username: "08640000002", password: "halima", name: "Halima Akter" }
-];
-let GLOBAL_MEMORY_LOGS = [];
-
 app.use(express.json());
 app.use(express.static(__dirname));
 
-async function pushToTelegramBot(message) {
-    if(!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN.includes("YOUR_BOT")) return;
+// 📂 users.json ফাইল হ্যান্ডলিং (পুরোপুরি আলাদা)
+function loadUsersFromFile() {
+    if (!fs.existsSync(USERS_FILE)) return [];
     try {
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        await axios.post(url, { chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'HTML' });
-    } catch (e) { console.error("Telegram Sync Error:", e.message); }
+        return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    } catch (e) {
+        return [];
+    }
 }
 
-// লগইন এপিআই ও টেলিগ্রাম পুশ
-app.post('/api/login', (req, res) => {
-    const { username, password, ipAddress, device } = req.body;
-    let text = "";
+function saveUsersToFile(users) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+}
 
+// ১. লগইন রুট (এডমিন ও ইউজার আইডি সম্পূর্ণ আলাদা ও ফিক্সড)
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+
+    // এডমিন চেক
     if (username === ADMIN_USER && password === ADMIN_PASS) {
-        text = `🔐 <b>Admin Login Success</b>\n👤 Identity: Admin Node\n🌐 IP Address: ${ipAddress}\n📱 Platform: ${device}`;
-        pushToTelegramBot(text);
         return res.json({ success: true, role: 'admin', name: 'Administrator', username: ADMIN_USER });
     }
-    
-    const user = GLOBAL_MEMORY_USERS.find(u => u.username === username && u.password === password);
-    if (user) {
-        text = `🔓 <b>User Login Alert</b>\n👤 Name: ${user.name}\n🔢 Extension: ${user.username}\n🌐 IP Address: ${ipAddress}\n📱 Platform: ${device}`;
-        pushToTelegramBot(text);
-        return res.json({ success: true, role: 'user', name: user.name, username: user.username });
+
+    // ইউজার চেক (users.json ফাইল থেকে)
+    const users = loadUsersFromFile();
+    const matchedUser = users.find(u => u.username === username && u.password === password);
+    if (matchedUser) {
+        return res.json({ success: true, role: 'user', name: matchedUser.name, username: matchedUser.username });
     }
-    return res.json({ success: false, message: 'Invalid Extension or Password' });
+
+    return res.json({ success: false, message: 'Invalid Username or Password' });
 });
 
-// ইউজার ক্রিয়েট, এডিট এবং ডিলিট অপারেশন + টেলিগ্রাম লগ
+// ২. ইউজার ক্রিয়েট, এডিট, ডিলিট এপিআই (সরাসরি users.json এ সেভ হবে)
 app.post('/api/manage-user', (req, res) => {
-    const { action, username, password, name, oldUsername, creator } = req.body;
-    let text = "";
+    const { action, username, password, name, oldUsername } = req.body;
+    let users = loadUsersFromFile();
 
     if (action === 'add') {
-        if (GLOBAL_MEMORY_USERS.find(u => u.username === username)) {
+        if (users.find(u => u.username === username)) {
             return res.json({ success: false, message: 'Extension already exists!' });
         }
-        GLOBAL_MEMORY_USERS.push({ username, password, name });
-        text = `➕ <b>User Account Created</b>\n👤 Full Name: ${name}\n🔢 Ext Number: ${username}\n🔑 Key Pass: ${password}\n✍️ Registered By: ${creator}`;
+        users.push({ username, password, name, created: new Date().toISOString() });
     } 
     else if (action === 'edit') {
-        const index = GLOBAL_MEMORY_USERS.findIndex(u => u.username === oldUsername);
+        const index = users.findIndex(u => u.username === oldUsername);
         if (index !== -1) {
-            GLOBAL_MEMORY_USERS[index] = { username, password, name };
-            text = `📝 <b>Full Profile Updated</b>\n🔄 Target Ext: ${oldUsername}\n👤 New Name: ${name}\n🔢 New Ext: ${username}\n🔑 New Pass: ${password}`;
+            users[index] = { username, password, name, created: users[index].created };
         }
     } 
     else if (action === 'delete') {
-        GLOBAL_MEMORY_USERS = GLOBAL_MEMORY_USERS.filter(u => u.username !== username);
-        text = `❌ <b>User Account Deleted</b>\n🔢 Ext Number: ${username}`;
+        users = users.filter(u => u.username !== username);
     }
 
-    pushToTelegramBot(text);
+    saveUsersToFile(users);
     res.json({ success: true });
 });
 
-app.get('/api/users', (req, res) => res.json(GLOBAL_MEMORY_USERS));
-app.get('/api/logs', (req, res) => res.json(GLOBAL_MEMORY_LOGS));
+app.get('/api/users', (req, res) => {
+    res.json(loadUsersFromFile());
+});
+
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
-// সকেট আইও রিয়েল-টাইম রাউটিং ইঞ্জিন
+// ৩. সকেট কলিং ও সিগন্যালিং ইঞ্জিন (মোবাইল কানেকশন ড্রপ ফিক্স)
 io.on('connection', (socket) => {
     
     socket.on('register_user', (data) => {
-        socket.userData = data;
+        socket.userData = data; 
+        console.log(`Registered Line: ${data.username} on Socket ID: ${socket.id}`);
     });
 
-    // ইউজার টু ইউজার মেসেজ ব্রডকাস্টার ও টেলিগ্রাম ডাটা পাঠানো
-    socket.on('send_message', (data) => {
-        const receiverSocket = Array.from(io.sockets.sockets.values()).find(
-            s => s.userData && s.userData.username === data.targetUsername
-        );
-        if (receiverSocket) {
-            receiverSocket.emit('receive_message', { sender: socket.userData.username, text: data.text });
-        }
-        pushToTelegramBot(`💬 <b>Internal Secure Chat</b>\nFrom: ${socket.userData.name} (${socket.userData.username})\nTo Target: ${data.targetUsername}\n✉️ Text: ${data.text}`);
-    });
-
-    // কল অফার রাউটিং
+    // কল অফার হ্যান্ডলার (টার্গেট সকেট ট্র্যাকিং)
     socket.on('call_offer', (data) => {
-        const receiverSocket = Array.from(io.sockets.sockets.values()).find(
+        const targetSocket = Array.from(io.sockets.sockets.values()).find(
             s => s.userData && s.userData.username === data.targetUsername
         );
-        if (receiverSocket) {
-            receiverSocket.emit('incoming_call', {
+
+        if (targetSocket) {
+            targetSocket.emit('incoming_call', {
                 callerName: data.callerName,
                 callerUsername: data.callerUsername,
                 callerSocketId: socket.id, 
                 offer: data.offer
             });
         } else {
-            socket.emit('call_error', { message: `Extension Line ${data.targetUsername} is Offline.` });
+            socket.emit('call_error', { message: `Line ${data.targetUsername} is offline.` });
         }
     });
 
@@ -126,34 +112,26 @@ io.on('connection', (socket) => {
         const targetSocket = Array.from(io.sockets.sockets.values()).find(
             s => s.userData && s.userData.username === data.targetUsername
         );
-        if (targetSocket) targetSocket.emit('ice_candidate_received', { candidate: data.candidate });
-    });
-
-    // কল লগ জেনারেট ও টেলিগ্রাম পাঠানো
-    socket.on('log_call_telegram', (data) => {
-        const logItem = {
-            caller: data.caller,
-            receiver: data.receiver,
-            duration: data.duration,
-            time: new Date().toLocaleTimeString()
-        };
-        GLOBAL_MEMORY_LOGS.unshift(logItem);
-        if(GLOBAL_MEMORY_LOGS.length > 30) GLOBAL_MEMORY_LOGS.pop();
-
-        pushToTelegramBot(`📞 <b>Call Logs Summary</b>\n🟢 Source Ext: ${data.caller}\n🔴 Target Ext: ${data.receiver}\n⏱️ Call Duration: ${data.duration} Seconds`);
+        if (targetSocket) {
+            targetSocket.emit('ice_candidate_received', { candidate: data.candidate });
+        }
     });
 
     socket.on('hangup', (data) => {
-        if(data && data.targetUsername) {
+        if (data && data.targetUsername) {
             const targetSocket = Array.from(io.sockets.sockets.values()).find(
                 s => s.userData && s.userData.username === data.targetUsername
             );
-            if(targetSocket) targetSocket.emit('call_disconnected');
+            if (targetSocket) targetSocket.emit('call_disconnected');
         }
         socket.broadcast.emit('call_disconnected');
     });
 
-    socket.on('disconnect', () => {});
+    socket.on('disconnect', () => {
+        console.log(`Disconnected Socket: ${socket.id}`);
+    });
 });
 
-http.listen(PORT, '0.0.0.0', () => console.log(`Server live on port ${PORT}`));
+http.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+});
