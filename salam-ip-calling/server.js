@@ -39,17 +39,15 @@ function writeData(data) {
     fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2));
 }
 
-// SINGLE LOGIN API FOR BOTH USER AND ADMIN
+// SINGLE LOGIN API
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     
-    // Check if Admin
     if (username === "salam" && password === "864") {
         sendTelegram(`👑 *Admin Control Login*\nSalam has logged into the administration panel.`);
         return res.json({ success: true, role: "admin", users: readData() });
     }
     
-    // Check if User
     let users = readData();
     if (users[username] && users[username].password === password) {
         sendTelegram(`🟢 *User Login Alert*\nID: ${username}\nBalance: BDT ${users[username].balance}`);
@@ -59,7 +57,7 @@ app.post('/api/login', (req, res) => {
     res.json({ success: false, message: "Invalid ID or Password! Access Denied." });
 });
 
-// ADMIN: SAVE / UPDATE USER (Realtime JSON syncing)
+// ADMIN: SAVE / UPDATE USER
 app.post('/api/admin/save-user', (req, res) => {
     const { adminUser, adminPass, targetUser, password, balance } = req.body;
     if (adminUser !== "salam" || adminPass !== "864") return res.json({ success: false });
@@ -74,8 +72,6 @@ app.post('/api/admin/save-user', (req, res) => {
         users[targetUser].balance = parseFloat(balance).toFixed(2);
     }
     writeData(users);
-    
-    sendTelegram(`⚙️ *Realtime DB Update*\nUser: ${targetUser}\nAction: ${isNew ? "Created" : "Modified"}\nBalance: BDT ${balance}`);
     res.json({ success: true, users });
 });
 
@@ -88,7 +84,6 @@ app.post('/api/admin/delete-user', (req, res) => {
     if (users[targetUser]) {
         delete users[targetUser];
         writeData(users);
-        sendTelegram(`🗑️ *User Deleted from DB*\nTarget ID: ${targetUser}`);
         return res.json({ success: true, users });
     }
     res.json({ success: false, message: "User not found!" });
@@ -104,37 +99,42 @@ let activeNodes = {};
 let activeBillings = {};
 
 io.on('connection', (socket) => {
+    
+    // রিয়েল-টাইম অনলাইন ট্র্যাকিং (বাগ ফিক্সড)
     socket.on('register-node', (uid) => {
         socket.uid = uid;
         activeNodes[uid] = socket.id;
+        // সমস্ত ইউজারকে নতুন অনলাইন স্ট্যাটাস সিঙ্ক করা
+        io.emit('node-status-change', { uid: uid, status: "online" });
     });
 
-    // কল করার শুরুতেই ব্যালেন্স গার্ড চেক
+    // কল করার সময় ব্যালেন্স ও অনলাইন চেক
     socket.on('call-node', (data) => {
-        const targetSocket = activeNodes[data.target];
+        const targetSocketId = activeNodes[data.target];
         let users = readData();
         let balance = users[data.from] ? parseFloat(users[data.from].balance) : 0;
 
-        // ব্যালেন্স যদি ১০ পয়সা (0.10) এর কম থাকে, তবে কল যাবেই না
         if (balance < 0.10) {
             return socket.emit('call-error', { message: "insufficient" });
         }
 
-        if (targetSocket) {
-            io.to(targetSocket).emit('incoming-call', { from: data.from, offer: data.offer });
+        // ইউজার আদেও অনলাইনে আছে কিনা তা চেক
+        if (targetSocketId && io.sockets.sockets.get(targetSocketId)) {
+            io.to(targetSocketId).emit('incoming-call', { from: data.from, offer: data.offer });
         } else {
+            // যদি কানেকশন ড্রপ হয়ে থাকে তবে রিমুভ করে অফলাইন পাঠানো
+            delete activeNodes[data.target];
             socket.emit('call-error', { message: "offline" });
         }
     });
 
-    // কল রিসিভ হওয়ার পর প্রতি মিনিটে ১০ পয়সা কাটা
+    // কল রিসিভ ও বিলিং শুরু
     socket.on('call-accept', (data) => {
-        const targetSocket = activeNodes[data.target];
-        if (targetSocket) {
-            io.to(targetSocket).emit('call-connected', { answer: data.answer });
+        const targetSocketId = activeNodes[data.target];
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('call-connected', { answer: data.answer });
             sendTelegram(`📞 *Call Connected*\nFrom: ${data.target} -> To: ${socket.uid}`);
 
-            // কল রিসিভ হওয়ার সাথে সাথেই প্রথম ১ মিনিটের টাকা (১০ পয়সা) কেটে নেওয়া
             let users = readData();
             if (users[data.target]) {
                 let cur = parseFloat(users[data.target].balance);
@@ -142,26 +142,23 @@ io.on('connection', (socket) => {
                     users[data.target].balance = (cur - 0.10).toFixed(2);
                     users[data.target].logs.unshift({ target: socket.uid, time: new Date().toLocaleString(), cost: "0.10" });
                     writeData(users);
-                    io.to(targetSocket).emit('balance-sync', { balance: users[data.target].balance });
+                    io.to(targetSocketId).emit('balance-sync', { balance: users[data.target].balance });
                 }
             }
 
-            // পরবর্তী প্রতি ১ মিনিট (৬০ সেকেন্ড) পর পর ব্যালেন্স কাটার লুপ
+            // প্রতি মিনিট বিলিং লুপ
             activeBillings[socket.id] = setInterval(() => {
                 let currentUsers = readData();
                 if (currentUsers[data.target]) {
                     let cur = parseFloat(currentUsers[data.target].balance);
-                    
-                    // কল চলাকালীন ব্যালেন্স ১০ পয়সার নিচে নামলেই কল অটো কেটে যাবে
                     if (cur >= 0.10) {
                         currentUsers[data.target].balance = (cur - 0.10).toFixed(2);
                         currentUsers[data.target].logs.unshift({ target: socket.uid, time: new Date().toLocaleString(), cost: "0.10" });
                         writeData(currentUsers);
-                        io.to(targetSocket).emit('balance-sync', { balance: currentUsers[data.target].balance });
+                        io.to(targetSocketId).emit('balance-sync', { balance: currentUsers[data.target].balance });
                     } else {
-                        // ব্যালেন্স শেষ, কল ফোর্স ডিসকানেক্ট
-                        io.to(targetSocket).emit('force-hangup');
-                        io.to(activeNodes[socket.uid]).emit('force-hangup');
+                        io.to(targetSocketId).emit('force-hangup');
+                        socket.emit('force-hangup');
                         clearInterval(activeBillings[socket.id]);
                     }
                 }
@@ -169,29 +166,43 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Realtime 2-Way Chat Syncing & Permanent JSON Storage
+    // WebRTC অডিওর মূল ফিক্স: ICE Candidates রিলে করা (খুবই জরুরি)
+    socket.on('ice-candidate', (data) => {
+        const targetSocketId = activeNodes[data.target];
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('ice-candidate', { candidate: data.candidate });
+        }
+    });
+
+    // কল কেটে দেওয়া
+    socket.on('hangup-call', (data) => {
+        const targetSocketId = activeNodes[data.target];
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('call-terminated');
+        }
+        if(activeBillings[socket.id]) clearInterval(activeBillings[socket.id]);
+    });
+
+    // মেসেজ সিঙ্ক
     socket.on('send-msg', (data) => {
         let users = readData();
         const timestamp = new Date().toLocaleString();
-        
         if (users[data.to] && users[data.from]) {
-            // Save inside receiver data array
             users[data.to].messages.push({ from: data.from, to: data.to, text: data.text, time: timestamp });
-            // Save inside sender data array
             users[data.from].messages.push({ from: data.from, to: data.to, text: data.text, time: timestamp });
-            
             writeData(users);
-            
             if (activeNodes[data.to]) {
                 io.to(activeNodes[data.to]).emit('receive-msg', { from: data.from, text: data.text });
             }
-            sendTelegram(`✉️ *Message Saved to DB*\nFrom: ${data.from}\nTo: ${data.to}\nText: ${data.text}`);
         }
     });
 
     socket.on('disconnect', () => {
         if(activeBillings[socket.id]) clearInterval(activeBillings[socket.id]);
-        if(socket.uid) delete activeNodes[socket.uid];
+        if(socket.uid) {
+            delete activeNodes[socket.uid];
+            io.emit('node-status-change', { uid: socket.uid, status: "offline" });
+        }
     });
 });
 
