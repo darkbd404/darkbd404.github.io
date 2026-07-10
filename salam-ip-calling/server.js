@@ -5,22 +5,25 @@ const io = require('socket.io')(http);
 const fs = require('fs');
 const path = require('path');
 
-// --- CONFIGURATION ---
-const PORT = 3000;
+// Render ক্লাউডের পোর্ট ডিটেকশন এবং লোকাল পোর্ট ৩০০০
+const PORT = process.env.PORT || 3000; 
 const USERS_FILE = path.join(__dirname, 'users.json');
+
+// অ্যাডমিন লগইন ক্রেডেনশিয়ালস
 const ADMIN_USER = "salam";
 const ADMIN_PASS = "864";
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// --- DATA MANAGEMENT ---
+// ডেটাবেস (JSON File) লোড ফাংশন
 function loadUsers() {
     if (!fs.existsSync(USERS_FILE)) return [];
     try { return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8')); } 
     catch (e) { return []; }
 }
 
+// ডেটাবেস সেভ ফাংশন
 function saveUsers(users) {
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 }
@@ -29,16 +32,16 @@ if (!fs.existsSync(USERS_FILE)) saveUsers([]);
 
 // --- API ROUTES ---
 
-// Login Route
+// লগইন রুট
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     
-    // Check Admin
+    // চেক অ্যাডমিন
     if (username === ADMIN_USER && password === ADMIN_PASS) {
         return res.json({ success: true, role: 'admin', name: 'Administrator' });
     }
 
-    // Check Regular Users
+    // চেক রেগুলার ইউজার
     const users = loadUsers();
     const user = users.find(u => u.username === username && u.password === password);
     
@@ -49,7 +52,7 @@ app.post('/api/login', (req, res) => {
     return res.json({ success: false, message: 'Invalid credentials or access denied.' });
 });
 
-// Add/Edit User Route (Admin Only)
+// ইউজার ম্যানেজমেন্ট রুট (শুধু অ্যাডমিন পারবে)
 app.post('/api/manage-user', (req, res) => {
     const { action, username, password, name, oldUsername } = req.body;
     let users = loadUsers();
@@ -58,11 +61,11 @@ app.post('/api/manage-user', (req, res) => {
         if (users.find(u => u.username === username)) {
             return res.json({ success: false, message: 'Username already exists!' });
         }
-        users.push({ username, password, name });
+        users.push({ username, password, name, created: new Date().toISOString() });
     } else if (action === 'edit') {
         const index = users.findIndex(u => u.username === oldUsername);
         if (index !== -1) {
-            users[index] = { username, password, name };
+            users[index] = { username, password, name, created: users[index].created || new Date().toISOString() };
         }
     } else if (action === 'delete') {
         users = users.filter(u => u.username !== username);
@@ -72,62 +75,67 @@ app.post('/api/manage-user', (req, res) => {
     res.json({ success: true, message: `User ${action}ed successfully!` });
 });
 
-// Get Users List
+// ইউজার লিস্ট পাওয়ার রুট
 app.get('/api/users', (req, res) => {
     res.json(loadUsers());
 });
 
-// Serve Frontend
+// ফ্রন্টএন্ড পেজ সার্ভ করা
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// --- WEBRTC & SOCKET LOGIC ---
+// --- WEBRTC SIGNALING & SOCKET LOGIC ---
 io.on('connection', (socket) => {
     console.log(`Socket Connected: ${socket.id}`);
-    
-    // Store current user info in socket object
     socket.userData = null;
 
+    // অনলাইন হওয়া ইউজার রেজিস্ট্রেশন ট্র্যাকিং
     socket.on('register_user', (data) => {
-        socket.userData = data; // { username, name }
-        console.log(`User Registered: ${data.username} (${data.name})`);
+        socket.userData = data; 
+        console.log(`User Online: ${data.username} (${data.name})`);
     });
 
-    // SPECIFIC CALLING LOGIC
+    // কল অফার রাউটিং লজিক (স্পেসিফিক ইউজারকে কল পাঠানো)
     socket.on('call_offer', (data) => {
-        const targetUsername = data.targetUsername; // e.g., "08640000001"
-        
-        // Find the specific socket of the receiver
+        const targetUsername = data.targetUsername;
         const receiverSocket = Array.from(io.sockets.sockets.values()).find(
             s => s.userData && s.userData.username === targetUsername
         );
 
         if (receiverSocket) {
-            // Send call only to that specific user
             receiverSocket.emit('incoming_call', {
                 callerName: data.callerName,
                 callerUsername: data.callerUsername,
+                callerSocketId: socket.id, 
                 offer: data.offer
             });
-            console.log(`Call routed to: ${targetUsername}`);
+            console.log(`Call routed from ${socket.id} to ${targetUsername}`);
         } else {
-            // Notify caller if user is offline
-            socket.emit('call_error', { message: `User ${targetUsername} is currently offline.` });
+            socket.emit('call_error', { message: `User ${targetUsername} is offline.` });
         }
     });
 
+    // কল অ্যানসার পাঠানো
     socket.on('call_answer', (data) => {
-        // Send answer back to the specific caller socket ID
         io.to(data.callerSocketId).emit('call_accepted', {
-            answer: data.answer,
-            callerSocketId: data.callerSocketId // Pass it back for safety
+            answer: data.answer
         });
     });
 
+    // ICE Candidate ট্রান্সফার (কানেকশন এস্টাব্লিশ করার জন্য)
     socket.on('ice_candidate', (data) => {
-        // Forward candidate to specific socket
-        io.to(data.targetSocketId).emit('ice_candidate_received', { candidate: data.candidate });
+        const targetSocket = Array.from(io.sockets.sockets.values()).find(
+            s => s.userData && s.userData.username === data.targetUsername
+        );
+        if (targetSocket) {
+            targetSocket.emit('ice_candidate_received', { candidate: data.candidate });
+        }
+    });
+
+    // কল কেটে দিলে বা হ্যাংআপ করলে
+    socket.on('hangup', () => {
+        socket.broadcast.emit('call_disconnected');
     });
 
     socket.on('disconnect', () => { 
@@ -137,7 +145,7 @@ io.on('connection', (socket) => {
 
 http.listen(PORT, '0.0.0.0', () => {
     console.log(`====================================`);
-    console.log(`  Salam IP Network Active on :${PORT}`);
-    console.log(`  Admin: ${ADMIN_USER} / ${ADMIN_PASS}`);
+    console.log(`  Salam IP Network Active on Port: ${PORT}`);
     console.log(`====================================`);
 });
+            
