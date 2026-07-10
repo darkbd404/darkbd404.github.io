@@ -31,8 +31,15 @@ function sendTelegram(msg) {
 }
 
 function readData() {
-    if (!fs.existsSync(USERS_FILE)) return {};
-    try { return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8')); } catch (e) { return {}; }
+    if (!fs.existsSync(USERS_FILE)) {
+        fs.writeFileSync(USERS_FILE, JSON.stringify({}, null, 2));
+        return {};
+    }
+    try { 
+        return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8')); 
+    } catch (e) { 
+        return {}; 
+    }
 }
 
 function writeData(data) {
@@ -57,22 +64,35 @@ app.post('/api/login', (req, res) => {
     res.json({ success: false, message: "Invalid ID or Password! Access Denied." });
 });
 
-// ADMIN: SAVE / UPDATE USER
+// ADMIN: SAVE / UPDATE USER (Fixed and Verified)
 app.post('/api/admin/save-user', (req, res) => {
     const { adminUser, adminPass, targetUser, password, balance } = req.body;
-    if (adminUser !== "salam" || adminPass !== "864") return res.json({ success: false });
+    if (adminUser !== "salam" || adminPass !== "864") {
+        return res.json({ success: false, message: "Unauthorized Admin access!" });
+    }
+
+    if (!targetUser || !password) {
+        return res.json({ success: false, message: "User ID and Password are required!" });
+    }
 
     let users = readData();
     const isNew = !users[targetUser];
     
     if (isNew) {
-        users[targetUser] = { password, balance: parseFloat(balance).toFixed(2), logs: [], messages: [] };
+        users[targetUser] = { 
+            password: password, 
+            balance: parseFloat(balance || 0).toFixed(2), 
+            logs: [], 
+            messages: [] 
+        };
     } else {
         users[targetUser].password = password;
-        users[targetUser].balance = parseFloat(balance).toFixed(2);
+        users[targetUser].balance = parseFloat(balance || 0).toFixed(2);
     }
+    
     writeData(users);
-    res.json({ success: true, users });
+    sendTelegram(`⚙️ *DB Sync*\nUser: ${targetUser}\nAction: ${isNew ? "Created" : "Modified"}\nBalance: BDT ${balance}`);
+    res.json({ success: true, users: readData() });
 });
 
 // ADMIN: DELETE USER
@@ -84,7 +104,8 @@ app.post('/api/admin/delete-user', (req, res) => {
     if (users[targetUser]) {
         delete users[targetUser];
         writeData(users);
-        return res.json({ success: true, users });
+        sendTelegram(`🗑️ *User Purged*\nTarget ID: ${targetUser}`);
+        return res.json({ success: true, users: readData() });
     }
     res.json({ success: false, message: "User not found!" });
 });
@@ -100,15 +121,12 @@ let activeBillings = {};
 
 io.on('connection', (socket) => {
     
-    // রিয়েল-টাইম অনলাইন ট্র্যাকিং (বাগ ফিক্সড)
     socket.on('register-node', (uid) => {
         socket.uid = uid;
         activeNodes[uid] = socket.id;
-        // সমস্ত ইউজারকে নতুন অনলাইন স্ট্যাটাস সিঙ্ক করা
         io.emit('node-status-change', { uid: uid, status: "online" });
     });
 
-    // কল করার সময় ব্যালেন্স ও অনলাইন চেক
     socket.on('call-node', (data) => {
         const targetSocketId = activeNodes[data.target];
         let users = readData();
@@ -118,17 +136,14 @@ io.on('connection', (socket) => {
             return socket.emit('call-error', { message: "insufficient" });
         }
 
-        // ইউজার আদেও অনলাইনে আছে কিনা তা চেক
         if (targetSocketId && io.sockets.sockets.get(targetSocketId)) {
             io.to(targetSocketId).emit('incoming-call', { from: data.from, offer: data.offer });
         } else {
-            // যদি কানেকশন ড্রপ হয়ে থাকে তবে রিমুভ করে অফলাইন পাঠানো
             delete activeNodes[data.target];
             socket.emit('call-error', { message: "offline" });
         }
     });
 
-    // কল রিসিভ ও বিলিং শুরু
     socket.on('call-accept', (data) => {
         const targetSocketId = activeNodes[data.target];
         if (targetSocketId) {
@@ -146,7 +161,6 @@ io.on('connection', (socket) => {
                 }
             }
 
-            // প্রতি মিনিট বিলিং লুপ
             activeBillings[socket.id] = setInterval(() => {
                 let currentUsers = readData();
                 if (currentUsers[data.target]) {
@@ -166,7 +180,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // WebRTC অডিওর মূল ফিক্স: ICE Candidates রিলে করা (খুবই জরুরি)
     socket.on('ice-candidate', (data) => {
         const targetSocketId = activeNodes[data.target];
         if (targetSocketId) {
@@ -174,7 +187,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // কল কেটে দেওয়া
     socket.on('hangup-call', (data) => {
         const targetSocketId = activeNodes[data.target];
         if (targetSocketId) {
@@ -183,7 +195,6 @@ io.on('connection', (socket) => {
         if(activeBillings[socket.id]) clearInterval(activeBillings[socket.id]);
     });
 
-    // মেসেজ সিঙ্ক
     socket.on('send-msg', (data) => {
         let users = readData();
         const timestamp = new Date().toLocaleString();
