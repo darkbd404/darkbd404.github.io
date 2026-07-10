@@ -28,13 +28,13 @@
         .dial-actions { display: flex; justify-content: space-around; align-items: center; width: 100%; max-width: 360px; margin: 15px auto 0; padding: 0 30px; }
         .action-call-btn { width: 68px; height: 68px; background: var(--green); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; }
         
-        /* বটম নেভিগেশন */
+        /* বটম নেভিগেশন বার */
         .android-nav-bar { height: 65px; background: var(--surface); display: none; justify-content: space-around; align-items: center; border-top: 1px solid #2c2c2e; width: 100%; z-index: 999; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--gray); font-size: 11px; cursor: pointer; background: none; border: none; flex: 1; height: 100%; justify-content: center; }
         .nav-item.active-nav { color: var(--primary); font-weight: 500; }
         .nav-item svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 4px; }
 
-        /* ফরম ও কালেকশন */
+        /* ইনপুট ও বাটন এলিমেন্ট */
         .input-group { width: 100%; margin-bottom: 12px; }
         .input-group input { width: 100%; padding: 14px; background: var(--surface); border: 1px solid #2c2c2e; border-radius: 10px; color: #fff; font-size: 15px; outline: none; }
         .app-btn { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 10px; font-weight: 500; font-size: 15px; cursor: pointer; }
@@ -141,7 +141,7 @@
         let activeSession = null, localMediaStream = null, rtcPeerConnection = null;
         let callDurationSeconds = 0, durationInterval, currentRemoteExt = null;
 
-        // 🚨 REFRESH LOGOUT RULE: কোনো স্টোরেজ রাখা যাবে না
+        // ব্রাউজার রিফ্রেশ রুল ক্লিয়ারেন্স
         window.addEventListener('DOMContentLoaded', () => {
             triggerLogout(); 
         });
@@ -175,7 +175,7 @@
 
             socket.emit('register_user', { username: activeSession.username, name: activeSession.name });
             
-            // রোল ভিত্তিক পারমিশন লক ফিক্স
+            // রোল পারমিশন চেক
             if(activeSession.role === 'admin') {
                 document.getElementById('adminForm').style.display = 'block';
             } else {
@@ -260,7 +260,7 @@
             }
         }
 
-        // --- WebRTC HD Calling System ---
+        // --- WebRTC IP Calling Engine ---
         function generatePeerConn() {
             rtcPeerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
             rtcPeerConnection.onicecandidate = e => {
