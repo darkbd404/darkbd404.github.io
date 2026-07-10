@@ -3,10 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IP Calling Engine Pro</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
+    <title>3D Next-Gen Calling Interface</title>
     <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root {
+            --bg-3d: #e0e8f5;
+            --box-shadow-3d: 9px 9px 16px #be99b3, -9px -9px 16px #ffffff;
+            --inner-shadow-3d: inset 3px 3px 7px #b8b0ce, inset -3px -3px 7px #ffffff;
+        }
+        body {
+            background: var(--bg-3d);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .phone-container {
+            width: 380px;
+            height: 720px;
+            background: var(--bg-3d);
+            border-radius: 30px;
+            box-shadow: 12px 12px 24px #b5c1d7, -12px -12px 24px #ffffff;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: 4px solid #f1f5fa;
+        }
+        .screen-panel {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        .active-panel { display: flex; }
+        .input-3d {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            background: var(--bg-3d);
+            border-radius: 15px;
+            box-shadow: var(--inner-shadow-3d);
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            outline: none;
+            font-size: 15px;
+            color: #4a5568;
+        }
+        .btn-3d {
+            padding: 14px;
+            border: none;
+            background: var(--bg-3d);
+            border-radius: 15px;
+            box-shadow: 5px 5px 10px #b5c1d7, -5px -5px 10px #ffffff;
+            cursor: pointer;
+            font-weight: bold;
+            color: #0066cc;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .btn-3d:active {
+            box-shadow: var(--inner-shadow-3d);
+        }
+        .dial-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .dial-btn {
+            height: 65px;
+            font-size: 22px;
+            font-weight: 600;
+            border: none;
+            background: var(--bg-3d);
+            border-radius: 50%;
+            box-shadow: 5px 5px 10px #b5c1d7, -5px -5px 10px #ffffff;
+            color: #2d3748;
+            cursor: pointer;
+        }
+        .dial-btn:active { box-shadow: var(--inner-shadow-3d); }
+        .calling-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-3d);
+            border-radius: 26px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+        .video-box {
+            width: 100%;
+            height: 220px;
+            background: #2d3748;
+            border-radius: 20px;
+            box-shadow: var(--inner-shadow-3d);
+            overflow: hidden;
+            display: none;
+        }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        .nav-tabs {
+            display: flex;
+            justify-content: space-between;
+            background: var(--bg-3d);
+            padding: 10px;
+            border-radius: 20px;
+            box-shadow: var(--inner-shadow-3d);
+            margin-bottom: 15px;
+        }
+        .tab-item { cursor: pointer; font-size: 18px; padding: 5px 10px; }
+        .active-tab { color: #0066cc; font-weight: bold; }
+    </style>
 </head>
 <body>
 
@@ -14,51 +127,32 @@
 
 <div class="phone-container">
     
-    <div id="panel-login" class="screen-panel active-panel">
-        <h2 style="color:#0066cc; margin:0 0 5px 0;">IP Calling Portal</h2>
-        <p style="color:#718096; font-size:14px; margin:0 0 25px 0;">Enter account configurations to start node pipeline</p>
-        <input type="text" id="login-user" class="input-field" placeholder="User ID / Admin Code">
-        <input type="password" id="login-pass" class="input-field" placeholder="Secure Password">
-        <button class="btn-primary" onclick="executeAuthentication()">Authenticate & Connect</button>
+    <div id="panel-login" class="screen-panel active-panel" style="justify-content: center;">
+        <h2 style="text-align: center; color: #0066cc; text-shadow: 2px 2px 4px #b5c1d7;">3D IP Dialer</h2>
+        <input type="text" id="login-user" class="input-3d" placeholder="Username / Admin Code">
+        <input type="password" id="login-pass" class="input-3d" placeholder="Secure Passphrase">
+        <button class="btn-3d" onclick="executeAuthentication()">Login Engine</button>
     </div>
 
-    <div id="panel-admin" class="screen-panel" style="display:none;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #edf2f7; padding-bottom:10px;">
-            <h3 style="margin:0; color:#1a202c;">System Control Database</h3>
-            <button class="btn-logout" onclick="location.reload()">Admin Logout</button>
-        </div>
-        <div style="background:#f7fafc; padding:15px; border:1px solid #edf2f7; border-radius:10px; margin-bottom:15px;">
-            <h4 style="margin:0 0 10px 0; font-size:14px; color:#4a5568;">User Account Management (CRUD)</h4>
-            <input type="text" id="adm-uid" class="input-field" placeholder="Account Number ID">
-            <input type="text" id="adm-pass" class="input-field" placeholder="Set Passphrase">
-            <input type="number" id="adm-bal" class="input-field" placeholder="Initialize Balance (BDT)">
-            <div style="display:flex; gap:10px; margin-top:5px;">
-                <button class="btn-primary" style="background:#38a169; flex:1;" onclick="adminCommitUser()">Save / Update</button>
-                <button class="btn-primary" style="background:#e53e3e; width:90px;" onclick="adminDeleteUser()">Delete</button>
-            </div>
-        </div>
-        <h4 style="color:#718096; font-size:13px; margin:10px 0 5px 0;">REALTIME USERS LIST</h4>
-        <div id="admin-db-list-view"></div>
+    <div id="panel-admin" class="screen-panel">
+        <h3>Admin System Panel</h3>
+        <input type="text" id="adm-uid" class="input-3d" placeholder="Account Number ID (Username)">
+        <input type="text" id="adm-name" class="input-3d" placeholder="Customer Name">
+        <input type="text" id="adm-pass" class="input-3d" placeholder="Set Password">
+        <input type="number" id="adm-bal" class="input-3d" placeholder="Initialize Balance">
+        <button class="btn-3d" style="margin-bottom: 10px;" onclick="adminCommitUser()">Save User Structure</button>
+        <button class="btn-3d" style="color: red;" onclick="location.reload()">Logout</button>
     </div>
 
-    <div id="panel-user-app" style="display: none; flex-direction: column; height: 100%;">
-        <div class="app-header">
-            <span id="app-view-title">Dialer</span>
-            <button class="btn-logout" onclick="location.reload()">Logout</button>
-        </div>
+    <div id="panel-user-app" class="screen-panel">
         <div class="nav-tabs">
             <div class="tab-item active-tab" id="tab-dialpad" onclick="userRoute('dialpad')">📞</div>
-            <div class="tab-item" id="tab-logs" onclick="userRoute('logs')">🕒</div>
             <div class="tab-item" id="tab-contacts" onclick="userRoute('contacts')">👤</div>
-            <div class="tab-item" id="tab-chat" onclick="userRoute('chat')">💬</div>
             <div class="tab-item" id="tab-settings" onclick="userRoute('settings')">⚙</div>
         </div>
 
-        <div id="user-dialpad" class="screen-panel active-panel" style="padding:15px 0;">
-            <div style="display:flex; justify-content:space-between; padding:0 22px; color:#718096; font-size:14px;">
-                <span>Available Balance</span><strong id="usr-live-balance" style="color:#38a169;">BDT 0.00</strong>
-            </div>
-            <div class="dial-view" id="dial-display-box"></div>
+        <div id="user-dialpad" class="screen-panel active-panel">
+            <div id="dial-display-box" class="input-3d" style="height: 55px; font-size: 24px; text-align: center; font-weight: bold; padding-top: 10px;"></div>
             <div class="dial-grid">
                 <button class="dial-btn" onclick="dialAppend('1')">1</button>
                 <button class="dial-btn" onclick="dialAppend('2')">2</button>
@@ -73,49 +167,43 @@
                 <button class="dial-btn" onclick="dialAppend('0')">0</button>
                 <button class="dial-btn" onclick="dialAppend('#')">#</button>
             </div>
-            <div style="display:flex; justify-content:center; align-items:center; position:relative;">
-                <button class="call-btn-trigger" onclick="initiateVoiceOutbound()">📞</button>
-                <span style="position:absolute; right:55px; font-size:24px; cursor:pointer; color:#a0aec0; top:42px;" onclick="dialBackspace()">⌫</span>
+            <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                <button class="btn-3d" style="border-radius: 50%; width: 60px; height: 60px; font-size: 20px;" onclick="openCallOptions()">📞</button>
+                <button class="btn-3d" style="border-radius: 50%; width: 60px; height: 60px; font-size: 20px;" onclick="dialBackspace()">⌫</button>
             </div>
         </div>
-
-        <div id="user-logs" class="screen-panel"><div id="logs-list-render"></div></div>
 
         <div id="user-contacts" class="screen-panel">
-            <button class="btn-primary" onclick="syncDeviceContacts()">Grant Native Contacts Stream</button>
-            <div id="contacts-list-render" style="margin-top:15px;"></div>
-        </div>
-
-        <div id="user-chat" class="screen-panel">
-            <input type="text" id="chat-recipient" class="input-field" placeholder="Target Receiver Node ID">
-            <div class="chat-window" id="chat-stream-render"></div>
-            <div style="display:flex; gap:6px;">
-                <input type="text" id="chat-text-payload" class="input-field" style="margin:0;" placeholder="Message packet...">
-                <button class="btn-primary" style="width:75px; margin:0;" onclick="dispatchSecureMessage()">Send</button>
-            </div>
+            <h4>System Contact List</h4>
+            <div id="contacts-render-box" style="overflow-y: auto; height: 100%;"></div>
         </div>
 
         <div id="user-settings" class="screen-panel">
-            <div style="background:#f7fafc; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #edf2f7;">
-                <small style="color:#a0aec0; font-weight:bold; letter-spacing:0.5px;">ACCOUNT METADATA</small>
-                <div style="margin-top:10px; font-size:16px; color:#1a202c;">Active Node ID: <span id="lbl-profile-uid" style="font-weight:600;">-</span></div>
+            <div class="input-3d" style="height: auto;">
+                <div>📦 <strong>Account Name:</strong> <span id="lbl-cust-name">-</span></div>
+                <div style="margin-top: 5px;">🆔 <strong>IP Number:</strong> <span id="lbl-ip-num">-</span></div>
+                <div style="margin-top: 5px;">💰 <strong>Balance:</strong> <span id="lbl-live-bal" style="color: green; font-weight: bold;">BDT 0.00</span></div>
             </div>
-            <div style="background:#f7fafc; padding:15px; border-radius:10px; border:1px solid #edf2f7;">
-                <small style="color:#a0aec0; font-weight:bold; letter-spacing:0.5px;">REQUEST BALANCE REFILL</small>
-                <input type="number" id="req-bal-val" class="input-field" placeholder="Amount Packet (BDT)">
-                <button class="btn-primary" style="background:#38a169;" onclick="triggerRefillRequest()">Transmit Request to Telegram</button>
-            </div>
+            <h4>Add Balance Trigger</h4>
+            <input type="number" id="refill-input" class="input-3d" placeholder="Enter Refill Amount">
+            <button class="btn-3d" onclick="trigger3DRefillRequest()">Add Balance Packet</button>
         </div>
     </div>
 
     <div id="call-overlay-window" class="calling-overlay">
-        <div style="text-align: center;">
-            <div style="font-size: 30px; font-weight: 600;" id="call-view-target-num">0000</div>
-            <div style="font-size: 14px; color: #4299e1; margin-top: 6px; font-weight: 500;" id="call-view-status">Connecting...</div>
+        <div>
+            <h2 id="call-view-target-num" style="margin: 0; text-align: center;">0000</h2>
+            <div id="call-view-status" style="text-align: center; color: #0066cc; font-weight: 500; margin-top: 5px;">Connecting...</div>
+            <div id="call-live-timer" style="text-align: center; font-size: 20px; font-weight: bold; margin-top: 10px; color: #4a5568; display: none;">00:00</div>
         </div>
-        <div style="width:115px; height:115px; background:#1a202c; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:50px; border:2px solid #2d3748;">👤</div>
-        <button class="hangup-btn" onclick="terminateActiveSession(true)">❌</button>
+
+        <div id="video-stream-container" class="video-box">
+            <video id="remoteVideoTrack" autoplay playsinline></video>
+        </div>
+
+        <button class="btn-3d" style="color: red; border-radius: 50%; width: 65px; height: 65px; font-size: 24px;" onclick="terminateActiveSession(true)">❌</button>
     </div>
+
 </div>
 
 <script>
@@ -126,13 +214,12 @@
     let webrtcPeerConnection = null;
     let localMicAudioStream = null;
     let currentRemoteActiveTarget = "";
-
-    const iceConfiguration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+    let callTimerInterval = null;
+    let totalSeconds = 0;
 
     function executeAuthentication() {
         const username = document.getElementById('login-user').value.trim();
         const password = document.getElementById('login-pass').value.trim();
-        if(!username || !password) return alert("All credentials required.");
 
         fetch('/api/login', {
             method: 'POST',
@@ -140,165 +227,120 @@
             body: JSON.stringify({ username, password })
         }).then(res => res.json()).then(data => {
             if (data.success) {
-                document.getElementById('panel-login').style.display = 'none';
-                
+                document.getElementById('panel-login').classList.remove('active-panel');
                 if (data.role === "admin") {
-                    document.getElementById('panel-admin').style.display = 'block';
-                    renderAdminDatabaseTable(data.users);
+                    document.getElementById('panel-admin').classList.add('active-panel');
                 } else {
                     currentSessionUid = username;
                     currentSessionUser = data.user;
-                    document.getElementById('panel-user-app').style.display = 'flex';
-                    document.getElementById('lbl-profile-uid').innerText = currentSessionUid;
+                    document.getElementById('panel-user-app').classList.add('active-panel');
                     
-                    syncUserDatabaseState(currentSessionUser.balance, currentSessionUser.logs, currentSessionUser.messages);
+                    document.getElementById('lbl-cust-name').innerText = currentSessionUser.name || username;
+                    document.getElementById('lbl-ip-num').innerText = username;
+                    document.getElementById('lbl-live-bal').innerText = "BDT " + currentSessionUser.balance;
+
                     socket.emit('register-node', currentSessionUid);
+                    loadContactProfiles();
                     userRoute('dialpad');
                 }
             } else { alert(data.message); }
         });
     }
 
-    // ADMIN: DATABASE RENDER (Fixed Structure)
-    function renderAdminDatabaseTable(users) {
-        const box = document.getElementById('admin-db-list-view');
-        box.innerHTML = "";
-        if (!users || Object.keys(users).length === 0) {
-            box.innerHTML = `<p style="color:#718096; text-align:center;">No users registered yet.</p>`;
-            return;
-        }
-        for (let u in users) {
-            box.innerHTML += `<div style="padding:12px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:6px; font-size:14px; display:flex; justify-content:space-between; align-items:center;">
-                <div><strong>Node ID: ${u}</strong><br><span style="color:#718096;">Pass: ${users[u].password} | Bal: BDT ${users[u].balance}</span></div>
-                <button class="btn-logout" style="background:#0066cc; color:#fff; padding:4px 10px; border-radius:5px;" onclick="populateAdminForm('${u}','${users[u].password}','${users[u].balance}')">Modify</button>
-            </div>`;
-        }
-    }
-
-    function populateAdminForm(u, p, b) {
-        document.getElementById('adm-uid').value = u;
-        document.getElementById('adm-pass').value = p;
-        document.getElementById('adm-bal').value = b;
-    }
-
-    // ADMIN: SAVE / UPDATE INTERACTION (Fixed API routing payload)
-    function adminCommitUser() {
-        const adminUser = document.getElementById('login-user').value.trim();
-        const adminPass = document.getElementById('login-pass').value.trim();
-        const targetUser = document.getElementById('adm-uid').value.trim();
-        const password = document.getElementById('adm-pass').value.trim();
-        const balance = document.getElementById('adm-bal').value.trim();
-
-        if(!targetUser || !password) return alert("User ID and Password required.");
-
-        fetch('/api/admin/save-user', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adminUser, adminPass, targetUser, password, balance })
-        }).then(res => res.json()).then(data => {
-            if (data.success) {
-                alert("Database update completed successfully!");
-                renderAdminDatabaseTable(data.users);
-                clearAdminInputs();
-            } else {
-                alert(data.message || "Failed to save user.");
-            }
-        }).catch(err => alert("Error communicating with server."));
-    }
-
-    function adminDeleteUser() {
-        const adminUser = document.getElementById('login-user').value.trim();
-        const adminPass = document.getElementById('login-pass').value.trim();
-        const targetUser = document.getElementById('adm-uid').value.trim();
-        if(!targetUser) return alert("Select a target user to delete.");
-
-        if(confirm("Delete User ID " + targetUser + " permanently?")) {
-            fetch('/api/admin/delete-user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adminUser, adminPass, targetUser })
-            }).then(res => res.json()).then(data => {
-                if(data.success) {
-                    alert("User removed.");
-                    renderAdminDatabaseTable(data.users);
-                    clearAdminInputs();
-                } else { alert(data.message); }
-            });
-        }
-    }
-
-    function clearAdminInputs() {
-        document.getElementById('adm-uid').value = "";
-        document.getElementById('adm-pass').value = "";
-        document.getElementById('adm-bal').value = "";
-    }
-
-    function userRoute(p) {
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
-        document.getElementById('panel-user-app').querySelectorAll('.screen-panel').forEach(p => p.classList.remove('active-panel'));
-        document.getElementById('tab-' + p).classList.add('active-tab');
-        document.getElementById('user-' + p).classList.add('active-panel');
-        document.getElementById('app-view-title').innerText = p.toUpperCase();
-    }
-
     function dialAppend(n) { typedCallString += n; renderDialScreen(); }
     function dialBackspace() { typedCallString = typedCallString.slice(0, -1); renderDialScreen(); }
     function renderDialScreen() { document.getElementById('dial-display-box').innerText = typedCallString; }
 
-    function setupWebRTCPeer(targetUser) {
-        webrtcPeerConnection = new RTCPeerConnection(iceConfiguration);
-        
-        webrtcPeerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                socket.emit('ice-candidate', { target: targetUser, candidate: event.candidate });
-            }
-        };
-
-        webrtcPeerConnection.ontrack = (event) => {
-            const remoteAudio = document.getElementById('remoteAudioNode');
-            if (remoteAudio) {
-                remoteAudio.srcObject = event.streams[0];
-            }
-        };
-
-        if (localMicAudioStream) {
-            localMicAudioStream.getTracks().forEach(track => webrtcPeerConnection.addTrack(track, localMicAudioStream));
-        }
+    function userRoute(p) {
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
+        document.getElementById('panel-user-app').querySelectorAll('.screen-panel').forEach(panel => panel.classList.remove('active-panel'));
+        document.getElementById('tab-' + p).classList.add('active-tab');
+        document.getElementById('user-' + p).classList.add('active-panel');
     }
 
-    function initiateVoiceOutbound() {
-        if(!typedCallString) return;
-        currentRemoteActiveTarget = typedCallString;
+    // ১২৩ আইভিআর (IVR) কাস্টমার কেয়ার ব্যালেন্স সিস্টেম
+    function triggerIVRSystem() {
+        const bal = currentSessionUser.balance;
+        const ivrText = `আপনার বর্তমান ব্যালেন্স হচ্ছে ${bal} টাকা।`;
+        const speech = new SpeechSynthesisUtterance(ivrText);
+        speech.lang = 'bn-BD';
+        speech.rate = 0.9;
+        
+        document.getElementById('call-view-target-num').innerText = "123";
+        document.getElementById('call-view-status').innerText = "Playing IVR Account Stream...";
+        document.getElementById('call-overlay-window').style.display = 'flex';
 
-        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        window.speechSynthesis.speak(speech);
+        speech.onend = () => { terminateActiveSession(false); };
+    }
+
+    function openCallOptions() {
+        if(!typedCallString) return;
+        if(typedCallString === "123") { return triggerIVRSystem(); }
+
+        const opt = confirm("Press [OK] for HD Video Call or [Cancel] for Ultra-HD Audio Call.");
+        initiateVoiceOutbound(opt ? 'video' : 'audio');
+    }
+
+    // লাইভ টাইমার স্টার্ট ফাংশন
+    function startCallTimer() {
+        totalSeconds = 0;
+        const timerBox = document.getElementById('call-live-timer');
+        timerBox.style.display = 'block';
+        timerBox.innerText = "00:00";
+        
+        callTimerInterval = setInterval(() => {
+            totalSeconds++;
+            let min = Math.floor(totalSeconds / 60);
+            let sec = totalSeconds % 60;
+            timerBox.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}`;
+        }, 1000);
+    }
+
+    function initiateVoiceOutbound(type) {
+        currentRemoteActiveTarget = typedCallString;
+        const constraints = { audio: true, video: type === 'video' ? { width: 1280, height: 720 } : false };
+
+        navigator.mediaDevices.getUserMedia(constraints).then(stream => {
             localMicAudioStream = stream;
             document.getElementById('call-view-target-num').innerText = currentRemoteActiveTarget;
             document.getElementById('call-overlay-window').style.display = 'flex';
-            document.getElementById('call-view-status').innerText = "Calling Node...";
 
-            setupWebRTCPeer(currentRemoteActiveTarget);
+            if(type === 'video') document.getElementById('video-stream-container').style.display = 'block';
 
-            webrtcPeerConnection.createOffer().then(offer => {
-                return webrtcPeerConnection.setLocalDescription(offer);
-            }).then(() => {
-                socket.emit('call-node', { target: currentRemoteActiveTarget, from: currentSessionUid, offer: webrtcPeerConnection.localDescription });
+            webrtcPeerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+            stream.getTracks().forEach(track => webrtcPeerConnection.addTrack(track, stream));
+
+            webrtcPeerConnection.ontrack = (e) => {
+                if(type === 'video') document.getElementById('remoteVideoTrack').srcObject = e.streams[0];
+                else document.getElementById('remoteAudioNode').srcObject = e.streams[0];
+            };
+
+            webrtcPeerConnection.createOffer().then(offer => webrtcPeerConnection.setLocalDescription(offer)).then(() => {
+                socket.emit('call-node', { target: currentRemoteActiveTarget, from: currentSessionUid, offer: webrtcPeerConnection.localDescription, callType: type });
             });
-        }).catch(err => {
-            alert("Microphone permission required to call.");
         });
     }
 
     socket.on('incoming-call', (data) => {
         currentRemoteActiveTarget = data.from;
-        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-            let accept = confirm("Incoming Call from Node: " + data.from + ". Answer?");
-            if (accept) {
+        let accept = confirm(`Incoming ${data.callType.toUpperCase()} Call from Node: ${data.from}. Accept?`);
+        if(accept) {
+            const constraints = { audio: true, video: data.callType === 'video' ? { width: 1280, height: 720 } : false };
+            navigator.mediaDevices.getUserMedia(constraints).then(stream => {
                 localMicAudioStream = stream;
                 document.getElementById('call-view-target-num').innerText = currentRemoteActiveTarget;
                 document.getElementById('call-overlay-window').style.display = 'flex';
-                document.getElementById('call-view-status').innerText = "Connecting Audio...";
+                
+                if(data.callType === 'video') document.getElementById('video-stream-container').style.display = 'block';
 
-                setupWebRTCPeer(currentRemoteActiveTarget);
+                webrtcPeerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+                stream.getTracks().forEach(track => webrtcPeerConnection.addTrack(track, stream));
+
+                webrtcPeerConnection.ontrack = (e) => {
+                    if(data.callType === 'video') document.getElementById('remoteVideoTrack').srcObject = e.streams[0];
+                    else document.getElementById('remoteAudioNode').srcObject = e.streams[0];
+                };
 
                 webrtcPeerConnection.setRemoteDescription(new RTCSessionDescription(data.offer)).then(() => {
                     return webrtcPeerConnection.createAnswer();
@@ -306,55 +348,84 @@
                     return webrtcPeerConnection.setLocalDescription(ans);
                 }).then(() => {
                     socket.emit('call-accept', { target: currentRemoteActiveTarget, answer: webrtcPeerConnection.localDescription });
+                    startCallTimer();
                 });
-            } else {
-                stream.getTracks().forEach(t => t.stop());
-                socket.emit('hangup-call', { target: currentRemoteActiveTarget });
-            }
-        }).catch(() => {
-            alert("Microphone error on receiver end.");
-        });
+            });
+        } else {
+            socket.emit('hangup-call', { target: currentRemoteActiveTarget });
+        }
     });
 
     socket.on('call-connected', (data) => {
-        document.getElementById('call-view-status').innerText = "Call Active • 10 poysa/min";
+        document.getElementById('call-view-status').innerText = "Active Session Stream";
         webrtcPeerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        startCallTimer();
     });
 
-    socket.on('ice-candidate', (data) => {
-        if (webrtcPeerConnection && data.candidate) {
-            webrtcPeerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e));
-        }
-    });
+    // গিটহাব সিঙ্ক ট্রিকারিং ও টেলিগ্রাম নোটিফিকেশন প্যাকেজ
+    function trigger3DRefillRequest() {
+        const amt = document.getElementById('refill-input').value;
+        if(!amt || amt <= 0) return alert("Enter valid amount");
 
-    socket.on('call-terminated', () => { terminateActiveSession(false); });
-    socket.on('force-hangup', () => { terminateActiveSession(false); alert("Insufficient balance!"); });
-
-    socket.on('call-error', (d) => { 
-        alert(d.message === "offline" ? "User is offline." : "Insufficient balance!");
-        terminateActiveSession(false);
-    });
-
-    function terminateActiveSession(notifyServer) {
-        if (notifyServer && currentRemoteActiveTarget) {
-            socket.emit('hangup-call', { target: currentRemoteActiveTarget });
-        }
-        if(webrtcPeerConnection) { webrtcPeerConnection.close(); webrtcPeerConnection = null; }
-        if(localMicAudioStream) { localMicAudioStream.getTracks().forEach(t => t.stop()); localMicAudioStream = null; }
-        document.getElementById('call-overlay-window').style.display = 'none';
-        const remoteAudio = document.getElementById('remoteAudioNode');
-        if (remoteAudio) remoteAudio.srcObject = null;
-    }
-
-    function syncUserDatabaseState(bal, logs, msgs) {
-        document.getElementById('usr-live-balance').innerText = "BDT " + bal;
-        const logBox = document.getElementById('logs-list-render');
-        logBox.innerHTML = logs.length === 0 ? '<p style="text-align:center;font-size:14px;color:#718096;">No call logs.</p>' : '';
-        logs.forEach(l => {
-            logBox.innerHTML += `<div style="padding:12px; border-bottom:1px solid #edf2f7; font-size:14px;">Dialed: <strong>${l.target}</strong><br><small style="color:#a0aec0;">${l.time}</small><span style="color:#e53e3e; float:right;">-BDT ${l.cost}</span></div>`;
+        fetch('/api/user/request-balance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: currentSessionUid,
+                name: currentSessionUser.name,
+                currentBalance: currentSessionUser.balance,
+                amount: amt
+            })
+        }).then(() => {
+            alert("Balance Packet Pinged to Admin Telegram Pipeline.");
+            document.getElementById('refill-input').value = "";
         });
     }
-    socket.on('balance-sync', (d) => { document.getElementById('usr-live-balance').innerText = "BDT " + d.balance; });
+
+    function loadContactProfiles() {
+        fetch('/api/users-list').then(res => res.json()).then(users => {
+            const box = document.getElementById('contacts-render-box');
+            box.innerHTML = "";
+            for(let u in users) {
+                box.innerHTML += `<div class="input-3d" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="typedCallString='${u}'; renderDialScreen(); userRoute('dialpad');">
+                    <div><strong>${users[u].name}</strong><br><small style="color:#718096;">Node: ${u}</small></div>
+                    <span style="color:#0066cc;">📞</span>
+                </div>`;
+            }
+        });
+    }
+
+    function adminCommitUser() {
+        const adminUser = document.getElementById('login-user').value.trim();
+        const adminPass = document.getElementById('login-pass').value.trim();
+        const targetUser = document.getElementById('adm-uid').value.trim();
+        const name = document.getElementById('adm-name').value.trim();
+        const password = document.getElementById('adm-pass').value.trim();
+        const balance = document.getElementById('adm-bal').value.trim();
+
+        fetch('/api/admin/save-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminUser, adminPass, targetUser, name, password, balance })
+        }).then(res => res.json()).then(data => {
+            if(data.success) alert("Admin Mutation Applied to Matrix Local JSON Storage.");
+        });
+    }
+
+    socket.on('call-terminated', () => { terminateActiveSession(false); });
+    socket.on('balance-sync', (d) => { document.getElementById('lbl-live-bal').innerText = "BDT " + d.balance; });
+
+    function terminateActiveSession(notify) {
+        if(notify && currentRemoteActiveTarget) socket.emit('hangup-call', { target: currentRemoteActiveTarget });
+        if(callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
+        if(webrtcPeerConnection) { webrtcPeerConnection.close(); webrtcPeerConnection = null; }
+        if(localMicAudioStream) { localMicAudioStream.getTracks().forEach(t => t.stop()); localMicAudioStream = null; }
+        
+        window.speechSynthesis.cancel();
+        document.getElementById('call-overlay-window').style.display = 'none';
+        document.getElementById('video-stream-container').style.display = 'none';
+        document.getElementById('call-live-timer').style.display = 'none';
+    }
 </script>
 </body>
 </html>
