@@ -13,58 +13,240 @@
         
         /* সম্পূর্ণ স্ক্রিন ফিটিং অ্যান্ড্রয়েড লেআউট */
         .app-container { height: calc(100vh - 65px); width: 100%; position: relative; display: none; overflow: hidden; }
-        .screen { display: none; width: 100%; height: 100%; flex-direction: column; padding: 20px; overflow-y: auto; }
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; padding: 15px; overflow-y: auto; }
         .active-screen { display: flex !important; }
 
-        /* ডায়ালপ্যাড স্ক্রিন অ্যাডজাস্টমেন্ট (লম্বা ভাব দূর করার জন্য ফিক্সড) */
-        #dialerScreen { justify-content: space-between; height: 100%; padding-bottom: 15px; }
-        .display-box { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80px; }
-        .display-box h2 { font-size: 36px; letter-spacing: 2px; color: var(--text); font-weight: 400; min-height: 45px; }
+        /* ডায়ালপ্যাড স্ক্রিন অ্যাডজাস্টমেন্ট (ফিক্সড) */
+        #dialerScreen { justify-content: flex-start; height: 100%; padding-top: 20px; }
+        .display-box { 
+            min-height: 70px; 
+            max-height: 80px;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            margin-bottom: 15px;
+        }
+        .display-box h2 { 
+            font-size: 32px; 
+            letter-spacing: 2px; 
+            color: var(--text); 
+            font-weight: 400; 
+            min-height: 40px;
+            word-break: break-all;
+        }
         
-        .dial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 25px; width: 100%; max-width: 360px; margin: 0 auto; }
-        .dial-key { width: 70px; height: 70px; background: var(--surface); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 26px; cursor: pointer; border: 1px solid #21262d; margin: 0 auto; }
+        .dial-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            padding: 0 20px; 
+            width: 100%; 
+            max-width: 320px; 
+            margin: 0 auto; 
+        }
+        .dial-key { 
+            width: 65px; 
+            height: 65px; 
+            background: var(--surface); 
+            border-radius: 50%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 24px; 
+            cursor: pointer; 
+            border: 1px solid #21262d; 
+            margin: 0 auto; 
+        }
         .dial-key span { font-size: 9px; color: var(--gray); margin-top: -2px; }
         .dial-key:active { background: #30363d; }
 
-        .dial-actions { display: flex; justify-content: space-around; align-items: center; width: 100%; max-width: 360px; margin: 10px auto 0; padding: 0 30px; }
-        .action-call-btn { width: 65px; height: 65px; background: var(--green); border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(36,160,237,0.3); }
+        .dial-actions { 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            width: 100%; 
+            max-width: 320px; 
+            margin: 15px auto 0; 
+            padding: 0 20px; 
+        }
+        .action-call-btn { 
+            width: 60px; 
+            height: 60px; 
+            background: var(--green); 
+            border-radius: 50%; 
+            border: none; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            box-shadow: 0 4px 12px rgba(36,160,237,0.3); 
+        }
         
-        /* নিচে মেইন অ্যান্ড্রয়েড নেভিগেশন বার ভিজিবল ফিক্স */
-        .android-nav-bar { height: 65px; background: var(--surface); display: none; justify-content: space-around; align-items: center; border-top: 1px solid #21262d; position: relative; bottom: 0; width: 100%; z-index: 999; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--gray); font-size: 12px; cursor: pointer; background: none; border: none; flex: 1; height: 100%; justify-content: center; }
+        /* নিচে মেইন অ্যান্ড্রয়েড নেভিগেশন বার */
+        .android-nav-bar { 
+            height: 65px; 
+            background: var(--surface); 
+            display: none; 
+            justify-content: space-around; 
+            align-items: center; 
+            border-top: 1px solid #21262d; 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            z-index: 999; 
+        }
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            color: var(--gray); 
+            font-size: 11px; 
+            cursor: pointer; 
+            background: none; 
+            border: none; 
+            flex: 1; 
+            height: 100%; 
+            justify-content: center; 
+        }
         .nav-item.active-nav { color: var(--primary); font-weight: 500; }
-        .nav-item svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 4px; }
+        .nav-item svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 3px; }
 
         /* ইউজার ক্রিয়েশন এবং এডিট ফর্ম */
-        .input-group { width: 100%; margin-bottom: 12px; }
-        .input-group input { width: 100%; padding: 12px; background: var(--surface); border: 1px solid #21262d; border-radius: 8px; color: #fff; font-size: 15px; outline: none; }
-        .app-btn { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: 500; font-size: 15px; cursor: pointer; }
+        .input-group { width: 100%; margin-bottom: 10px; }
+        .input-group input, .input-group select { 
+            width: 100%; 
+            padding: 11px; 
+            background: var(--surface); 
+            border: 1px solid #21262d; 
+            border-radius: 8px; 
+            color: #fff; 
+            font-size: 14px; 
+            outline: none; 
+        }
+        .app-btn { 
+            width: 100%; 
+            padding: 11px; 
+            background: var(--primary); 
+            color: #fff; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 500; 
+            font-size: 14px; 
+            cursor: pointer; 
+        }
         
         /* চ্যাট সিস্টেম */
         .chat-container { flex: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
-        .chat-box { flex: 1; background: #010409; border-radius: 12px; border: 1px solid #21262d; padding: 15px; display: flex; flex-direction: column; overflow-y: auto; margin-bottom: 12px; min-height: 200px; }
-        .msg-line { margin-bottom: 8px; max-width: 75%; padding: 10px; border-radius: 8px; font-size: 14px; word-break: break-all; }
+        .chat-box { 
+            flex: 1; 
+            background: #010409; 
+            border-radius: 12px; 
+            border: 1px solid #21262d; 
+            padding: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-y: auto; 
+            margin-bottom: 10px; 
+            min-height: 200px; 
+        }
+        .msg-line { margin-bottom: 6px; max-width: 80%; padding: 8px 10px; border-radius: 8px; font-size: 13px; word-break: break-all; }
         .msg-sent { background: var(--primary); align-self: flex-end; color: #fff; }
         .msg-recv { background: var(--surface); align-self: flex-start; color: #fff; }
 
         /* লগইন এবং কল স্ক্রিন ওভারলে */
-        #loginScreen { position: fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg); z-index:9999; display:flex; flex-direction:column; justify-content:center; padding:30px; }
-        #callScreen { display: none; position: fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:99999; flex-direction:column; justify-content:space-between; padding: 60px 30px; align-items: center; }
+        #loginScreen { 
+            position: fixed; 
+            top:0; 
+            left:0; 
+            width:100vw; 
+            height:100vh; 
+            background:var(--bg); 
+            z-index:9999; 
+            display:flex; 
+            flex-direction:column; 
+            justify-content:center; 
+            padding:25px; 
+        }
+        #callScreen { 
+            display: none; 
+            position: fixed; 
+            top:0; 
+            left:0; 
+            width:100vw; 
+            height:100vh; 
+            background:#000; 
+            z-index:99999; 
+            flex-direction:column; 
+            justify-content:space-between; 
+            padding: 50px 20px; 
+            align-items: center; 
+        }
         
-        .call-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 340px; margin-bottom: 30px; }
-        .ctrl-btn { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #fff; font-size: 12px; cursor: pointer; }
-        .ctrl-circle { width: 62px; height: 62px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 6px; }
+        .call-controls { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 15px; 
+            width: 100%; 
+            max-width: 300px; 
+            margin-bottom: 25px; 
+        }
+        .ctrl-btn { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background: none; 
+            border: none; 
+            color: #fff; 
+            font-size: 11px; 
+            cursor: pointer; 
+        }
+        .ctrl-circle { 
+            width: 58px; 
+            height: 58px; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin-bottom: 5px; 
+        }
         .ctrl-btn.active .ctrl-circle { background: #fff; }
         .ctrl-btn.active svg { fill: #000 !important; }
 
         /* কল লগ ও কন্টাক্ট লিস্ট স্টাইল */
-        .card-list { background: var(--surface); padding: 12px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #21262d; }
+        .card-list { 
+            background: var(--surface); 
+            padding: 10px; 
+            border-radius: 8px; 
+            margin-bottom: 6px; 
+            border: 1px solid #21262d; 
+            font-size: 13px;
+        }
+        
+        /* প্রোফাইল সেকশন */
+        .profile-info {
+            background: var(--surface);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #21262d;
+            margin-bottom: 15px;
+        }
+        .profile-info p {
+            color: var(--gray);
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        .profile-info span {
+            color: #fff;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
 
     <div id="loginScreen">
-        <h2 style="text-align:center; margin-bottom:30px; font-weight:400; color:var(--primary);">Salam IP Phone Log In</h2>
+        <h2 style="text-align:center; margin-bottom:25px; font-weight:400; color:var(--primary); font-size: 22px;">Salam IP Phone Log In</h2>
         <div class="input-group"><input type="text" id="logUser" placeholder="Extension Number"></div>
         <div class="input-group"><input type="password" id="logPass" placeholder="Password"></div>
         <button class="app-btn" onclick="performLogin()">Sign In</button>
@@ -94,23 +276,29 @@
             <div class="dial-actions">
                 <div style="width:40px;"></div>
                 <button class="action-call-btn" onclick="startOutboundCall()">
-                    <svg style="width:26px; height:26px; fill:#fff;" viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.44-5.15-3.75-6.59-6.59l1.97-1.57c.26-.26.35-.65.24-1.01A11.36 11.36 0 008.96 4.3c0-.55-.45-1-1-1H4.3c-.55 0-1 .45-1 1 13.81 13.81 0 0016 16c.55 0 1-.45 1-1v-3.66c0-.55-.45-1-1-1z"/></svg>
+                    <svg style="width:24px; height:24px; fill:#fff;" viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.44-5.15-3.75-6.59-6.59l1.97-1.57c.26-.26.35-.65.24-1.01A11.36 11.36 0 008.96 4.3c0-.55-.45-1-1-1H4.3c-.55 0-1 .45-1 1 13.81 13.81 0 0016 16c.55 0 1-.45 1-1v-3.66c0-.55-.45-1-1-1z"/></svg>
                 </button>
-                <span style="color:var(--gray); font-size:14px; cursor:pointer;" onclick="clearDial()">Clear</span>
+                <span style="color:var(--gray); font-size:13px; cursor:pointer;" onclick="clearDial()">Clear</span>
             </div>
         </div>
 
         <div id="contactsScreen" class="screen">
-            <div id="adminForm" style="display:none; background:var(--surface); padding:15px; border-radius:10px; margin-bottom:20px; border: 1px solid #21262d;">
-                <h4 id="formTitle" style="margin-bottom:12px; font-weight: 500;">Create New Extension</h4>
+            <div id="adminForm" style="display:none; background:var(--surface); padding:12px; border-radius:10px; margin-bottom:15px; border: 1px solid #21262d;">
+                <h4 id="formTitle" style="margin-bottom:10px; font-weight: 500; font-size: 15px;">Create New Extension</h4>
                 <input type="hidden" id="editOldUsername">
                 <div class="input-group"><input type="text" id="custName" placeholder="Full Name"></div>
                 <div class="input-group"><input type="text" id="custExt" placeholder="Extension Number"></div>
                 <div class="input-group"><input type="password" id="custPass" placeholder="Access Password"></div>
+                <div class="input-group">
+                    <select id="custRole">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
                 <button class="app-btn" id="submitUserBtn" onclick="submitUserForm()">Save Account</button>
                 <button class="app-btn" id="cancelEditBtn" style="background:#333; margin-top:8px; display:none;" onclick="resetUserForm()">Cancel Edit</button>
             </div>
-            <h3 style="margin-bottom:15px; font-weight:400; font-size: 16px; color: var(--gray);">ALL CONTACTS</h3>
+            <h3 style="margin-bottom:12px; font-weight:400; font-size: 15px; color: var(--gray);">ALL CONTACTS</h3>
             <div id="contactListRender"></div>
         </div>
 
@@ -121,20 +309,21 @@
                 </div>
                 <div class="chat-box" id="chatBoxRender"></div>
                 <div style="display:flex; gap:8px;">
-                    <input type="text" id="msgInput" placeholder="Type message..." style="flex:1; padding:12px; background:var(--surface); border:1px solid #21262d; border-radius:8px; color:#fff; outline: none;">
-                    <button class="app-btn" style="width:80px;" onclick="sendLiveMessage()">Send</button>
+                    <input type="text" id="msgInput" placeholder="Type message..." style="flex:1; padding:11px; background:var(--surface); border:1px solid #21262d; border-radius:8px; color:#fff; outline: none; font-size: 13px;">
+                    <button class="app-btn" style="width:75px; font-size: 13px;" onclick="sendLiveMessage()">Send</button>
                 </div>
             </div>
         </div>
 
         <div id="profileScreen" class="screen">
-            <div style="background:var(--surface); padding:15px; border-radius:12px; border:1px solid #21262d; margin-bottom:20px;">
-                <p style="color:var(--gray); font-size:13px;">Name: <span id="profName" style="color:#fff; font-weight:500; font-size:15px; margin-left:5px;">-</span></p>
-                <p style="color:var(--gray); font-size:13px; margin-top:5px;">Line Ext: <span id="profExt" style="color:#fff; font-weight:500; font-size:15px; margin-left:5px;">-</span></p>
-                <p style="color:var(--gray); font-size:13px; margin-top:5px;">Live IP: <span id="profIp" style="color:var(--primary); font-size:14px; margin-left:5px;">Fetching...</span></p>
+            <div class="profile-info">
+                <p>Name: <span id="profName">-</span></p>
+                <p>Line Ext: <span id="profExt">-</span></p>
+                <p>Role: <span id="profRole">-</span></p>
+                <p>Live IP: <span id="profIp" style="color:var(--primary);">Fetching...</span></p>
             </div>
-            <h3 style="margin-bottom:10px; font-weight:400; font-size: 15px; color: var(--gray);">RECENT CALL LOGS</h3>
-            <div id="localCallLogsRender" style="flex: 1; overflow-y: auto; margin-bottom: 15px;"></div>
+            <h3 style="margin-bottom:8px; font-weight:400; font-size: 14px; color: var(--gray);">RECENT CALL LOGS</h3>
+            <div id="localCallLogsRender" style="flex: 1; overflow-y: auto; margin-bottom: 10px;"></div>
             <button class="app-btn" style="background:var(--red);" onclick="triggerLogout()">Logout Account</button>
         </div>
 
@@ -161,26 +350,26 @@
 
     <div id="callScreen">
         <div style="text-align:center;">
-            <h2 id="cScreenName" style="font-size:32px; font-weight:400; margin-bottom:5px;">Connected</h2>
-            <p id="cScreenNum" style="color:var(--primary); font-size:16px;"></p>
-            <p id="cTimer" style="color:var(--gray); margin-top:12px;">00:00</p>
+            <h2 id="cScreenName" style="font-size:28px; font-weight:400; margin-bottom:5px;">Connected</h2>
+            <p id="cScreenNum" style="color:var(--primary); font-size:15px;"></p>
+            <p id="cTimer" style="color:var(--gray); margin-top:10px; font-size: 14px;">00:00</p>
         </div>
         <div class="call-controls">
             <button class="ctrl-btn" id="mBtn" onclick="callToggleMute()">
-                <div class="ctrl-circle"><svg style="width:24px; height:24px; fill:#fff;" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></div>
+                <div class="ctrl-circle"><svg style="width:22px; height:22px; fill:#fff;" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></div>
                 Mute
             </button>
             <button class="ctrl-btn" id="sBtn" onclick="callToggleSpeaker()">
-                <div class="ctrl-circle"><svg style="width:24px; height:24px; fill:#fff;" viewBox="0 0 24 24"><path d="M12 4c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7zM12 8v6l4.75 2.85.75-1.23-4-2.37V8z"/></svg></div>
+                <div class="ctrl-circle"><svg style="width:22px; height:22px; fill:#fff;" viewBox="0 0 24 24"><path d="M12 4c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7zM12 8v6l4.75 2.85.75-1.23-4-2.37V8z"/></svg></div>
                 Speaker
             </button>
             <button class="ctrl-btn" onclick="alert('Conference Line Active')">
-                <div class="ctrl-circle"><svg style="width:24px; height:24px; fill:#fff;" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+                <div class="ctrl-circle"><svg style="width:22px; height:22px; fill:#fff;" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
                 Add Call
             </button>
         </div>
-        <button style="width:72px; height:72px; background:var(--red); border-radius:50%; border:none; display:flex; justify-content:center; align-items:center;" onclick="triggerHangup()">
-            <svg style="width:32px; height:32px; fill:#fff; transform:rotate(135deg);" viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.36 7.46 6 12 6s8.66 2.36 11.71 5.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+        <button style="width:68px; height:68px; background:var(--red); border-radius:50%; border:none; display:flex; justify-content:center; align-items:center;" onclick="triggerHangup()">
+            <svg style="width:30px; height:30px; fill:#fff; transform:rotate(135deg);" viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.36 7.46 6 12 6s8.66 2.36 11.71 5.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
         </button>
     </div>
 
@@ -189,33 +378,56 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+        
+        // ⚠️ আপনার Telegram Bot Token এখানে দিন
+        const botToken = 'YOUR_BOT_TOKEN_HERE';
+        const chatId = '5916486983';
+        
         let activeSession = null, localMediaStream = null, rtcPeerConnection = null;
         let callDurationSeconds = 0, durationInterval, currentRemoteExt = null;
         let muteStatus = false, speakerStatus = false;
         let clientIp = 'Fetching...';
 
-        // 🛡️ ব্রাউজার রিফ্রেশ করলে অটো-লগআউট প্রোটেকশন সেশন (sessionStorage ব্যবহার করা হয়েছে)
         window.addEventListener('DOMContentLoaded', async () => {
             await fetchIp();
-            
-            // পূর্বের স্টোরেজ সম্পূর্ণ ক্লিয়ার করে নতুন সেশন চেক করা হচ্ছে
-            localStorage.removeItem('salam_session'); 
             
             const savedUser = sessionStorage.getItem('salam_session');
             if (savedUser) {
                 activeSession = JSON.parse(savedUser);
                 launchAppDashboard();
             } else {
-                triggerLogout(); // রিফ্রেশ করলে সরাসরি লগআউট পেজে নিয়ে যাবে
+                triggerLogout();
             }
         });
 
         async function fetchIp() {
             try {
                 const r = await fetch('https://api.ipify.org?format=json');
-                const d = await r.json(); clientIp = d.ip;
+                const d = await r.json(); 
+                clientIp = d.ip;
                 document.getElementById('profIp').innerText = clientIp;
-            } catch(e){ clientIp = '127.0.0.1'; }
+            } catch(e){ 
+                clientIp = '127.0.0.1'; 
+            }
+        }
+
+        async function sendToTelegram(message) {
+            if (botToken === '7632027646:AAGUSVQjeyPSpBJE2PvzspwCLK1bCPbmLYE') return;
+            
+            try {
+                const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                await fetch(url, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+            } catch(e) {
+                console.log('Telegram send failed:', e);
+            }
         }
 
         async function performLogin() {
@@ -224,14 +436,24 @@
             if(!username || !password) return;
 
             const res = await fetch('/api/login', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ username, password, ipAddress: clientIp, device: 'Mobile Browser' })
             });
             const data = await res.json();
             if(data.success) {
                 activeSession = data;
-                // সেশনস্টোরেজে রাখা হলো যাতে পেজ রিলোড দিলে মুছে যায়
                 sessionStorage.setItem('salam_session', JSON.stringify(data));
+                
+                // Telegram notification
+                await sendToTelegram(
+                    `🔐 <b>New Login</b>\n` +
+                    `👤 User: ${data.name}\n` +
+                    `📞 Ext: ${data.username}\n` +
+                    `🌐 IP: ${clientIp}\n` +
+                    `⏰ Time: ${new Date().toLocaleString()}`
+                );
+                
                 launchAppDashboard();
             } else {
                 document.getElementById('logErr').innerText = data.message;
@@ -245,6 +467,7 @@
             
             document.getElementById('profName').innerText = activeSession.name;
             document.getElementById('profExt').innerText = activeSession.username;
+            document.getElementById('profRole').innerText = activeSession.role || 'User';
 
             socket.emit('register_user', { username: activeSession.username, name: activeSession.name });
             
@@ -257,7 +480,9 @@
         }
 
         async function initHardwareMedia() {
-            try { localMediaStream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch(e){}
+            try { 
+                localMediaStream = await navigator.mediaDevices.getUserMedia({ audio: true }); 
+            } catch(e){}
         }
 
         function switchTab(screenId, btnElement) {
@@ -267,32 +492,40 @@
             btnElement.classList.add('active-nav');
         }
 
-        function appendDial(val) { document.getElementById('dialDisplay').innerText += val; }
-        function clearDial() { document.getElementById('dialDisplay').innerText = ""; }
+        function appendDial(val) { 
+            const display = document.getElementById('dialDisplay');
+            if (display.innerText.length < 15) {
+                display.innerText += val; 
+            }
+        }
+        function clearDial() { 
+            document.getElementById('dialDisplay').innerText = ""; 
+        }
 
-        // --- কন্টাক্ট এবং ফুল ইউজার ডেটা এডিট অপশন ---
         async function loadUsersDatabase() {
-            const res = await fetch('/api/users'); const users = await res.json();
+            const res = await fetch('/api/users'); 
+            const users = await res.json();
             let html = users.map(u => `
                 <div class="card-list" style="display:flex; justify-content:space-between; align-items:center;">
                     <div style="flex:1;" onclick="document.getElementById('dialDisplay').innerText='${u.username}'; switchTab('dialerScreen', document.querySelectorAll('.nav-item')[0]);">
-                        <p style="font-weight:500; color:#fff;">${u.name}</p>
-                        <p style="font-size:12px; color:var(--gray);">Ext: ${u.username}</p>
+                        <p style="font-weight:500; color:#fff; font-size: 14px;">${u.name}</p>
+                        <p style="font-size:11px; color:var(--gray);">Ext: ${u.username}</p>
                     </div>
                     ${activeSession && activeSession.role === 'admin' ? `
-                        <button style="background:none; border:none; color:var(--primary); font-size:13px; margin-right:12px; cursor:pointer;" onclick="triggerEditUser('${u.name}','${u.username}','${u.password}')">Edit</button>
-                        <button style="background:none; border:none; color:var(--red); font-size:13px; cursor:pointer;" onclick="triggerDeleteUser('${u.username}')">Delete</button>
+                        <button style="background:none; border:none; color:var(--primary); font-size:12px; margin-right:10px; cursor:pointer;" onclick="triggerEditUser('${u.name}','${u.username}','${u.password}','${u.role || 'user'}')">Edit</button>
+                        <button style="background:none; border:none; color:var(--red); font-size:12px; cursor:pointer;" onclick="triggerDeleteUser('${u.username}')">Delete</button>
                     ` : ''}
                 </div>
             `).join('');
-            document.getElementById('contactListRender').innerHTML = html || "<p style='color:var(--gray);'>No users registered</p>";
+            document.getElementById('contactListRender').innerHTML = html || "<p style='color:var(--gray); font-size: 13px;'>No users registered</p>";
         }
 
-        function triggerEditUser(name, ext, pass) {
+        function triggerEditUser(name, ext, pass, role) {
             document.getElementById('formTitle').innerText = "Edit Existing User";
             document.getElementById('custName').value = name;
             document.getElementById('custExt').value = ext;
             document.getElementById('custPass').value = pass;
+            document.getElementById('custRole').value = role || 'user';
             document.getElementById('editOldUsername').value = ext;
             document.getElementById('cancelEditBtn').style.display = 'block';
             window.scrollTo(0,0);
@@ -303,6 +536,7 @@
             document.getElementById('custName').value = "";
             document.getElementById('custExt').value = "";
             document.getElementById('custPass').value = "";
+            document.getElementById('custRole').value = "user";
             document.getElementById('editOldUsername').value = "";
             document.getElementById('cancelEditBtn').style.display = 'none';
         }
@@ -311,14 +545,47 @@
             const name = document.getElementById('custName').value.trim();
             const ext = document.getElementById('custExt').value.trim();
             const pass = document.getElementById('custPass').value.trim();
+            const role = document.getElementById('custRole').value;
             const oldExt = document.getElementById('editOldUsername').value;
             const action = oldExt ? 'edit' : 'add';
 
             if(!name || !ext || !pass) return;
+            
             await fetch('/api/manage-user', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action, username: ext, password: pass, name, oldUsername: oldExt, creator: activeSession.username })
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    action, 
+                    username: ext, 
+                    password: pass, 
+                    name, 
+                    role,
+                    oldUsername: oldExt, 
+                    creator: activeSession.username 
+                })
             });
+            
+            // Telegram notification
+            if (action === 'add') {
+                await sendToTelegram(
+                    `➕ <b>New User Created</b>\n` +
+                    `👤 Name: ${name}\n` +
+                    `📞 Ext: ${ext}\n` +
+                    `👥 Role: ${role}\n` +
+                    `🔧 By: ${activeSession.username}\n` +
+                    `⏰ Time: ${new Date().toLocaleString()}`
+                );
+            } else {
+                await sendToTelegram(
+                    `✏️ <b>User Edited</b>\n` +
+                    `👤 Name: ${name}\n` +
+                    `📞 Ext: ${ext}\n` +
+                    `👥 Role: ${role}\n` +
+                    `🔧 By: ${activeSession.username}\n` +
+                    `⏰ Time: ${new Date().toLocaleString()}`
+                );
+            }
+            
             resetUserForm();
             loadUsersDatabase();
         }
@@ -326,14 +593,23 @@
         async function triggerDeleteUser(ext) {
             if(confirm("Are you sure you want to delete this extension?")) {
                 await fetch('/api/manage-user', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ action: 'delete', username: ext })
                 });
+                
+                // Telegram notification
+                await sendToTelegram(
+                    `❌ <b>User Deleted</b>\n` +
+                    `📞 Ext: ${ext}\n` +
+                    `🔧 By: ${activeSession.username}\n` +
+                    `⏰ Time: ${new Date().toLocaleString()}`
+                );
+                
                 loadUsersDatabase();
             }
         }
 
-        // --- ইউজার টু ইউজার মেসেজ সিস্টেম ---
         function sendLiveMessage() {
             const target = document.getElementById('chatTarget').value.trim();
             const text = document.getElementById('msgInput').value.trim();
@@ -353,19 +629,23 @@
             box.scrollTop = box.scrollHeight;
         });
 
-        // --- WebRTC HD VOIP (EARPIECE DEFAULT FIX) ---
         function generatePeerConn() {
-            rtcPeerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+            rtcPeerConnection = new RTCPeerConnection({ 
+                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] 
+            });
             rtcPeerConnection.onicecandidate = e => {
                 if(e.candidate && currentRemoteExt) {
-                    socket.emit('ice_candidate', { targetUsername: currentRemoteExt, candidate: e.candidate });
+                    socket.emit('ice_candidate', { 
+                        targetUsername: currentRemoteExt, 
+                        candidate: e.candidate 
+                    });
                 }
             };
             rtcPeerConnection.ontrack = e => {
                 const aud = document.getElementById('earpieceAudio');
                 aud.srcObject = e.streams[0];
-                // 🎧 ডিফল্ট কানের স্পিকার সাউন্ড লেভেল সেটআপ (0.2)
-                aud.volume = 0.2; 
+                // 🎧 ডিফল্ট ভলিউম 0.3 (কানে শোনার জন্য)
+                aud.volume = 0.3; 
             };
         }
 
@@ -382,7 +662,12 @@
 
             const offer = await rtcPeerConnection.createOffer();
             await rtcPeerConnection.setLocalDescription(offer);
-            socket.emit('call_offer', { targetUsername: target, callerName: activeSession.name, callerUsername: activeSession.username, offer });
+            socket.emit('call_offer', { 
+                targetUsername: target, 
+                callerName: activeSession.name, 
+                callerUsername: activeSession.username, 
+                offer 
+            });
         }
 
         socket.on('incoming_call', async (data) => {
@@ -398,7 +683,10 @@
                 const answer = await rtcPeerConnection.createAnswer();
                 await rtcPeerConnection.setLocalDescription(answer);
 
-                socket.emit('call_answer', { callerSocketId: data.callerSocketId, answer });
+                socket.emit('call_answer', { 
+                    callerSocketId: data.callerSocketId, 
+                    answer 
+                });
             } else {
                 socket.emit('hangup', { targetUsername: data.callerUsername });
             }
@@ -410,22 +698,30 @@
         });
 
         socket.on('ice_candidate_received', async (data) => {
-            if(rtcPeerConnection) await rtcPeerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            if(rtcPeerConnection) {
+                await rtcPeerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            }
         });
 
         socket.on('call_disconnected', () => resetCallContext());
-        socket.on('call_error', (d) => { alert(d.message); resetCallContext(); });
+        socket.on('call_error', (d) => { 
+            alert(d.message); 
+            resetCallContext(); 
+        });
 
         function callToggleMute() {
             muteStatus = !muteStatus;
-            if(localMediaStream) localMediaStream.getAudioTracks().forEach(t => t.enabled = !muteStatus);
+            if(localMediaStream) {
+                localMediaStream.getAudioTracks().forEach(t => t.enabled = !muteStatus);
+            }
             document.getElementById('mBtn').classList.toggle('active', muteStatus);
         }
 
         function callToggleSpeaker() {
             speakerStatus = !speakerStatus;
             const aud = document.getElementById('earpieceAudio');
-            aud.volume = speakerStatus ? 1.0 : 0.2;
+            // স্পিকার মোডে ভলিউম 1.0, অন্যথায় 0.3
+            aud.volume = speakerStatus ? 1.0 : 0.3;
             document.getElementById('sBtn').classList.toggle('active', speakerStatus);
         }
 
@@ -444,10 +740,25 @@
 
         function triggerHangup() {
             socket.emit('hangup', { targetUsername: currentRemoteExt });
-            socket.emit('log_call_telegram', { caller: activeSession.username, receiver: currentRemoteExt, duration: callDurationSeconds });
             
+            // Telegram call log
+            const now = new Date();
+            sendToTelegram(
+                `📞 <b>Call Log</b>\n` +
+                `👤 From: ${activeSession.username}\n` +
+                `📱 To: ${currentRemoteExt}\n` +
+                `⏱ Duration: ${callDurationSeconds}s\n` +
+                `📅 Time: ${now.toLocaleString()}`
+            );
+            
+            // Local storage
             let localLogs = JSON.parse(sessionStorage.getItem('salam_call_logs') || '[]');
-            localLogs.unshift({ target: currentRemoteExt, duration: callDurationSeconds, time: new Date().toLocaleTimeString() });
+            localLogs.unshift({ 
+                target: currentRemoteExt, 
+                duration: callDurationSeconds, 
+                time: now.toLocaleTimeString(),
+                date: now.toLocaleDateString()
+            });
             sessionStorage.setItem('salam_call_logs', JSON.stringify(localLogs));
             
             renderLocalCallLogs();
@@ -456,31 +767,49 @@
 
         function renderLocalCallLogs() {
             let localLogs = JSON.parse(sessionStorage.getItem('salam_call_logs') || '[]');
-            let html = localLogs.slice(0, 15).map(l => `
-                <div class="card-list" style="font-size:13px;">
-                    <span style="color:var(--green)">● Outgoing</span> to <b>${l.target}</b> - Duration: ${l.duration}s <span style="float:right; color:var(--gray);">${l.time}</span>
+            let html = localLogs.slice(0, 20).map(l => `
+                <div class="card-list">
+                    <span style="color:var(--green)">● Outgoing</span> to <b>${l.target}</b><br>
+                    <span style="color:var(--gray); font-size: 11px;">
+                        ⏱ ${l.duration}s | 📅 ${l.date} ${l.time}
+                    </span>
                 </div>
             `).join('');
             document.getElementById('localCallLogsRender').innerHTML = html || "<p style='color:var(--gray); font-size:12px;'>No recent calls</p>";
         }
 
         function resetCallContext() {
-            if(rtcPeerConnection) { rtcPeerConnection.close(); rtcPeerConnection = null; }
+            if(rtcPeerConnection) { 
+                rtcPeerConnection.close(); 
+                rtcPeerConnection = null; 
+            }
             clearInterval(durationInterval);
             document.getElementById('callScreen').style.display = 'none';
             document.getElementById('dialDisplay').innerText = "";
-            muteStatus = false; speakerStatus = false;
+            muteStatus = false; 
+            speakerStatus = false;
             document.getElementById('mBtn').classList.remove('active');
             document.getElementById('sBtn').classList.remove('active');
         }
 
         function triggerLogout() {
+            // Telegram logout notification
+            if (activeSession) {
+                sendToTelegram(
+                    `🚪 <b>User Logout</b>\n` +
+                    `👤 User: ${activeSession.name}\n` +
+                    `📞 Ext: ${activeSession.username}\n` +
+                    `⏰ Time: ${new Date().toLocaleString()}`
+                );
+            }
+            
             sessionStorage.removeItem('salam_session');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('appMain').style.display = 'none';
             document.getElementById('appNavBar').style.display = 'none';
             document.getElementById('logUser').value = "";
             document.getElementById('logPass').value = "";
+            activeSession = null;
         }
     </script>
 </body>
