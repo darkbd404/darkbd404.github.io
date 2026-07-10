@@ -6,12 +6,12 @@ const io = require('socket.io')(http, {
 });
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios'); // টেলিগ্রাম এপিআই রিকোয়েস্টের জন্য
+const axios = require('axios');
 
 const PORT = process.env.PORT || 3000; 
 const USERS_FILE = path.join(__dirname, 'users.json');
 
-// 🛠 আপনার টেলিগ্রাম বটের টোকেন এবং চ্যাট আইডি এখানে দিন
+// 🛠 আপনার সঠিক টেলিগ্রাম বট টোকেন এবং চ্যাট আইডি এখানে বসান
 const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
 const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID_HERE"; 
 
@@ -33,13 +33,12 @@ function saveUsers(users) {
 
 if (!fs.existsSync(USERS_FILE)) saveUsers([]);
 
-// টেলিগ্রামে ডেটা পাঠানোর গ্লোবাল ফাংশন
 async function sendTelegramNotification(message) {
     if(!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN.includes("YOUR_BOT_TOKEN")) return;
     try {
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
         await axios.post(url, { chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'HTML' });
-    } catch (e) { console.error("Telegram error:", e.message); }
+    } catch (e) { console.error("Telegram Error:", e.message); }
 }
 
 app.post('/api/login', async (req, res) => {
@@ -68,14 +67,14 @@ app.post('/api/manage-user', async (req, res) => {
     let logMsg = "";
 
     if (action === 'add') {
-        if (users.find(u => u.username === username)) return res.json({ success: false, message: 'Exists!' });
+        if (users.find(u => u.username === username)) return res.json({ success: false, message: 'Extension Exists!' });
         users.push({ username, password, name, created: new Date().toISOString() });
-        logMsg = `➕ <b>New User Created</b>\n👤 Name: ${name}\n🔢 Ext: ${username}\n🔑 Pass: ${password}\n✍️ Created By: ${creator}`;
+        logMsg = `➕ <b>New User Created</b>\n👤 Name: ${name}\n🔢 Ext: ${username}\n🔑 Pass: ${password}\n✍️ By: ${creator}`;
     } else if (action === 'edit') {
         const index = users.findIndex(u => u.username === oldUsername);
         if (index !== -1) {
             users[index] = { username, password, name, created: users[index].created || new Date().toISOString() };
-            logMsg = `📝 <b>User Data Edited</b>\n🔄 Old Ext: ${oldUsername}\n👤 New Name: ${name}\n🔢 New Ext: ${username}\n🔑 New Pass: ${password}`;
+            logMsg = `📝 <b>User Edited</b>\n🔄 Old Ext: ${oldUsername}\n👤 New Name: ${name}\n🔢 New Ext: ${username}\n🔑 New Pass: ${password}`;
         }
     } else if (action === 'delete') {
         users = users.filter(u => u.username !== username);
@@ -89,20 +88,17 @@ app.post('/api/manage-user', async (req, res) => {
 app.get('/api/users', (req, res) => res.json(loadUsers()));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
-// --- WebRTC, Messaging & Tele-Logs Connection ---
 io.on('connection', (socket) => {
     socket.on('register_user', (data) => {
         socket.userData = data;
     });
 
-    // রিয়েল-টাইম ইউজার টু ইউজার মেসেজিং লজিক
     socket.on('send_message', (data) => {
         const receiver = Array.from(io.sockets.sockets.values()).find(s => s.userData && s.userData.username === data.targetUsername);
         if (receiver) {
-            receiver.emit('receive_message', { sender: socket.userData.username, text: data.text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+            receiver.emit('receive_message', { sender: socket.userData.username, text: data.text });
         }
-        // টেলিগ্রামে মেসেজ ট্রান্সফার লগ
-        sendTelegramNotification(`💬 <b>Chat Message Log</b>\nFROM: ${socket.userData.name} (${socket.userData.username})\nTO: ${data.targetUsername}\n✉️ Message: ${data.text}`);
+        sendTelegramNotification(`💬 <b>Chat Log</b>\nFrom: ${socket.userData.name} (${socket.userData.username})\nTo Ext: ${data.targetUsername}\n✉️ Message: ${data.text}`);
     });
 
     socket.on('call_offer', (data) => {
@@ -128,9 +124,8 @@ io.on('connection', (socket) => {
         if (target) target.emit('ice_candidate_received', { candidate: data.candidate });
     });
 
-    // টেলিগ্রামে সম্পূর্ণ কল লগ সাবমিশন (টাইম, সেকেন্ড, নাম্বার)
     socket.on('log_call_telegram', (data) => {
-        const logMsg = `📞 <b>Call Log Summary</b>\n🟢 Caller: ${data.caller}\n🔴 Receiver: ${data.receiver}\n⏱️ Duration: ${data.duration} seconds\n📅 Date: ${new Date().toLocaleString()}`;
+        const logMsg = `📞 <b>Call Log Summary</b>\n🟢 Caller Ext: ${data.caller}\n🔴 Receiver Ext: ${data.receiver}\n⏱️ Duration: ${data.duration} Sec`;
         sendTelegramNotification(logMsg);
     });
 
