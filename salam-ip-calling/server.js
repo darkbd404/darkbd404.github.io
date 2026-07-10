@@ -14,7 +14,7 @@ const ADMIN_PASS = "864";
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// 📂 users.json ফাইল হ্যান্ডলিং (পুরোপুরি আলাদা)
+// 📂 users.json ফাইল হ্যান্ডলিং
 function loadUsersFromFile() {
     if (!fs.existsSync(USERS_FILE)) return [];
     try {
@@ -28,40 +28,61 @@ function saveUsersToFile(users) {
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 }
 
-// ১. লগইন রুট (এডমিন ও ইউজার আইডি সম্পূর্ণ আলাদা ও ফিক্সড)
+// ১. লগইন রুট (Admin ও User পুরোপুরি আলাদা এবং টাইপ-সেফ ফিক্স)
 app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
+    const username = String(req.body.username).trim();
+    const password = String(req.body.password).trim();
 
-    // এডমিন চেক
+    // অ্যাডমিন লগইন চেক
     if (username === ADMIN_USER && password === ADMIN_PASS) {
         return res.json({ success: true, role: 'admin', name: 'Administrator', username: ADMIN_USER });
     }
 
-    // ইউজার চেক (users.json ফাইল থেকে)
+    // ইউজার লগইন চেক (users.json থেকে)
     const users = loadUsersFromFile();
-    const matchedUser = users.find(u => u.username === username && u.password === password);
+    const matchedUser = users.find(u => String(u.username).trim() === username && String(u.password).trim() === password);
+    
     if (matchedUser) {
-        return res.json({ success: true, role: 'user', name: matchedUser.name, username: matchedUser.username });
+        return res.json({ 
+            success: true, 
+            role: 'user', 
+            name: matchedUser.name, 
+            username: matchedUser.username,
+            ipNumber: matchedUser.ipNumber || `IP-${matchedUser.username}`,
+            callNumber: matchedUser.callNumber || matchedUser.username
+        });
     }
 
     return res.json({ success: false, message: 'Invalid Username or Password' });
 });
 
-// ২. ইউজার ক্রিয়েট, এডিট, ডিলিট এপিআই (সরাসরি users.json এ সেভ হবে)
+// ২. ইউজার ক্রিয়েট, এডিট, ডিলিট এপিআই
 app.post('/api/manage-user', (req, res) => {
-    const { action, username, password, name, oldUsername } = req.body;
+    const { action, username, password, name, oldUsername, ipNumber, callNumber } = req.body;
     let users = loadUsersFromFile();
 
     if (action === 'add') {
         if (users.find(u => u.username === username)) {
-            return res.json({ success: false, message: 'Extension already exists!' });
+            return res.json({ success: false, message: 'User already exists!' });
         }
-        users.push({ username, password, name, created: new Date().toISOString() });
+        users.push({ 
+            username, 
+            password, 
+            name, 
+            ipNumber: ipNumber || `IP-${username}`, 
+            callNumber: callNumber || username 
+        });
     } 
     else if (action === 'edit') {
         const index = users.findIndex(u => u.username === oldUsername);
         if (index !== -1) {
-            users[index] = { username, password, name, created: users[index].created };
+            users[index] = { 
+                username, 
+                password, 
+                name, 
+                ipNumber: ipNumber || `IP-${username}`, 
+                callNumber: callNumber || username 
+            };
         }
     } 
     else if (action === 'delete') {
@@ -78,20 +99,17 @@ app.get('/api/users', (req, res) => {
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
-// ৩. সকেট কলিং ও সিগন্যালিং ইঞ্জিন (মোবাইল কানেকশন ড্রপ ফিক্স)
+// ৩. সকেট সিগন্যালিং ইঞ্জিন
 io.on('connection', (socket) => {
-    
     socket.on('register_user', (data) => {
         socket.userData = data; 
-        console.log(`Registered Line: ${data.username} on Socket ID: ${socket.id}`);
+        console.log(`Registered User: ${data.username}`);
     });
 
-    // কল অফার হ্যান্ডলার (টার্গেট সকেট ট্র্যাকিং)
     socket.on('call_offer', (data) => {
         const targetSocket = Array.from(io.sockets.sockets.values()).find(
             s => s.userData && s.userData.username === data.targetUsername
         );
-
         if (targetSocket) {
             targetSocket.emit('incoming_call', {
                 callerName: data.callerName,
@@ -127,9 +145,7 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('call_disconnected');
     });
 
-    socket.on('disconnect', () => {
-        console.log(`Disconnected Socket: ${socket.id}`);
-    });
+    socket.on('disconnect', () => {});
 });
 
 http.listen(PORT, '0.0.0.0', () => {
