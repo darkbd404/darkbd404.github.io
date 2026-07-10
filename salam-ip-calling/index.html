@@ -544,5 +544,55 @@
             }
         }
     </script>
+    <!-- ... আপনার আগের সব HTML কোড ... -->
+
+    <!-- নিচের স্ক্রিপ্টটি </body> এর ঠিক আগে বসান -->
+    <script>
+        // --- PWA Notification System (Added Only) ---
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") showToast("System", "Notifications Enabled!");
+                });
+            }
+        }
+
+        function sendBrowserNotification(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(title, { 
+                    body: body, 
+                    icon: "https://cdn-icons-png.flaticon.com/512/5585/5585856.png",
+                    badge: "https://cdn-icons-png.flaticon.com/512/5585/5585856.png"
+                });
+            }
+        }
+
+        function showToast(title, message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; top: 20px; right: 20px; z-index: 9999;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white; padding: 15px 20px; border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slideIn 0.3s ease;
+                max-width: 300px; font-family: sans-serif;
+            `;
+            toast.innerHTML = `<strong>${title}</strong><br>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+        }
+
+        // Socket Listener for Notifications
+        if(typeof socket !== 'undefined') {
+            socket.on('system-notification', (data) => {
+                sendBrowserNotification(data.title, data.message);
+                showToast(data.title, data.message);
+            });
+        }
+
+        // Call permission on load
+        window.addEventListener('load', requestNotificationPermission);
+    </script>
+</body>
+</html>
 </body>
 </html>
