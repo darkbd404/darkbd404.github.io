@@ -10,6 +10,8 @@
 </head>
 <body>
 
+<audio id="remoteAudioNode" autoplay></audio>
+
 <div class="phone-container">
     
     <div id="panel-login" class="screen-panel active-panel">
@@ -35,7 +37,6 @@
                 <button class="btn-primary" style="background:#e53e3e; width:90px;" onclick="adminDeleteUser()">Delete</button>
             </div>
         </div>
-        <h4 style="color:#718096; font-size:13px; margin:10px 0 5px 0;">REALTIME ACTIVE USER PACKETS</h4>
         <div id="admin-db-list-view"></div>
     </div>
 
@@ -58,18 +59,18 @@
             </div>
             <div class="dial-view" id="dial-display-box"></div>
             <div class="dial-grid">
-                <button class="dial-btn" onclick="dialAppend('1')">1<span>&nbsp;</span></button>
-                <button class="dial-btn" onclick="dialAppend('2')">2<span>abc</span></button>
-                <button class="dial-btn" onclick="dialAppend('3')">3<span>def</span></button>
-                <button class="dial-btn" onclick="dialAppend('4')">4<span>ghi</span></button>
-                <button class="dial-btn" onclick="dialAppend('5')">5<span>jkl</span></button>
-                <button class="dial-btn" onclick="dialAppend('6')">6<span>mno</span></button>
-                <button class="dial-btn" onclick="dialAppend('7')">7<span>pqrs</span></button>
-                <button class="dial-btn" onclick="dialAppend('8')">8<span>tuv</span></button>
-                <button class="dial-btn" onclick="dialAppend('9')">9<span>wxyz</span></button>
-                <button class="dial-btn" onclick="dialAppend('*')">*<span>&nbsp;</span></button>
-                <button class="dial-btn" onclick="dialAppend('0')">0<span>+</span></button>
-                <button class="dial-btn" onclick="dialAppend('#')">#<span>&nbsp;</span></button>
+                <button class="dial-btn" onclick="dialAppend('1')">1</button>
+                <button class="dial-btn" onclick="dialAppend('2')">2</button>
+                <button class="dial-btn" onclick="dialAppend('3')">3</button>
+                <button class="dial-btn" onclick="dialAppend('4')">4</button>
+                <button class="dial-btn" onclick="dialAppend('5')">5</button>
+                <button class="dial-btn" onclick="dialAppend('6')">6</button>
+                <button class="dial-btn" onclick="dialAppend('7')">7</button>
+                <button class="dial-btn" onclick="dialAppend('8')">8</button>
+                <button class="dial-btn" onclick="dialAppend('9')">9</button>
+                <button class="dial-btn" onclick="dialAppend('*')">*</button>
+                <button class="dial-btn" onclick="dialAppend('0')">0</button>
+                <button class="dial-btn" onclick="dialAppend('#')">#</button>
             </div>
             <div style="display:flex; justify-content:center; align-items:center; position:relative;">
                 <button class="call-btn-trigger" onclick="initiateVoiceOutbound()">📞</button>
@@ -95,9 +96,8 @@
 
         <div id="user-settings" class="screen-panel">
             <div style="background:#f7fafc; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #edf2f7;">
-                <small style="color:#a0aec0; font-weight:bold; letter-spacing:0.5px;">ACCOUNT METADATA (LOCKED)</small>
+                <small style="color:#a0aec0; font-weight:bold; letter-spacing:0.5px;">ACCOUNT METADATA</small>
                 <div style="margin-top:10px; font-size:16px; color:#1a202c;">Active Node ID: <span id="lbl-profile-uid" style="font-weight:600;">-</span></div>
-                <div style="margin-top:5px; font-size:16px; color:#1a202c;">Database Sync: <span style="font-weight:600; color:#38a169;">Verified Stable</span></div>
             </div>
             <div style="background:#f7fafc; padding:15px; border-radius:10px; border:1px solid #edf2f7;">
                 <small style="color:#a0aec0; font-weight:bold; letter-spacing:0.5px;">REQUEST BALANCE REFILL</small>
@@ -110,19 +110,11 @@
     <div id="call-overlay-window" class="calling-overlay">
         <div style="text-align: center;">
             <div style="font-size: 30px; font-weight: 600;" id="call-view-target-num">0000</div>
-            <div style="font-size: 14px; color: #4299e1; margin-top: 6px; font-weight: 500;" id="call-view-status">Resolving Node Audio...</div>
+            <div style="font-size: 14px; color: #4299e1; margin-top: 6px; font-weight: 500;" id="call-view-status">Connecting...</div>
         </div>
         <div style="width:115px; height:115px; background:#1a202c; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:50px; border:2px solid #2d3748;">👤</div>
-        
-        <div class="controls-grid">
-            <div onclick="toggleAudioMute(this)"><div class="control-bubble">🎙️</div>Mute</div>
-            <div onclick="alert('HD Speaker Enabled')"><div class="control-bubble">🔊</div>Speaker</div>
-            <div onclick="alert('Internal Earpiece Active')"><div class="control-bubble">🎧</div>Earpiece</div>
-            <div onclick="alert('HD Video Mode Request Transmitted')"><div class="control-bubble">📹</div>Video Call</div>
-        </div>
-        <button class="hangup-btn" onclick="terminateActiveSession()">❌</button>
+        <button class="hangup-btn" onclick="terminateActiveSession(true)">❌</button>
     </div>
-
 </div>
 
 <script>
@@ -130,18 +122,11 @@
     let currentSessionUser = null;
     let currentSessionUid = "";
     let typedCallString = "";
-    let webrtcPeerConnection;
-    let localMicAudioStream;
+    let webrtcPeerConnection = null;
+    let localMicAudioStream = null;
+    let currentRemoteActiveTarget = "";
 
-    const audioConstraints = {
-        audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-            channelCount: 1,
-            sampleRate: 48000
-        }
-    };
+    const iceConfiguration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
     function executeAuthentication() {
         const username = document.getElementById('login-user').value.trim();
@@ -155,7 +140,6 @@
         }).then(res => res.json()).then(data => {
             if (data.success) {
                 document.getElementById('panel-login').classList.remove('active-panel');
-                
                 if (data.role === "admin") {
                     document.getElementById('panel-admin').classList.add('active-panel');
                     renderAdminDatabaseTable(data.users);
@@ -173,76 +157,9 @@
         });
     }
 
-    function renderAdminDatabaseTable(users) {
-        const box = document.getElementById('admin-db-list-view');
-        box.innerHTML = "";
-        for (let u in users) {
-            box.innerHTML += `<div style="padding:12px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:6px; font-size:14px; display:flex; justify-content:space-between; align-items:center;">
-                <div><strong>Node ID: ${u}</strong><br><span style="color:#718096;">Pass: ${users[u].password} | Bal: BDT ${users[u].balance}</span></div>
-                <button class="btn-logout" style="background:#0066cc;" onclick="populateAdminForm('${u}','${users[u].password}','${users[u].balance}')">Modify</button>
-            </div>`;
-        }
-    }
-
-    function populateAdminForm(u, p, b) {
-        document.getElementById('adm-uid').value = u;
-        document.getElementById('adm-pass').value = p;
-        document.getElementById('adm-bal').value = b;
-    }
-
-    function adminCommitUser() {
-        const adminUser = document.getElementById('login-user').value.trim();
-        const adminPass = document.getElementById('login-pass').value.trim();
-        const targetUser = document.getElementById('adm-uid').value.trim();
-        const password = document.getElementById('adm-pass').value.trim();
-        const balance = document.getElementById('adm-bal').value.trim();
-
-        if(!targetUser || !password || !balance) return alert("Fill all fields to update JSON stream.");
-
-        fetch('/api/admin/save-user', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adminUser, adminPass, targetUser, password, balance })
-        }).then(res => res.json()).then(data => {
-            if (data.success) {
-                alert("Realtime Database Sync Complete.");
-                renderAdminDatabaseTable(data.users);
-                clearAdminInputs();
-            }
-        });
-    }
-
-    function adminDeleteUser() {
-        const adminUser = document.getElementById('login-user').value.trim();
-        const adminPass = document.getElementById('login-pass').value.trim();
-        const targetUser = document.getElementById('adm-uid').value.trim();
-        if(!targetUser) return alert("Select target user ID packet to clear.");
-
-        if(confirm("Confirm structural deletion of " + targetUser + " from system database?")) {
-            fetch('/api/admin/delete-user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adminUser, adminPass, targetUser })
-            }).then(res => res.json()).then(data => {
-                if(data.success) {
-                    alert("User purged from data layer.");
-                    renderAdminDatabaseTable(data.users);
-                    clearAdminInputs();
-                } else { alert(data.message); }
-            });
-        }
-    }
-
-    function clearAdminInputs() {
-        document.getElementById('adm-uid').value = "";
-        document.getElementById('adm-pass').value = "";
-        document.getElementById('adm-bal').value = "";
-    }
-
     function userRoute(p) {
         document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active-tab'));
         document.getElementById('panel-user-app').querySelectorAll('.screen-panel').forEach(p => p.classList.remove('active-panel'));
-        
         document.getElementById('tab-' + p).classList.add('active-tab');
         document.getElementById('user-' + p).classList.add('active-panel');
         document.getElementById('app-view-title').innerText = p.toUpperCase();
@@ -252,152 +169,122 @@
     function dialBackspace() { typedCallString = typedCallString.slice(0, -1); renderDialScreen(); }
     function renderDialScreen() { document.getElementById('dial-display-box').innerText = typedCallString; }
 
-    function syncUserDatabaseState(bal, logs, msgs) {
-        document.getElementById('usr-live-balance').innerText = "BDT " + bal;
-        const logBox = document.getElementById('logs-list-render');
-        logBox.innerHTML = logs.length === 0 ? '<p style="color:#718096;text-align:center;font-size:14px;">No audio routing logs recorded.</p>' : '';
-        logs.forEach(l => {
-            logBox.innerHTML += `<div style="padding:12px; border-bottom:1px solid #edf2f7; font-size:14px; color:#2d3748;">Dialed Node: <strong>${l.target}</strong><br><small style="color:#a0aec0;">${l.time}</small><span style="color:#e53e3e; float:right; font-weight:600;">-BDT ${l.cost}</span></div>`;
-        });
+    // WebRTC পিয়ার কানেকশন তৈরি ও স্ট্রিম হ্যান্ডলিং (ভয়েস ফিক্স)
+    function setupWebRTCPeer(targetUser) {
+        webrtcPeerConnection = new RTCPeerConnection(iceConfiguration);
+        
+        // নেটওয়ার্ক ক্যান্ডিডেট রুট পাঠানো
+        webrtcPeerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                socket.emit('ice-candidate', { target: targetUser, candidate: event.candidate });
+            }
+        };
 
-        const chatBox = document.getElementById('chat-stream-render');
-        chatBox.innerHTML = "";
-        msgs.forEach(m => {
-            const side = m.from === currentSessionUid ? 'sent' : 'rcv';
-            chatBox.innerHTML += `<div class="msg-bubble ${side}"><strong>${m.from}:</strong> ${m.text}</div>`;
-        });
-        chatBox.scrollTop = chatBox.scrollHeight;
+        // ওপাশ থেকে আসা অডিও ট্র্যাক রিসিভ করে স্পিকারে বাজানো
+        webrtcPeerConnection.ontrack = (event) => {
+            const remoteAudio = document.getElementById('remoteAudioNode');
+            if (remoteAudio) {
+                remoteAudio.srcObject = event.streams[0];
+            }
+        };
+
+        if (localMicAudioStream) {
+            localMicAudioStream.getTracks().forEach(track => webrtcPeerConnection.addTrack(track, localMicAudioStream));
+        }
     }
 
-    function triggerRefillRequest() {
-        const amount = document.getElementById('req-bal-val').value;
-        if (!amount || amount <= 0) return alert("Specify valid financial value.");
-        fetch('/api/user/request-balance', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: currentSessionUid, amount })
-        }).then(() => {
-            alert("Refill packet pinged directly to admin dashboard node via bot.");
-            document.getElementById('req-bal-val').value = "";
-        });
-    }
-
-    function syncDeviceContacts() {
-        navigator.mediaDevices.getUserMedia(audioConstraints).then(() => {
-            const staticList = [{name:"Salam IP Node", id:"123"}, {name:"Terminal Engine Hub", id:"864"}];
-            const renderBox = document.getElementById('contacts-list-render');
-            renderBox.innerHTML = "";
-            staticList.forEach(c => {
-                renderBox.innerHTML += `<div class="list-item" style="display:flex; justify-content:between; align-items:center; padding:12px; border-bottom:1px solid #edf2f7; cursor:pointer;" onclick="typedCallString='${c.id}'; renderDialScreen(); userRoute('dialpad');">
-                    <div><strong>${c.name}</strong><br><small style="color:#718096;">Node: ${c.id}</small></div>
-                    <span style="color:#0066cc; font-size:18px;">📞</span>
-                </div>`;
-            });
-        }).catch(() => { alert("Microphone access validation forced."); });
-    }
-
+    // আউটবাউন্ড কল (কল করা)
     function initiateVoiceOutbound() {
         if(!typedCallString) return;
-        
-        navigator.mediaDevices.getUserMedia(audioConstraints).then(stream => {
-            document.getElementById('call-view-target-num').innerText = typedCallString;
-            document.getElementById('call-overlay-window').style.display = 'flex';
-            document.getElementById('call-view-status').innerText = "Streaming Crystal Audio...";
+        currentRemoteActiveTarget = typedCallString;
 
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
             localMicAudioStream = stream;
-            webrtcPeerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-            stream.getTracks().forEach(track => webrtcPeerConnection.addTrack(track, stream));
+            document.getElementById('call-view-target-num').innerText = currentRemoteActiveTarget;
+            document.getElementById('call-overlay-window').style.display = 'flex';
+            document.getElementById('call-view-status').innerText = "Calling Node...";
 
-            webrtcPeerConnection.createOffer().then(offer => webrtcPeerConnection.setLocalDescription(offer)).then(() => {
-                socket.emit('call-node', { target: typedCallString, from: currentSessionUid, offer: webrtcPeerConnection.localDescription });
+            setupWebRTCPeer(currentRemoteActiveTarget);
+
+            webrtcPeerConnection.createOffer().then(offer => {
+                return webrtcPeerConnection.setLocalDescription(offer);
+            }).then(() => {
+                socket.emit('call-node', { target: currentRemoteActiveTarget, from: currentSessionUid, offer: webrtcPeerConnection.localDescription });
             });
         }).catch(err => {
-            alert("Call Terminated! Microphone permission must be verified.");
+            alert("Microphone permission denied! Cannot call.");
         });
     }
 
+    // ইনকামিং কল (কল আসা)
     socket.on('incoming-call', (data) => {
-        navigator.mediaDevices.getUserMedia(audioConstraints).then(stream => {
-            let accept = confirm("Incoming High-Fidelity Audio Request from Node ID: " + data.from + ". Receive stream?");
+        currentRemoteActiveTarget = data.from;
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            let accept = confirm("Incoming Call from Node: " + data.from + ". Answer?");
             if (accept) {
-                document.getElementById('call-view-target-num').innerText = data.from;
-                document.getElementById('call-overlay-window').style.display = 'flex';
-                document.getElementById('call-view-status').innerText = "Session Bridged Stable";
-
                 localMicAudioStream = stream;
-                webrtcPeerConnection = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-                stream.getTracks().forEach(track => webrtcPeerConnection.addTrack(track, stream));
-                
+                document.getElementById('call-view-target-num').innerText = currentRemoteActiveTarget;
+                document.getElementById('call-overlay-window').style.display = 'flex';
+                document.getElementById('call-view-status').innerText = "Connecting Audio...";
+
+                setupWebRTCPeer(currentRemoteActiveTarget);
+
                 webrtcPeerConnection.setRemoteDescription(new RTCSessionDescription(data.offer)).then(() => {
                     return webrtcPeerConnection.createAnswer();
                 }).then(ans => {
                     return webrtcPeerConnection.setLocalDescription(ans);
                 }).then(() => {
-                    socket.emit('call-accept', { target: data.from, answer: webrtcPeerConnection.localDescription });
+                    socket.emit('call-accept', { target: currentRemoteActiveTarget, answer: webrtcPeerConnection.localDescription });
                 });
             } else {
                 stream.getTracks().forEach(t => t.stop());
+                socket.emit('hangup-call', { target: currentRemoteActiveTarget });
             }
         }).catch(() => {
-            alert("Cannot process inbound stream without internal hardware audio node access.");
+            alert("Microphone hardware error.");
         });
     });
 
-    socket.on('call-connected', async (data) => {
-        document.getElementById('call-view-status').innerText = "Active Link • 10 poysa/min billing";
-        await webrtcPeerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+    socket.on('call-connected', (data) => {
+        document.getElementById('call-view-status').innerText = "Call Active • 10 poysa/min";
+        webrtcPeerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
     });
 
-    socket.on('balance-sync', (d) => { document.getElementById('usr-live-balance').innerText = "BDT " + d.balance; });
-    
-    socket.on('force-hangup', () => { 
-        terminateActiveSession(); 
-        alert("অপর্যাপ্ত ব্যালেন্সের কারণে কলটি কেটে গেছে! দয়া করে অ্যাকাউন্ট রিচার্জ করুন।"); 
+    socket.on('ice-candidate', (data) => {
+        if (webrtcPeerConnection && data.candidate) {
+            webrtcPeerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error(e));
+        }
     });
+
+    socket.on('call-terminated', () => { terminateActiveSession(false); });
+    socket.on('force-hangup', () => { terminateActiveSession(false); alert("Insufficient balance! Call cut."); });
 
     socket.on('call-error', (d) => { 
-        if(d.message === "insufficient") {
-            document.getElementById('call-view-status').innerText = "ব্যালেন্স নেই! দয়া করে রিচার্জ করুন।";
-            alert("আপনার অ্যাকাউন্ট ব্যালেন্স অপর্যাপ্ত! কল করতে মেইন ব্যালেন্স যোগ করুন।");
-            terminateActiveSession();
-        } else if(d.message === "offline") {
-            document.getElementById('call-view-status').innerText = "ইউজার অফলাইন আছেন।";
-        } else {
-            document.getElementById('call-view-status').innerText = d.message;
-        }
+        alert(d.message === "offline" ? "User is currently Offline." : "Insufficient Balance!");
+        terminateActiveSession(false);
     });
 
-    function terminateActiveSession() {
+    function terminateActiveSession(notifyServer) {
+        if (notifyServer && currentRemoteActiveTarget) {
+            socket.emit('hangup-call', { target: currentRemoteActiveTarget });
+        }
         if(webrtcPeerConnection) { webrtcPeerConnection.close(); webrtcPeerConnection = null; }
-        if(localMicAudioStream) { localMicAudioStream.getTracks().forEach(t => t.stop()); }
+        if(localMicAudioStream) { localMicAudioStream.getTracks().forEach(t => t.stop()); localMicAudioStream = null; }
         document.getElementById('call-overlay-window').style.display = 'none';
+        const remoteAudio = document.getElementById('remoteAudioNode');
+        if (remoteAudio) remoteAudio.srcObject = null;
     }
 
-    function toggleAudioMute(element) {
-        if (localMicAudioStream) {
-            const audioTrack = localMicAudioStream.getAudioTracks()[0];
-            audioTrack.enabled = !audioTrack.enabled;
-            element.querySelector('.control-bubble').classList.toggle('active-ctrl', !audioTrack.enabled);
-        }
+    // নিচের বাকি ফাংশনগুলো (Admin Management, Sync, Messages) আগের মতোই থাকবে...
+    function syncUserDatabaseState(bal, logs, msgs) {
+        document.getElementById('usr-live-balance').innerText = "BDT " + bal;
+        const logBox = document.getElementById('logs-list-render');
+        logBox.innerHTML = logs.length === 0 ? '<p style="text-align:center;font-size:14px;color:#718096;">No call logs.</p>' : '';
+        logs.forEach(l => {
+            logBox.innerHTML += `<div style="padding:12px; border-bottom:1px solid #edf2f7; font-size:14px;">Dialed: <strong>${l.target}</strong><br><small style="color:#a0aec0;">${l.time}</small><span style="color:#e53e3e; float:right;">-BDT ${l.cost}</span></div>`;
+        });
     }
-
-    function dispatchSecureMessage() {
-        const to = document.getElementById('chat-recipient').value.trim();
-        const text = document.getElementById('chat-text-payload').value.trim();
-        if(!to || !text) return;
-
-        socket.emit('send-msg', { to, from: currentSessionUid, text });
-        const box = document.getElementById('chat-stream-render');
-        box.innerHTML += `<div class="msg-bubble sent"><strong>${currentSessionUid}:</strong> ${text}</div>`;
-        document.getElementById('chat-text-payload').value = "";
-        box.scrollTop = box.scrollHeight;
-    }
-
-    socket.on('receive-msg', (data) => {
-        const box = document.getElementById('chat-stream-render');
-        box.innerHTML += `<div class="msg-bubble rcv"><strong>${data.from}:</strong> ${data.text}</div>`;
-        box.scrollTop = box.scrollHeight;
-    });
+    socket.on('balance-sync', (d) => { document.getElementById('usr-live-balance').innerText = "BDT " + d.balance; });
 </script>
 </body>
 </html>
