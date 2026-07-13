@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Router Admin</title>
+    
+    <!-- Inline Manifest (PWA) -->
+    <link rel="manifest" href='data:application/json;charset=utf-8,{"name":"Router Admin","short_name":"Router","description":"Router Admin Panel","start_url":"./","display":"standalone","background_color":"%230a0a1a","theme_color":"%230a0a1a","orientation":"any","icons":[{"src":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTkyIDE5MiI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM2I4MmY2Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjOGI1Y2Y2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0MCIgZmlsbD0idXJsKCNnKSIvPjx0ZXh0IHg9Ijk2IiB5PSIxMjAiIGZvbnQtc2l6ZT0iOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiPvCfk6U8L3RleHQ+PC9zdmc+","sizes":"192x192","type":"image/svg+xml"},{"src":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM2I4MmY2Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjOGI1Y2Y2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSIxMDAiIGZpbGw9InVybCgjZykiLz48dGV4dCB4PSIyNTYiIHk9IjMxMCIgZm9udC1zaXplPSIyNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiPvCfk6U8L3RleHQ+PC9zdmc+","sizes":"512x512","type":"image/svg+xml"}]}'>
+    
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">📡</text></svg>'>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0a0a1a;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #0a0a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(59, 130, 246, 0.2);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #94a3b8;
+            font-size: 14px;
+            font-family: sans-serif;
+        }
+
+        /* Iframe Container */
+        .iframe-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .router-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Error Message (if iframe blocked) */
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(20, 20, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            max-width: 90%;
+            display: none;
+            z-index: 100;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .error-title {
+            color: #f1f5f9;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-family: sans-serif;
+        }
+
+        .error-text {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-family: sans-serif;
+            line-height: 1.5;
+        }
+
+        .redirect-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: sans-serif;
+            transition: transform 0.2s;
+        }
+
+        .redirect-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Install Banner */
+        .install-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(20, 20, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 18px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            animation: slideUp 0.5s ease;
+        }
+
+        .install-banner.show {
+            display: flex;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .install-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .install-icon {
+            font-size: 24px;
+        }
+
+        .install-text {
+            font-size: 12px;
+            color: #94a3b8;
+            font-family: sans-serif;
+        }
+
+        .install-text strong {
+            color: #fff;
+            display: block;
+            font-size: 13px;
+        }
+
+        .install-btn {
+            padding: 8px 18px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            font-family: sans-serif;
+        }
+
+        .close-banner {
+            position: absolute;
+            top: 6px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            padding: 12px 18px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            color: #10b981;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 9999;
+            font-family: sans-serif;
+            transition: transform 0.4s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Router Admin লোড হচ্ছে...</div>
+    </div>
+
+    <!-- Iframe Container -->
+    <div class="iframe-container">
+        <iframe 
+            id="routerFrame" 
+            class="router-frame" 
+            src="http://192.168.0.1/login.html"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+            allow="fullscreen"
+        ></iframe>
+    </div>
+
+    <!-- Error Message (if iframe blocked) -->
+    <div class="error-message" id="errorMessage">
+        <div class="error-icon">🔒</div>
+        <div class="error-title">Security Restriction</div>
+        <div class="error-text">
+            Router security এর কারণে iframe এ load করা যাচ্ছে না।<br>
+            Direct open করুন:
+        </div>
+        <button class="redirect-btn" onclick="directOpen()">
+            Open Router Admin
+        </button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Message</div>
+
+    <!-- Install Banner -->
+    <div class="install-banner" id="installBanner">
+        <button class="close-banner" onclick="closeBanner()">✕</button>
+        <div class="install-info">
+            <span class="install-icon">📱</span>
+            <div class="install-text">
+                <strong>Install as App</strong>
+                App হিসেবে ব্যবহার করুন
+            </div>
+        </div>
+        <button class="install-btn" onclick="installApp()">INSTALL</button>
+    </div>
+
+    <script>
+        // ==========================================
+        // SERVICE WORKER (Inline - PWA)
+        // ==========================================
+        const swCode = `
+            const CACHE = 'router-v1';
+            self.addEventListener('install', e => self.skipWaiting());
+            self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+            self.addEventListener('fetch', e => {
+                if (e.request.method !== 'GET') return;
+                e.respondWith(
+                    fetch(e.request).then(res => {
+                        if (res.status === 200) {
+                            const c = res.clone();
+                            caches.open(CACHE).then(cache => cache.put(e.request, c));
+                        }
+                        return res;
+                    }).catch(() => caches.match(e.request))
+                );
+            });
+        `;
+
+        if ('serviceWorker' in navigator) {
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(url).catch(() => {});
+        }
+
+        // ==========================================
+        // IFRAME LOAD DETECTION
+        // ==========================================
+        const routerFrame = document.getElementById('routerFrame');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const errorMessage = document.getElementById('errorMessage');
+        let loadTimeout;
+
+        // Timeout: 5 seconds এ load না হলে error দেখাও
+        loadTimeout = setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+            errorMessage.classList.add('show');
+        }, 5000);
+
+        // Iframe load হলে loading hide করো
+        routerFrame.addEventListener('load', () => {
+            clearTimeout(loadTimeout);
+            loadingScreen.classList.add('hidden');
+        });
+
+        // Iframe error হলে
+        routerFrame.addEventListener('error', () => {
+            clearTimeout(loadTimeout);
+            loadingScreen.classList.add('hidden');
+            errorMessage.classList.add('show');
+        });
+
+        // ==========================================
+        // DIRECT OPEN (Fallback)
+        // ==========================================
+        function directOpen() {
+            window.location.href = 'http://192.168.0.1/login.html';
+        }
+
+        // ==========================================
+        // TOAST
+        // ==========================================
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ==========================================
+        // PWA INSTALL
+        // ==========================================
+        let deferredPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => {
+                if (deferredPrompt) {
+                    document.getElementById('installBanner').classList.add('show');
+                }
+            }, 2000);
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choice) => {
+                    if (choice.outcome === 'accepted') {
+                        showToast('App ইনস্টল হচ্ছে! 🎉');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('installBanner').classList.remove('show');
+                });
+            } else {
+                showToast('ব্রাউজার মেনু (⋮) → "Install App" চাপুন');
+            }
+        }
+
+        function closeBanner() {
+            document.getElementById('installBanner').classList.remove('show');
+        }
+
+        window.addEventListener('appinstalled', () => {
+            showToast('App ইনস্টল হয়েছে! 🎉');
+            document.getElementById('installBanner').classList.remove('show');
+        });
+    </script>
+</body>
+</html>
