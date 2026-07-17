@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:5000/api'; // Change this to your Render URL in production
+// Render-এ ডিপ্লয় করার সময় এই URL পরিবর্তন করতে হবে অথবা Environment Variable ব্যবহার করতে হবে
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const authAPI = {
     async register(name, email, password) {
