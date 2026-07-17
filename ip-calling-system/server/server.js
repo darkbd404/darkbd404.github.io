@@ -10,33 +10,26 @@ const xss = require('xss-clean');
 const path = require('path');
 
 // Internal Modules
-const connectDatabase = require('./database/connectDB'); // ✅ এই পাথটি ঠিক আছে কারণ database ফোল্ডার আছে
+// const connectDatabase = require('./database/connectDB'); // ⚠️ আপাতত কমেন্ট আউট রাখুন
 const logger = require('./config/logger');
 const errorHandler = require('./middleware/errorHandler');
 
 // Initialize Express App & HTTP Server
 const app = express();
-
-// ⚠️ Render-এর জন্য জরুরি
 app.set('trust proxy', true); 
-
 const server = http.createServer(app);
 
 // Allowed Origins
-const allowedOrigins = process.env.CLIENT_URL 
-    ? process.env.CLIENT_URL.split(',') 
-    : ['http://localhost:3000'];
+const allowedOrigins = process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',') : ['*'];
 
 // Socket.IO Setup
-const io = new Server(server, {
-  cors: { origin: allowedOrigins, methods: ['GET', 'POST'], credentials: true }
-});
+const io = new Server(server, { cors: { origin: allowedOrigins, methods: ['GET', 'POST'] } });
 
 // Security Middleware
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin: allowedOrigins, credentials: true }));
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(cors({ origin: allowedOrigins }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(mongoSanitize());
 app.use(xss());
 
@@ -47,8 +40,13 @@ app.use('/api/', limiter);
 // Static Files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Database Connection
-connectDatabase();
+// Database Connection (Commented out for testing)
+// connectDatabase(); 
+
+// Test Route
+app.get('/', (req, res) => {
+    res.json({ message: 'Server is running perfectly!', status: 'ok' });
+});
 
 // API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -65,11 +63,5 @@ app.use(errorHandler);
 // Start Server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
-
-// Handle Unhandled Rejections
-process.on('unhandledRejection', (err) => {
-  logger.error(`Unhandled Rejection: ${err.message}`);
-  server.close(() => process.exit(1));
+    console.log(`✅ Server running on port ${PORT}`);
 });
