@@ -1,158 +1,65 @@
 import { authAPI } from './api.js';
 import { callManager } from './webrtc.js';
 
-// State Management
-const state = {
-    user: null,
-    token: localStorage.getItem('token'),
-    currentView: 'login'
-};
-
-// DOM Elements
 const root = document.getElementById('root');
+let currentUser = null;
 
-// --- UI Components ---
-
-const renderLogin = () => {
+function renderLogin() {
     root.innerHTML = `
         <div class="auth-container">
-            <h2>Welcome Back</h2>
-            <form id="loginForm">
-                <input type="email" id="loginEmail" placeholder="Email" required />
-                <input type="password" id="loginPassword" placeholder="Password" required />
-                <button type="submit">Login</button>
-            </form>
-            <p>Don't have an account? <a href="#" id="showRegister">Register</a></p>
-        </div>
-    `;
-    
-    document.getElementById('loginForm').addEventListener('submit', handleLogin);
-    document.getElementById('showRegister').addEventListener('click', (e) => {
-        e.preventDefault();
-        renderRegister();
-    });
-};
+            <h2>Login</h2>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="primary-btn" onclick="handleLogin()">Login</button>
+            <p class="link-text" onclick="renderRegister()">Create Account</p>
+        </div>`;
+}
 
-const renderRegister = () => {
+function renderRegister() {
     root.innerHTML = `
         <div class="auth-container">
-            <h2>Create Account</h2>
-            <form id="registerForm">
-                <input type="text" id="regName" placeholder="Full Name" required />
-                <input type="email" id="regEmail" placeholder="Email" required />
-                <input type="password" id="regPassword" placeholder="Password" required />
-                <button type="submit">Register</button>
-            </form>
-            <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
-        </div>
-    `;
+            <h2>Register</h2>
+            <input type="text" id="name" placeholder="Full Name">
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="primary-btn" onclick="handleRegister()">Sign Up</button>
+            <p class="link-text" onclick="renderLogin()">Back to Login</p>
+        </div>`;
+}
 
-    document.getElementById('registerForm').addEventListener('submit', handleRegister);
-    document.getElementById('showLogin').addEventListener('click', (e) => {
-        e.preventDefault();
-        renderLogin();
-    });
-};
-
-const renderDashboard = () => {
+function renderDashboard() {
     root.innerHTML = `
         <div class="dashboard">
-            <header>
-                <h3>Contacts</h3>
-                <button id="logoutBtn">Logout</button>
-            </header>
-            <div id="contactList"></div>
-            <button id="startCallBtn" class="fab">📞</button>
-        </div>
-    `;
-    
-    document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-    loadContacts();
+            <div class="header"><h3>Contacts</h3><button onclick="logout()" style="background:none;border:none;color:#aaa;">Logout</button></div>
+            <div class="contact-list" id="list"></div>
+            <button class="fab" onclick="startDemoCall()">📞</button>
+        </div>`;
+    document.getElementById('list').innerHTML = `<div class="contact-item"><div class="avatar"></div><div><b>Demo User</b><br><small>Online</small></div></div>`;
+}
+
+window.handleLogin = async () => {
+    try {
+        const d = await authAPI.login(document.getElementById('email').value, document.getElementById('pass').value);
+        localStorage.setItem('token', d.data.token);
+        currentUser = d.data;
+        callManager.init(d.data._id);
+        renderDashboard();
+    } catch(e) { alert(e.message); }
 };
 
-const renderCallScreen = (targetUserId, isOutgoing = true) => {
-    root.innerHTML = `
-        <div class="call-screen">
-            <div class="caller-info">
-                <div class="avatar"></div>
-                <h3>Calling...</h3>
-            </div>
-            <div class="call-controls">
-                <button id="muteBtn" class="icon-btn">🎤</button>
-                <button id="endCallBtn" class="icon-btn danger">❌</button>
-                <button id="speakerBtn" class="icon-btn">🔊</button>
-            </div>
-        </div>
-    `;
-
-    document.getElementById('endCallBtn').addEventListener('click', () => {
-        callManager.endCall();
+window.handleRegister = async () => {
+    try {
+        const d = await authAPI.register(document.getElementById('name').value, document.getElementById('email').value, document.getElementById('pass').value);
+        localStorage.setItem('token', d.data.token);
+        currentUser = d.data;
+        callManager.init(d.data._id);
         renderDashboard();
-    });
-
-    // Start WebRTC Call
-    if (isOutgoing) {
-        callManager.startCall(targetUserId);
-    }
+    } catch(e) { alert(e.message); }
 };
 
-// --- Logic Functions ---
-
-async function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-
-    try {
-        const data = await authAPI.login(email, password);
-        state.token = data.data.token;
-        state.user = data.data;
-        localStorage.setItem('token', state.token);
-        renderDashboard();
-    } catch (err) {
-        alert(err.message || 'Login failed');
-    }
-}
-
-async function handleRegister(e) {
-    e.preventDefault();
-    const name = document.getElementById('regName').value;
-    const email = document.getElementById('regEmail').value;
-    const password = document.getElementById('regPassword').value;
-
-    try {
-        const data = await authAPI.register(name, email, password);
-        state.token = data.data.token;
-        state.user = data.data;
-        localStorage.setItem('token', state.token);
-        renderDashboard();
-    } catch (err) {
-        alert(err.message || 'Registration failed');
-    }
-}
-
-function handleLogout() {
-    localStorage.removeItem('token');
-    state.token = null;
-    state.user = null;
-    renderLogin();
-}
-
-async function loadContacts() {
-    // Mock data for now, will replace with API call later
-    const list = document.getElementById('contactList');
-    list.innerHTML = `
-        <div class="contact-item" onclick="renderCallScreen('user123')">
-            <span>User One</span>
-            <span class="status online"></span>
-        </div>
-    `;
-}
+window.logout = () => { localStorage.removeItem('token'); location.reload(); };
+window.startDemoCall = () => { if(confirm("Start demo call?")) callManager.startCall('demo-user-id'); };
 
 export function initApp() {
-    if (state.token) {
-        renderDashboard();
-    } else {
-        renderLogin();
-    }
+    if(localStorage.getItem('token')) renderDashboard(); else renderLogin();
 }
