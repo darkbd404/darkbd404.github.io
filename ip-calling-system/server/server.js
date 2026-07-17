@@ -10,7 +10,7 @@ const xss = require('xss-clean');
 const path = require('path');
 
 // Internal Modules
-const connectDatabase = require('./database/connectDB');
+const connectDatabase = require('./database/connectDB'); // ✅ এই পাথটি ঠিক আছে কারণ database ফোল্ডার আছে
 const logger = require('./config/logger');
 const errorHandler = require('./middleware/errorHandler');
 
