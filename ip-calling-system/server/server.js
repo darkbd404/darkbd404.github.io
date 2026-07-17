@@ -10,7 +10,7 @@ const xss = require('xss-clean');
 const path = require('path');
 
 // Internal Modules (পরবর্তী ধাপে এই ফাইলগুলো তৈরি করা হবে)
-const connectDatabase = require('./config/database');
+const connectDatabase = require('require('./database/connectDB');
 const logger = require('./config/logger');
 const errorHandler = require('./middleware/errorHandler');
 
