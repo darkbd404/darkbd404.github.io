@@ -4,9 +4,6 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
 const path = require('path');
 
 // Internal Modules
@@ -14,47 +11,17 @@ const connectDatabase = require('./database/connectDB');
 const logger = require('./config/logger');
 const errorHandler = require('./middleware/errorHandler');
 
-// Initialize Express App & HTTP Server
-const app = express(); // ️ এই লাইনটি অবশ্যই থাকতে হবে
-
-// Render-এর জন্য Trust Proxy
-app.set('trust proxy', true); 
-
+const app = express();
+app.set('trust proxy', true);
 const server = http.createServer(app);
 
-// Allowed Origins
-const allowedOrigins = process.env.CLIENT_URL 
-    ? process.env.CLIENT_URL.split(',') 
-    : ['*'];
-
-// Socket.IO Setup
-const io = new Server(server, {
-  cors: { origin: allowedOrigins, methods: ['GET', 'POST'], credentials: true }
-});
-
-// Security Middleware
+// CORS & Security
+app.use(cors({ origin: '*', credentials: true }));
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
-app.options('*', cors()); // Preflight request handle
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-app.use(mongoSanitize());
-app.use(xss());
-
-// Rate Limiting
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
-app.use('/api/', limiter);
-
-// Static Files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Database Connection
+// Database
 connectDatabase();
 
 // API Routes
@@ -64,19 +31,22 @@ app.use('/api/calls', require('./routes/callRoutes'));
 app.use('/api/contacts', require('./routes/contactRoutes'));
 
 // Socket Handler
+const io = new Server(server, { cors: { origin: '*' } });
 require('./socket/socketHandler')(io);
 
-// Global Error Handler
+// ⚠️ STATIC FILES SERVE (FRONTEND)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Catch-all route for SPA
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Error Handler
 app.use(errorHandler);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
-
-// Handle Unhandled Rejections
-process.on('unhandledRejection', (err) => {
-  logger.error(`Unhandled Rejection: ${err.message}`);
-  server.close(() => process.exit(1));
+    logger.info(`Server running on port ${PORT}`);
 });
