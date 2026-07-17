@@ -1,46 +1,55 @@
+// DOM Elements
 const root = document.getElementById('root');
-let currentUser = null;
 
-// 1. Show Login Form
+// 1. Login Screen
 function showLogin() {
     root.innerHTML = `
         <div class="container">
             <h2>Login</h2>
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="pass" placeholder="Password">
-            <button onclick="handleLogin()">Login</button>
-            <p class="link" onclick="showRegister()">Create Account</p>
+            <input type="email" id="loginEmail" placeholder="Email">
+            <input type="password" id="loginPass" placeholder="Password">
+            <button id="btnLogin">Login</button>
+            <p class="link" id="goRegister">Create Account</p>
         </div>`;
+    
+    // Event Listeners (এই পদ্ধতিটি ১০০% কাজ করে)
+    document.getElementById('btnLogin').addEventListener('click', handleLogin);
+    document.getElementById('goRegister').addEventListener('click', showRegister);
 }
 
-// 2. Show Register Form
+// 2. Register Screen
 function showRegister() {
     root.innerHTML = `
         <div class="container">
             <h2>Create Account</h2>
-            <input type="text" id="name" placeholder="Full Name">
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="pass" placeholder="Password">
-            <button onclick="handleRegister()">Sign Up</button>
-            <p class="link" onclick="showLogin()">Back to Login</p>
+            <input type="text" id="regName" placeholder="Full Name">
+            <input type="email" id="regEmail" placeholder="Email">
+            <input type="password" id="regPass" placeholder="Password">
+            <button id="btnRegister">Sign Up</button>
+            <p class="link" id="goLogin">Back to Login</p>
         </div>`;
+        
+    // Event Listeners
+    document.getElementById('btnRegister').addEventListener('click', handleRegister);
+    document.getElementById('goLogin').addEventListener('click', showLogin);
 }
 
-// 3. Show Dashboard
-function showDashboard() {
+// 3. Dashboard
+function showDashboard(name) {
     root.innerHTML = `
         <div class="container">
-            <h2>Welcome, ${currentUser.name}</h2>
+            <h2>Welcome, ${name}</h2>
             <p style="color:#0f0; margin: 10px 0;">● Online</p>
-            <button onclick="logout()" style="background:#cf6679;">Logout</button>
+            <button onclick="location.reload()" style="background:#cf6679;">Logout</button>
         </div>`;
 }
 
-// --- Logic Functions ---
+// --- API Functions ---
 
 async function handleLogin() {
-    const email = document.getElementById('email').value;
-    const pass = document.getElementById('pass').value;
+    const email = document.getElementById('loginEmail').value;
+    const pass = document.getElementById('loginPass').value;
+    
     if(!email || !pass) return alert("Please fill all fields");
     
     try {
@@ -50,18 +59,21 @@ async function handleLogin() {
             body: JSON.stringify({ email, password: pass })
         });
         const data = await res.json();
+        
         if (!res.ok) throw new Error(data.message || "Login failed");
         
-        currentUser = data.data;
         localStorage.setItem('token', data.data.token);
-        showDashboard();
-    } catch (e) { alert(e.message); }
+        showDashboard(data.data.name);
+    } catch (e) { 
+        alert(e.message); 
+    }
 }
 
 async function handleRegister() {
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const pass = document.getElementById('pass').value;
+    const name = document.getElementById('regName').value;
+    const email = document.getElementById('regEmail').value;
+    const pass = document.getElementById('regPass').value;
+    
     if(!name || !email || !pass) return alert("Please fill all fields");
 
     try {
@@ -71,24 +83,20 @@ async function handleRegister() {
             body: JSON.stringify({ name, email, password: pass })
         });
         const data = await res.json();
+        
         if (!res.ok) throw new Error(data.message || "Registration failed");
         
-        currentUser = data.data;
         localStorage.setItem('token', data.data.token);
-        showDashboard();
-    } catch (e) { alert(e.message); }
-}
-
-function logout() {
-    localStorage.removeItem('token');
-    location.reload();
+        showDashboard(data.data.name);
+    } catch (e) { 
+        alert(e.message); 
+    }
 }
 
 // Initialize App
 if (localStorage.getItem('token')) {
-    // Temporary user object for UI testing
-    currentUser = { name: "User" }; 
-    showDashboard();
+    // If token exists, show dashboard (In real app, verify token first)
+    showDashboard("User"); 
 } else {
     showLogin();
 }
