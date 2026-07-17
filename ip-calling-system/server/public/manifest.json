@@ -1,0 +1,9 @@
+{
+  "name": "IP Calling System",
+  "short_name": "IPCall",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#bb86fc",
+  "icons": [{ "src": "https://via.placeholder.com/192/bb86fc/000000?text=IP", "sizes": "192x192", "type": "image/png" }]
+}
