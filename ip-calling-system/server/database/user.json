@@ -2,15 +2,15 @@
   {
     "id": 1,
     "name": "Salam",
-    "email": "admin@.com.bd",
-    "number": "01620230864",
+    "email": "salam@gmail.com",
+    "number": "01700000000",
     "password": "123456"
   },
   {
     "id": 2,
-    "name": "Test User",
-    "email": "test@test.com",
-    "number": "01800000000",
-    "password": "1234"
+    "name": "Admin",
+    "email": "admin@test.com",
+    "number": "01900000000",
+    "password": "admin123"
   }
 ]
