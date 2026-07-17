@@ -1,16 +1,13 @@
 [
   {
-    "id": 1,
-    "name": "Salam",
-    "email": "salam@gmail.com",
-    "number": "01700000000",
-    "password": "123456"
-  },
-  {
-    "id": 2,
-    "name": "Admin",
-    "email": "admin@test.com",
-    "number": "01900000000",
-    "password": "admin123"
+    "id": "seed-user-1",
+    "username": "admin",
+    "password": "1234", 
+    "profile": { "displayName": "Admin User", "avatar": null },
+    "online": false,
+    "socketId": null,
+    "friends": [],
+    "recentCalls": [],
+    "createdAt": "2026-07-17T00:00:00.000Z"
   }
 ]
