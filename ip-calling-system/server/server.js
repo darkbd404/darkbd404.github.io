@@ -5,7 +5,7 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
-const fs = require('fs'); // ফাইল চেক করার জন্য
+const fs = require('fs');
 
 // Internal Modules
 const connectDatabase = require('./database/connectDB');
@@ -35,17 +35,17 @@ app.use('/api/contacts', require('./routes/contactRoutes'));
 const io = new Server(server, { cors: { origin: '*' } });
 require('./socket/socketHandler')(io);
 
-// ️ STATIC FILES SERVE (Safe Check)
+// ⚠️ STATIC FILES SERVE (Safe Check)
 const publicPath = path.join(__dirname, 'public');
 if (fs.existsSync(publicPath)) {
     app.use(express.static(publicPath));
     
-    // Catch-all route for SPA (Only if public folder exists)
+    // Catch-all route for SPA
     app.get('*', (req, res) => {
         res.sendFile(path.join(publicPath, 'index.html'));
     });
 } else {
-    logger.warn("Public folder not found! Frontend will not load, but API is working.");
+    logger.warn("Public folder not found! Frontend will not load.");
     app.get('/', (req, res) => {
         res.json({ message: "Backend is running. Public folder missing." });
     });
