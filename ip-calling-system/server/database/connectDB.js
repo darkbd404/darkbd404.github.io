@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
-const logger = require('../config/logger');
+const logger = require('../config/logger'); // ✅ পাথ ঠিক করা হয়েছে (config ফোল্ডার থেকে নেওয়ার জন্য)
 
-const connectDB = async () => {
+const connectDatabase = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
-    logger.info(`MongoDB Connected: ${conn.connection.host}`);
+    logger.info(`MongoDB Connected Successfully: ${conn.connection.host}`);
   } catch (error) {
-    logger.error(`Error: ${error.message}`);
-    process.exit(1);
+    logger.error(`Database connection error: ${error.message}`);
+    process.exit(1); 
   }
 };
 
-module.exports = connectDB;
+module.exports = connectDatabase;
