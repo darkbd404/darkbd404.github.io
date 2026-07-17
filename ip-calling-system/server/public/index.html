@@ -2,14 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IP Calling System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IP Call</title>
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="/style.css">
+    <meta name="theme-color" content="#121212">
 </head>
 <body>
-    <div id="root"></div>
-    <!-- Socket.IO Client Library (CDN) -->
+    <div id="app"></div>
+    <audio id="remote-audio" autoplay></audio>
+    
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="/app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+    </script>
 </body>
 </html>
