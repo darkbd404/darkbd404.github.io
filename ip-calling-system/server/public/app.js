@@ -12,7 +12,6 @@ function showLogin() {
             <p class="link" id="goRegister">Create Account</p>
         </div>`;
     
-    // Event Listeners (এই পদ্ধতিটি ১০০% কাজ করে)
     document.getElementById('btnLogin').addEventListener('click', handleLogin);
     document.getElementById('goRegister').addEventListener('click', showRegister);
 }
@@ -29,7 +28,6 @@ function showRegister() {
             <p class="link" id="goLogin">Back to Login</p>
         </div>`;
         
-    // Event Listeners
     document.getElementById('btnRegister').addEventListener('click', handleRegister);
     document.getElementById('goLogin').addEventListener('click', showLogin);
 }
@@ -44,7 +42,7 @@ function showDashboard(name) {
         </div>`;
 }
 
-// --- API Functions ---
+// --- API Functions (Safe Version) ---
 
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value;
@@ -58,7 +56,11 @@ async function handleLogin() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password: pass })
         });
-        const data = await res.json();
+        
+        // ⚠️ Safe JSON Parse
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch(e) { throw new Error("Server error: Invalid response"); }
         
         if (!res.ok) throw new Error(data.message || "Login failed");
         
@@ -82,7 +84,11 @@ async function handleRegister() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password: pass })
         });
-        const data = await res.json();
+        
+        // ⚠️ Safe JSON Parse
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch(e) { throw new Error("Server error: Invalid response. Is server awake?"); }
         
         if (!res.ok) throw new Error(data.message || "Registration failed");
         
@@ -95,7 +101,6 @@ async function handleRegister() {
 
 // Initialize App
 if (localStorage.getItem('token')) {
-    // If token exists, show dashboard (In real app, verify token first)
     showDashboard("User"); 
 } else {
     showLogin();
