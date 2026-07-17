@@ -9,8 +9,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const path = require('path');
 
-// Internal Modules (পরবর্তী ধাপে এই ফাইলগুলো তৈরি করা হবে)
-const connectDatabase = require('require('./database/connectDB');
+// Internal Modules
+const connectDatabase = require('./database/connectDB');
 const logger = require('./config/logger');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -18,10 +18,15 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 const server = http.createServer(app);
 
+// Allowed Origins (Frontend URLs)
+const allowedOrigins = process.env.CLIENT_URL 
+    ? process.env.CLIENT_URL.split(',') 
+    : ['http://localhost:3000'];
+
 // Socket.IO Setup with CORS
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -32,18 +37,18 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }
 }));
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-app.use(mongoSanitize()); // Prevent NoSQL Injection
-app.use(xss()); // Prevent XSS attacks
+app.use(mongoSanitize());
+app.use(xss());
 
 // Rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per window
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api/', limiter);
@@ -54,7 +59,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Database Connection
 connectDatabase();
 
-// API Routes (পরবর্তী ধাপে এই ফাইলগুলো তৈরি করা হবে)
+// API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/calls', require('./routes/callRoutes'));
@@ -72,7 +77,6 @@ server.listen(PORT, () => {
   logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
 
-// Handle Unhandled Promise Rejections
 process.on('unhandledRejection', (err) => {
   logger.error(`Unhandled Rejection: ${err.message}`);
   server.close(() => process.exit(1));
