@@ -1,4 +1,4 @@
-import { initApp } from './app.js';
+import { initApp } from 'import './style.css';
 
 // Initialize App when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
