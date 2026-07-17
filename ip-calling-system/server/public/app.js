@@ -9,7 +9,7 @@ function showLogin() {
             <input type="email" id="email" placeholder="Email">
             <input type="password" id="pass" placeholder="Password">
             <button onclick="handleLogin()">Login</button>
-            <p style="margin-top:15px;cursor:pointer;color:#aaa;" onclick="showRegister()">Create Account</p>
+            <p class="link" onclick="showRegister()">Create Account</p>
         </div>`;
 }
 
@@ -22,7 +22,7 @@ function showRegister() {
             <input type="email" id="email" placeholder="Email">
             <input type="password" id="pass" placeholder="Password">
             <button onclick="handleRegister()">Sign Up</button>
-            <p style="margin-top:15px;cursor:pointer;color:#aaa;" onclick="showLogin()">Back to Login</p>
+            <p class="link" onclick="showLogin()">Back to Login</p>
         </div>`;
 }
 
@@ -31,7 +31,7 @@ function showDashboard() {
     root.innerHTML = `
         <div class="container">
             <h2>Welcome, ${currentUser.name}</h2>
-            <p>Status: Online</p>
+            <p style="color:#0f0; margin: 10px 0;">● Online</p>
             <button onclick="logout()" style="background:#cf6679;">Logout</button>
         </div>`;
 }
@@ -41,6 +41,8 @@ function showDashboard() {
 async function handleLogin() {
     const email = document.getElementById('email').value;
     const pass = document.getElementById('pass').value;
+    if(!email || !pass) return alert("Please fill all fields");
+    
     try {
         const res = await fetch('/api/auth/login', {
             method: 'POST',
@@ -48,7 +50,7 @@ async function handleLogin() {
             body: JSON.stringify({ email, password: pass })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
+        if (!res.ok) throw new Error(data.message || "Login failed");
         
         currentUser = data.data;
         localStorage.setItem('token', data.data.token);
@@ -60,6 +62,8 @@ async function handleRegister() {
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
     const pass = document.getElementById('pass').value;
+    if(!name || !email || !pass) return alert("Please fill all fields");
+
     try {
         const res = await fetch('/api/auth/register', {
             method: 'POST',
@@ -67,7 +71,7 @@ async function handleRegister() {
             body: JSON.stringify({ name, email, password: pass })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
+        if (!res.ok) throw new Error(data.message || "Registration failed");
         
         currentUser = data.data;
         localStorage.setItem('token', data.data.token);
@@ -80,9 +84,9 @@ function logout() {
     location.reload();
 }
 
-// Initialize
+// Initialize App
 if (localStorage.getItem('token')) {
-    // In a real app, verify token here. For now, just show dashboard.
+    // Temporary user object for UI testing
     currentUser = { name: "User" }; 
     showDashboard();
 } else {
