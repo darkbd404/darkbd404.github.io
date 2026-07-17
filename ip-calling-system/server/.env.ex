@@ -1,0 +1,10 @@
+PORT=5000
+NODE_ENV=development
+MONGO_URI=mongodb://localhost:27017/ip-calling-system
+JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
+JWT_EXPIRE=7d
+CLIENT_URL=http://localhost:3000
+STUN_URL=stun:stun.l.google.com:19302
+TURN_URL=turn:your-turn-server.com:3478
+TURN_USERNAME=your_turn_username
+TURN_CREDENTIAL=your_turn_credential
