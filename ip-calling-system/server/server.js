@@ -16,13 +16,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', require('./routes/authRoutes'));
 
+// NEW: API to get all users for the dashboard
+app.get('/api/users', async (req, res) => {
+    try {
+        const DB_PATH = path.join(__dirname, 'database/user.json');
+        const data = await fs.readFile(DB_PATH, 'utf8');
+        const users = JSON.parse(data);
+        // Remove passwords before sending to frontend
+        const safeUsers = users.map(({ password, ...u }) => u);
+        res.json(safeUsers);
+    } catch (e) {
+        res.status(500).json({ message: "Failed to load users" });
+    }
+});
+
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// MAP USERID TO SOCKETID
+// SOCKET.IO & WEBRTC SIGNALING
 const userSocketMap = {}; 
-
 const DB_PATH = path.join(__dirname, 'database/user.json');
 
 async function updateUserStatus(userId, updates) {
@@ -38,24 +51,17 @@ async function updateUserStatus(userId, updates) {
 }
 
 io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-
     socket.on('join', async ({ userId }) => {
         socket.userId = userId;
-        userSocketMap[userId] = socket.id; // STORE MAPPING
-        
+        userSocketMap[userId] = socket.id;
         await updateUserStatus(userId, { online: true, socketId: socket.id });
         io.emit('user-status', { userId, online: true });
     });
 
-    // ROUTE BY USERID
     socket.on('call-user', ({ targetUserId, offer, callerId }) => {
         const targetSocketId = userSocketMap[targetUserId];
-        if (targetSocketId) {
-            io.to(targetSocketId).emit('incoming-call', { offer, callerId });
-        } else {
-            socket.emit('call-error', { message: "User is offline" });
-        }
+        if (targetSocketId) io.to(targetSocketId).emit('incoming-call', { offer, callerId });
+        else socket.emit('call-error', { message: "User is offline" });
     });
 
     socket.on('answer-call', ({ targetUserId, answer }) => {
@@ -77,7 +83,7 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', async () => {
         if (socket.userId) {
-            delete userSocketMap[socket.userId]; // REMOVE MAPPING
+            delete userSocketMap[socket.userId];
             await updateUserStatus(socket.userId, { online: false, socketId: null });
             io.emit('user-status', { userId: socket.userId, online: false });
         }
