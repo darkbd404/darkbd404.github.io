@@ -8,107 +8,101 @@ let dialedNumber = '';
 
 const RTC_CONFIG = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
-// --- NAVIGATION ---
+// --- NAVIGATION & RENDERING ---
 function renderBottomNav() {
-    return `
-    <div class="bottom-nav">
-        <div class="nav-item ${currentTab==='dial'?'active':''}" onclick="switchTab('dial')">
-            <span class="nav-icon"></span>Dial
-        </div>
-        <div class="nav-item ${currentTab==='contacts'?'active':''}" onclick="switchTab('contacts')">
-            <span class="nav-icon"></span>Contacts
-        </div>
-        <div class="nav-item ${currentTab==='logs'?'active':''}" onclick="switchTab('logs')">
-            <span class="nav-icon">📋</span>Logs
-        </div>
-        <div class="nav-item ${currentTab==='profile'?'active':''}" onclick="switchTab('profile')">
-            <span class="nav-icon">👤</span>Profile
-        </div>
+    const icons = { dial: '📞', contacts: '', logs: '📋', profile: '👤' };
+    return `<div class="bottom-nav">
+        ${Object.keys(icons).map(tab => `
+            <div class="nav-item ${currentTab===tab?'active':''}" onclick="switchTab('${tab}')">
+                <span class="nav-icon">${icons[tab]}</span>
+                <span>${tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
+            </div>
+        `).join('')}
     </div>`;
 }
 
-function switchTab(tab) {
-    currentTab = tab;
-    renderApp();
-}
+function switchTab(tab) { currentTab = tab; renderApp(); }
 
-// --- SCREENS ---
 function renderLogin() {
     document.getElementById('app').innerHTML = `
-        <div class="auth-container">
-            <h2 style="text-align:center;margin-bottom:30px;color:var(--primary)">IP Calling System</h2>
+        <div style="display:flex;flex-direction:column;justify-content:center;height:100%;padding:30px;">
+            <h2 style="text-align:center;margin-bottom:40px;font-size:28px;">IP Calling System 📱</h2>
             <input type="text" id="username" placeholder="Username" autocomplete="off">
             <input type="password" id="password" placeholder="Password">
-            <button onclick="handleLogin()">Login</button>
+            <button onclick="handleLogin()">Login Securely 🔐</button>
         </div>`;
 }
 
 function renderDialPad() {
     document.getElementById('app').innerHTML = `
-        <div class="dial-display" id="dialDisplay">${dialedNumber || '<span style="color:#555">Enter IP Number</span>'}</div>
+        <div class="dial-input-container">
+            <input type="text" class="dial-input" id="dialInput" value="${dialedNumber}" placeholder="Enter IP Number..." readonly onclick="this.select()">
+        </div>
         <div class="dial-grid">
-            ${[1,2,3,4,5,6,7,8,9,'*',0,'#'].map(n => 
-                `<div class="dial-btn" onclick="pressKey('${n}')">${n}</div>`
-            ).join('')}
+            ${[1,2,3,4,5,6,7,8,9,'*',0,'#'].map(n => `<div class="dial-btn" onclick="pressKey('${n}')">${n}</div>`).join('')}
             <div class="dial-btn del-btn" onclick="deleteKey()"></div>
-            <div class="dial-btn call-btn" onclick="makeCall()"></div>
+            <div class="dial-btn call-btn-main" onclick="makeCall()">📞</div>
             <div class="dial-btn" style="visibility:hidden"></div>
         </div>
-        ${renderBottomNav()}
-    `;
+        ${renderBottomNav()}`;
 }
 
 function renderContacts() {
     const others = allUsers.filter(u => u.id !== currentUser.id);
     document.getElementById('app').innerHTML = `
-        <div style="padding:20px;font-size:20px;font-weight:bold">Contacts</div>
+        <div style="padding:25px;font-size:22px;font-weight:bold;">Contacts 👥</div>
         ${others.map(u => `
             <div class="list-item">
-                <div class="item-info">
-                    <h4>${u.profile.name}</h4>
-                    <p>IP: ${u.ipNumber} | ${u.online ? '🟢 Online' : '⚪ Offline'}</p>
+                <div class="item-left">
+                    <img src="${u.profile.avatar}" class="avatar-small" onerror="this.src='https://via.placeholder.com/45'">
+                    <div class="item-info">
+                        <h4>${u.profile.name}</h4>
+                        <p>IP: ${u.ipNumber} | ${u.online ? '🟢 Online' : '⚪ Offline'}</p>
+                    </div>
                 </div>
-                <button class="action-btn" onclick="callFromContact('${u.ipNumber}')">Call</button>
+                <button class="action-btn" onclick="callFromContact('${u.ipNumber}')">Call 📞</button>
             </div>
         `).join('')}
-        ${renderBottomNav()}
-    `;
+        ${renderBottomNav()}`;
 }
 
 function renderLogs() {
+    const logs = (currentUser.callLogs || []).slice().reverse();
     document.getElementById('app').innerHTML = `
-        <div style="padding:20px;font-size:20px;font-weight:bold">Call Logs</div>
-        ${(currentUser.callLogs || []).length === 0 
-            ? '<div style="text-align:center;padding:40px;color:#555">No call history</div>'
-            : currentUser.callLogs.slice().reverse().map(log => `
-                <div class="list-item">
+        <div style="padding:25px;font-size:22px;font-weight:bold;">Call Logs 📋</div>
+        ${logs.length === 0 ? '<div style="text-align:center;padding:50px;color:var(--text-muted)">No history yet ️</div>' : 
+        logs.map(log => `
+            <div class="list-item">
+                <div class="item-left">
+                    <div style="font-size:24px;">${log.type === 'outgoing' ? '↗️' : '↙️'}</div>
                     <div class="item-info">
-                        <h4>${log.type === 'outgoing' ? '↗ Outgoing' : ' Incoming'} - ${log.targetName || log.targetIp}</h4>
-                        <p>${new Date(log.time).toLocaleString()} | ${log.duration || 'Missed'}</p>
+                        <h4>${log.targetName || log.targetIp}</h4>
+                        <p>${new Date(log.time).toLocaleString()} | ${log.duration || 'Missed '}</p>
                     </div>
                 </div>
-            `).join('')
-        }
-        ${renderBottomNav()}
-    `;
+            </div>
+        `).join('')}
+        ${renderBottomNav()}`;
 }
 
 function renderProfile() {
+    const p = currentUser.profile;
     document.getElementById('app').innerHTML = `
         <div class="profile-header">
-            <div class="avatar">${currentUser.profile.name.charAt(0)}</div>
-            <h2>${currentUser.profile.name}</h2>
-            <p style="color:#aaa;margin-top:5px">${currentUser.profile.userType}</p>
+            <img src="${p.avatar}" class="avatar-large" onerror="this.src='https://via.placeholder.com/110'">
+            <h2>${p.name}</h2>
+            <p class="bio-text">"${p.bio}" 💭</p>
         </div>
-        <div class="detail-row"><span>IP Number</span><span style="color:var(--primary)">${currentUser.ipNumber}</span></div>
-        <div class="detail-row"><span>Email</span><span>${currentUser.profile.email}</span></div>
-        <div class="detail-row"><span>Mobile</span><span>${currentUser.profile.mobile}</span></div>
-        <div class="detail-row"><span>Joined</span><span>${new Date(currentUser.profile.createdAt).toLocaleDateString()}</span></div>
-        <div style="padding:20px">
-            <button onclick="logout()" style="background:var(--danger);color:#fff">Logout</button>
+        <div class="detail-row"><span class="detail-label"> IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
+        <div class="detail-row"><span class="detail-label"> Email</span><span>${p.email}</span></div>
+        <div class="detail-row"><span class="detail-label">📱 Mobile</span><span>${p.mobile}</span></div>
+        <div class="detail-row"><span class="detail-label">📍 Location</span><span>${p.location}</span></div>
+        <div class="detail-row"><span class="detail-label">⚧ Gender</span><span>${p.gender}</span></div>
+        <div class="detail-row"><span class="detail-label">📅 Joined</span><span>${p.joined}</span></div>
+        <div style="padding:20px;">
+            <button onclick="logout()" style="background:rgba(255,71,87,0.15);color:var(--danger);border:1px solid rgba(255,71,87,0.3);box-shadow:none;">Logout 🚪</button>
         </div>
-        ${renderBottomNav()}
-    `;
+        ${renderBottomNav()}`;
 }
 
 function renderApp() {
@@ -138,31 +132,30 @@ async function handleLogin() {
     } catch (e) { alert(e.message); }
 }
 
-function logout() {
-    localStorage.removeItem('user');
-    location.reload();
-}
+function logout() { localStorage.removeItem('user'); location.reload(); }
 
 // --- DIAL PAD LOGIC ---
 function pressKey(key) {
     if (dialedNumber.length < 15) {
         dialedNumber += key;
-        renderDialPad();
+        updateDialDisplay();
     }
 }
-
 function deleteKey() {
     dialedNumber = dialedNumber.slice(0, -1);
-    renderDialPad();
+    updateDialDisplay();
 }
-
+function updateDialDisplay() {
+    const input = document.getElementById('dialInput');
+    if(input) input.value = dialedNumber;
+}
 function callFromContact(ip) {
     dialedNumber = ip;
     switchTab('dial');
-    setTimeout(makeCall, 300);
+    setTimeout(makeCall, 400);
 }
 
-// --- SOCKET & WEBRTC ---
+// --- SOCKET & WEBRTC (AUDIO FIX INCLUDED) ---
 async function fetchUsers() {
     try {
         const res = await fetch(`${API_URL}/api/users`);
@@ -172,18 +165,19 @@ async function fetchUsers() {
 
 function initSocket() {
     socket.emit('join', { userId: currentUser.id, ipNumber: currentUser.ipNumber });
-    
     socket.on('user-status', () => { if(currentTab === 'contacts') renderContacts(); });
     
     socket.on('incoming-call', async ({ offer, callerId, callerName, callerIp }) => {
-        showCallOverlay(callerName || callerIp, true);
-        await acceptCall(callerId, offer, callerName || callerIp);
+        const caller = allUsers.find(u => u.id === callerId) || { profile: { name: callerName || 'Unknown', avatar: '' } };
+        showCallOverlay(caller, true);
+        // Audio play will happen inside acceptCall after user interaction
+        await acceptCall(callerId, offer, caller);
     });
 
     socket.on('call-answered', ({ answer }) => {
         peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
         startTimer();
-        updateCallUI('Connected');
+        updateCallUI('Connected ✅');
     });
 
     socket.on('ice-candidate', ({ candidate }) => {
@@ -195,44 +189,43 @@ function initSocket() {
 }
 
 async function makeCall() {
-    if (!dialedNumber) return alert("Enter IP Number");
+    if (!dialedNumber) return alert("Enter IP Number first! 🔢");
     const targetUser = allUsers.find(u => u.ipNumber === dialedNumber);
-    const displayName = targetUser ? targetUser.profile.name : dialedNumber;
+    if(!targetUser) return alert("Invalid IP Number ❌");
     
-    showCallOverlay(displayName, false);
+    showCallOverlay(targetUser, false);
     
     localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     peerConnection = new RTCPeerConnection(RTC_CONFIG);
     localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
     
     peerConnection.ontrack = (e) => {
-        document.getElementById('remote-audio').srcObject = e.streams[0];
+        const audio = document.getElementById('remote-audio');
+        audio.srcObject = e.streams[0];
+        // Play audio immediately when track is received
+        audio.play().catch(e => console.log("Audio autoplay blocked", e));
     };
     peerConnection.onicecandidate = (e) => {
-        if (e.candidate) socket.emit('ice-candidate', { targetUserId: targetUser?.id, candidate: e.candidate });
+        if (e.candidate) socket.emit('ice-candidate', { targetUserId: targetUser.id, candidate: e.candidate });
     };
 
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
     
-    socket.emit('call-ip', { 
-        targetIp: dialedNumber, 
-        offer, 
-        callerId: currentUser.id, 
-        callerName: currentUser.profile.name 
-    });
-
-    // Add to logs
-    addLog('outgoing', displayName, dialedNumber);
+    socket.emit('call-ip', { targetIp: dialedNumber, offer, callerId: currentUser.id, callerName: currentUser.profile.name });
+    addLog('outgoing', targetUser.profile.name, dialedNumber);
 }
 
-async function acceptCall(callerId, offer, callerName) {
+async function acceptCall(callerId, offer, callerData) {
     localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     peerConnection = new RTCPeerConnection(RTC_CONFIG);
     localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
     
     peerConnection.ontrack = (e) => {
-        document.getElementById('remote-audio').srcObject = e.streams[0];
+        const audio = document.getElementById('remote-audio');
+        audio.srcObject = e.streams[0];
+        // CRITICAL FIX: Play audio here because this runs after user clicked "Answer"
+        audio.play().then(() => console.log("Remote audio playing 🔊")).catch(e => console.log("Audio error", e));
     };
     peerConnection.onicecandidate = (e) => {
         if (e.candidate) socket.emit('ice-candidate', { targetUserId: callerId, candidate: e.candidate });
@@ -244,8 +237,8 @@ async function acceptCall(callerId, offer, callerName) {
     socket.emit('answer-call', { targetUserId: callerId, answer });
     
     startTimer();
-    updateCallUI('Connected');
-    addLog('incoming', callerName, '');
+    updateCallUI('Connected ✅');
+    addLog('incoming', callerData.profile.name, '');
 }
 
 function endCall() {
@@ -264,16 +257,19 @@ function cleanupCall() {
     if(currentTab === 'dial') renderDialPad();
 }
 
-function showCallOverlay(name, isIncoming) {
+function showCallOverlay(user, isIncoming) {
     const div = document.createElement('div');
     div.className = 'call-overlay';
     div.id = 'callOverlay';
     div.innerHTML = `
-        <h2>${isIncoming ? 'Incoming Call' : 'Calling...'}</h2>
-        <h1 style="margin:10px 0;color:var(--primary)">${name}</h1>
-        <div class="timer" id="callTimer">00:00</div>
+        <div class="call-info">
+            <img src="${user.profile?.avatar || 'https://via.placeholder.com/140'}" class="caller-avatar" onerror="this.src='https://via.placeholder.com/140'">
+            <h2 style="margin-top:20px;">${isIncoming ? 'Incoming Call 📲' : 'Calling... 📞'}</h2>
+            <p>${user.profile?.name || user.ipNumber}</p>
+            <div class="timer" id="callTimer">00:00</div>
+        </div>
         <div class="controls">
-            <button class="ctrl-btn" id="btnMute" onclick="toggleMute()">🎤</button>
+            <button class="ctrl-btn" id="btnMute" onclick="toggleMute()"></button>
             <button class="ctrl-btn end" onclick="endCall()">📞</button>
             <button class="ctrl-btn" id="btnSpk" onclick="toggleSpeaker()"></button>
         </div>
@@ -293,7 +289,7 @@ function startTimer() {
 }
 
 function updateCallUI(status) {
-    const el = document.querySelector('.call-overlay h2');
+    const el = document.querySelector('.call-info h2');
     if(el) el.innerText = status;
 }
 
@@ -301,17 +297,18 @@ function toggleMute() {
     if(localStream) {
         const t = localStream.getAudioTracks()[0];
         t.enabled = !t.enabled;
-        document.getElementById('btnMute').style.opacity = t.enabled ? '1' : '0.3';
+        document.getElementById('btnMute').classList.toggle('active', !t.enabled);
     }
 }
 
 function toggleSpeaker() {
     document.getElementById('btnSpk').classList.toggle('active');
+    // Note: Actual speaker switching requires setSinkId which is limited in browsers
 }
 
 function addLog(type, name, ip) {
     if(!currentUser.callLogs) currentUser.callLogs = [];
-    currentUser.callLogs.push({ type, targetName: name, targetIp: ip, time: new Date().toISOString(), duration: '' });
+    currentUser.callLogs.push({ type, targetName: name, targetIp: ip, time: new Date().toISOString(), duration: seconds > 0 ? `${Math.floor(seconds/60)}m ${seconds%60}s` : 'Missed' });
     localStorage.setItem('user', JSON.stringify(currentUser));
 }
 
