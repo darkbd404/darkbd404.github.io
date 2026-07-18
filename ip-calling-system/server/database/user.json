@@ -1,30 +1,34 @@
 [
   {
-    "id": "user-001",
-    "username": "admin",
+    "id": "u1",
+    "username": "salam",
     "password": "123456",
+    "ipNumber": "09696590864",
     "profile": {
-      "displayName": "Admin Boss",
-      "avatar": null
+      "name": "Salam",
+      "email": "salam@example.com",
+      "mobile": "01700000000",
+      "userType": "Admin",
+      "createdAt": "2026-07-17T00:00:00.000Z"
     },
     "online": false,
     "socketId": null,
-    "friends": [],
-    "recentCalls": [],
-    "createdAt": "2026-07-17T00:00:00.000Z"
+    "callLogs": []
   },
   {
-    "id": "user-002",
-    "username": "salam",
-    "password": "mypassword",
+    "id": "u2",
+    "username": "wife",
+    "password": "123456",
+    "ipNumber": "0964930864",
     "profile": {
-      "displayName": "Salam Vai",
-      "avatar": null
+      "name": "Wife",
+      "email": "wife@example.com",
+      "mobile": "01800000000",
+      "userType": "User",
+      "createdAt": "2026-07-17T00:00:00.000Z"
     },
     "online": false,
     "socketId": null,
-    "friends": [],
-    "recentCalls": [],
-    "createdAt": "2026-07-17T00:00:00.000Z"
+    "callLogs": []
   }
 ]
