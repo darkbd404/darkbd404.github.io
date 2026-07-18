@@ -1,13 +1,1 @@
-[
-  {
-    "id": "seed-user-1",
-    "username": "admin",
-    "password": "1234", 
-    "profile": { "displayName": "Admin User", "avatar": null },
-    "online": false,
-    "socketId": null,
-    "friends": [],
-    "recentCalls": [],
-    "createdAt": "2026-07-17T00:00:00.000Z"
-  }
-]
+[]
