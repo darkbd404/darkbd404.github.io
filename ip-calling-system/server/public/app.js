@@ -94,10 +94,10 @@ function renderProfile() {
             <h2>${p.name}</h2>
             <p class="bio-text">"${p.bio}" 💭</p>
         </div>
-        <div class="detail-row"><span class="detail-label"> IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
+        <div class="detail-row"><span class="detail-label">🔢 IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
         <div class="detail-row"><span class="detail-label">📧 Email</span><span>${p.email}</span></div>
-        <div class="detail-row"><span class="detail-label">📱 Mobile</span><span>${p.mobile}</span></div>
-        <div class="detail-row"><span class="detail-label"> Location</span><span>${p.location}</span></div>
+        <div class="detail-row"><span class="detail-label"> Mobile</span><span>${p.mobile}</span></div>
+        <div class="detail-row"><span class="detail-label">📍 Location</span><span>${p.location}</span></div>
         <div class="detail-row"><span class="detail-label">⚧ Gender</span><span>${p.gender}</span></div>
         <div class="detail-row"><span class="detail-label">📅 Joined</span><span>${p.joined}</span></div>
         <div style="padding:20px;">
