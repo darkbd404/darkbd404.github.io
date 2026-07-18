@@ -8,7 +8,11 @@ const fs = require('fs').promises;
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] }, pingTimeout: 60000 });
+const io = new Server(server, { 
+    cors: { origin: "*", methods: ["GET", "POST"] }, 
+    pingTimeout: 60000,
+    pingInterval: 25000
+});
 
 app.use(cors());
 app.use(express.json());
@@ -49,11 +53,19 @@ io.on('connection', (socket) => {
 
     socket.on('join', async ({ userId, ipNumber }) => {
         socket.userId = userId;
+        
+        // Clean up old mappings for this user/IP before creating new ones
+        if(userSocketMap[userId]) delete userSocketMap[userId];
+        Object.keys(ipToUserIdMap).forEach(ip => {
+            if(ipToUserIdMap[ip] === userId) delete ipToUserIdMap[ip];
+        });
+
         userSocketMap[userId] = socket.id;
         ipToUserIdMap[ipNumber] = userId;
         
         await updateUserStatus(userId, { online: true, socketId: socket.id });
         io.emit('user-status', { userId, online: true });
+        console.log(`User ${userId} joined with IP ${ipNumber}`);
     });
 
     socket.on('call-ip', ({ targetIp, offer, callerId, callerName }) => {
@@ -82,7 +94,8 @@ io.on('connection', (socket) => {
         console.log('User disconnected:', socket.id);
         if (socket.userId) {
             delete userSocketMap[socket.userId];
-            // Find IP to remove from map
+            
+            // Find and remove IP mapping
             const userIp = Object.keys(ipToUserIdMap).find(key => ipToUserIdMap[key] === socket.userId);
             if(userIp) delete ipToUserIdMap[userIp];
 
