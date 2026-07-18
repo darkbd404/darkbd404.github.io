@@ -10,7 +10,7 @@ const RTC_CONFIG = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 // --- NAVIGATION & RENDERING ---
 function renderBottomNav() {
-    const icons = { dial: '📞', contacts: '', logs: '📋', profile: '👤' };
+    const icons = { dial: '📞', contacts: '👥', logs: '📋', profile: '👤' };
     return `<div class="bottom-nav">
         ${Object.keys(icons).map(tab => `
             <div class="nav-item ${currentTab===tab?'active':''}" onclick="switchTab('${tab}')">
@@ -50,7 +50,7 @@ function renderDialPad() {
 function renderContacts() {
     const others = allUsers.filter(u => u.id !== currentUser.id);
     document.getElementById('app').innerHTML = `
-        <div style="padding:25px;font-size:22px;font-weight:bold;">Contacts 👥</div>
+        <div style="padding:25px;font-size:22px;font-weight:bold;">Contacts </div>
         ${others.map(u => `
             <div class="list-item">
                 <div class="item-left">
@@ -70,14 +70,14 @@ function renderLogs() {
     const logs = (currentUser.callLogs || []).slice().reverse();
     document.getElementById('app').innerHTML = `
         <div style="padding:25px;font-size:22px;font-weight:bold;">Call Logs 📋</div>
-        ${logs.length === 0 ? '<div style="text-align:center;padding:50px;color:var(--text-muted)">No history yet ️</div>' : 
+        ${logs.length === 0 ? '<div style="text-align:center;padding:50px;color:var(--text-muted)">No history yet 🕊️</div>' : 
         logs.map(log => `
             <div class="list-item">
                 <div class="item-left">
                     <div style="font-size:24px;">${log.type === 'outgoing' ? '↗️' : '↙️'}</div>
                     <div class="item-info">
                         <h4>${log.targetName || log.targetIp}</h4>
-                        <p>${new Date(log.time).toLocaleString()} | ${log.duration || 'Missed '}</p>
+                        <p>${new Date(log.time).toLocaleString()} | ${log.duration || 'Missed ⏰'}</p>
                     </div>
                 </div>
             </div>
@@ -93,9 +93,9 @@ function renderProfile() {
             <h2>${p.name}</h2>
             <p class="bio-text">"${p.bio}" 💭</p>
         </div>
-        <div class="detail-row"><span class="detail-label"> IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
-        <div class="detail-row"><span class="detail-label"> Email</span><span>${p.email}</span></div>
-        <div class="detail-row"><span class="detail-label">📱 Mobile</span><span>${p.mobile}</span></div>
+        <div class="detail-row"><span class="detail-label">🔢 IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
+        <div class="detail-row"><span class="detail-label">📧 Email</span><span>${p.email}</span></div>
+        <div class="detail-row"><span class="detail-label"> Mobile</span><span>${p.mobile}</span></div>
         <div class="detail-row"><span class="detail-label">📍 Location</span><span>${p.location}</span></div>
         <div class="detail-row"><span class="detail-label">⚧ Gender</span><span>${p.gender}</span></div>
         <div class="detail-row"><span class="detail-label">📅 Joined</span><span>${p.joined}</span></div>
@@ -264,14 +264,14 @@ function showCallOverlay(user, isIncoming) {
     div.innerHTML = `
         <div class="call-info">
             <img src="${user.profile?.avatar || 'https://via.placeholder.com/140'}" class="caller-avatar" onerror="this.src='https://via.placeholder.com/140'">
-            <h2 style="margin-top:20px;">${isIncoming ? 'Incoming Call 📲' : 'Calling... 📞'}</h2>
+            <h2 style="margin-top:20px;">${isIncoming ? 'Incoming Call ' : 'Calling... 📞'}</h2>
             <p>${user.profile?.name || user.ipNumber}</p>
             <div class="timer" id="callTimer">00:00</div>
         </div>
         <div class="controls">
-            <button class="ctrl-btn" id="btnMute" onclick="toggleMute()"></button>
-            <button class="ctrl-btn end" onclick="endCall()">📞</button>
-            <button class="ctrl-btn" id="btnSpk" onclick="toggleSpeaker()"></button>
+            <button class="ctrl-btn" id="btnMute" onclick="toggleMute()">🎤</button>
+            <button class="ctrl-btn end" onclick="endCall()"></button>
+            <button class="ctrl-btn" id="btnSpk" onclick="toggleSpeaker()">🔊</button>
         </div>
     `;
     document.body.appendChild(div);
@@ -308,7 +308,7 @@ function toggleSpeaker() {
 
 function addLog(type, name, ip) {
     if(!currentUser.callLogs) currentUser.callLogs = [];
-    currentUser.callLogs.push({ type, targetName: name, targetIp: ip, time: new Date().toISOString(), duration: seconds > 0 ? `${Math.floor(seconds/60)}m ${seconds%60}s` : 'Missed' });
+    currentUser.callLogs.push({ type, targetName: name, targetIp: ip, time: new Date().toISOString(), duration: seconds > 0 ? `${Math.floor(seconds/60)}m ${seconds%60}s` : 'Missed ⏰' });
     localStorage.setItem('user', JSON.stringify(currentUser));
 }
 
