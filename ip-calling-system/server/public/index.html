@@ -11,13 +11,10 @@
 <body>
     <div id="app"></div>
     <audio id="remote-audio" autoplay></audio>
-    
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="/app.js"></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
-        }
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
     </script>
 </body>
 </html>
