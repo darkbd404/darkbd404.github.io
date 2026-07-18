@@ -8,7 +8,7 @@ const fs = require('fs').promises;
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
+const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] }, pingTimeout: 60000 });
 
 app.use(cors());
 app.use(express.json());
@@ -16,7 +16,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', require('./routes/authRoutes'));
 
-// GET ALL USERS FOR CONTACTS & DIALING
 app.get('/api/users', async (req, res) => {
     try {
         const DB_PATH = path.join(__dirname, 'database/user.json');
@@ -29,9 +28,8 @@ app.get('/api/users', async (req, res) => {
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-// SOCKET.IO LOGIC
 const userSocketMap = {}; 
-const ipToUserIdMap = {}; // Map IP Number to UserID
+const ipToUserIdMap = {}; 
 const DB_PATH = path.join(__dirname, 'database/user.json');
 
 async function updateUserStatus(userId, updates) {
@@ -47,24 +45,23 @@ async function updateUserStatus(userId, updates) {
 }
 
 io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
     socket.on('join', async ({ userId, ipNumber }) => {
         socket.userId = userId;
         userSocketMap[userId] = socket.id;
-        ipToUserIdMap[ipNumber] = userId; // Store IP mapping
+        ipToUserIdMap[ipNumber] = userId;
         
         await updateUserStatus(userId, { online: true, socketId: socket.id });
         io.emit('user-status', { userId, online: true });
     });
 
-    // CALL BY IP NUMBER
     socket.on('call-ip', ({ targetIp, offer, callerId, callerName }) => {
         const targetUserId = ipToUserIdMap[targetIp];
         if (targetUserId && userSocketMap[targetUserId]) {
-            io.to(userSocketMap[targetUserId]).emit('incoming-call', { 
-                offer, callerId, callerName, callerIp: targetIp 
-            });
+            io.to(userSocketMap[targetUserId]).emit('incoming-call', { offer, callerId, callerName, callerIp: targetIp });
         } else {
-            socket.emit('call-error', { message: "User offline or invalid IP" });
+            socket.emit('call-error', { message: "User is offline or invalid IP ❌" });
         }
     });
 
@@ -80,9 +77,15 @@ io.on('connection', (socket) => {
         if (targetUserId && userSocketMap[targetUserId]) io.to(userSocketMap[targetUserId]).emit('call-ended');
     });
 
+    // CRITICAL: Handle disconnect properly
     socket.on('disconnect', async () => {
+        console.log('User disconnected:', socket.id);
         if (socket.userId) {
             delete userSocketMap[socket.userId];
+            // Find IP to remove from map
+            const userIp = Object.keys(ipToUserIdMap).find(key => ipToUserIdMap[key] === socket.userId);
+            if(userIp) delete ipToUserIdMap[userIp];
+
             await updateUserStatus(socket.userId, { online: false, socketId: null });
             io.emit('user-status', { userId: socket.userId, online: false });
         }
