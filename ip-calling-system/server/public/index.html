@@ -3,18 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IP Call System</title>
+    <title>IP Calling System</title>
     <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="/style.css">
-    <meta name="theme-color" content="#121212">
+    <!-- ⚠️ VERSIONING ADDED TO FIX CACHE -->
+    <link rel="stylesheet" href="/style.css?v=3">
+    <meta name="theme-color" content="#0f0f13">
 </head>
 <body>
     <div id="app"></div>
     <audio id="remote-audio" autoplay playsinline></audio>
+    
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="/app.js"></script>
+    <script src="/app.js?v=3"></script>
     <script>
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                } 
+            });
+            // Register fresh SW after clearing old ones
+            setTimeout(() => {
+                 navigator.serviceWorker.register('/sw.js');
+            }, 500);
+        }
     </script>
 </body>
 </html>
