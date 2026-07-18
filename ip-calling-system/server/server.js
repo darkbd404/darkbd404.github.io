@@ -16,11 +16,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', require('./routes/authRoutes'));
 
+// Serve Frontend
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// SOCKET.IO LOGIC
+// SOCKET.IO & WEBRTC SIGNALING
 const DB_PATH = path.join(__dirname, 'database/user.json');
 
 async function updateUserStatus(userId, updates) {
@@ -36,12 +37,15 @@ async function updateUserStatus(userId, updates) {
 }
 
 io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
     socket.on('join', async ({ userId }) => {
         socket.userId = userId;
         await updateUserStatus(userId, { online: true, socketId: socket.id });
         io.emit('user-status', { userId, online: true });
     });
 
+    // WebRTC Signaling Events
     socket.on('call-user', ({ targetSocketId, offer, callerId }) => {
         io.to(targetSocketId).emit('incoming-call', { offer, callerId });
     });
