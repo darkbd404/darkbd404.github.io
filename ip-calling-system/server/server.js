@@ -16,26 +16,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', require('./routes/authRoutes'));
 
-// NEW: API to get all users for the dashboard
+// GET ALL USERS FOR CONTACTS & DIALING
 app.get('/api/users', async (req, res) => {
     try {
         const DB_PATH = path.join(__dirname, 'database/user.json');
         const data = await fs.readFile(DB_PATH, 'utf8');
         const users = JSON.parse(data);
-        // Remove passwords before sending to frontend
         const safeUsers = users.map(({ password, ...u }) => u);
         res.json(safeUsers);
-    } catch (e) {
-        res.status(500).json({ message: "Failed to load users" });
-    }
+    } catch (e) { res.status(500).json({ message: "Error loading users" }); }
 });
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-// SOCKET.IO & WEBRTC SIGNALING
+// SOCKET.IO LOGIC
 const userSocketMap = {}; 
+const ipToUserIdMap = {}; // Map IP Number to UserID
 const DB_PATH = path.join(__dirname, 'database/user.json');
 
 async function updateUserStatus(userId, updates) {
@@ -47,38 +43,41 @@ async function updateUserStatus(userId, updates) {
             users[idx] = { ...users[idx], ...updates };
             await fs.writeFile(DB_PATH, JSON.stringify(users, null, 2));
         }
-    } catch (e) { console.error("DB Update Error:", e); }
+    } catch (e) { console.error("DB Error:", e); }
 }
 
 io.on('connection', (socket) => {
-    socket.on('join', async ({ userId }) => {
+    socket.on('join', async ({ userId, ipNumber }) => {
         socket.userId = userId;
         userSocketMap[userId] = socket.id;
+        ipToUserIdMap[ipNumber] = userId; // Store IP mapping
+        
         await updateUserStatus(userId, { online: true, socketId: socket.id });
         io.emit('user-status', { userId, online: true });
     });
 
-    socket.on('call-user', ({ targetUserId, offer, callerId }) => {
-        const targetSocketId = userSocketMap[targetUserId];
-        if (targetSocketId) io.to(targetSocketId).emit('incoming-call', { offer, callerId });
-        else socket.emit('call-error', { message: "User is offline" });
+    // CALL BY IP NUMBER
+    socket.on('call-ip', ({ targetIp, offer, callerId, callerName }) => {
+        const targetUserId = ipToUserIdMap[targetIp];
+        if (targetUserId && userSocketMap[targetUserId]) {
+            io.to(userSocketMap[targetUserId]).emit('incoming-call', { 
+                offer, callerId, callerName, callerIp: targetIp 
+            });
+        } else {
+            socket.emit('call-error', { message: "User offline or invalid IP" });
+        }
     });
 
     socket.on('answer-call', ({ targetUserId, answer }) => {
-        const targetSocketId = userSocketMap[targetUserId];
-        if (targetSocketId) io.to(targetSocketId).emit('call-answered', { answer });
+        if (userSocketMap[targetUserId]) io.to(userSocketMap[targetUserId]).emit('call-answered', { answer });
     });
 
     socket.on('ice-candidate', ({ targetUserId, candidate }) => {
-        const targetSocketId = userSocketMap[targetUserId];
-        if (targetSocketId) io.to(targetSocketId).emit('ice-candidate', { candidate });
+        if (userSocketMap[targetUserId]) io.to(userSocketMap[targetUserId]).emit('ice-candidate', { candidate });
     });
 
     socket.on('end-call', ({ targetUserId }) => {
-        if (targetUserId) {
-            const targetSocketId = userSocketMap[targetUserId];
-            if (targetSocketId) io.to(targetSocketId).emit('call-ended');
-        }
+        if (targetUserId && userSocketMap[targetUserId]) io.to(userSocketMap[targetUserId]).emit('call-ended');
     });
 
     socket.on('disconnect', async () => {
