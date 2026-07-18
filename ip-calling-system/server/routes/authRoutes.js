@@ -21,7 +21,7 @@ async function writeDB(data) {
 // REGISTER
 router.post('/register', async (req, res) => {
     const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ message: "Missing fields" });
+    if (!username || !password) return res.status(400).json({ message: "Username and password required" });
 
     const users = await readDB();
     if (users.find(u => u.username === username)) {
@@ -44,7 +44,6 @@ router.post('/register', async (req, res) => {
     users.push(newUser);
     await writeDB(users);
     
-    // Return user without password
     const { password: _, ...safeUser } = newUser;
     res.status(201).json(safeUser);
 });
@@ -55,7 +54,12 @@ router.post('/login', async (req, res) => {
     const users = await readDB();
     const user = users.find(u => u.username === username);
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
         return res.status(401).json({ message: "Invalid credentials" });
     }
 
