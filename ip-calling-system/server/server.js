@@ -61,7 +61,7 @@ io.on('connection', (socket) => {
         if (targetUserId && userSocketMap[targetUserId]) {
             io.to(userSocketMap[targetUserId]).emit('incoming-call', { offer, callerId, callerName, callerIp: targetIp });
         } else {
-            socket.emit('call-error', { message: "User is offline or invalid IP " });
+            socket.emit('call-error', { message: "User is offline or invalid IP ❌" });
         }
     });
 
