@@ -1,5 +1,4 @@
 const API_URL = window.location.origin;
-// Force new connection on every login
 let socket = null; 
 let currentUser = JSON.parse(localStorage.getItem('user'));
 let peerConnection, localStream, callTimerInterval, seconds = 0;
@@ -9,6 +8,23 @@ let dialedNumber = '';
 let remoteAudioEl; 
 
 const RTC_CONFIG = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+
+// --- NOTIFICATION SETUP ---
+async function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission !== 'granted') {
+        await Notification.requestPermission();
+    }
+}
+
+function showCallNotification(name, isIncoming) {
+    if (Notification.permission === 'granted') {
+        new Notification(isIncoming ? `Incoming Call from ${name}` : `Calling ${name}...`, {
+            body: isIncoming ? 'Tap to answer the call' : 'Waiting for connection...',
+            icon: 'https://api.dicebear.com/7.x/shapes/svg?seed=phone&backgroundColor=6c5ce7',
+            vibrate: [200, 100, 200]
+        });
+    }
+}
 
 // --- NAVIGATION & RENDERING ---
 function renderBottomNav() {
@@ -98,7 +114,7 @@ function renderProfile() {
         <div class="detail-row"><span class="detail-label"> IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
         <div class="detail-row"><span class="detail-label">📧 Email</span><span>${p.email}</span></div>
         <div class="detail-row"><span class="detail-label">📱 Mobile</span><span>${p.mobile}</span></div>
-        <div class="detail-row"><span class="detail-label">📍 Location</span><span>${p.location}</span></div>
+        <div class="detail-row"><span class="detail-label"> Location</span><span>${p.location}</span></div>
         <div class="detail-row"><span class="detail-label">⚧ Gender</span><span>${p.gender}</span></div>
         <div class="detail-row"><span class="detail-label"> Joined</span><span>${p.joined}</span></div>
         <div style="padding:20px;">
@@ -130,7 +146,9 @@ async function handleLogin() {
         currentUser = data;
         localStorage.setItem('user', JSON.stringify(currentUser));
         
-        // CRITICAL FIX: Disconnect old socket and create new one
+        // Request notification permission on login
+        requestNotificationPermission();
+        
         if (socket) socket.disconnect();
         socket = io(API_URL, { reconnection: true, reconnectionDelay: 1000 });
         
@@ -148,42 +166,29 @@ function logout() {
 
 // --- DIAL PAD LOGIC ---
 function pressKey(key) {
-    if (dialedNumber.length < 15) {
-        dialedNumber += key;
-        updateDialDisplay();
-    }
+    if (dialedNumber.length < 15) { dialedNumber += key; updateDialDisplay(); }
 }
-function deleteKey() {
-    dialedNumber = dialedNumber.slice(0, -1);
-    updateDialDisplay();
-}
+function deleteKey() { dialedNumber = dialedNumber.slice(0, -1); updateDialDisplay(); }
 function updateDialDisplay() {
     const input = document.getElementById('dialInput');
     if(input) input.value = dialedNumber;
 }
 function callFromContact(ip) {
-    dialedNumber = ip;
-    switchTab('dial');
-    setTimeout(makeCall, 400);
+    dialedNumber = ip; switchTab('dial'); setTimeout(makeCall, 400);
 }
 
 // --- SOCKET & WEBRTC ---
 async function fetchUsers() {
-    try {
-        const res = await fetch(`${API_URL}/api/users`);
-        allUsers = await res.json();
-    } catch (e) { console.error(e); }
+    try { const res = await fetch(`${API_URL}/api/users`); allUsers = await res.json(); } 
+    catch (e) { console.error(e); }
 }
 
 function initSocket() {
     if(!socket) return;
-    
-    // Emit join event immediately after connection
     socket.on('connect', () => {
         socket.emit('join', { userId: currentUser.id, ipNumber: currentUser.ipNumber });
     });
 
-    // Handle realtime status updates from server
     socket.on('user-status', ({ userId, online }) => {
         const userIndex = allUsers.findIndex(u => u.id === userId);
         if (userIndex !== -1) {
@@ -192,10 +197,10 @@ function initSocket() {
         }
     });
 
-    // Handle incoming calls
     socket.on('incoming-call', async ({ offer, callerId, callerName, callerIp }) => {
         const caller = allUsers.find(u => u.id === callerId) || { profile: { name: callerName || 'Unknown', avatar: '' } };
-        showCallOverlay(caller, true);
+        showPremiumCallScreen(caller, true);
+        showCallNotification(caller.profile.name, true);
         await acceptCall(callerId, offer, caller);
     });
 
@@ -213,55 +218,86 @@ function initSocket() {
     socket.on('call-error', ({ message }) => { alert(message); cleanupCall(); });
 }
 
-// FORCE PLAY AUDIO METHOD
+// FORCE PLAY AUDIO
 function forcePlayAudio(stream) {
     if (!remoteAudioEl) {
         remoteAudioEl = document.getElementById('remote-audio');
-        remoteAudioEl.volume = 0.5;
-        remoteAudioEl.autoplay = true;
-        remoteAudioEl.playsInline = true;
+        remoteAudioEl.volume = 0.5; remoteAudioEl.autoplay = true; remoteAudioEl.playsInline = true;
     }
     remoteAudioEl.srcObject = stream;
-    
-    remoteAudioEl.play().then(() => {
-        console.log("Audio playing successfully 🔊");
-    }).catch(err => {
-        console.warn("Autoplay blocked, waiting for interaction...", err);
+    remoteAudioEl.play().catch(err => {
         if(!document.getElementById('audio-unlock')) {
             const btn = document.createElement('button');
-            btn.id = 'audio-unlock';
-            btn.innerText = 'Tap to Enable Sound ';
-            btn.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;padding:20px;background:#6c5ce7;color:white;border:none;border-radius:12px;font-size:18px;';
-            btn.onclick = () => {
-                remoteAudioEl.play();
-                btn.remove();
-            };
+            btn.id = 'audio-unlock'; btn.innerText = 'Tap to Enable Sound ';
+            btn.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:99999;padding:20px;background:#6c5ce7;color:white;border:none;border-radius:12px;';
+            btn.onclick = () => { remoteAudioEl.play(); btn.remove(); };
             document.body.appendChild(btn);
         }
     });
 }
+
+// PREMIUM CALL SCREEN UI
+function showPremiumCallScreen(user, isIncoming) {
+    const div = document.createElement('div');
+    div.className = 'call-overlay';
+    div.id = 'callOverlay';
+    
+    div.innerHTML = `
+        <div class="caller-info">
+            <img src="${user.profile?.avatar || 'https://via.placeholder.com/150'}" class="caller-avatar" onerror="this.src='https://via.placeholder.com/150'">
+            <div class="caller-name">${user.profile?.name || user.ipNumber}</div>
+            <div class="call-status" id="callStatusText">${isIncoming ? 'Incoming Call...' : 'Calling...'}</div>
+            <div class="timer" id="callTimer">00:00</div>
+        </div>
+
+        ${isIncoming ? `
+        <div class="main-actions">
+            <button class="call-action-btn reject" onclick="endCall()">📞</button>
+            <button class="call-action-btn accept" onclick="answerIncomingCall()"></button>
+        </div>` : `
+        <div class="main-actions">
+            <button class="call-action-btn reject" onclick="endCall()">📞</button>
+        </div>`}
+
+        <div class="actions-container">
+            <button class="action-btn" id="btnMute" onclick="toggleMute()"></button>
+            <button class="action-btn" id="btnSpk" onclick="toggleSpeaker()">🔊</button>
+            <button class="action-btn" onclick="toggleKeypad()">️</button>
+        </div>
+    `;
+    document.body.appendChild(div);
+    if(!isIncoming) startTimer();
+}
+
+// Handle Accept Button Click Explicitly
+window.answerIncomingCall = async function() {
+    // This function is called when user clicks the green button
+    // Audio will play because it's inside a click event
+    if(localStream) {
+        forcePlayAudio(localStream); // Play local mic feedback if needed
+    }
+    // The actual remote audio plays in acceptCall -> ontrack
+};
 
 async function makeCall() {
     if (!dialedNumber) return alert("Enter IP Number first! 🔢");
     const targetUser = allUsers.find(u => u.ipNumber === dialedNumber);
     if(!targetUser) return alert("Invalid IP Number ❌");
     
-    showCallOverlay(targetUser, false);
+    showPremiumCallScreen(targetUser, false);
+    showCallNotification(targetUser.profile.name, false);
     
     localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     peerConnection = new RTCPeerConnection(RTC_CONFIG);
     localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
     
-    peerConnection.ontrack = (e) => {
-        forcePlayAudio(e.streams[0]);
-    };
+    peerConnection.ontrack = (e) => forcePlayAudio(e.streams[0]);
     peerConnection.onicecandidate = (e) => {
         if (e.candidate) socket.emit('ice-candidate', { targetUserId: targetUser.id, candidate: e.candidate });
     };
 
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
-    
     socket.emit('call-ip', { targetIp: dialedNumber, offer, callerId: currentUser.id, callerName: currentUser.profile.name });
     addLog('outgoing', targetUser.profile.name, dialedNumber);
 }
@@ -271,9 +307,7 @@ async function acceptCall(callerId, offer, callerData) {
     peerConnection = new RTCPeerConnection(RTC_CONFIG);
     localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
     
-    peerConnection.ontrack = (e) => {
-        forcePlayAudio(e.streams[0]);
-    };
+    peerConnection.ontrack = (e) => forcePlayAudio(e.streams[0]);
     peerConnection.onicecandidate = (e) => {
         if (e.candidate) socket.emit('ice-candidate', { targetUserId: callerId, candidate: e.candidate });
     };
@@ -296,39 +330,14 @@ function endCall() {
 function cleanupCall() {
     if (peerConnection) peerConnection.close();
     if (localStream) localStream.getTracks().forEach(t => t.stop());
-    if (remoteAudioEl) {
-        remoteAudioEl.srcObject = null;
-        remoteAudioEl.pause();
-    }
-    clearInterval(callTimerInterval);
-    seconds = 0;
+    if (remoteAudioEl) { remoteAudioEl.srcObject = null; remoteAudioEl.pause(); }
+    clearInterval(callTimerInterval); seconds = 0;
     const overlay = document.getElementById('callOverlay');
     if (overlay) overlay.remove();
     const forceBtn = document.getElementById('audio-unlock');
     if(forceBtn) forceBtn.remove();
     dialedNumber = '';
     if(currentTab === 'dial') renderDialPad();
-}
-
-function showCallOverlay(user, isIncoming) {
-    const div = document.createElement('div');
-    div.className = 'call-overlay';
-    div.id = 'callOverlay';
-    div.innerHTML = `
-        <div class="call-info">
-            <img src="${user.profile?.avatar || 'https://via.placeholder.com/140'}" class="caller-avatar" onerror="this.src='https://via.placeholder.com/140'">
-            <h2 style="margin-top:20px;">${isIncoming ? 'Incoming Call 📲' : 'Calling... '}</h2>
-            <p>${user.profile?.name || user.ipNumber}</p>
-            <div class="timer" id="callTimer">00:00</div>
-        </div>
-        <div class="controls">
-            <button class="ctrl-btn" id="btnMute" onclick="toggleMute()">🎤</button>
-            <button class="ctrl-btn end" onclick="endCall()">📞</button>
-            <button class="ctrl-btn" id="btnSpk" onclick="toggleSpeaker()">🔊</button>
-        </div>
-    `;
-    document.body.appendChild(div);
-    if(!isIncoming) startTimer();
 }
 
 function startTimer() {
@@ -342,7 +351,7 @@ function startTimer() {
 }
 
 function updateCallUI(status) {
-    const el = document.querySelector('.call-info h2');
+    const el = document.getElementById('callStatusText');
     if(el) el.innerText = status;
 }
 
@@ -354,9 +363,8 @@ function toggleMute() {
     }
 }
 
-function toggleSpeaker() {
-    document.getElementById('btnSpk').classList.toggle('active');
-}
+function toggleSpeaker() { document.getElementById('btnSpk').classList.toggle('active'); }
+function toggleKeypad() { alert("Keypad feature coming soon! 🔢"); }
 
 function addLog(type, name, ip) {
     if(!currentUser.callLogs) currentUser.callLogs = [];
@@ -366,10 +374,8 @@ function addLog(type, name, ip) {
 
 // INIT
 if (currentUser) {
-    // Ensure fresh socket on page load
+    requestNotificationPermission();
     if(!socket) socket = io(API_URL, { reconnection: true, reconnectionDelay: 1000 });
     initSocket();
     fetchUsers().then(renderApp);
-} else {
-    renderLogin();
-}
+} else { renderLogin(); }
