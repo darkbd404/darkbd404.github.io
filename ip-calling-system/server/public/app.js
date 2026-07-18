@@ -1,17 +1,17 @@
 const API_URL = window.location.origin;
-const socket = io(API_URL);
+const socket = io(API_URL, { reconnection: true, reconnectionDelay: 1000 });
 let currentUser = JSON.parse(localStorage.getItem('user'));
 let peerConnection, localStream, callTimerInterval, seconds = 0;
 let allUsers = [];
 let currentTab = 'dial';
 let dialedNumber = '';
-let remoteAudioEl; // Global audio element reference
+let remoteAudioEl; 
 
 const RTC_CONFIG = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 // --- NAVIGATION & RENDERING ---
 function renderBottomNav() {
-    const icons = { dial: '📞', contacts: '👥', logs: '📋', profile: '' };
+    const icons = { dial: '📞', contacts: '👥', logs: '📋', profile: '👤' };
     return `<div class="bottom-nav">
         ${Object.keys(icons).map(tab => `
             <div class="nav-item ${currentTab===tab?'active':''}" onclick="switchTab('${tab}')">
@@ -94,14 +94,14 @@ function renderProfile() {
             <h2>${p.name}</h2>
             <p class="bio-text">"${p.bio}" 💭</p>
         </div>
-        <div class="detail-row"><span class="detail-label">🔢 IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
+        <div class="detail-row"><span class="detail-label"> IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
         <div class="detail-row"><span class="detail-label">📧 Email</span><span>${p.email}</span></div>
         <div class="detail-row"><span class="detail-label">📱 Mobile</span><span>${p.mobile}</span></div>
-        <div class="detail-row"><span class="detail-label">📍 Location</span><span>${p.location}</span></div>
+        <div class="detail-row"><span class="detail-label"> Location</span><span>${p.location}</span></div>
         <div class="detail-row"><span class="detail-label">⚧ Gender</span><span>${p.gender}</span></div>
         <div class="detail-row"><span class="detail-label">📅 Joined</span><span>${p.joined}</span></div>
         <div style="padding:20px;">
-            <button onclick="logout()" style="background:rgba(255,71,87,0.15);color:var(--danger);border:1px solid rgba(255,71,87,0.3);box-shadow:none;">Logout </button>
+            <button onclick="logout()" style="background:rgba(255,71,87,0.15);color:var(--danger);border:1px solid rgba(255,71,87,0.3);box-shadow:none;">Logout 🚪</button>
         </div>
         ${renderBottomNav()}`;
 }
@@ -127,7 +127,7 @@ async function handleLogin() {
         if (!res.ok) throw new Error(data.message);
         currentUser = data;
         localStorage.setItem('user', JSON.stringify(currentUser));
-        initSocket();
+        initSocket(); // Initialize socket AFTER login
         await fetchUsers();
         renderApp();
     } catch (e) { alert(e.message); }
@@ -156,7 +156,7 @@ function callFromContact(ip) {
     setTimeout(makeCall, 400);
 }
 
-// --- SOCKET & WEBRTC (AUDIO FIX + VOLUME CONTROL) ---
+// --- SOCKET & WEBRTC (AUDIO FIX + REALTIME STATUS) ---
 async function fetchUsers() {
     try {
         const res = await fetch(`${API_URL}/api/users`);
@@ -165,9 +165,19 @@ async function fetchUsers() {
 }
 
 function initSocket() {
+    // Emit join event immediately
     socket.emit('join', { userId: currentUser.id, ipNumber: currentUser.ipNumber });
-    socket.on('user-status', () => { if(currentTab === 'contacts') renderContacts(); });
-    
+
+    // Handle realtime status updates from server
+    socket.on('user-status', ({ userId, online }) => {
+        const userIndex = allUsers.findIndex(u => u.id === userId);
+        if (userIndex !== -1) {
+            allUsers[userIndex].online = online;
+            if(currentTab === 'contacts') renderContacts();
+        }
+    });
+
+    // Handle incoming calls
     socket.on('incoming-call', async ({ offer, callerId, callerName, callerIp }) => {
         const caller = allUsers.find(u => u.id === callerId) || { profile: { name: callerName || 'Unknown', avatar: '' } };
         showCallOverlay(caller, true);
@@ -188,26 +198,28 @@ function initSocket() {
     socket.on('call-error', ({ message }) => { alert(message); cleanupCall(); });
 }
 
-// Helper to setup audio with volume control
-function setupRemoteAudio(stream) {
+// FORCE PLAY AUDIO METHOD
+function forcePlayAudio(stream) {
     if (!remoteAudioEl) {
         remoteAudioEl = document.getElementById('remote-audio');
-        remoteAudioEl.volume = 0.5; // 50% Volume (Not too loud)
+        remoteAudioEl.volume = 0.5;
         remoteAudioEl.autoplay = true;
+        remoteAudioEl.playsInline = true;
     }
     remoteAudioEl.srcObject = stream;
     
-    // Play audio explicitly after user interaction
+    // Try to play immediately
     remoteAudioEl.play().then(() => {
-        console.log("Remote audio playing at 50% volume 🔊");
-    }).catch(e => {
-        console.log("Audio play failed:", e);
-        // Fallback: Create a button to force play if browser blocks it
-        if(!document.getElementById('force-play-btn')) {
+        console.log("Audio playing successfully 🔊");
+    }).catch(err => {
+        console.warn("Autoplay blocked, waiting for interaction...", err);
+        // If blocked, we rely on the fact that Accept/Call button was clicked
+        // But as a failsafe, we can add a temporary overlay button
+        if(!document.getElementById('audio-unlock')) {
             const btn = document.createElement('button');
-            btn.id = 'force-play-btn';
-            btn.innerText = 'Tap to Hear Sound 🔊';
-            btn.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;padding:20px;font-size:18px;background:#6c5ce7;color:white;border:none;border-radius:12px;';
+            btn.id = 'audio-unlock';
+            btn.innerText = 'Tap to Enable Sound 🔊';
+            btn.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;padding:20px;background:#6c5ce7;color:white;border:none;border-radius:12px;font-size:18px;';
             btn.onclick = () => {
                 remoteAudioEl.play();
                 btn.remove();
@@ -229,7 +241,7 @@ async function makeCall() {
     localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
     
     peerConnection.ontrack = (e) => {
-        setupRemoteAudio(e.streams[0]);
+        forcePlayAudio(e.streams[0]);
     };
     peerConnection.onicecandidate = (e) => {
         if (e.candidate) socket.emit('ice-candidate', { targetUserId: targetUser.id, candidate: e.candidate });
@@ -248,7 +260,7 @@ async function acceptCall(callerId, offer, callerData) {
     localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
     
     peerConnection.ontrack = (e) => {
-        setupRemoteAudio(e.streams[0]);
+        forcePlayAudio(e.streams[0]);
     };
     peerConnection.onicecandidate = (e) => {
         if (e.candidate) socket.emit('ice-candidate', { targetUserId: callerId, candidate: e.candidate });
@@ -280,7 +292,7 @@ function cleanupCall() {
     seconds = 0;
     const overlay = document.getElementById('callOverlay');
     if (overlay) overlay.remove();
-    const forceBtn = document.getElementById('force-play-btn');
+    const forceBtn = document.getElementById('audio-unlock');
     if(forceBtn) forceBtn.remove();
     dialedNumber = '';
     if(currentTab === 'dial') renderDialPad();
