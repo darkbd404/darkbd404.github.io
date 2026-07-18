@@ -1,19 +1,19 @@
 [
   {
     "id": "u1",
-    "username": "salam",
-    "password": "123456",
+    "username": "admin",
+    "password": "admin",
     "ipNumber": "09696590864",
     "profile": {
-      "name": "Salam Vai",
-      "email": "salam@example.com",
-      "mobile": "01700000000",
+      "name": "Admin",
+      "email": "admin@com.bd",
+      "mobile": "01620230864",
       "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Salam&backgroundColor=b6e3f4",
       "bio": "Always busy but available for family ❤️",
-      "location": "Dhaka, BD",
+      "location": " Cumilla, BD",
       "gender": "Male",
       "status": "online",
-      "joined": "2024-01-15"
+      "joined": "2026-07-18"
     },
     "online": false,
     "socketId": null,
@@ -21,19 +21,19 @@
   },
   {
     "id": "u2",
-    "username": "wife",
+    "username": "Halima",
     "password": "123456",
     "ipNumber": "09649230864",
     "profile": {
       "name": "My Wife",
-      "email": "wife@example.com",
-      "mobile": "01800000000",
+      "email": "mihalimaakter50521@gmail.com",
+      "mobile": "01602959925",
       "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Wife&backgroundColor=ffdfbf",
       "bio": "Home is where the heart is 🏡",
-      "location": "Chittagong, BD",
+      "location": "Cumilla, BD",
       "gender": "Female",
       "status": "busy",
-      "joined": "2024-02-20"
+      "joined": "2026-07-18"
     },
     "online": false,
     "socketId": null,
