@@ -18,7 +18,7 @@ async function requestNotificationPermission() {
 
 function showCallNotification(name, isIncoming) {
     if (Notification.permission === 'granted') {
-        new Notification(isIncoming ? `Incoming Call from ${name}` : `Calling ${name}...`, {
+        new Notification(isIncoming ? `📲 Incoming Call from ${name}` : `Calling ${name}...`, {
             body: isIncoming ? 'Tap to answer the call' : 'Waiting for connection...',
             icon: 'https://api.dicebear.com/7.x/shapes/svg?seed=phone&backgroundColor=6c5ce7',
             vibrate: [200, 100, 200]
@@ -75,7 +75,7 @@ function renderContacts() {
                     <img src="${u.profile.avatar}" class="avatar-small" onerror="this.src='https://via.placeholder.com/45'">
                     <div class="item-info">
                         <h4>${u.profile.name}</h4>
-                        <p>IP: ${u.ipNumber} | ${u.online ? '🟢 Online' : '⚪ Offline'}</p>
+                        <p>IP: ${u.ipNumber} | ${u.online ? ' Online' : '⚪ Offline'}</p>
                     </div>
                 </div>
                 <button class="action-btn" onclick="callFromContact('${u.ipNumber}')">Call 📞</button>
@@ -88,7 +88,7 @@ function renderLogs() {
     const logs = (currentUser.callLogs || []).slice().reverse();
     document.getElementById('app').innerHTML = `
         <div style="padding:25px;font-size:22px;font-weight:bold;">Call Logs 📋</div>
-        ${logs.length === 0 ? '<div style="text-align:center;padding:50px;color:var(--text-muted)">No history yet 🕊️</div>' : 
+        ${logs.length === 0 ? '<div style="text-align:center;padding:50px;color:#888">No history yet 🕊️</div>' : 
         logs.map(log => `
             <div class="list-item">
                 <div class="item-left">
@@ -109,14 +109,14 @@ function renderProfile() {
         <div class="profile-header">
             <img src="${p.avatar}" class="avatar-large" onerror="this.src='https://via.placeholder.com/110'">
             <h2>${p.name}</h2>
-            <p class="bio-text">"${p.bio}" 💭</p>
+            <p style="color:#888;margin-top:10px;font-style:italic;">"${p.bio}" 💭</p>
         </div>
-        <div class="detail-row"><span class="detail-label"> IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
-        <div class="detail-row"><span class="detail-label">📧 Email</span><span>${p.email}</span></div>
-        <div class="detail-row"><span class="detail-label">📱 Mobile</span><span>${p.mobile}</span></div>
-        <div class="detail-row"><span class="detail-label"> Location</span><span>${p.location}</span></div>
-        <div class="detail-row"><span class="detail-label">⚧ Gender</span><span>${p.gender}</span></div>
-        <div class="detail-row"><span class="detail-label"> Joined</span><span>${p.joined}</span></div>
+        <div class="detail-row"><span>🔢 IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
+        <div class="detail-row"><span>📧 Email</span><span>${p.email}</span></div>
+        <div class="detail-row"><span> Mobile</span><span>${p.mobile}</span></div>
+        <div class="detail-row"><span>📍 Location</span><span>${p.location}</span></div>
+        <div class="detail-row"><span>⚧ Gender</span><span>${p.gender}</span></div>
+        <div class="detail-row"><span> Joined</span><span>${p.joined}</span></div>
         <div style="padding:20px;">
             <button onclick="logout()" style="background:rgba(255,71,87,0.15);color:var(--danger);border:1px solid rgba(255,71,87,0.3);box-shadow:none;">Logout 🚪</button>
         </div>
@@ -146,7 +146,6 @@ async function handleLogin() {
         currentUser = data;
         localStorage.setItem('user', JSON.stringify(currentUser));
         
-        // Request notification permission on login
         requestNotificationPermission();
         
         if (socket) socket.disconnect();
@@ -260,23 +259,17 @@ function showPremiumCallScreen(user, isIncoming) {
         </div>`}
 
         <div class="actions-container">
-            <button class="action-btn" id="btnMute" onclick="toggleMute()"></button>
-            <button class="action-btn" id="btnSpk" onclick="toggleSpeaker()">🔊</button>
-            <button class="action-btn" onclick="toggleKeypad()">️</button>
+            <button class="action-btn-call" id="btnMute" onclick="toggleMute()"></button>
+            <button class="action-btn-call" id="btnSpk" onclick="toggleSpeaker()">🔊</button>
+            <button class="action-btn-call" onclick="toggleKeypad()">️</button>
         </div>
     `;
     document.body.appendChild(div);
     if(!isIncoming) startTimer();
 }
 
-// Handle Accept Button Click Explicitly
 window.answerIncomingCall = async function() {
-    // This function is called when user clicks the green button
-    // Audio will play because it's inside a click event
-    if(localStream) {
-        forcePlayAudio(localStream); // Play local mic feedback if needed
-    }
-    // The actual remote audio plays in acceptCall -> ontrack
+    if(localStream) forcePlayAudio(localStream);
 };
 
 async function makeCall() {
