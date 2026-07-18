@@ -8,23 +8,19 @@ const fs = require('fs').promises;
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-    cors: { origin: "*", methods: ["GET", "POST"] }
-});
+const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 
-// SPA Fallback
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// SOCKET.IO SIGNALING
+// SOCKET.IO LOGIC
 const DB_PATH = path.join(__dirname, 'database/user.json');
 
 async function updateUserStatus(userId, updates) {
@@ -40,15 +36,12 @@ async function updateUserStatus(userId, updates) {
 }
 
 io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-
     socket.on('join', async ({ userId }) => {
         socket.userId = userId;
         await updateUserStatus(userId, { online: true, socketId: socket.id });
         io.emit('user-status', { userId, online: true });
     });
 
-    // CALL SIGNALING EVENTS
     socket.on('call-user', ({ targetSocketId, offer, callerId }) => {
         io.to(targetSocketId).emit('incoming-call', { offer, callerId });
     });
@@ -65,7 +58,6 @@ io.on('connection', (socket) => {
         if (targetSocketId) io.to(targetSocketId).emit('call-ended');
     });
 
-    // DISCONNECT
     socket.on('disconnect', async () => {
         if (socket.userId) {
             await updateUserStatus(socket.userId, { online: false, socketId: null });
