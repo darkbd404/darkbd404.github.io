@@ -42,7 +42,7 @@ function renderDialPad() {
         <div class="dial-grid">
             ${[1,2,3,4,5,6,7,8,9,'*',0,'#'].map(n => `<div class="dial-btn" onclick="pressKey('${n}')">${n}</div>`).join('')}
             <div class="dial-btn del-btn" onclick="deleteKey()"></div>
-            <div class="dial-btn call-btn-main" onclick="makeCall()">📞</div>
+            <div class="dial-btn call-btn-main" onclick="makeCall()"></div>
             <div class="dial-btn" style="visibility:hidden"></div>
         </div>
         ${renderBottomNav()}`;
@@ -70,7 +70,7 @@ function renderContacts() {
 function renderLogs() {
     const logs = (currentUser.callLogs || []).slice().reverse();
     document.getElementById('app').innerHTML = `
-        <div style="padding:25px;font-size:22px;font-weight:bold;">Call Logs 📋</div>
+        <div style="padding:25px;font-size:22px;font-weight:bold;">Call Logs </div>
         ${logs.length === 0 ? '<div style="text-align:center;padding:50px;color:var(--text-muted)">No history yet 🕊️</div>' : 
         logs.map(log => `
             <div class="list-item">
@@ -348,7 +348,7 @@ function toggleSpeaker() {
 
 function addLog(type, name, ip) {
     if(!currentUser.callLogs) currentUser.callLogs = [];
-    currentUser.callLogs.push({ type, targetName: name, targetIp: ip, time: new Date().toISOString(), duration: seconds > 0 ? `${Math.floor(seconds/60)}m ${seconds%60}s` : 'Missed ⏰' });
+    currentUser.callLogs.push({ type, targetName: name, targetIp: ip, time: new Date().toISOString(), duration: seconds > 0 ? `${Math.floor(seconds/60)}m ${seconds%60}s` : 'Missed ' });
     localStorage.setItem('user', JSON.stringify(currentUser));
 }
 
