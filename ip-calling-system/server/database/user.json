@@ -3,13 +3,17 @@
     "id": "u1",
     "username": "salam",
     "password": "123456",
-    "ipNumber": "09696590864",
+    "ipNumber": "1001",
     "profile": {
-      "name": "Salam",
+      "name": "Salam Vai",
       "email": "salam@example.com",
       "mobile": "01700000000",
-      "userType": "Admin",
-      "createdAt": "2026-07-17T00:00:00.000Z"
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Salam&backgroundColor=b6e3f4",
+      "bio": "Always busy but available for family ❤️",
+      "location": "Dhaka, BD",
+      "gender": "Male",
+      "status": "online",
+      "joined": "2024-01-15"
     },
     "online": false,
     "socketId": null,
@@ -19,13 +23,17 @@
     "id": "u2",
     "username": "wife",
     "password": "123456",
-    "ipNumber": "0964930864",
+    "ipNumber": "1002",
     "profile": {
-      "name": "Wife",
+      "name": "My Wife",
       "email": "wife@example.com",
       "mobile": "01800000000",
-      "userType": "User",
-      "createdAt": "2026-07-17T00:00:00.000Z"
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Wife&backgroundColor=ffdfbf",
+      "bio": "Home is where the heart is 🏡",
+      "location": "Chittagong, BD",
+      "gender": "Female",
+      "status": "busy",
+      "joined": "2024-02-20"
     },
     "online": false,
     "socketId": null,
