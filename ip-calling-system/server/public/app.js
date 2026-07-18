@@ -1,5 +1,6 @@
 const API_URL = window.location.origin;
-const socket = io(API_URL, { reconnection: true, reconnectionDelay: 1000 });
+// Force new connection on every login
+let socket = null; 
 let currentUser = JSON.parse(localStorage.getItem('user'));
 let peerConnection, localStream, callTimerInterval, seconds = 0;
 let allUsers = [];
@@ -42,7 +43,7 @@ function renderDialPad() {
         <div class="dial-grid">
             ${[1,2,3,4,5,6,7,8,9,'*',0,'#'].map(n => `<div class="dial-btn" onclick="pressKey('${n}')">${n}</div>`).join('')}
             <div class="dial-btn del-btn" onclick="deleteKey()"></div>
-            <div class="dial-btn call-btn-main" onclick="makeCall()"></div>
+            <div class="dial-btn call-btn-main" onclick="makeCall()">📞</div>
             <div class="dial-btn" style="visibility:hidden"></div>
         </div>
         ${renderBottomNav()}`;
@@ -70,7 +71,7 @@ function renderContacts() {
 function renderLogs() {
     const logs = (currentUser.callLogs || []).slice().reverse();
     document.getElementById('app').innerHTML = `
-        <div style="padding:25px;font-size:22px;font-weight:bold;">Call Logs </div>
+        <div style="padding:25px;font-size:22px;font-weight:bold;">Call Logs 📋</div>
         ${logs.length === 0 ? '<div style="text-align:center;padding:50px;color:var(--text-muted)">No history yet 🕊️</div>' : 
         logs.map(log => `
             <div class="list-item">
@@ -94,12 +95,12 @@ function renderProfile() {
             <h2>${p.name}</h2>
             <p class="bio-text">"${p.bio}" 💭</p>
         </div>
-        <div class="detail-row"><span class="detail-label">🔢 IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
+        <div class="detail-row"><span class="detail-label"> IP Number</span><span style="color:var(--primary);font-weight:bold;">${currentUser.ipNumber}</span></div>
         <div class="detail-row"><span class="detail-label">📧 Email</span><span>${p.email}</span></div>
-        <div class="detail-row"><span class="detail-label"> Mobile</span><span>${p.mobile}</span></div>
+        <div class="detail-row"><span class="detail-label">📱 Mobile</span><span>${p.mobile}</span></div>
         <div class="detail-row"><span class="detail-label">📍 Location</span><span>${p.location}</span></div>
         <div class="detail-row"><span class="detail-label">⚧ Gender</span><span>${p.gender}</span></div>
-        <div class="detail-row"><span class="detail-label">📅 Joined</span><span>${p.joined}</span></div>
+        <div class="detail-row"><span class="detail-label"> Joined</span><span>${p.joined}</span></div>
         <div style="padding:20px;">
             <button onclick="logout()" style="background:rgba(255,71,87,0.15);color:var(--danger);border:1px solid rgba(255,71,87,0.3);box-shadow:none;">Logout 🚪</button>
         </div>
@@ -114,7 +115,7 @@ function renderApp() {
     else if (currentTab === 'profile') renderProfile();
 }
 
-// --- AUTH ---
+// --- AUTH & SOCKET FIX ---
 async function handleLogin() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
@@ -125,15 +126,25 @@ async function handleLogin() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message);
+        
         currentUser = data;
         localStorage.setItem('user', JSON.stringify(currentUser));
-        initSocket(); // Initialize socket AFTER login
+        
+        // CRITICAL FIX: Disconnect old socket and create new one
+        if (socket) socket.disconnect();
+        socket = io(API_URL, { reconnection: true, reconnectionDelay: 1000 });
+        
+        initSocket(); 
         await fetchUsers();
         renderApp();
     } catch (e) { alert(e.message); }
 }
 
-function logout() { localStorage.removeItem('user'); location.reload(); }
+function logout() { 
+    if(socket) socket.disconnect();
+    localStorage.removeItem('user'); 
+    location.reload(); 
+}
 
 // --- DIAL PAD LOGIC ---
 function pressKey(key) {
@@ -156,7 +167,7 @@ function callFromContact(ip) {
     setTimeout(makeCall, 400);
 }
 
-// --- SOCKET & WEBRTC (AUDIO FIX + REALTIME STATUS) ---
+// --- SOCKET & WEBRTC ---
 async function fetchUsers() {
     try {
         const res = await fetch(`${API_URL}/api/users`);
@@ -165,8 +176,12 @@ async function fetchUsers() {
 }
 
 function initSocket() {
-    // Emit join event immediately
-    socket.emit('join', { userId: currentUser.id, ipNumber: currentUser.ipNumber });
+    if(!socket) return;
+    
+    // Emit join event immediately after connection
+    socket.on('connect', () => {
+        socket.emit('join', { userId: currentUser.id, ipNumber: currentUser.ipNumber });
+    });
 
     // Handle realtime status updates from server
     socket.on('user-status', ({ userId, online }) => {
@@ -208,17 +223,14 @@ function forcePlayAudio(stream) {
     }
     remoteAudioEl.srcObject = stream;
     
-    // Try to play immediately
     remoteAudioEl.play().then(() => {
         console.log("Audio playing successfully 🔊");
     }).catch(err => {
         console.warn("Autoplay blocked, waiting for interaction...", err);
-        // If blocked, we rely on the fact that Accept/Call button was clicked
-        // But as a failsafe, we can add a temporary overlay button
         if(!document.getElementById('audio-unlock')) {
             const btn = document.createElement('button');
             btn.id = 'audio-unlock';
-            btn.innerText = 'Tap to Enable Sound 🔊';
+            btn.innerText = 'Tap to Enable Sound ';
             btn.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;padding:20px;background:#6c5ce7;color:white;border:none;border-radius:12px;font-size:18px;';
             btn.onclick = () => {
                 remoteAudioEl.play();
@@ -348,12 +360,14 @@ function toggleSpeaker() {
 
 function addLog(type, name, ip) {
     if(!currentUser.callLogs) currentUser.callLogs = [];
-    currentUser.callLogs.push({ type, targetName: name, targetIp: ip, time: new Date().toISOString(), duration: seconds > 0 ? `${Math.floor(seconds/60)}m ${seconds%60}s` : 'Missed ' });
+    currentUser.callLogs.push({ type, targetName: name, targetIp: ip, time: new Date().toISOString(), duration: seconds > 0 ? `${Math.floor(seconds/60)}m ${seconds%60}s` : 'Missed ⏰' });
     localStorage.setItem('user', JSON.stringify(currentUser));
 }
 
 // INIT
 if (currentUser) {
+    // Ensure fresh socket on page load
+    if(!socket) socket = io(API_URL, { reconnection: true, reconnectionDelay: 1000 });
     initSocket();
     fetchUsers().then(renderApp);
 } else {
