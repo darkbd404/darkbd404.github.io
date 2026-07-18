@@ -16,12 +16,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', require('./routes/authRoutes'));
 
-// Serve Frontend
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// SOCKET.IO & WEBRTC SIGNALING
+// MAP USERID TO SOCKETID
+const userSocketMap = {}; 
+
 const DB_PATH = path.join(__dirname, 'database/user.json');
 
 async function updateUserStatus(userId, updates) {
@@ -41,29 +42,42 @@ io.on('connection', (socket) => {
 
     socket.on('join', async ({ userId }) => {
         socket.userId = userId;
+        userSocketMap[userId] = socket.id; // STORE MAPPING
+        
         await updateUserStatus(userId, { online: true, socketId: socket.id });
         io.emit('user-status', { userId, online: true });
     });
 
-    // WebRTC Signaling Events
-    socket.on('call-user', ({ targetSocketId, offer, callerId }) => {
-        io.to(targetSocketId).emit('incoming-call', { offer, callerId });
+    // ROUTE BY USERID
+    socket.on('call-user', ({ targetUserId, offer, callerId }) => {
+        const targetSocketId = userSocketMap[targetUserId];
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('incoming-call', { offer, callerId });
+        } else {
+            socket.emit('call-error', { message: "User is offline" });
+        }
     });
 
-    socket.on('answer-call', ({ targetSocketId, answer }) => {
-        io.to(targetSocketId).emit('call-answered', { answer });
+    socket.on('answer-call', ({ targetUserId, answer }) => {
+        const targetSocketId = userSocketMap[targetUserId];
+        if (targetSocketId) io.to(targetSocketId).emit('call-answered', { answer });
     });
 
-    socket.on('ice-candidate', ({ targetSocketId, candidate }) => {
-        io.to(targetSocketId).emit('ice-candidate', { candidate });
+    socket.on('ice-candidate', ({ targetUserId, candidate }) => {
+        const targetSocketId = userSocketMap[targetUserId];
+        if (targetSocketId) io.to(targetSocketId).emit('ice-candidate', { candidate });
     });
 
-    socket.on('end-call', ({ targetSocketId }) => {
-        if (targetSocketId) io.to(targetSocketId).emit('call-ended');
+    socket.on('end-call', ({ targetUserId }) => {
+        if (targetUserId) {
+            const targetSocketId = userSocketMap[targetUserId];
+            if (targetSocketId) io.to(targetSocketId).emit('call-ended');
+        }
     });
 
     socket.on('disconnect', async () => {
         if (socket.userId) {
+            delete userSocketMap[socket.userId]; // REMOVE MAPPING
             await updateUserStatus(socket.userId, { online: false, socketId: null });
             io.emit('user-status', { userId: socket.userId, online: false });
         }
