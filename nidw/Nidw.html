@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>NID Server Copy</title>
+    <link href="https://surokkha.gov.bd/favicon.png" rel="icon">
+    <link href="https://surokkha.gov.bd/favicon.png" rel="apple-touch-icon">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.1.1/css/all.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" type="text/javascript"></script>
+    <style>
+        @import url('https://fonts.maateen.me/solaiman-lipi/font.css');
+        @page { size: A4; margin: auto; }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Solaimanlipi;
+            font-weight: bold;
+        }
+
+        .background {
+            background-color: lightgrey;
+            position: relative;
+            width: 750px;
+            height: 1065px;
+            margin: auto;
+        }
+        .crane { max-width: 100%; height: 100%; }
+        #loadMe { visibility: hidden; }
+
+        @media print {
+            html, body {
+                width: 210mm !important;
+                height: 297mm !important;
+                background-color: #fff !important;
+            }
+            .print, .toggle-bar, .input-menu { display: none !important; }
+        }
+
+        #print {
+            background: #03a9f4;
+            padding: 8px;
+            width: 700px;
+            height: 40px;
+            border: 0px;
+            font-size: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 1px 4px 4px #878787;
+            color: #fff;
+            border-radius: 10px;
+            margin: 25px;
+            display: none;
+        }
+        #present_addr, #permanent_addr { text-align: left; }
+
+        /* --- TOGGLE BUTTON --- */
+        .toggle-bar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 50px 50px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 1000;
+            font-size: 18px;
+            z-index: 1000;
+            box-shadow: 0 6px 22px rgba(0,0,0,0.35);
+            transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: Arial, sans-serif;
+            border: none;
+            letter-spacing: .4px;
+        }
+        .toggle-bar:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 12px 32px rgba(0,0,0,0.45); }
+        .toggle-bar:active { transform: translateY(-1px) scale(.98); }
+        .toggle-bar i { transition: transform .4s ease; }
+        .toggle-bar:hover i { transform: rotate(-12deg) scale(1.15); }
+
+        /* --- BIG CLEAN INPUT MENU --- */
+        .input-menu {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(.96);
+            width: 900px;
+            max-width: 98vw;
+            background: #ffffff;
+            padding: 50px 50px;
+            border-radius: 22px;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.28);
+            z-index: 999;
+            display: none;
+            max-height: 96vh;
+            overflow-y: auto;
+            font-family: Arial, sans-serif;
+            border: 2px solid #e2e2e2;
+            opacity: 0;
+            transition: opacity .28s ease, transform .28s cubic-bezier(.34,1.56,.64,1);
+        }
+        .input-menu.open { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+        .input-menu::-webkit-scrollbar { width: 10px; }
+        .input-menu::-webkit-scrollbar-track { background: #f3f3f3; border-radius: 10px; }
+        .input-menu::-webkit-scrollbar-thumb { background: #c4c4c4; border-radius: 10px; }
+        .input-menu::-webkit-scrollbar-thumb:hover { background: #999; }
+
+        .input-menu h3 {
+            margin: 0 0 34px 0;
+            color: #111;
+            text-align: center;
+            padding-bottom: 22px;
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: .5px;
+            position: relative;
+        }
+        .input-menu h3::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: #111;
+            border-radius: 4px;
+            transition: width .35s ease;
+        }
+        .input-menu:hover h3::after { width: 200px; }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #111;
+            margin: 38px 0 20px 0;
+            padding: 0 0 12px 14px;
+            border-left: 5px solid #111;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0; bottom: 0;
+            width: 100%; height: 1px;
+            background: #e0e0e0;
+        }
+        .section-title:first-of-type { margin-top: 0; }
+        .section-title i { font-size: 17px; color: #444; transition: transform .3s ease; }
+        .section-title:hover i { transform: scale(1.25) rotate(8deg); }
+
+        .form-group { margin-bottom: 26px; }
+
+        .form-group label {
+            display: block;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #2a2a2a;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            transition: color .2s ease, transform .2s ease;
+        }
+        .form-group:focus-within label { color: #000; transform: translateX(4px); }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 18px 22px;
+            border: 2px solid #cfcfcf;
+            border-radius: 14px;
+            font-size: 19px;
+            color: #111;
+            background-color: #fafafa;
+            transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease, background-color .2s ease;
+            font-family: Arial, sans-serif;
+            font-weight: 500;
+        }
+        .form-group input:hover,
+        .form-group textarea:hover { border-color: #999; background-color: #fff; }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #111;
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+        .form-group textarea { resize: vertical; min-height: 120px; line-height: 1.65; }
+
+        /* File Upload */
+        .file-upload-wrapper {
+            border: 3px dashed #b0b0b0;
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #fafafa;
+            transition: all .25s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .file-upload-wrapper:hover {
+            border-color: #111;
+            background: #f0f0f0;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+        .file-upload-wrapper i { font-size: 48px; color: #555; margin-bottom: 14px; display: block; transition: transform .3s ease; }
+        .file-upload-wrapper:hover i { transform: translateY(-6px) scale(1.1); }
+        .file-upload-wrapper span { color: #555; font-size: 17px; font-weight: 600; }
+        .file-upload-wrapper input[type="file"] {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
+        }
+
+        /* Update Button */
+        .btn-gen {
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            padding: 22px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 22px;
+            margin-top: 34px;
+            transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, background .2s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: Arial, sans-serif;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+        .btn-gen:hover { background: #000; transform: translateY(-3px); box-shadow: 0 14px 34px rgba(0,0,0,0.35); }
+        .btn-gen:active { transform: translateY(0) scale(.98); }
+        .btn-gen i { transition: transform .3s ease; }
+        .btn-gen:hover i { transform: scale(1.2); }
+
+        /* --- MOBILE FULL-SCREEN --- */
+        @media (max-width: 600px) {
+            .input-menu {
+                width: 100vw !important;
+                max-width: 100vw !important;
+                max-height: 100vh !important;
+                height: 100vh !important;
+                border-radius: 0 !important;
+                padding: 28px 22px !important;
+                border: none !important;
+            }
+            .input-menu h3 { font-size: 30px; margin-bottom: 26px; }
+            .form-group input, .form-group textarea { font-size: 18px; padding: 16px 18px; }
+            .form-group label { font-size: 15px; }
+            .section-title { font-size: 16px; }
+            .btn-gen { font-size: 20px; padding: 20px; }
+            .toggle-bar { bottom: 20px; right: 20px; padding: 15px 28px; font-size: 16px; }
+        }
+    </style>
+</head>
+<body onload="showprint()" style="text-align: center;">
+
+    <!-- TOGGLE BUTTON -->
+    <button class="toggle-bar" onclick="toggleMenu()">
+        <i class="fas fa-pen-to-square"></i> Edit Data
+    </button>
+
+    <!-- BIG CLEAN INPUT MENU -->
+    <div class="input-menu" id="inputMenu">
+        <h3><i class="fas fa-id-card"></i> NID Data Input</h3>
+
+        <!-- Personal Information -->
+        <div class="section-title"><i class="fas fa-user"></i> Personal Information</div>
+        <div class="form-group"><label>Name (English):</label><input type="text" id="in_nameEn" value="ABDUS SALAM"></div>
+        <div class="form-group"><label>Name (Bangla):</label><input type="text" id="in_nameBn" value="আবদুছ ছালাম"></div>
+        <div class="form-group"><label>Father's Name:</label><input type="text" id="in_father" value="আবদুল ***"></div>
+        <div class="form-group"><label>Mother's Name:</label><input type="text" id="in_mother" value="**** বেগম"></div>
+        <div class="form-group"><label>Date of Birth:</label><input type="date" id="in_dob" value="2000-01-01"></div>
+        <div class="form-group"><label>Gender:</label><input type="text" id="in_gender" value="male"></div>
+        <div class="form-group"><label>Spouse Name:</label><input type="text" id="in_spouse" value=""></div>
+
+        <!-- NID Information -->
+        <div class="section-title"><i class="fas fa-fingerprint"></i> NID Information</div>
+        <div class="form-group"><label>National ID No:</label><input type="text" id="in_nid" value="8967758425"></div>
+        <div class="form-group"><label>PIN Number:</label><input type="text" id="in_pin" value="20001110994000864"></div>
+        <div class="form-group"><label>Voter Serial No:</label><input type="text" id="in_voterSl" value="230675000402"></div>
+        <div class="form-group"><label>Voter No:</label><input type="text" id="in_voterNo" value="191975"></div>
+        <div class="form-group"><label>Voter Area Code:</label><input type="text" id="in_areaCode" value="19175"></div>
+
+        <!-- Additional Information -->
+        <div class="section-title"><i class="fas fa-info-circle"></i> Additional Information</div>
+        <div class="form-group"><label>Birth Place / District:</label><input type="text" id="in_district" value="কুমিল্লা"></div>
+        <div class="form-group"><label>Blood Group:</label><input type="text" id="in_blood" value="B+"></div>
+
+        <!-- Address -->
+        <div class="section-title"><i class="fas fa-home"></i> Address</div>
+        <div class="form-group"><label>Present Address:</label><textarea id="in_presentAddr" rows="4">বাসা/হোল্ডিং ৩৪, গ্রাম/রাস্তা: ফলকামুড়ী, মৌজা/মহল্লা: ফলকামুড়ী, ইউনিয়ন ওয়ার্ড: শীলমুড়ি দক্ষিণ, ডাকঘর: আমড়াতলী- ৩৫০০, উপজেলা: বরুড়া, জেলা: কুমিল্লা, বিভাগ: চট্টগ্রাম</textarea></div>
+        <div class="form-group"><label>Permanent Address:</label><textarea id="in_permanentAddr" rows="4">বাসা/হোল্ডিং:৩৪, গ্রাম/রাস্তা: ফলকামুড়ী, মৌজা/মহল্লা: ফলকামুড়ী, ইউনিয়ন ওয়ার্ড: শীলমুড়ি দক্ষিণ, ডাকঘর: আমড়াতলী- ৩৫০০, উপজেলা: বরুড়া, জেলা: কুমিল্লা, বিভাগ: চট্টগ্রাম</textarea></div>
+
+        <!-- Photo -->
+        <div class="section-title"><i class="fas fa-camera"></i> Photo</div>
+        <div class="form-group">
+            <div class="file-upload-wrapper">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Click here to upload photo</span>
+                <input type="file" id="in_photo_file" accept="image/*">
+            </div>
+        </div>
+
+        <button class="btn-gen" onclick="updateAndHide()"><i class="fas fa-check"></i> Update Card</button>
+    </div>
+
+    <div class="background">
+        <img class="crane" src="https://raw.githubusercontent.com/matherofsetuxyz/hfhtf/main/cbimage.png" height="1000px" width="750px">
+
+        <div style="position: absolute; left: 30%; top: 8%; width: auto; font-size: 16px; color: rgb(255 224 0);"><b>National Identity Registration Wing (NIDW)</b></div>
+        <div style="position: absolute; left: 37%; top: 11%; width: auto; font-size: 14px; color: rgb(255, 47, 161);"><b>Select Your Search Category</b></div>
+        <div style="position: absolute; left: 45%; top: 12.8%; width: auto; font-size: 12px; color: rgb(8, 121, 4);">Search By NID / Voter No.</div>
+        <div style="position: absolute; left: 45%; top: 14.3%; width: auto; font-size: 12px; color: rgb(7, 119, 184);">Search By Form No.</div>
+        <div style="position: absolute; left: 30%; top: 16.9%; width: auto; font-size: 12px; color: rgb(252, 0, 0);"><b>NID or Voter No*</b></div>
+        <div style="position: absolute; left: 45%; top: 16.9%; width: auto; font-size: 12px; color: rgb(143, 143, 143);">NID</div>
+        <div style="position: absolute; left: 62.9%; top: 17.1%; width: auto; font-size: 11px; color: rgb(255 255 255);">Submit</div>
+        <div style="position: absolute; left: 89%; top: 11.55%; width: auto; font-size: 11px; color: #fff;">Home</div>
+
+        <div style="position: absolute; left: 37%; top: 27%; width: auto; font-size: 16px; color: rgb(7, 7, 7);"><b>জাতীয় পরিচিতি তথ্য</b></div>
+        <div style="position: absolute; left: 37%; top: 29.7%; width: auto; font-size: 13px; color: rgb(7, 7, 7);">জাতীয় পরিচয় পত্র নম্বর</div>
+        <div id="nid_no" style="position: absolute; left: 55%; top: 29.7%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">7667738439</div>
+        <div style="position: absolute; left: 37%; top: 32.5%; width: auto; font-size: 13px; color: rgb(7, 7, 7);">পিন নম্বর</div>
+        <div id="nid_father" style="position: absolute; left: 55%; top: 32.5%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">200011109940001864</div>
+        <div style="position: absolute; left: 37%; top: 35%; width: auto; font-size: 13px; color: rgb(7, 7, 7);">ভোটার সিরিয়াল নাম্বার</div>
+        <div id="from_number" style="position: absolute; left: 55%; top: 35%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">986675000404</div>
+        <div style="position: absolute; left: 37%; top: 37.5%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">ভোটার নাম্বার</div>
+        <div id="spouse" style="position: absolute; left: 55%; top: 37.5%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">191775</div>
+        <div style="position: absolute; left: 37%; top: 40.2%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">ভোটার এলাকা নাম্বার</div>
+        <div id="voter_area_code" style="position: absolute; left: 55%; top: 40.2%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">191775</div>
+
+        <div style="position: absolute; left: 37%; top: 43%; width: auto; font-size: 16px; color: rgb(7, 7, 7);"><b>ব্যক্তিগত তথ্য</b></div>
+        <div style="position: absolute; left: 37%; top: 45.6%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">নাম (বাংলা)</div>
+        <div id="name_bn" style="position: absolute; font-weight: bold; left: 55%; top: 45.6%; width: auto; font-size: 14px; color: rgb(7, 7, 7);"><b>আবদুছ ছালাম</b></div>
+        <div style="position: absolute; left: 37%; top: 48.5%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">নাম (ইংরেজি)</div>
+        <div id="name_en" style="position: absolute; left: 55%; top:48.5%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">ABDUS SALAM</div>
+        <div style="position: absolute; left: 37%; top: 51%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">জন্ম তারিখ</div>
+        <div id="dob" style="position: absolute; left: 55%; top: 51%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">2000-01-01</div>
+        <div style="position: absolute; left: 37%; top: 53.7%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">পিতার নাম</div>
+        <div id="fathers_name" style="position: absolute; left: 55%; top: 53.7%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">আবদুল ***</div>
+        <div style="position: absolute; left: 37%; top: 56.2%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">মাতার নাম</div>
+        <div id="mothers_name" style="position: absolute; left: 55%; top: 56.2%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">**** বেগম</div>
+
+        <div style="position: absolute; left: 37%; top: 59%; width: auto; font-size: 16px; color: rgb(7, 7, 7);"><b>অন্যান্য তথ্য</b></div>
+        <div style="position: absolute; left: 37%; top: 62.2%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">স্বামী/স্ত্রীর নাম</div>
+        <div id="gender" style="position: absolute; left: 55%; top: 62.2%; width: auto; font-size: 14px; color: rgb(7, 7, 7);"></div>
+        <div style="position: absolute; left: 37%; top: 64.8%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">জন্মস্থান</div>
+        <div id="birth_place" style="position: absolute; left: 55%; top: 64.8%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">কুমিল্লা</div>
+        <div style="position: absolute; left: 37%; top: 67.5%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">রক্তের গ্রুপ</div>
+        <div id="blood_group" style="position: absolute; left: 55%; top: 67.5%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">AB+</div>
+        <div style="position: absolute; left: 37%; top: 70%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">লিঙ্গ</div>
+        <div id="religion" style="position: absolute; left: 55%; top: 70%; width: auto; font-size: 14px; color: rgb(7, 7, 7);">male</div>
+
+        <div style="position: absolute; left: 37%; top: 73%; width: auto; font-size: 16px; color: rgb(7, 7, 7);"><b>বর্তমান ঠিকানা</b></div>
+        <div id="present_addr" style="position: absolute; left: 37%; top: 75.5%; width: 48%; font-size: 12px; color: rgb(7, 7, 7);">বাসা/হোল্ডিং:৩৪, গ্রাম/রাস্তা: ফলকামুড়ী, মৌজা/মহল্লা: ফলকামুড়ী, ইউনিয়ন ওয়ার্ড: শীলমুড়ি দক্ষিণ, ডাকঘর: আমড়াতলী- ৩৫০০, উপজেলা: বরুড়া, জেলা: কুমিল্লা, বিভাগ: চট্টগ্রাম</div>
+        <div style="position: absolute; left: 37%; top: 82%; width: auto; font-size: 16px; color: rgb(7, 7, 7);"><b>স্থায়ী ঠিকানা</b></div>
+        <div id="permanent_addr" style="position: absolute; left: 37%; top: 84.5%; width: 48%; font-size: 12px; color: rgb(7, 7, 7);">বাসা/হোল্ডিং:৩৪, গ্রাম/রাস্তা: ফলকামুড়ী, মৌজা/মহল্লা: ফলকামুড়ী, ইউনিয়ন ওয়ার্ড: শীলমুড়ি দক্ষিণ, ডাকঘর: আমড়াতলী- ৩৫০০, উপজেলা: বরুড়া, জেলা: কুমিল্লা, বিভাগ: চট্টগ্রাম</div>
+
+        <div style="position: absolute; top: 92%; width: 100%; font-size: 12px; text-align: center; color: rgb(255, 0, 0);">উপরে প্রদর্শিত তথ্যসমূহ জাতীয় পরিচয়পত্র সংশ্লিষ্ট, ভোটার তালিকার সাথে সরাসরি সম্পর্কযুক্ত নয়।</div>
+        <div style="position: absolute; top: 93.5%; width: 100%; text-align: center; font-size: 12px; color: rgb(3, 3, 3);">This is Software Generated Report From Bangladesh Election Commission, Signature &amp; Seal Aren't Required.</div>
+
+        <div style="position: absolute; left: 16%; top: 25.7%; width: auto; font-size: 12px; color: rgb(3, 3, 3);">
+            <img id="photo" src="https://via.placeholder.com/121x140?text=Photo" height="140px" width="121px" style="border-radius: 10px" />
+        </div>
+
+        <div id="qr_container" style="position: absolute; font-weight: bold; left: 15.5%; top: 44.0%; height: 32px; width: 130px; font-size: 13px; color: rgb(7, 7, 7); margin: auto; align-items: center;" align="center">
+            <img id="qr" src="" height="100px" width="100px">
+        </div>
+
+        <div id="name_title" style="position: absolute;display: flex;font-weight: bold;left: 15.5%;top: 39.6%;height: 32px;width: 130px;font-size: 15px;color: rgb(7, 7, 7);margin: auto;align-items: center;" align="center">
+            <div style="flex: 1;">Nidw_Server_Copy_Salam</div>
+        </div>
+
+        <button class="print" id="print" onclick="window.print()">SAVE NID</button>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('inputMenu');
+            if (menu.classList.contains('open')) {
+                menu.classList.remove('open');
+                setTimeout(() => { menu.style.display = 'none'; }, 250);
+            } else {
+                menu.style.display = 'block';
+                requestAnimationFrame(() => menu.classList.add('open'));
+            }
+        }
+
+        function updateAndHide() {
+            generateNID();
+            const menu = document.getElementById('inputMenu');
+            menu.classList.remove('open');
+            setTimeout(() => { menu.style.display = 'none'; }, 250);
+        }
+
+        function showprint() { $("#print").show(500); }
+
+        function generateNID() {
+            const data = {
+                in_nameEn: document.getElementById('in_nameEn').value,
+                in_nameBn: document.getElementById('in_nameBn').value,
+                in_father: document.getElementById('in_father').value,
+                in_mother: document.getElementById('in_mother').value,
+                in_dob: document.getElementById('in_dob').value,
+                in_nid: document.getElementById('in_nid').value,
+                in_pin: document.getElementById('in_pin').value,
+                in_voterSl: document.getElementById('in_voterSl').value,
+                in_voterNo: document.getElementById('in_voterNo').value,
+                in_areaCode: document.getElementById('in_areaCode').value,
+                in_district: document.getElementById('in_district').value,
+                in_blood: document.getElementById('in_blood').value,
+                in_gender: document.getElementById('in_gender').value,
+                in_spouse: document.getElementById('in_spouse').value,
+                in_presentAddr: document.getElementById('in_presentAddr').value,
+                in_permanentAddr: document.getElementById('in_permanentAddr').value
+            };
+
+            if(document.getElementById('name_en')) document.getElementById('name_en').innerText = data.in_nameEn;
+            if(document.querySelector('#name_title div')) document.querySelector('#name_title div').innerText = data.in_nameEn;
+            if(document.querySelector('#name_bn b')) document.querySelector('#name_bn b').innerText = data.in_nameBn;
+            if(document.getElementById('fathers_name')) document.getElementById('fathers_name').innerText = data.in_father;
+            if(document.getElementById('mothers_name')) document.getElementById('mothers_name').innerText = data.in_mother;
+            if(document.getElementById('dob')) document.getElementById('dob').innerText = data.in_dob;
+            if(document.getElementById('nid_no')) document.getElementById('nid_no').innerText = data.in_nid;
+            if(document.getElementById('nid_father')) document.getElementById('nid_father').innerText = data.in_pin;
+            if(document.getElementById('from_number')) document.getElementById('from_number').innerText = data.in_voterSl;
+            if(document.getElementById('spouse')) document.getElementById('spouse').innerText = data.in_voterNo;
+            if(document.getElementById('voter_area_code')) document.getElementById('voter_area_code').innerText = data.in_areaCode;
+            if(document.getElementById('birth_place')) document.getElementById('birth_place').innerText = data.in_district;
+            if(document.getElementById('blood_group')) document.getElementById('blood_group').innerText = data.in_blood;
+            if(document.getElementById('religion')) document.getElementById('religion').innerText = data.in_gender;
+            if(document.getElementById('gender')) document.getElementById('gender').innerText = data.in_spouse;
+            if(document.getElementById('present_addr')) document.getElementById('present_addr').innerText = data.in_presentAddr;
+            if(document.getElementById('permanent_addr')) document.getElementById('permanent_addr').innerText = data.in_permanentAddr;
+
+            const qrText = `${data.in_nid}|${data.in_nameEn}|${data.in_dob}`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrText)}`;
+            if(document.getElementById('qr')) document.getElementById('qr').src = qrUrl;
+        }
+
+        document.getElementById('in_photo_file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imgElement = document.getElementById('photo');
+                    if(imgElement) imgElement.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        window.onload = function() {
+            showprint();
+            generateNID();
+        };
+    </script>
+</body>
+</html>
