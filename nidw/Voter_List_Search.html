@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falkamuri Smart Voter Search</title>
+    <!-- বাংলা ফন্ট -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- লাইব্রেরি -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Hind Siliguri', sans-serif; }
+        
+        body { background-color: #f4f4f4; display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
+
+        .app-container {
+            width: 100%; max-width: 480px; background: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;
+            position: relative;
+        }
+
+        /* --- Form Section Styles --- */
+        .form-section { padding: 20px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+
+        .input-box {
+            width: 100%; height: 45px; border: 1px solid #d89ba3; border-radius: 6px;
+            padding: 0 12px; font-size: 15px; color: #c0392b; outline: none;
+        }
+        .input-box::placeholder { color: #c0392b; opacity: 0.8; }
+        
+        select.input-box {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c0392b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;
+        }
+
+        /* Buttons */
+        .btn { border: none; border-radius: 6px; height: 45px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; font-size: 15px; color: white; transition: 0.2s; }
+        .btn-search { background-color: #2c3e8f; }
+        .btn-clear { background-color: #5a6268; }
+        .btn-delete { background-color: #dc3545; }
+        .btn-upload { background-color: #28a745; }
+        .btn:active { transform: scale(0.98); }
+        
+        .divider { height: 1px; background-color: #eaeaea; margin: 0 20px 15px 20px; }
+        .icon { width: 18px; height: 18px; fill: currentColor; }
+
+        /* --- Result Header --- */
+        .result-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; background-color: #fff; border-bottom: 1px solid #f0f0f0;
+        }
+        .res-title { color: #c0392b; font-weight: 700; font-size: 18px; }
+        .res-count { color: #c0392b; font-weight: 700; font-size: 18px; }
+
+        /* --- Result Card Design --- */
+        .results-list { padding: 15px; background-color: #f8f9fa; max-height: 600px; overflow-y: auto; }
+        
+        .result-card {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-header-green {
+            background-color: #00695c;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .voter-no-text { font-size: 18px; font-weight: 700; }
+        .header-icons { display: flex; gap: 15px; }
+        .icon-btn { cursor: pointer; opacity: 0.9; }
+        .icon-btn:hover { opacity: 1; transform: scale(1.1); }
+
+        .card-body { padding: 20px; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 15px;
+        }
+
+        .info-item { display: flex; flex-direction: column; gap: 4px; }
+        .label { color: #6c757d; font-size: 13px; font-weight: 500; }
+        .value { color: #212529; font-size: 16px; font-weight: 600; word-break: break-word;}
+
+        .full-width { grid-column: span 2; margin-top: 5px; border-top: 1px dashed #eee; padding-top: 10px;}
+        .address-text { color: #212529; font-size: 15px; font-weight: 500; line-height: 1.5; }
+
+        /* --- Bottom Action Bar --- */
+        .bottom-actions {
+            position: sticky; bottom: 0; background: #fff;
+            padding: 15px; display: flex; justify-content: center; gap: 10px;
+            border-top: 1px solid #eee; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 10;
+        }
+
+        .action-pill {
+            border: none; border-radius: 50px; padding: 10px 20px;
+            color: white; font-weight: 600; font-size: 14px; cursor: pointer;
+            display: flex; align-items: center; gap: 6px; transition: 0.2s;
+        }
+        .pill-copy { background-color: #9c27b0; }
+        .pill-download { background-color: #f44336; }
+
+        /* Loading Overlay */
+        #fileInput { display: none; }
+        .loading-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(255,255,255,0.95); z-index: 50;
+            display: none; align-items: center; justify-content: center;
+            flex-direction: column; color: #2c3e8f; font-weight: bold; text-align: center; padding: 20px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3; border-top: 4px solid #2c3e8f;
+            border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-bottom: 10px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p id="loadingText">ফাইল প্রসেস হচ্ছে...<br><small>(অপেক্ষা করুন)</small></p>
+    </div>
+
+    <!-- Form Section -->
+    <div class="form-section">
+        <div class="grid-2">
+            <select id="district" class="input-box"><option value="">জেলা</option></select>
+            <select id="upazila" class="input-box"><option value="">উপজেলা</option></select>
+        </div>
+        <div class="grid-3">
+            <input type="text" id="name" class="input-box" placeholder="নাম">
+            <input type="text" id="father" class="input-box" placeholder="পিতা">
+            <input type="text" id="mother" class="input-box" placeholder="মাতা">
+        </div>
+        <div class="grid-3">
+            <input type="date" id="dob" class="input-box">
+            <select id="filter" class="input-box"><option value="">সব</option></select>
+            <button class="btn btn-search" onclick="performSearch()">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                সার্চ
+            </button>
+        </div>
+        <div class="divider"></div>
+        <div class="grid-3">
+            <button class="btn btn-clear" onclick="clearForm()">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                ক্লিয়ার
+            </button>
+            <button class="btn btn-delete" onclick="deleteData()">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                ডিলেট
+            </button>
+            <button class="btn btn-upload" onclick="document.getElementById('fileInput').click()">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                আপলোড
+            </button>
+            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf,.txt,.json" onchange="handleFileUpload(this)">
+        </div>
+    </div>
+
+    <!-- Results Header -->
+    <div class="result-header">
+        <span class="res-title">অনুসন্ধানের ফলাফল</span>
+        <span class="res-count" id="countDisplay">০ জন</span>
+    </div>
+
+    <!-- Results Area -->
+    <div class="results-list" id="resultsContainer">
+        <div class="empty-state">
+            <p>কোন ডাটা পাওয়া যায়নি</p>
+        </div>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="bottom-actions">
+        <button class="action-pill pill-copy" onclick="copyAllData()">
+            <svg style="width:16px;height:16px;fill:white" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            All Copy
+        </button>
+        <button class="action-pill pill-download" onclick="downloadAsPNG()">
+            <svg style="width:16px;height:16px;fill:white" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Download PNG
+        </button>
+    </div>
+</div>
+
+<script>
+    // PDF.js Worker Setup
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+    let allData = []; 
+    let filteredData = [];
+
+    const FIXED_LOCATION = {
+        postOffice: "আমড়াতলী",
+        postCode: "৩৫০",
+        upazila: "বরুড়া",
+        district: "কুমিল্লা",
+        union: "নং দক্ষিণ শিলমুড়ি",
+        voterArea: "ফলকামুড়ি"
+    };
+
+    function toBengaliNum(num) {
+        const bengaliNums = ['','১','২','৩','','','৬','৭','','৯'];
+        return num.toString().split('').map(d => bengaliNums[d] || d).join('');
+    }
+
+    // --- MULTI-VOTER SMART PARSER ---
+    function parseRawTextToVoters(text) {
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        const voters = [];
+        let currentVoter = {};
+        let lastField = null; 
+
+        lines.forEach(line => {
+            // 1. Clean OCR Noise (Fix common mistakes like 'bi ho' -> 'পিতা')
+            let cleanLine = line.replace(/^(bi ho|fita|Pita|Pitha|Father)\s*:?/i, "পিতা:");
+            
+            // 2. Check if this line starts a NEW voter (Heuristic: Name or Voter ID at start)
+            // If we already have a name and father, and we see a new "Name:" or "Voter ID:", push previous.
+            const isNewVoterStart = (cleanLine.includes('নাম:') && currentVoter.name && currentVoter.father) || 
+                                    (cleanLine.match(/^\d+\.\s*নাম:/) && currentVoter.name);
+
+            if (isNewVoterStart) {
+                voters.push(currentVoter);
+                currentVoter = {}; // Reset for next voter
+                lastField = null;
+            }
+
+            // 3. Extract Data based on Keywords
+            if (cleanLine.includes('নাম:') || cleanLine.match(/^\d+\.\s*নাম:/)) {
+                currentVoter.name = cleanLine.split(/[:\.]/).pop().trim();
+                lastField = 'name';
+            } 
+            else if (cleanLine.includes('ভোটার নং:') || cleanLine.includes('ID:')) {
+                currentVoter.voter_id = cleanLine.split(/[:\-]/).pop().trim();
+                lastField = 'voter_id';
+            } 
+            else if (cleanLine.includes('পিতা:') || cleanLine.includes('Father:')) {
+                let val = cleanLine.split(/[:\-]/).pop().trim();
+                if(val && val.length > 2 && isNaN(val)) {
+                    currentVoter.father = val;
+                } else {
+                    lastField = 'father'; 
+                }
+            } 
+            else if (cleanLine.includes('মাতা:') || cleanLine.includes('Mother:')) {
+                let val = cleanLine.split(/[:\-]/).pop().trim();
+                if(val && val.length > 2 && isNaN(val)) {
+                    currentVoter.mother = val;
+                } else {
+                    lastField = 'mother';
+                }
+            } 
+            else if (cleanLine.includes('পেশা') || cleanLine.includes('Occupation')) {
+                 let val = cleanLine.split(/[:\-]/).pop().trim();
+                 if(val && val.length > 1) {
+                     currentVoter.occupation = val;
+                 } else {
+                     lastField = 'occupation';
+                 }
+            }
+            else if (cleanLine.includes('জন্ম') || cleanLine.includes('DOB') || /\d{2}\/\d{2}\/\d{4}/.test(cleanLine)) {
+                const dateMatch = cleanLine.match(/\d{2}\/\d{2}\/\d{4}/);
+                if(dateMatch) currentVoter.birth_date = dateMatch[0];
+                else currentVoter.birth_date = cleanLine.split(/[:\-]/).pop().trim();
+                lastField = 'birth_date';
+            } 
+            else if (cleanLine.includes('ঠিকানা:') || cleanLine.includes('Address:') || cleanLine.includes('bikana')) {
+                currentVoter.address = cleanLine.split(/[:\-]/).pop().trim();
+                
+                // Auto-parse address parts (Comma separated)
+                const addrParts = currentVoter.address.split(',').map(p => p.trim());
+                if(addrParts.length >= 3) {
+                    currentVoter.district = addrParts[addrParts.length-1];
+                    currentVoter.upazila = addrParts[addrParts.length-2];
+                }
+                lastField = 'address';
+            }
+            // Handle values that appear on the NEXT line (Common in OCR)
+            else if (lastField && !cleanLine.includes(':')) {
+                if(lastField === 'father') currentVoter.father = cleanLine;
+                else if(lastField === 'mother') currentVoter.mother = cleanLine;
+                else if(lastField === 'occupation') currentVoter.occupation = cleanLine;
+                else if(lastField === 'birth_date') currentVoter.birth_date = cleanLine;
+                lastField = null; 
+            }
+        });
+
+        // Push the last voter found
+        if (currentVoter.name) voters.push(currentVoter);
+
+        // Fallback: If structured parsing failed completely
+        if (voters.length === 0 && lines.length > 0) {
+             return lines.map((l, i) => ({ name: l, serial: i+1 }));
+        }
+
+        return voters;
+    }
+
+    // --- MAIN FILE HANDLER ---
+    async function handleFileUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const overlay = document.getElementById('loadingOverlay');
+        const loadText = document.getElementById('loadingText');
+        overlay.style.display = 'flex';
+
+        try {
+            const ext = file.name.split('.').pop().toLowerCase();
+            let extractedText = "";
+
+            if (ext === 'json') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        processDataArray(Array.isArray(json) ? json : [json]);
+                    } catch(err) { alert("JSON এরর!"); }
+                    overlay.style.display = 'none';
+                };
+                reader.readAsText(file);
+                return;
+
+            } else if (ext === 'txt') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const parsed = parseRawTextToVoters(e.target.result);
+                    processDataArray(parsed);
+                    overlay.style.display = 'none';
+                };
+                reader.readAsText(file);
+                return;
+
+            } else if (ext === 'pdf') {
+                loadText.innerText = "PDF পড়া হচ্ছে...";
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    loadText.innerText = `PDF পেজ ${i} পড়া হচ্ছে...`;
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    extractedText += pageText + "\n";
+                }
+
+            } else if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+                loadText.innerText = "ছবি থেকে লেখা বের করা হচ্ছে... (একটু সময় লাগবে)";
+                const worker = await Tesseract.createWorker('ben+eng');
+                const ret = await worker.recognize(file);
+                extractedText = ret.data.text;
+                await worker.terminate();
+
+            } else {
+                alert("এই ফাইল ফরম্যাট সাপোর্টেড নয়।");
+                overlay.style.display = 'none';
+                return;
+            }
+
+            if (extractedText) {
+                console.log("Extracted Text:", extractedText);
+                const parsedData = parseRawTextToVoters(extractedText);
+                processDataArray(parsedData);
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("ফাইল পড়তে সমস্যা হয়েছে: " + error.message);
+        } finally {
+            overlay.style.display = 'none';
+            input.value = ''; 
+        }
+    }
+
+    function processDataArray(data) {
+        if(!data || data.length === 0) {
+            alert("কোন ডাটা পাওয়া যায়নি! দয়া করে পরিষ্কার ছবি দিন।");
+            return;
+        }
+
+        allData = [...allData, ...data]; 
+        
+        allData.forEach(item => {
+            // Fill missing location data with defaults if not found in text
+            if(!item.postOffice) item.postOffice = FIXED_LOCATION.postOffice;
+            if(!item.postCode) item.postCode = FIXED_LOCATION.postCode;
+            if(!item.upazila) item.upazila = item.upazila || FIXED_LOCATION.upazila;
+            if(!item.district) item.district = item.district || FIXED_LOCATION.district;
+            if(!item.union) item.union = FIXED_LOCATION.union;
+            if(!item.voterArea) item.voterArea = FIXED_LOCATION.voterArea;
+            
+            item._parsedDistrict = item.district || "";
+            item._parsedUpazila = item.upazila || "";
+        });
+
+        alert(`সফলভাবে ${data.length} টি নতুন ডাটা যুক্ত হয়েছে!`);
+        populateDropdowns();
+        performSearch(); 
+    }
+
+    function populateDropdowns() {
+        const districts = [...new Set(allData.map(d => d._parsedDistrict).filter(Boolean))].sort();
+        const upazilas = [...new Set(allData.map(d => d._parsedUpazila).filter(Boolean))].sort();
+        
+        const distSelect = document.getElementById('district');
+        const upaSelect = document.getElementById('upazila');
+        
+        distSelect.innerHTML = '<option value="">জেলা</option>';
+        upaSelect.innerHTML = '<option value="">উপজেলা</option>';
+
+        districts.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d; opt.innerText = d;
+            distSelect.appendChild(opt);
+        });
+        upazilas.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u; opt.innerText = u;
+            upaSelect.appendChild(opt);
+        });
+    }
+
+    function performSearch() {
+        const district = document.getElementById('district').value.toLowerCase();
+        const upazila = document.getElementById('upazila').value.toLowerCase();
+        const name = document.getElementById('name').value.toLowerCase();
+        const father = document.getElementById('father').value.toLowerCase();
+        const mother = document.getElementById('mother').value.toLowerCase();
+        const dob = document.getElementById('dob').value;
+
+        filteredData = allData.filter(item => {
+            const matchDist = !district || (item._parsedDistrict && item._parsedDistrict.toLowerCase().includes(district));
+            const matchUpa = !upazila || (item._parsedUpazila && item._parsedUpazila.toLowerCase().includes(upazila));
+            const matchName = !name || (item.name && item.name.toLowerCase().includes(name));
+            const matchFather = !father || (item.father && item.father.toLowerCase().includes(father));
+            const matchMother = !mother || (item.mother && item.mother.toLowerCase().includes(mother));
+            
+            let matchDob = true;
+            if (dob && item.birth_date) {
+                const cleanDob = item.birth_date.replace(/[^\d\/-]/g, ''); 
+                if(cleanDob.includes(dob.replace(/-/g, '/'))) matchDob = true;
+                else matchDob = false;
+            }
+            return matchDist && matchUpa && matchName && matchFather && matchMother && matchDob;
+        });
+
+        renderResults();
+    }
+
+    function renderResults() {
+        const container = document.getElementById('resultsContainer');
+        const countDisplay = document.getElementById('countDisplay');
+        
+        countDisplay.innerText = `${toBengaliNum(filteredData.length)} জন`;
+
+        if (filteredData.length === 0) {
+            container.innerHTML = '<div class="empty-state"><p>কোন ডাটা পাওয়া যায়নি</p></div>';
+            return;
+        }
+
+        let html = '';
+        filteredData.forEach((item, index) => {
+            const displayId = item.voter_id || item.id || item.serial || (index + 1);
+            const name = item.name || '-';
+            
+            html += `
+            <div class="result-card" id="card-${index}">
+                <div class="card-header-green">
+                    <span class="voter-no-text">ভোটার নং: ${displayId}</span>
+                    <div class="header-icons">
+                        <svg class="icon-btn" onclick="copySingleCard(${index})" style="width:24px;height:24px;fill:white" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="info-grid">
+                        <div class="info-item full-width" style="border:none; padding:0; margin-bottom:10px;">
+                            <span class="label">নাম</span>
+                            <span class="value" style="font-size:18px; color:#00695c;">${index + 1}. নাম: ${name}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="label">পিতার নাম</span>
+                            <span class="value">${item.father || '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">মাতার নাম</span>
+                            <span class="value">${item.mother || '-'}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="label">জন্ম তারিখ</span>
+                            <span class="value">${item.birth_date || '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">পেশা</span>
+                            <span class="value">${item.occupation || '-'}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="label">জেলা</span>
+                            <span class="value">${item.district || FIXED_LOCATION.district}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">উপজেলা</span>
+                            <span class="value">${item.upazila || FIXED_LOCATION.upazila}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="label">ইউনিয়ন</span>
+                            <span class="value">${item.union || FIXED_LOCATION.union}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">ভোটার এলাকা</span>
+                            <span class="value">${item.voterArea || FIXED_LOCATION.voterArea}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="label">পোস্ট অফিস</span>
+                            <span class="value">${item.postOffice || FIXED_LOCATION.postOffice}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">পোস্ট কোড</span>
+                            <span class="value">${item.postCode || FIXED_LOCATION.postCode}</span>
+                        </div>
+
+                        <div class="info-item full-width">
+                            <span class="label">বর্তমান িকানা</span>
+                            <span class="address-text">${item.address || `${FIXED_LOCATION.voterArea}, ${FIXED_LOCATION.union}, ${FIXED_LOCATION.upazila}, ${FIXED_LOCATION.district}`}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function clearForm() {
+        document.querySelectorAll('.input-box').forEach(el => {
+            if(el.tagName === 'SELECT') el.selectedIndex = 0;
+            else el.value = '';
+        });
+        performSearch();
+    }
+
+    function deleteData() {
+        if(confirm("সব ডাটা মুছে ফেলতে চান?")) {
+            allData = [];
+            filteredData = [];
+            renderResults();
+        }
+    }
+
+    function copyAllData() {
+        if(filteredData.length === 0) return alert("কপি করার জন্য ডাটা নেই!");
+        let text = "";
+        filteredData.forEach((item, i) => {
+            const s = item.voter_id || item.id || item.serial || (i+1);
+            text += `ভোটার নং: ${s}\nনাম: ${item.name}\nপিতা: ${item.father}, মাতা: ${item.mother}\nঠিকানা: ${item.address || ''}\n\n`;
+        });
+        navigator.clipboard.writeText(text).then(() => alert("সব ডাটা কপি হয়েছে!"));
+    }
+
+    function copySingleCard(index) {
+        const item = filteredData[index];
+        const s = item.voter_id || item.id || item.serial || (index+1);
+        const text = `ভোটার নং: ${s}\nনাম: ${item.name}\nপিতা: ${item.father}\nমাতা: ${item.mother}\nঠিকানা: ${item.address || ''}`;
+        navigator.clipboard.writeText(text).then(() => alert("কার্ড কপি হয়েছে!"));
+    }
+
+    async function downloadAsPNG() {
+        if(filteredData.length === 0) return alert("ডাউনলোড করার জন্য ডাটা নেই!");
+        
+        const container = document.getElementById('resultsContainer');
+        const originalOverflow = container.style.overflow;
+        container.style.overflow = 'visible'; 
+
+        try {
+            const canvas = await html2canvas(container, {
+                scale: 2, 
+                useCORS: true,
+                backgroundColor: "#f8f9fa"
+            });
+            
+            const link = document.createElement('a');
+            link.download = 'voter_results.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        } catch(err) {
+            console.error(err);
+            alert("ছবি তৈরিতে সমস্যা হয়েছে!");
+        } finally {
+            container.style.overflow = originalOverflow;
+        }
+    }
+</script>
+
+</body>
+</html>
