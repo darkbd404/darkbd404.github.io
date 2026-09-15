@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1020">
+  <title>My Server Security Lab</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">AUTHORIZED TESTING ONLY</div>
+      <h1>Security Lab</h1>
+    </div>
+    <button id="themeBtn" class="iconBtn" aria-label="Toggle theme">☾</button>
+  </header>
+
+  <main>
+    <section class="card hero">
+      <div class="shield">🛡️</div>
+      <div>
+        <h2>Own-server security checker</h2>
+        <p>Run lightweight checks against a server you own or are explicitly authorized to test.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <label for="target">Your server URL</label>
+      <div class="row">
+        <input id="target" type="url" placeholder="https://example.com" autocomplete="url">
+        <button id="scanBtn" class="primary">Scan</button>
+      </div>
+      <p class="hint">The browser can check basic HTTP responses only when the target permits CORS. For a complete scan, use the included GitHub Actions scanner.</p>
+    </section>
+
+    <section id="summary" class="card hidden">
+      <div class="scoreWrap">
+        <div id="score" class="score">--</div>
+        <div><b>Security score</b><span id="scoreText">Run a scan</span></div>
+      </div>
+      <div id="stats" class="stats"></div>
+    </section>
+
+    <section id="results" class="results"></section>
+
+    <section class="card">
+      <h3>What this lab checks</h3>
+      <ul class="checks">
+        <li>HTTPS usage</li>
+        <li>Security headers</li>
+        <li>CORS visibility</li>
+        <li>Server information disclosure</li>
+        <li>Basic cookie flags</li>
+        <li>Common public metadata files</li>
+      </ul>
+      <p class="warning">This is not a full penetration test. It intentionally avoids password attacks, exploitation, destructive requests, and port scanning.</p>
+    </section>
+  </main>
+
+  <footer>Security Lab • Use only on systems you own or are authorized to test.</footer>
+  <script src="app.js"></script>
+</body>
+</html>
