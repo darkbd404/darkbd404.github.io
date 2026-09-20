@@ -1,246 +1,51 @@
 <!doctype html>
 <html lang="bn">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#087b63">
-<meta name="description" content="মুনাফা হিসাব Smart Finance Tools">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="https://darkbd404.github.io/profit-calculator/icon-512.png">
-<title>মুনাফা হিসাব</title>
-<style>
-:root{
- --bg:#edf7f5;--card:#ffffff;--text:#10262b;--muted:#6c7f84;--line:#dcebea;
- --primary:#07547d;--primary2:#087b63;--accent:#14bfd2;--gold:#e7bb4d;
- --soft:#e8f7f2;--danger:#c83e48;--hero1:#062f4f;--hero2:#075d90;--hero3:#087e68;
- --shadow:0 14px 38px rgba(5,56,68,.11);--radius:22px;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{margin:0;min-height:100%;font-family:"Noto Sans Bengali","Hind Siliguri",system-ui,sans-serif;background:
- radial-gradient(circle at 0 0,#dff5ef 0,transparent 30%),linear-gradient(180deg,var(--bg),#f8fbfc 60%,var(--bg));color:var(--text)}
-button,input,select{font:inherit}button{cursor:pointer}
-.app{max-width:590px;margin:auto;min-height:100vh}
-.topbar{position:sticky;top:0;z-index:100;padding:calc(8px + env(safe-area-inset-top)) 13px 9px;background:color-mix(in srgb,var(--hero1) 94%,transparent);color:#fff;display:flex;justify-content:space-between;align-items:center;box-shadow:0 5px 22px #001c2b35;backdrop-filter:blur(16px)}
-.brand{display:flex;gap:9px;align-items:center;min-width:0}.brand-logo{width:42px;height:42px;border-radius:12px;object-fit:cover;background:#fff;box-shadow:0 4px 14px #0003}.brand b{display:block;font-size:16px;white-space:nowrap}.brand small{display:block;font-size:9px;color:#bfe1e6;margin-top:1px}
-.actions{display:flex;gap:6px}.topbtn{width:39px;height:39px;border:1px solid #ffffff2b;background:#ffffff12;color:#fff;border-radius:12px}
-.hero{padding:19px 14px 17px;background:linear-gradient(145deg,var(--hero1),var(--hero2) 58%,var(--hero3));color:#fff;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
-.hero:after{content:"";position:absolute;width:230px;height:230px;border:1px solid #fff2;border-radius:50%;right:-120px;top:-110px;box-shadow:0 0 0 24px #fff1,0 0 0 48px #fff08;pointer-events:none}
-.hero-flex{display:flex;justify-content:space-between;gap:10px;position:relative;z-index:1}.hero h1{margin:0;font-size:26px}.hero p{margin:3px 0 0;color:#d5ecf0;font-size:11px}.rate{border:1px solid #fff2;background:#ffffff12;border-radius:13px;padding:7px 10px;text-align:right;min-width:74px}.rate small{font-size:8px;display:block;color:#b9dce6}.rate b{font-size:15px}
-.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:14px;position:relative;z-index:1}.quick button{background:#ffffff12;border:1px solid #fff2;color:#fff;border-radius:13px;padding:7px 3px;font-size:10px}.quick i{display:block;font-style:normal;font-size:17px;margin-bottom:1px}
-.navtabs{position:sticky;top:58px;z-index:90;padding:8px 12px;background:color-mix(in srgb,var(--bg) 91%,transparent);backdrop-filter:blur(14px);display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.navtabs button{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:13px;padding:9px 3px;font-size:10px;font-weight:800;box-shadow:0 4px 14px #073d4a0a}.navtabs button.active{color:#fff;background:linear-gradient(135deg,var(--primary2),var(--primary));border-color:transparent;box-shadow:0 7px 16px color-mix(in srgb,var(--primary2) 22%,transparent)}
-.content{padding:3px 12px 40px}.card{background:var(--card);border-radius:var(--radius);padding:16px;margin:0 0 13px;box-shadow:var(--shadow);border:1px solid color-mix(in srgb,var(--line) 65%,#fff)}
-.title{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}.title h2{font-size:17px;margin:0}.badge{font-size:8px;background:var(--soft);color:var(--primary2);padding:6px 9px;border-radius:20px;font-weight:900;letter-spacing:.3px}
-.field{margin-bottom:11px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}.input{display:flex;align-items:center;min-height:49px;border:1px solid var(--line);background:color-mix(in srgb,var(--bg) 50%,#fff);border-radius:13px;overflow:hidden;transition:.2s}.input:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}.prefix,.suffix{padding:0 10px;color:var(--primary2);font-weight:800}.suffix{font-size:10px;color:var(--muted)}.input input,.input select{border:0;outline:0;background:transparent;color:var(--text);width:100%;height:47px;padding:0 6px;font-size:15px;min-width:0}.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.presets-title{font-size:10px;color:var(--muted);font-weight:800;margin:1px 0 6px}.presets{display:flex;gap:6px;overflow:auto;margin:0 -2px 12px;padding:1px 2px 4px;scrollbar-width:none}.presets::-webkit-scrollbar{display:none}.presets button{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;padding:7px 9px;font-size:10px;box-shadow:0 2px 8px #073d4a08}.presets button.active{background:var(--soft);border-color:var(--accent);color:var(--primary2);font-weight:900}
-.primary{width:100%;border:0;border-radius:14px;min-height:52px;color:#fff;font-size:16px;font-weight:900;background:linear-gradient(135deg,var(--primary2),var(--primary));box-shadow:0 10px 23px color-mix(in srgb,var(--primary2) 23%,transparent);transition:transform .15s,filter .2s}.primary:active{transform:scale(.985)}.secondary{width:100%;min-height:44px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:13px;margin-top:8px;font-weight:700}
-.result{background:linear-gradient(145deg,var(--hero1),var(--hero2) 58%,var(--hero3));color:#fff;border-radius:21px;padding:16px;position:relative;overflow:hidden}.result:after{content:"";position:absolute;width:250px;height:250px;border:1px solid #fff1;border-radius:50%;right:-160px;bottom:-160px}.resulttop{display:flex;justify-content:space-between;gap:10px;position:relative;z-index:1}.result small{color:#bcdde7}.result h3{font-size:11px;font-weight:600;margin:0}.big{font-size:29px;font-weight:900;line-height:1.18;margin:4px 0}.words{font-size:10px;line-height:1.55;color:#d8eef0}.ratebox{background:#ffffff10;border:1px solid #fff2;border-radius:13px;padding:7px 9px;text-align:center;min-width:70px;height:max-content}.ratebox b{display:block;font-size:15px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:13px;position:relative;z-index:1}.mini{background:#ffffff10;border:1px solid #fff2;border-radius:12px;padding:8px}.mini small{display:block;font-size:8px}.mini b{font-size:11px}.dategrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px;position:relative;z-index:1}.datebox{background:#ffffff10;border:1px solid #fff2;border-radius:12px;padding:9px}.datebox small{display:block;font-size:8px}.datebox b{display:block;color:#fff;font-size:11px;margin-top:2px}.rows{background:var(--card);border-radius:16px;margin-top:9px;padding:5px 11px;color:var(--text);position:relative;z-index:2}.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}.row:last-child{border:0}.value{font-weight:900;text-align:right}.green{color:#08775b}.red{color:var(--danger)}.net{margin-top:9px;background:var(--soft);border-radius:15px;padding:13px;display:flex;justify-content:space-between;align-items:center}.net .value{font-size:19px;color:var(--primary2)}.final{margin-top:8px;padding:14px;border-radius:15px;color:#fff;background:linear-gradient(135deg,var(--hero3),var(--primary));position:relative;z-index:2}.final .value{font-size:21px}.formula{margin-top:9px;background:color-mix(in srgb,var(--bg) 70%,#fff);color:var(--muted);border-radius:14px;padding:11px;font-size:10px;line-height:1.75}.formula b{color:var(--text)}
-.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.tool{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:14px;padding:11px 5px;text-align:center;transition:.2s}.tool:active{transform:scale(.97)}.tool span{display:block;font-size:19px}.tool b{font-size:9px}
-.themes{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.theme{border:1px solid var(--line);background:var(--card);border-radius:15px;padding:9px;text-align:left;color:var(--text);position:relative;overflow:hidden}.theme .swatch{height:42px;border-radius:11px;margin-bottom:7px;position:relative}.theme .swatch:after{content:"";position:absolute;width:45px;height:45px;border:1px solid #fff5;border-radius:50%;right:-14px;top:-15px}.theme b{font-size:11px}.theme small{display:block;color:var(--muted);font-size:8px;margin-top:2px}.theme.active{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 12%,transparent)}
-.history{font-size:11px}.hist{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:10px 0}.hist:last-child{border:0}.hist button{border:0;background:var(--soft);color:var(--primary2);border-radius:9px;padding:6px 8px;font-size:9px;font-weight:800}
-.developer{position:relative;overflow:hidden;background:linear-gradient(145deg,var(--hero1),var(--hero2) 54%,var(--hero3));color:#fff;border-radius:23px;padding:17px;box-shadow:0 18px 45px color-mix(in srgb,var(--hero1) 22%,transparent)}.developer:before,.developer:after{content:"";position:absolute;border:1px solid #fff1;border-radius:50%;pointer-events:none}.developer:before{width:260px;height:260px;right:-160px;top:-130px}.developer:after{width:180px;height:180px;left:-125px;bottom:-120px}
-.dev-head{display:flex;gap:12px;align-items:center;position:relative;z-index:1;min-width:0}.dev-photo{width:78px;height:78px;flex:0 0 78px;border-radius:22px;object-fit:cover;object-position:center;border:3px solid #ffffffaa;background:#fff;box-shadow:0 7px 18px #001d2c44}.developer h2{margin:0;font-size:20px;line-height:1.2}.developer p{margin:3px 0;color:#c4e1e7;font-size:10px;line-height:1.45;overflow-wrap:anywhere}.verified{display:inline-flex;gap:4px;align-items:center;margin-top:5px;background:#ffffff12;border:1px solid #fff2;padding:5px 8px;border-radius:20px;font-size:8px}.dev-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:14px;position:relative;z-index:1}.dev-link{display:flex;align-items:center;gap:8px;padding:11px;min-width:0;border:1px solid #fff2;background:#ffffff0d;border-radius:12px;color:#fff;text-decoration:none;font-size:10px;line-height:1.25}.dev-link > span:first-child{font-size:16px;flex:0 0 auto}.dev-link > span:last-child{font-size:10px;min-width:0;overflow-wrap:anywhere;word-break:break-word}.social{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;position:relative;z-index:1}.social a{color:#fff;text-decoration:none;text-align:center;border-radius:12px;padding:10px;background:#ffffff12;border:1px solid #fff2;font-size:10px;min-width:0}.dev-foot{margin-top:12px;font-size:8px;color:#a8d1dc;line-height:1.6;position:relative;z-index:1;overflow-wrap:anywhere}
-@media(max-width:520px){.dev-grid,.social{grid-template-columns:1fr}.dev-photo{width:76px;height:76px;flex-basis:76px}.developer{padding:15px}.dev-link{padding:11px 12px}.social a{padding:11px}}
-.section-anchor{scroll-margin-top:110px}.toast{position:fixed;left:50%;bottom:18px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#102d3b;color:#fff;padding:10px 14px;border-radius:12px;font-size:11px;z-index:200;transition:.22s;box-shadow:0 8px 25px #0003}.toast.show{opacity:1;transform:translate(-50%,0)}
-.dark{--bg:#071215;--card:#102127;--text:#effafa;--muted:#9db3ba;--line:#27404a;--soft:#12362e;--shadow:0 14px 38px #0006}
-.dark .input{background:#0c1b21}.dark .input input,.dark .input select{color:#fff}.dark .presets button{background:#102127;color:#e2eff2}.dark .formula{background:#0b1b21}.dark .navtabs button,.dark .tool,.dark .theme{background:#102127;color:#eaf6f7}
-@keyframes floatGlow{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.015)}}
-@keyframes shimmer{0%{background-position:-220% 0}100%{background-position:220% 0}}
-.hero,.result,.developer{animation:floatGlow 7s ease-in-out infinite}.primary{background-size:200% 100%;animation:shimmer 6s linear infinite}
-@media(max-width:390px){.hero h1{font-size:23px}.big{font-size:26px}.two{gap:7px}.summary{grid-template-columns:1fr 1fr}.mini:last-child{grid-column:span 2}}
-@media print{body{background:#fff}.topbar,.hero,.navtabs,.content>.card:nth-of-type(1),.content>.card:nth-of-type(3),.content>.card:nth-of-type(4),.content>.card:nth-of-type(5){display:none!important}.content{padding:0}.card{box-shadow:none;border:0}.result{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14213d">
+  <meta name="description" content="সহজে মুনাফা হিসাব করুন">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-512.png">
+  <title>মুনাফা হিসাব — Profit Calculator</title>
+  <style>
+    :root{--ink:#14213d;--muted:#667085;--paper:#fff;--canvas:#f4f7fb;--line:#d9e1ee;--brand:#2563eb;--brand-dark:#1d4ed8;--mint:#0f9f77;--warning:#f59e0b;--danger:#dc3545;--shadow:0 18px 45px rgba(20,33,61,.1);--radius:26px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(145deg,#eef5ff 0%,var(--canvas) 48%,#effbf7 100%);color:var(--ink);font-family:"Noto Sans Bengali","Hind Siliguri",system-ui,sans-serif;font-size:18px;line-height:1.55}button,input,select{font:inherit}button{cursor:pointer}.shell{width:min(100% - 28px,1080px);margin:auto;padding-bottom:48px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 0}.brand{display:flex;align-items:center;gap:14px}.brand img{width:58px;height:58px;border-radius:18px;box-shadow:0 8px 20px #14213d2a}.brand strong{display:block;font-size:1.45rem;line-height:1.15}.brand small{display:block;color:var(--muted);font-size:.9rem;margin-top:2px}.top-actions{display:flex;gap:10px}.icon-btn{width:50px;height:50px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:16px;font-size:1.5rem;box-shadow:0 6px 14px #14213d0b}
+    .hero{position:relative;overflow:hidden;border-radius:34px;padding:42px clamp(24px,5vw,66px);background:linear-gradient(120deg,#14213d,#234b91 56%,#0f9f77);color:#fff;box-shadow:var(--shadow)}.hero:after{content:"";position:absolute;width:280px;height:280px;border:1px solid #ffffff33;border-radius:50%;right:-100px;top:-130px;box-shadow:0 0 0 30px #ffffff12,0 0 0 62px #ffffff0a}.eyebrow{font-size:.82rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#b9d8ff}.hero h1{font-size:clamp(2rem,5vw,3.7rem);line-height:1.1;margin:8px 0 12px;max-width:680px}.hero p{font-size:1.12rem;color:#e0ecff;margin:0;max-width:620px}.hero-badge{display:inline-flex;margin-top:26px;padding:10px 16px;border:1px solid #ffffff42;border-radius:999px;background:#ffffff16;font-weight:700;font-size:.92rem}
+    .layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(340px,.95fr);gap:22px;margin-top:22px}.card{background:var(--paper);border:1px solid #fff;border-radius:var(--radius);padding:clamp(22px,3vw,34px);box-shadow:var(--shadow)}.card h2{font-size:1.65rem;line-height:1.2;margin:0}.card-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:25px}.live{font-size:.75rem;font-weight:900;color:var(--mint);background:#dff8ee;padding:7px 11px;border-radius:999px}
+    .field{margin:18px 0}.field label{display:block;font-size:1.02rem;font-weight:800;margin-bottom:8px}.input-wrap{display:flex;align-items:center;min-height:64px;border:2px solid var(--line);border-radius:17px;background:#fbfdff;transition:.2s}.input-wrap:focus-within{border-color:var(--brand);box-shadow:0 0 0 4px #2563eb1c}.prefix{font-size:1.25rem;font-weight:900;color:var(--brand);padding:0 15px}.input-wrap input,.input-wrap select{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--ink);font-size:1.2rem;font-weight:700;padding:12px 14px 12px 0}.suffix{color:var(--muted);font-weight:700;padding:0 15px 0 0}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px}.presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.preset{border:1px solid var(--line);background:#f7faff;color:var(--ink);padding:8px 12px;border-radius:11px;font-size:.92rem}.preset:hover,.preset.active{background:#e6efff;border-color:#9bbcfb;color:var(--brand-dark)}.primary{width:100%;border:0;border-radius:17px;padding:15px;margin-top:8px;background:var(--brand);color:#fff;font-size:1.18rem;font-weight:900;box-shadow:0 11px 20px #2563eb38}.primary:hover{background:var(--brand-dark);transform:translateY(-1px)}.secondary{width:100%;border:1px solid var(--line);border-radius:15px;padding:12px;margin-top:10px;background:transparent;color:var(--ink);font-weight:800}
+    .result-card{background:linear-gradient(145deg,#14213d,#234b91);color:#fff}.result-card .card-head{margin-bottom:18px}.result-card .live{background:#ffffff1c;color:#c9e5ff}.result-label{font-size:1rem;color:#dce8ff}.total{font-size:clamp(2.5rem,7vw,4.4rem);line-height:1.1;font-weight:950;letter-spacing:-.04em;margin:8px 0;word-break:break-word}.words{color:#c7dcff;font-size:1rem;min-height:30px}.summary{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:28px 0}.summary-item{padding:16px;border:1px solid #ffffff2a;border-radius:17px;background:#ffffff12}.summary-item small{display:block;color:#ccdcf4;font-size:.85rem}.summary-item b{display:block;font-size:1.3rem;margin-top:3px}.rows{border-top:1px solid #ffffff2d}.row{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #ffffff20;font-size:1rem}.row span:last-child{font-weight:800;text-align:right}.row.green span:last-child{color:#6de7bb}.row.red span:last-child{color:#ff9d9d}.net{display:flex;justify-content:space-between;padding:17px 0;font-size:1.16rem;font-weight:900}.final{background:#ffffff18;border:1px solid #ffffff35;border-radius:18px;padding:18px;margin-top:4px}.formula{color:#c7dcff;font-size:.85rem;margin-top:19px;padding-top:16px;border-top:1px solid #ffffff2d}.quick{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.quick button{border:1px solid var(--line);border-radius:16px;background:var(--paper);color:var(--ink);padding:14px 8px;font-weight:800}.quick button span{display:block;font-size:1.5rem;margin-bottom:3px}.footer{text-align:center;color:var(--muted);font-size:.9rem;padding:30px 0}.dark{--ink:#f4f7fb;--muted:#aab8cf;--paper:#15233c;--canvas:#0c1527;--line:#30415f}.dark body{background:linear-gradient(145deg,#0b172b,#101a2b 55%,#09241e)}.dark .input-wrap,.dark .preset,.dark .quick button,.dark .icon-btn{background:#101c31;color:var(--ink)}.dark .input-wrap input,.dark .input-wrap select{color:var(--ink)}
+    @media(max-width:780px){body{font-size:17px}.layout{grid-template-columns:1fr}.quick{grid-template-columns:repeat(2,1fr)}.hero{padding:34px 24px}.hero h1{font-size:2.35rem}.card{padding:23px}.result-card{order:-1}}
+    @media(max-width:480px){.shell{width:min(100% - 18px,1080px)}.topbar{padding:15px 0}.brand img{width:48px;height:48px}.brand strong{font-size:1.15rem}.brand small{font-size:.78rem}.top-actions{gap:6px}.icon-btn{width:44px;height:44px}.twocol{grid-template-columns:1fr;gap:0}.hero{border-radius:25px;padding:28px 20px}.hero h1{font-size:2rem}.hero p{font-size:1rem}.card{border-radius:21px;padding:19px}.card h2{font-size:1.4rem}.total{font-size:2.8rem}.row{font-size:.92rem}.summary-item b{font-size:1.05rem}}
+    @media(prefers-reduced-motion:no-preference){.hero{animation:rise .6s ease-out}.card{animation:rise .7s ease-out}@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}}
+  </style>
 </head>
 <body>
-<div class="app">
-<header class="topbar">
-  <div class="brand"><img class="brand-logo" src="https://darkbd404.github.io/profit-calculator/icon-512.png" alt="App logo"><div><b>মুনাফা হিসাব</b><small>Smart Finance Tools</small></div></div>
-  <div class="actions"><button class="topbtn" id="themeTop" aria-label="Dark mode">☾</button><button class="topbtn" id="installTop" aria-label="Install">＋</button></div>
-</header>
-
-<section class="hero">
-  <div class="hero-flex"><div><h1>মুনাফা ক্যালকুলেটর</h1><p>জমা • মুনাফা • কর্তন • নিট প্রাপ্য</p></div><div class="rate"><small>ডিফল্ট হার</small><b>৯.৫০%</b></div></div>
-  <div class="quick"><button onclick="focusTo('principal')"><i>💰</i>জমা</button><button onclick="focusTo('profitRate')"><i>📈</i>মুনাফা</button><button onclick="focusTo('taxRate')"><i>🧾</i>কর্তন</button><button onclick="go('resultCard')"><i>📊</i>ফলাফল</button></div>
-</section>
-
-<nav class="navtabs" id="navtabs">
-  <button class="active" data-go="calculator">🧮 হিসাব</button>
-  <button data-go="themes">🎨 Themes</button>
-  <button data-go="developer">👨‍💻 Developer</button>
-</nav>
-
-<main class="content">
-<section class="card section-anchor" id="calculator">
- <div class="title"><h2>🧮 হিসাবের তথ্য</h2><span class="badge">LIVE</span></div>
-
- <div class="field"><label>মূল টাকা</label><div class="input"><span class="prefix">৳</span><input id="principal" type="number" value="100000" min="0" step="100" inputmode="decimal"><span class="suffix">জমা</span></div></div>
- <div class="presets-title">মূল টাকার দ্রুত নির্বাচন</div>
- <div class="presets" id="moneyPresets">
-  <button data-v="50000">৳ ৫০ হাজার</button><button data-v="100000" class="active">৳ ১ লাখ</button><button data-v="200000">৳ ২ লাখ</button><button data-v="300000">৳ ৩ লাখ</button><button data-v="400000">৳ ৪ লাখ</button><button data-v="500000">৳ ৫ লাখ</button><button data-v="1000000">৳ ১০ লাখ</button><button data-v="2000000">৳ ২০ লাখ</button><button data-v="5000000">৳ ৫০ লাখ</button><button data-v="10000000">৳ ১ কোটি</button>
- </div>
-
- <div class="two">
-  <div class="field"><label>বার্ষিক মুনাফা</label><div class="input"><span class="prefix">%</span><input id="profitRate" type="number" value="9.50" min="0" step="0.01" inputmode="decimal"></div></div>
-  <div class="field"><label>কর্তন / VAT</label><div class="input"><span class="prefix">%</span><input id="taxRate" type="number" value="15" min="0" step="0.01" inputmode="decimal"></div></div>
- </div>
-
- <div class="two">
-  <div class="field"><label>মেয়াদ শুরু</label><div class="input"><span class="prefix">📅</span><input id="startDate" type="date"></div></div>
-  <div class="field"><label>মেয়াদ</label><div class="input"><span class="prefix">◷</span><input id="months" type="number" value="3" min="1" step="1" inputmode="numeric"><span class="suffix">মাস</span></div></div>
- </div>
- <div class="presets-title">মেয়াদ দ্রুত নির্বাচন</div>
- <div class="presets" id="periodPresets"><button data-v="1">১ মাস</button><button data-v="3" class="active">৩ মাস</button><button data-v="6">৬ মাস</button><button data-v="12">১ বছর</button><button data-v="24">২ বছর</button><button data-v="36">৩ বছর</button><button data-v="60">৫ বছর</button></div>
-
- <div class="two">
-  <div class="field"><label>হিসাবের ধরন</label><div class="input"><span class="prefix">◉</span><select id="mode"><option value="simple">সরল বার্ষিক</option><option value="monthly">মাসিক সরল</option></select></div></div>
-  <div class="field"><label>অতিরিক্ত চার্জ</label><div class="input"><span class="prefix">৳</span><input id="charge" type="number" value="0" min="0" step="0.01" inputmode="decimal"></div></div>
- </div>
- <button class="primary" id="calcBtn">হিসাব করুন</button>
- <button class="secondary" id="resetBtn">↻ ডিফল্ট হিসাব</button>
- <button class="secondary" id="installBtn" style="display:none">📱 Android App হিসেবে Install</button>
-</section>
-
-<section class="card section-anchor" id="resultCard">
- <div class="title"><h2>📊 হিসাবের ফলাফল</h2><span class="badge">RESULT</span></div>
- <div class="result">
-  <div class="resulttop"><div><h3>মেয়াদ শেষে মোট প্রাপ্য</h3><div class="big" id="total">৳১,০২,০১৮.৭৫</div><div class="words" id="totalWords">One Lakh Two Thousand Eighteen Taka Seventy Five Poysa</div></div><div class="ratebox"><small>বার্ষিক হার</small><b id="rateOut">৯.৫০%</b></div></div>
-  <div class="summary"><div class="mini"><small>নিট মুনাফা</small><b id="netMini">৳২,০১৮.৭৫</b></div><div class="mini"><small>মোট মুনাফা</small><b id="grossMini">৳২,৩৭৫.০০</b></div><div class="mini"><small>মেয়াদ</small><b id="periodMini">৩ মাস</b></div></div>
-  <div class="dategrid"><div class="datebox"><small>মেয়াদ শুরু</small><b id="startOut">16 Sep 2026</b></div><div class="datebox"><small>মেয়াদ শেষ</small><b id="maturityOut">16 Dec 2026</b></div></div>
- </div>
- <div class="rows">
-  <div class="row"><span>মূল টাকা</span><span class="value" id="principalOut">৳১,০০,০০০.০০</span></div>
-  <div class="row"><span>বার্ষিক মুনাফার হার</span><span class="value" id="rateRow">৯.৫০%</span></div>
-  <div class="row"><span>সময়কাল</span><span class="value" id="periodRow">৩ মাস</span></div>
-  <div class="row"><span>মেয়াদ শুরু</span><span class="value" id="startRow">16 Sep 2026</span></div>
-  <div class="row"><span>মেয়াদ শেষ</span><span class="value" id="maturityRow">16 Dec 2026</span></div>
-  <div class="row green"><span>মোট মুনাফা</span><span class="value" id="grossOut">৳২,৩৭৫.০০</span></div>
-  <div class="row red"><span id="taxLabel">১৫% কর্তন</span><span class="value" id="taxOut">− ৳৩৫৬.২৫</span></div>
-  <div class="row"><span>অতিরিক্ত চার্জ</span><span class="value" id="chargeOut">− ৳০.০০</span></div>
- </div>
- <div class="net"><b>নিট মুনাফা</b><span class="value" id="netOut">৳২,০১৮.৭৫</span></div>
- <div class="final"><div class="row" style="border:0;padding:0"><span><b>মেয়াদ শেষে মোট প্রাপ্য</b></span><span class="value" id="finalOut">৳১,০২,০১৮.৭৫</span></div><div class="words" id="finalWords" style="margin-top:5px">One Lakh Two Thousand Eighteen Taka Seventy Five Poysa</div></div>
- <div class="formula"><b>হিসাবের সূত্র</b><br>মোট মুনাফা = মূল টাকা × বার্ষিক মুনাফার হার × (মাস ÷ ১২)<br>কর্তন = মোট মুনাফা × কর্তনের হার<br>নিট মুনাফা = মোট মুনাফা − কর্তন − অতিরিক্ত চার্জ<br>মোট প্রাপ্য = মূল টাকা + নিট মুনাফা</div>
-</section>
-
-<section class="card">
- <div class="title"><h2>⚡ দ্রুত কাজ</h2><span class="badge">SMART</span></div>
- <div class="tools">
-  <button class="tool" id="copyBtn"><span>📋</span><b>কপি</b></button><button class="tool" id="shareBtn"><span>↗️</span><b>শেয়ার</b></button><button class="tool" id="pngBtn"><span>🖼️</span><b>PNG সেভ</b></button>
-  <button class="tool" id="printBtn"><span>🖨️</span><b>Print</b></button><button class="tool" id="saveBtn"><span>💾</span><b>সেভ</b></button><button class="tool" id="clearHistory"><span>🗑️</span><b>ইতিহাস</b></button>
- </div>
-</section>
-
-<section class="card section-anchor" id="themes">
- <div class="title"><h2>🎨 Theme Studio</h2><span class="badge">ANIMATED</span></div>
- <div class="themes">
-  <button class="theme active" data-theme="ocean"><div class="swatch" style="background:linear-gradient(135deg,#062f4f,#087e68)"></div><b>Ocean</b><small>Blue • Green</small></button>
-  <button class="theme" data-theme="emerald"><div class="swatch" style="background:linear-gradient(135deg,#064b3b,#12a875)"></div><b>Emerald</b><small>Fresh • Green</small></button>
-  <button class="theme" data-theme="royal"><div class="swatch" style="background:linear-gradient(135deg,#27377f,#783fa9)"></div><b>Royal</b><small>Deep • Premium</small></button>
-  <button class="theme" data-theme="sunset"><div class="swatch" style="background:linear-gradient(135deg,#7b2d45,#df7d27)"></div><b>Sunset</b><small>Warm • Gold</small></button>
- </div>
-</section>
-
-<section class="card">
- <div class="title"><h2>🕘 Saved Calculations</h2><span class="badge" id="historyCount">০টি</span></div>
- <div class="history" id="history"></div>
-</section>
-
-<section class="card section-anchor" id="developer">
- <div class="developer">
-  <div class="dev-head">
-   <img class="dev-photo" src="https://darkbd404.github.io/logo/file_00000000b7648211adcbf8a1d67a42fd.png" alt="Abdus Salam">
-   <div><h2>Abdus Salam</h2><p>Developer • Munafa Hisab Smart Finance Tools</p><div class="verified">✓ Developer Profile</div></div>
+  <div class="shell">
+    <header class="topbar"><div class="brand"><img src="icon-512.png" alt="মুনাফা হিসাব লোগো"><div><strong>মুনাফা হিসাব</strong><small>সহজ • দ্��ুত • নির্ভরযোগ্য</small></div></div><div class="top-actions"><button class="icon-btn" id="theme" aria-label="ডার্ক মোড">☾</button></div></header>
+    <section class="hero"><div class="eyebrow">SMART FINANCE TOOL</div><h1>আপনার মুনাফা, এক নজরে</h1><p>মূল টাকা, মুনাফার হার ও সময়কাল লিখুন। সঙ্গে সঙ্গে নিট প্রাপ্য হিসাব করুন।</p><div class="hero-badge">✓ বড় লেখা · মোবাইল ফ্রেন্ডলি · বিনামূল্যে</div></section>
+    <main class="layout">
+      <section class="card" aria-labelledby="input-title"><div class="card-head"><h2 id="input-title">হিসাবের তথ্য</h2><span class="live">LIVE</span></div>
+        <div class="field"><label for="principal">মূল টাকা</label><div class="input-wrap"><span class="prefix">৳</span><input id="principal" type="number" min="0" step="100" value="100000" inputmode="decimal"></div><div class="presets"><button class="preset" data-target="principal" data-value="50000">৳ ৫০ হাজার</button><button class="preset active" data-target="principal" data-value="100000">৳ ১ লাখ</button><button class="preset" data-target="principal" data-value="200000">৳ ২ লাখ</button></div></div>
+        <div class="twocol"><div class="field"><label for="rate">বার্ষিক মুনাফা</label><div class="input-wrap"><span class="prefix">%</span><input id="rate" type="number" min="0" step="0.01" value="9.5" inputmode="decimal"></div></div><div class="field"><label for="tax">কর্তন / VAT</label><div class="input-wrap"><span class="prefix">%</span><input id="tax" type="number" min="0" step="0.01" value="15" inputmode="decimal"></div></div></div>
+        <div class="twocol"><div class="field"><label for="months">মেয়াদ</label><div class="input-wrap"><span class="prefix">◷</span><input id="months" type="number" min="1" step="1" value="3" inputmode="numeric"><span class="suffix">মাস</span></div></div><div class="field"><label for="charge">অতিরিক্ত চার্জ</label><div class="input-wrap"><span class="prefix">৳</span><input id="charge" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div></div></div>
+        <div class="presets"><button class="preset" data-target="months" data-value="1">১ মাস</button><button class="preset active" data-target="months" data-value="3">৩ মাস</button><button class="preset" data-target="months" data-value="6">৬ মাস</button><button class="preset" data-target="months" data-value="12">১২ মাস</button></div>
+        <button class="primary" id="calculate">হিসাব করুন →</button><button class="secondary" id="reset">↻ ডিফল্টে ফিরুন</button>
+      </section>
+      <section class="card result-card" id="result" aria-live="polite"><div class="card-head"><h2>আপনার ফলাফল</h2><span class="live">RESULT</span></div><div class="result-label">মেয়াদ শেষে মোট প্রাপ্য</div><div class="total" id="total">৳১,০২,০১৮.৭৫</div><div class="words" id="words">Principal + net profit</div><div class="summary"><div class="summary-item"><small>নিট মুনাফা</small><b id="net">৳২,০১৮.৭৫</b></div><div class="summary-item"><small>মোট মুনাফা</small><b id="gross">৳২,৩৭৫.০০</b></div></div><div class="rows"><div class="row"><span>মূল টাকা</span><span id="outPrincipal">৳১,০০,০০০.০০</span></div><div class="row"><span>মুনাফার হার</span><span id="outRate">৯.৫০%</span></div><div class="row"><span>সময়কাল</span><span id="outMonths">৩ মাস</span></div><div class="row green"><span>মোট মুনাফা</span><span id="outGross">৳২,৩৭৫.০০</span></div><div class="row red"><span>কর্তন</span><span id="outTax">− ৳৩৫৬.২৫</span></div><div class="row"><span>অতিরিক্ত চার্জ</span><span id="outCharge">− ৳০.০০</span></div></div><div class="net"><span>নিট মুনাফা</span><span id="outNet">৳২,০১৮.৭৫</span></div><div class="final"><div class="row" style="border:0;padding:0"><span><b>মেয়াদ শেষে মোট প্রাপ্য</b></span><span id="outTotal"><b>৳১,০২,০১৮.৭৫</b></span></div></div><div class="formula">মোট মুনাফা = মূল টাকা × হার × (মাস ÷ ১২)</div></section>
+      <section class="quick"><button id="copy"><span>📋</span>ফলাফল কপি</button><button id="share"><span>↗</span>শেয়ার</button><button id="print"><span>🖨</span>প্রিন্ট</button><button id="save"><span>💾</span>সেভ করুন</button></section>
+    </main><footer class="footer">মুনাফা হিসাব · আপনার আর্থিক পরিকল্পনা আরও সহজ হোক</footer>
   </div>
-  <div class="dev-grid">
-   <a class="dev-link" href="tel:09696590864"><span>☎️</span><span>09696590864</span></a><a class="dev-link" href="tel:01620230864"><span>📞</span><span>01620230864</span></a>
-   <a class="dev-link" href="mailto:salam230864@gmail.com"><span>✉️</span><span>salam230864@gmail.com</span></a><a class="dev-link" href="mailto:salam230864@gmail.com?subject=Munafa%20Hisab%20Feedback"><span>📝</span><span>Send Feedback</span></a>
-  </div>
-  <div class="social"><a href="https://www.facebook.com/Salam.864" target="_blank" rel="noopener">ⓕ Facebook</a><a href="https://m.me/Salam.864" target="_blank" rel="noopener">💬 Messenger</a></div>
-  <div class="dev-foot">Munafa Hisab • Version 5.0 • © 2026 Abdus Salam<br>Smart calculation utility • Terms, rates, VAT and charges can vary by financial product.</div>
- </div>
-</section>
-</main>
-</div>
-<div class="toast" id="toast"></div>
-
-<script>
-const $=id=>document.getElementById(id),bn=['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
-const ones=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
-const tens=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
-function bnNum(n,d=2){return Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}).replace(/\d/g,x=>bn[x])}
-function money(n){return '৳'+bnNum(n,2)}
-function under1000(n){let s='';if(n>=100){s+=ones[Math.floor(n/100)]+' Hundred';n%=100;if(n)s+=' '}if(n>=20){s+=tens[Math.floor(n/10)];n%=10;if(n)s+=' '+ones[n]}else if(n)s+=ones[n];return s}
-function words(n){n=Math.round(Number(n)*100)/100;let taka=Math.floor(n),p=Math.round((n-taka)*100);if(taka===0)return 'Zero Taka'+(p?' '+under1000(p)+' Poysa':'');let groups=[],i=0;const names=['','Thousand','Million','Billion','Trillion'];while(taka){let g=taka%1000;if(g)groups.unshift(under1000(g)+(names[i]?' '+names[i]:''));taka=Math.floor(taka/1000);i++}return groups.join(' ')+' Taka'+(p?' '+under1000(p)+' Poysa':'')}
-function dateISO(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-function today(){let d=new Date();d.setHours(0,0,0,0);return d}
-function addMonths(date,months){let d=new Date(date),day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+Number(months));let last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,last));return d}
-function prettyDate(v){if(!v)return '-';return new Date(v+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}
-function toast(s){$('toast').textContent=s;$('toast').classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>$('toast').classList.remove('show'),1800)}
-function go(id){$(id).scrollIntoView({behavior:'smooth',block:'start'})}
-function focusTo(id){$(id).focus();$(id).scrollIntoView({behavior:'smooth',block:'center'})}
-
-function calc(){
- const p=Math.max(0,+$('principal').value||0),r=Math.max(0,+$('profitRate').value||0),t=Math.max(0,+$('taxRate').value||0),m=Math.max(1,parseInt($('months').value)||1),c=Math.max(0,+$('charge').value||0);
- let start=$('startDate').value;if(!start){start=dateISO(today());$('startDate').value=start}
- let maturity=addMonths(new Date(start+'T00:00:00'),m);
- const gross=p*r/100*m/12,tax=gross*t/100,net=Math.max(0,gross-tax-c),total=p+net,o={p,r,t,m,c,gross,tax,net,total,start,maturity:dateISO(maturity)};
- $('principalOut').textContent=money(p);$('rateOut').textContent=bnNum(r,2)+'%';$('rateRow').textContent=bnNum(r,2)+'%';$('periodMini').textContent=bnNum(m,0)+' মাস';$('periodRow').textContent=bnNum(m,0)+' মাস';
- $('grossOut').textContent=money(gross);$('grossMini').textContent=money(gross);$('taxLabel').textContent=bnNum(t,2)+'% কর্তন';$('taxOut').textContent='− '+money(tax);$('chargeOut').textContent='− '+money(c);$('netOut').textContent=money(net);$('netMini').textContent=money(net);
- $('finalOut').textContent=money(total);$('total').textContent=money(total);$('totalWords').textContent=words(total);$('finalWords').textContent=words(total);
- $('startOut').textContent=prettyDate(start);$('maturityOut').textContent=prettyDate(dateISO(maturity));$('startRow').textContent=prettyDate(start);$('maturityRow').textContent=prettyDate(dateISO(maturity));
- localStorage.setItem('munafa_state',JSON.stringify({p,r,t,m,c,start,mode:$('mode').value}));return o
-}
-function textResult(){let o=calc();return `MUNAFA HISAB\nPrincipal: ${money(o.p)}\nAnnual Profit: ${bnNum(o.r,2)}%\nPeriod: ${bnNum(o.m,0)} Months\nStart Date: ${prettyDate(o.start)}\nMaturity Date: ${prettyDate(o.maturity)}\nGross Profit: ${money(o.gross)}\nDeduction: ${money(o.tax)}\nExtra Charge: ${money(o.c)}\nNet Profit: ${money(o.net)}\nTotal Payable: ${money(o.total)}\nIn Words: ${words(o.total)}`}
-async function copy(){try{await navigator.clipboard.writeText(textResult());toast('ফলাফল কপি হয়েছে')}catch(e){toast('কপি করা যায়নি')}}
-async function share(){if(navigator.share){try{await navigator.share({title:'মুনাফা হিসাব',text:textResult()})}catch(e){}}else copy()}
-function save(){let o=calc(),h=JSON.parse(localStorage.getItem('munafa_history')||'[]');h.unshift({...o,created:new Date().toISOString()});localStorage.setItem('munafa_history',JSON.stringify(h.slice(0,20)));renderHistory();toast('হিসাব সেভ হয়েছে')}
-function renderHistory(){let h=JSON.parse(localStorage.getItem('munafa_history')||'[]');$('historyCount').textContent=bnNum(h.length,0)+'টি';if(!h.length){$('history').innerHTML='<div style="text-align:center;color:var(--muted);padding:12px;font-size:10px">কোনো সেভ করা হিসাব নেই</div>';return}$('history').innerHTML=h.map((x,i)=>`<div class="hist"><div><b>${money(x.total)}</b><br><span style="color:var(--muted)">${bnNum(x.m,0)} মাস • ${bnNum(x.r,2)}% • ${prettyDate(x.maturity)}</span></div><button onclick="loadHist(${i})">খুলুন</button></div>`).join('')}
-function loadHist(i){let x=JSON.parse(localStorage.getItem('munafa_history')||'[]')[i];if(!x)return;$('principal').value=x.p;$('profitRate').value=x.r;$('taxRate').value=x.t;$('months').value=x.m;$('charge').value=x.c;$('startDate').value=x.start;$('mode').value=x.mode||'simple';calc();go('resultCard');toast('সেভ করা হিসাব লোড হয়েছে')}
-function reset(){let d=today();$('principal').value=100000;$('profitRate').value=9.5;$('taxRate').value=15;$('months').value=3;$('charge').value=0;$('mode').value='simple';$('startDate').value=dateISO(d);calc();toast('ডিফল্ট হিসাব ফিরেছে')}
-
-function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
-function png(){
- const o=calc(),S=3,W=1080,H=1740,c=document.createElement('canvas');c.width=W*S;c.height=H*S;let x=c.getContext('2d');x.scale(S,S);
- x.fillStyle='#eef7f5';x.fillRect(0,0,W,H);
- let g=x.createLinearGradient(0,0,W,0);g.addColorStop(0,getComputedStyle(document.documentElement).getPropertyValue('--hero1'));g.addColorStop(.58,getComputedStyle(document.documentElement).getPropertyValue('--hero2'));g.addColorStop(1,getComputedStyle(document.documentElement).getPropertyValue('--hero3'));
- roundRect(x,38,36,W-76,245,34);x.fillStyle=g;x.fill();
- x.fillStyle='#fff';x.font='900 44px "Noto Sans Bengali",Arial';x.fillText('মুনাফা হিসাব',72,92);x.font='600 21px "Noto Sans Bengali",Arial';x.fillStyle='#d7edf0';x.fillText('Smart Finance Tools • Calculation Report',72,127);
- x.fillStyle='#cce8ea';x.font='700 24px "Noto Sans Bengali",Arial';x.fillText('মেয়াদ শেষে মোট প্রাপ্য',72,181);
- x.fillStyle='#fff';x.font='900 58px Arial';x.fillText(money(o.total),72,238);
- x.font='500 19px Arial';x.fillStyle='#d9eff1';x.fillText(words(o.total),72,266);
- roundRect(x,38,305,W-76,1320,34);x.fillStyle='#fff';x.fill();
- x.fillStyle='#12262c';x.font='900 31px "Noto Sans Bengali",Arial';x.fillText('হিসাবের সম্পূর্ণ ফলাফল',70,360);
- const rows=[['মূল টাকা',money(o.p)],['বার্ষিক মুনাফার হার',bnNum(o.r,2)+'%'],['সময়কাল',bnNum(o.m,0)+' মাস'],['মেয়াদ শুরু',prettyDate(o.start)],['মেয়াদ শেষ',prettyDate(o.maturity)],['মোট মুনাফা',money(o.gross)],['কর্তন / VAT',money(o.tax)],['অতিরিক্ত চার্জ',money(o.c)],['নিট মুনাফা',money(o.net)]];
- let y=415;
- rows.forEach((r,i)=>{x.strokeStyle='#e1e9ea';x.lineWidth=2;x.beginPath();x.moveTo(70,y+30);x.lineTo(W-70,y+30);x.stroke();x.fillStyle=i===5||i===8?'#08775b':i===6?'#c83e48':'#5f7075';x.font='500 23px "Noto Sans Bengali",Arial';x.fillText(r[0],70,y);x.fillStyle='#14262c';x.font='800 24px Arial';x.textAlign='right';x.fillText(r[1],W-70,y);x.textAlign='left';y+=79});
- roundRect(x,60,1150,W-120,108,25);x.fillStyle='#e8f7f2';x.fill();x.fillStyle='#08775b';x.font='800 27px "Noto Sans Bengali",Arial';x.fillText('নিট মুনাফা',85,1218);x.textAlign='right';x.font='900 32px Arial';x.fillText(money(o.net),W-85,1218);x.textAlign='left';
- roundRect(x,60,1280,W-120,135,25);x.fillStyle=g;x.fill();x.fillStyle='#fff';x.font='800 27px "Noto Sans Bengali",Arial';x.fillText('মেয়াদ শেষে মোট প্রাপ্য',85,1338);x.textAlign='right';x.font='900 36px Arial';x.fillText(money(o.total),W-85,1338);x.textAlign='left';x.font='500 17px Arial';x.fillText(words(o.total),85,1372);
- x.fillStyle='#63767b';x.font='600 18px Arial';x.fillText('Developer: Abdus Salam',70,1515);x.font='500 16px Arial';x.fillText('09696590864  •  01620230864  •  salam230864@gmail.com',70,1547);x.fillText('Munafa Hisab Smart Finance Tools • Version 5.0',70,1579);
- c.toBlob(blob=>{if(!blob){toast('PNG তৈরি করা যায়নি');return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`munafa-hisab-${o.start}-to-${o.maturity}.png`;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},2000);toast('High Quality PNG সেভ হয়েছে')},'image/png',1);
-}
-
-const palettes={
- ocean:{bg:'#edf7f5',card:'#fff',text:'#10262b',muted:'#6c7f84',line:'#dcebea',primary:'#07547d',primary2:'#087b63',accent:'#14bfd2',soft:'#e8f7f2',hero1:'#062f4f',hero2:'#075d90',hero3:'#087e68'},
- emerald:{bg:'#effaf4',card:'#fff',text:'#11291f',muted:'#6b8176',line:'#d8ebe1',primary:'#075b49',primary2:'#079b6c',accent:'#25c99a',soft:'#e5f7ee',hero1:'#063b31',hero2:'#087c5b',hero3:'#12a875'},
- royal:{bg:'#f2f3fb',card:'#fff',text:'#1d2140',muted:'#70758f',line:'#dfe1f1',primary:'#293d95',primary2:'#6b3aa8',accent:'#6ddcf2',soft:'#eceafb',hero1:'#1d285d',hero2:'#3f4fa3',hero3:'#783fa9'},
- sunset:{bg:'#fff5ef',card:'#fff',text:'#33221e',muted:'#806d67',line:'#f0ddd3',primary:'#8b3048',primary2:'#c65b2e',accent:'#f3b24a',soft:'#fff0df',hero1:'#612438',hero2:'#a9413c',hero3:'#df7d27'}
-};
-function applyTheme(name){let p=palettes[name]||palettes.ocean;Object.entries(p).forEach(([k,v])=>document.documentElement.style.setProperty('--'+k,v));localStorage.setItem('munafa_theme',name);document.querySelectorAll('.theme').forEach(b=>b.classList.toggle('active',b.dataset.theme===name));toast('পুরো Theme পরিবর্তন হয়েছে')}
-document.querySelectorAll('.theme').forEach(b=>b.onclick=()=>applyTheme(b.dataset.theme));
-$('themeTop').onclick=()=>{document.documentElement.classList.toggle('dark');localStorage.setItem('munafa_dark',document.documentElement.classList.contains('dark'));$('themeTop').textContent=document.documentElement.classList.contains('dark')?'☀':'☾'};
-$('calcBtn').onclick=()=>{calc();go('resultCard')};$('resetBtn').onclick=reset;$('copyBtn').onclick=copy;$('shareBtn').onclick=share;$('pngBtn').onclick=png;$('printBtn').onclick=()=>window.print();$('saveBtn').onclick=save;
-$('clearHistory').onclick=()=>{localStorage.removeItem('munafa_history');renderHistory();toast('ইতিহাস মুছে ফেলা হয়েছে')};
-['principal','profitRate','taxRate','months','startDate','charge','mode'].forEach(id=>$(id).addEventListener('input',calc));
-document.querySelectorAll('#moneyPresets button').forEach(b=>b.onclick=()=>{$('principal').value=b.dataset.v;document.querySelectorAll('#moneyPresets button').forEach(x=>x.classList.remove('active'));b.classList.add('active');calc()});
-document.querySelectorAll('#periodPresets button').forEach(b=>b.onclick=()=>{$('months').value=b.dataset.v;document.querySelectorAll('#periodPresets button').forEach(x=>x.classList.remove('active'));b.classList.add('active');calc()});
-document.querySelectorAll('#navtabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#navtabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');go(b.dataset.go)});
-
-let deferredPrompt=null;function install(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.finally(()=>deferredPrompt=null)}else toast('Chrome ⋮ → Install app নির্বাচন করুন')}
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBtn').style.display='block'});$('installTop').onclick=install;$('installBtn').onclick=install;window.addEventListener('appinstalled',()=>{$('installBtn').style.display='none';toast('App installed')});
-
-try{let s=JSON.parse(localStorage.getItem('munafa_state')||'null');if(s){$('principal').value=s.p;$('profitRate').value=s.r;$('taxRate').value=s.t;$('months').value=s.m;$('charge').value=s.c;$('startDate').value=s.start||dateISO(today());$('mode').value=s.mode||'simple'}}catch(e){}
-applyTheme(localStorage.getItem('munafa_theme')||'ocean');if(localStorage.getItem('munafa_dark')==='true'){document.documentElement.classList.add('dark');$('themeTop').textContent='☀'}calc();renderHistory();
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));
-</script>
+  <script>
+    const $=id=>document.getElementById(id),bn=['০','১','২','৩','৪','৫','৬','��','৮','৯'];
+    const num=n=>Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).replace(/\d/g,d=>bn[d]);
+    const money=n=>'৳'+num(n);const pct=n=>num(n)+'%';
+    function calculate(){const p=Math.max(0,parseFloat($('principal').value)||0),r=Math.max(0,parseFloat($('rate').value)||0),t=Math.max(0,parseFloat($('tax').value)||0),m=Math.max(1,parseInt($('months').value)||1),c=Math.max(0,parseFloat($('charge').value)||0);const gross=p*r/100*m/12,tax=gross*t/100,net=Math.max(0,gross-tax-c),total=p+net;[['total',money(total)],['net',money(net)],['gross',money(gross)],['outPrincipal',money(p)],['outRate',pct(r)],['outMonths',String(m).replace(/\d/g,d=>bn[d])+' মাস'],['outGross',money(gross)],['outTax','− '+money(tax)],['outCharge','− '+money(c)],['outNet',money(net)],['outTotal',money(total)]].forEach(([id,v])=>$(id).textContent=v);$('words').textContent='মূল টাকা + নিট মুনাফা = মোট প্রাপ্য';localStorage.setItem('munafa_new_state',JSON.stringify({p,r,t,m,c}));return {p,r,t,m,c,gross,tax,net,total}}
+    function text(){const o=calculate();return `মুনাফা হিসাব\nমূল টাকা: ${money(o.p)}\nমুনাফা: ${pct(o.r)}\nসময়কাল: ${o.m} মাস\nনিট মুনাফা: ${money(o.net)}\nমোট প্রাপ্য: ${money(o.total)}`}
+    document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{const el=$(b.dataset.target);el.value=b.dataset.value;document.querySelectorAll(`[data-target="${b.dataset.target}"]`).forEach(x=>x.classList.remove('active'));b.classList.add('active');calculate()});
+    ['principal','rate','tax','months','charge'].forEach(id=>$(id).addEventListener('input',calculate));$('calculate').onclick=()=>{$('result').scrollIntoView({behavior:'smooth',block:'start'});calculate()};$('reset').onclick=()=>{Object.assign($('principal'),{value:100000});Object.assign($('rate'),{value:9.5});Object.assign($('tax'),{value:15});Object.assign($('months'),{value:3});Object.assign($('charge'),{value:0});calculate()};$('copy').onclick=async()=>{await navigator.clipboard.writeText(text());$('copy').textContent='✓ কপি হয়েছে'};$('share').onclick=()=>navigator.share?navigator.share({title:'মুনাফা হিসাব',text:text()}):$('copy').click();$('print').onclick=()=>window.print();$('save').onclick=()=>{localStorage.setItem('munafa_saved_result',text());$('save').textContent='✓ সেভ হয়েছে'};$('theme').onclick=()=>{document.documentElement.classList.toggle('dark');localStorage.setItem('munafa_dark',document.documentElement.classList.contains('dark'));$('theme').textContent=document.documentElement.classList.contains('dark')?'☀':'☾'};
+    try{const s=JSON.parse(localStorage.getItem('munafa_new_state'));if(s){$('principal').value=s.p;$('rate').value=s.r;$('tax').value=s.t;$('months').value=s.m;$('charge').value=s.c}}catch(e){}if(localStorage.getItem('munafa_dark')==='true'){document.documentElement.classList.add('dark');$('theme').textContent='☀'}calculate();
+  </script>
 </body>
 </html>
