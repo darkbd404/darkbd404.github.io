@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#06180f">
+<title>মৌজা মানচিত্র · Bangladesh Satellite Mouza Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --ink:#04120a; --forest:#0a2a1b; --moss:#1e5b3a; --leaf:#7fbf5a;
+  --cream:#f4ecd3; --gold:#e3bd62; --orange:#ff8a1f; --orange-hi:#ffb15c;
+  --glass:rgba(7,28,18,.84); --line:rgba(227,189,98,.26);
+  --sheet-h:0px;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  --ui:'Hind Siliguri','Noto Sans Bengali','Segoe UI',system-ui,sans-serif;
+  --serif:'Noto Serif Bengali','Hind Siliguri',Georgia,serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--cream);font-family:var(--ui);overflow:hidden;overscroll-behavior:none}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--orange-hi);outline-offset:2px}
+[hidden]{display:none!important}
+#map{position:fixed;inset:0;background:#0b1f15}
+.leaflet-container{font-family:var(--ui)}
+.leaflet-bottom{bottom:var(--sheet-h);transition:bottom .25s ease}
+.leaflet-control-attribution{background:rgba(4,18,10,.72)!important;color:#cfd9c4!important;font-size:10px;backdrop-filter:blur(6px);border-radius:8px 0 0 0}
+.leaflet-control-attribution a{color:var(--orange-hi)!important}
+.leaflet-control-scale-line{background:rgba(4,18,10,.7);color:var(--cream);border-color:var(--cream);font-size:10px}
+.drawing .leaflet-container,.drawing.leaflet-container{cursor:crosshair!important}
+
+/* shared glass */
+.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 8px 28px rgba(0,0,0,.38)}
+
+/* top bar */
+#top{position:fixed;z-index:700;left:10px;right:10px;top:calc(10px + var(--sat));display:flex;gap:8px;align-items:center;pointer-events:none}
+#top>*{pointer-events:auto}
+#sform{flex:1;display:flex;align-items:center;border-radius:16px;height:46px;padding:0 4px 0 14px;min-width:0}
+#sform input{flex:1;min-width:0;background:none;border:0;outline:0;font-size:15px;height:100%}
+#sform input::placeholder{color:rgba(244,236,211,.55)}
+.ibtn{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:transparent;display:grid;place-items:center;color:var(--cream);transition:background .15s,color .15s,transform .1s}
+.ibtn:active{transform:scale(.94)}
+.ibtn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#sform .ibtn{border:0;width:40px;height:40px}
+#compass{width:46px;height:46px;border-radius:50%;padding:3px;flex:none}
+#compass svg{width:100%;height:100%}
+#results{position:fixed;z-index:760;left:10px;right:66px;top:calc(62px + var(--sat));max-height:46vh;overflow:auto;border-radius:16px;padding:6px}
+#results button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:11px;padding:9px 10px}
+#results button:hover,#results button:focus-visible{background:rgba(255,138,31,.16)}
+#results b{display:block;font-weight:600;font-size:14px}
+#results small{display:block;opacity:.65;font-size:12px;line-height:1.3;margin-top:1px}
+#results .msg{padding:12px;font-size:13px;opacity:.85}
+
+/* badge + status */
+#stack{position:fixed;z-index:650;left:10px;top:calc(66px + var(--sat));display:flex;flex-direction:column;gap:8px;align-items:flex-start;max-width:min(78vw,340px);pointer-events:none}
+#stack>*{pointer-events:auto}
+#badge{position:relative;padding:11px 22px 11px 20px;border-radius:18px;background:linear-gradient(160deg,#0d3320,#06180f);border:2px solid var(--gold);box-shadow:0 0 0 3px #06180f,0 0 0 4.5px rgba(227,189,98,.55),0 12px 30px rgba(0,0,0,.5);animation:pop .35s ease}
+#badge .l1{font-family:var(--serif);font-weight:800;font-size:clamp(19px,5.6vw,26px);line-height:1.25;color:#f9efc8;text-shadow:0 2px 0 rgba(0,0,0,.45)}
+#badge .l2{font-size:13.5px;line-height:1.45;color:#dfe6cf}
+#badge .l2 b{font-weight:600;color:var(--gold)}
+#badge svg{position:absolute;width:34px;height:34px;fill:#6fae4b;opacity:.95}
+#badge svg.a{left:-14px;top:-15px}
+#badge svg.b{right:-14px;bottom:-15px;transform:rotate(180deg)}
+@keyframes pop{from{transform:translateY(-6px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+#status{display:flex;align-items:center;gap:8px;padding:6px 11px;border-radius:12px;font-size:12px;line-height:1.3}
+#status .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);flex:none}
+#status.busy .dot{animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.7);opacity:.35}}
+#drawbar{display:flex;gap:6px;padding:6px;border-radius:16px;align-items:center}
+#drawbar span{font-size:12.5px;padding:0 6px;max-width:150px;line-height:1.25}
+#drawbar button{height:38px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:13px;font-weight:500}
+#drawbar button.go{background:var(--orange);border-color:var(--orange);color:#1a0d00;font-weight:700}
+#drawbar button:disabled{opacity:.4}
+
+/* tools */
+#tools{position:fixed;z-index:700;right:10px;top:calc(66px + var(--sat));display:flex;flex-direction:column;gap:8px}
+#tools .grp{display:flex;flex-direction:column;border-radius:16px;overflow:hidden}
+#tools .grp .ibtn{border:0;border-radius:0;border-bottom:1px solid var(--line)}
+#tools .grp .ibtn:last-child{border-bottom:0}
+#tools>.ibtn{border-radius:16px}
+#tools .ibtn.on{background:var(--orange);color:#1a0d00;border-color:var(--orange)}
+#tools .ibtn[disabled]{opacity:.45}
+
+/* panels */
+#layers{position:fixed;z-index:720;right:62px;top:calc(176px + var(--sat));border-radius:16px;padding:6px;min-width:178px}
+#layers button{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;border-radius:11px;padding:9px 10px;font-size:14px;text-align:left}
+#layers button .sw{width:26px;height:26px;border-radius:8px;border:1px solid var(--line);flex:none}
+#layers button.on{background:rgba(255,138,31,.2)}
+#legend{position:fixed;z-index:720;right:10px;left:10px;margin:auto;max-width:360px;top:calc(120px + var(--sat));border-radius:20px;padding:14px 16px;background:linear-gradient(170deg,rgba(244,236,211,.97),rgba(226,214,175,.97));color:#2a2410;border:1px solid #b8a05a}
+#legend h3{margin:0 0 8px;font-family:var(--serif);font-size:19px;color:#1d3a12}
+#legend h3 small{font-family:var(--ui);font-weight:500;font-size:12px;opacity:.7;margin-left:4px}
+#legend ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+#legend li{display:flex;align-items:center;gap:8px;font-size:13px}
+#legend .k{width:26px;height:14px;border-radius:3px;flex:none;border:1px solid rgba(0,0,0,.25)}
+#legend hr{border:0;border-top:1px dashed rgba(60,45,10,.35);margin:10px 0}
+#legend .info{font-size:13.5px;line-height:1.55}
+#legend .note{font-size:11.5px;line-height:1.4;margin-top:8px;color:#5a4a1c}
+#legend .x{position:absolute;right:8px;top:8px;width:34px;height:34px;border-radius:10px;border:0;background:rgba(0,0,0,.07);color:#2a2410}
+
+/* sheet */
+#sheet{position:fixed;z-index:730;left:8px;right:8px;bottom:calc(8px + var(--sab));max-width:640px;margin:auto;border-radius:22px;overflow:hidden}
+#sheet header{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;min-height:58px;cursor:pointer}
+#sheet header .t{flex:1;min-width:0}
+#sheet header strong{display:block;font-size:15px;font-weight:600}
+#sheet header span{display:block;font-size:12px;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sheet .grab{position:absolute;left:50%;top:5px;width:36px;height:4px;border-radius:2px;background:rgba(244,236,211,.3);transform:translateX(-50%)}
+#sheet .chev svg{transition:transform .25s}
+#sheet.collapsed .chev svg{transform:rotate(180deg)}
+#sheet .body{max-height:38vh;overflow:auto;padding:2px 12px 12px;transition:max-height .25s ease,padding .25s}
+#sheet.collapsed .body{max-height:0;padding-top:0;padding-bottom:0;overflow:hidden}
+#fields{display:grid;grid-template-columns:1fr 1fr;gap:9px 10px}
+.field label{display:block;font-size:11.5px;margin:0 0 3px 3px;opacity:.85}
+.field label i{font-style:normal;opacity:.55;margin-left:3px}
+.inwrap{position:relative}
+.inwrap input{width:100%;height:42px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);padding:0 34px 0 11px;font-size:14px;outline:0;text-overflow:ellipsis}
+.inwrap input:focus{border-color:var(--orange);background:rgba(255,138,31,.08)}
+.inwrap input:disabled{opacity:.38}
+.inwrap input::placeholder{color:rgba(244,236,211,.4)}
+.inwrap .clr{position:absolute;right:3px;top:3px;width:36px;height:36px;border:0;background:none;border-radius:9px;font-size:18px;opacity:.7}
+.inwrap .spin{position:absolute;right:11px;top:13px;width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.2);border-top-color:var(--orange);animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.note{font-size:11.5px;margin:3px 3px 0;color:#ffcf8f;line-height:1.35}
+.note button{background:none;border:0;color:var(--orange-hi);text-decoration:underline;padding:0 0 0 4px;font-size:11.5px}
+.disc{grid-column:1/-1;font-size:11.5px;opacity:.75;line-height:1.4;padding:6px 8px;border-radius:10px;background:rgba(255,138,31,.1);border:1px dashed rgba(255,138,31,.45)}
+
+/* dropdown */
+#ddl{position:fixed;z-index:900;max-height:250px;overflow:auto;border-radius:14px;padding:5px;background:#0b2a1b;border:1px solid var(--line);box-shadow:0 14px 36px rgba(0,0,0,.55)}
+#ddl .opt{padding:8px 10px;border-radius:9px;font-size:14px;line-height:1.3}
+#ddl .opt small{display:block;opacity:.6;font-size:11.5px}
+#ddl .opt:hover,#ddl .opt.hl{background:rgba(255,138,31,.2)}
+#ddl .empty{padding:10px;font-size:13px;opacity:.75}
+
+/* toast */
+#toast{position:fixed;z-index:1000;left:50%;top:calc(120px + var(--sat));transform:translate(-50%,-14px);opacity:0;pointer-events:none;max-width:min(92vw,420px);padding:11px 16px;border-radius:14px;background:#0b2a1b;border:1px solid var(--gold);font-size:13.5px;line-height:1.4;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:.25s}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.err{border-color:#ff7a59;background:#2a120c}
+
+/* map decorations */
+.area-tip{background:rgba(6,24,15,.9);border:1px solid var(--gold);color:var(--cream);font-weight:600;font-size:12px;border-radius:9px;box-shadow:none;padding:3px 8px;white-space:nowrap}
+.area-tip:before{display:none}
+.pin{position:relative}
+.pin i{position:absolute;left:-11px;top:-11px;width:22px;height:22px;border-radius:50%;background:var(--orange);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.6)}
+.pin b{position:absolute;left:-11px;top:-11px;width:22px;height:22px;border-radius:50%;border:2px solid var(--orange-hi);animation:ring 1.8s infinite}
+@keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(3.2);opacity:0}}
+.me i{background:#2f8cff}.me b{border-color:#7cb8ff}
+.hl-line{filter:drop-shadow(0 0 5px rgba(255,177,92,.9))}
+.vtx{background:#fff;border:2px solid var(--orange);border-radius:50%}
+
+/* splash */
+#splash{position:fixed;inset:0;z-index:2000;background:radial-gradient(120% 90% at 50% 40%,#0f3a25,#04120a 70%);display:grid;place-items:center;transition:opacity .7s ease,visibility .7s}
+#splash.gone{opacity:0;visibility:hidden}
+#splash svg{position:absolute;inset:0;width:100%;height:100%;opacity:.8;--r:0%;-webkit-mask-image:radial-gradient(circle at 50% 46%,#000 var(--r),transparent calc(var(--r) + 28%));mask-image:radial-gradient(circle at 50% 46%,#000 var(--r),transparent calc(var(--r) + 28%));animation:reveal 2.6s ease-out forwards}
+@property --r{syntax:'<percentage>';inherits:true;initial-value:0%}
+@keyframes reveal{to{--r:95%}}
+#splash .tt{position:relative;text-align:center;padding:0 24px}
+#splash h1{margin:0;font-family:var(--serif);font-weight:800;font-size:clamp(34px,10vw,56px);color:#f9efc8;text-shadow:0 4px 24px rgba(0,0,0,.7)}
+#splash p{margin:6px 0 0;font-size:14px;letter-spacing:.02em;color:#cfd9c4}
+#splash .bar{margin:22px auto 0;width:140px;height:3px;border-radius:2px;background:rgba(255,255,255,.14);overflow:hidden}
+#splash .bar:after{content:"";display:block;height:100%;width:40%;background:var(--orange);animation:slide 1.1s infinite ease-in-out}
+@keyframes slide{from{transform:translateX(-100%)}to{transform:translateX(350%)}}
+@media (min-width:700px){#fields{grid-template-columns:repeat(3,1fr)}#sheet{bottom:calc(14px + var(--sab))}#sheet .body{max-height:34vh}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}#splash svg{--r:95%}}
+</style>
+</head>
+<body>
+
+<div id="splash" role="status" aria-live="polite">
+  <svg id="splashSvg" viewBox="0 0 256 256" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+  <div class="tt">
+    <h1>মৌজা মানচিত্র</h1>
+    <p>Bangladesh Satellite Mouza Map</p>
+    <div class="bar"></div>
+  </div>
+</div>
+
+<div id="map" aria-label="Satellite map of Bangladesh"></div>
+
+<header id="top">
+  <form id="sform" class="glass" role="search" autocomplete="off">
+    <input id="q" type="search" enterkeyhint="search" placeholder="স্থান খুঁজুন · Search a place" aria-label="Search place">
+    <button class="ibtn" type="submit" aria-label="Search" data-i="search"></button>
+  </form>
+  <button id="compass" class="glass" type="button" title="বাংলাদেশ · Reset view" aria-label="Reset to Bangladesh view">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="46" fill="#0d3320" stroke="#e3bd62" stroke-width="3"/>
+      <path d="M50 8 58 50 50 92 42 50Z" fill="#f4ecd3" opacity=".9"/>
+      <path d="M50 8 58 50 50 50 42 50Z" fill="#d8321f"/>
+      <path d="M8 50 50 42 92 50 50 58Z" fill="#e3bd62" opacity=".85"/>
+      <circle cx="50" cy="50" r="5" fill="#0d3320" stroke="#e3bd62" stroke-width="2"/>
+      <text x="50" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="sans-serif">N</text>
+    </svg>
+  </button>
+</header>
+<div id="results" class="glass" hidden></div>
+
+<section id="stack">
+  <div id="badge" hidden>
+    <svg class="a" viewBox="0 0 32 32" aria-hidden="true"><path d="M3 29C3 14 12 4 29 3 29 18 20 27 3 29Z"/></svg>
+    <svg class="b" viewBox="0 0 32 32" aria-hidden="true"><path d="M3 29C3 14 12 4 29 3 29 18 20 27 3 29Z"/></svg>
+    <div class="l1"></div><div class="l2"></div>
+  </div>
+  <div id="status" class="glass"><span class="dot"></span><span id="stxt"></span></div>
+  <div id="drawbar" class="glass" hidden>
+    <span id="dtxt"></span>
+    <button id="dundo" type="button">Undo</button>
+    <button id="dfin" class="go" type="button" disabled>Finish</button>
+    <button id="dcan" type="button">✕</button>
+  </div>
+</section>
+
+<nav id="tools" aria-label="Map controls">
+  <div class="grp glass">
+    <button class="ibtn" id="zin" aria-label="Zoom in" data-i="plus"></button>
+    <button class="ibtn" id="zout" aria-label="Zoom out" data-i="minus"></button>
+  </div>
+  <button class="ibtn glass" id="locate" aria-label="Current location" title="আমার অবস্থান · My location" data-i="locate"></button>
+  <button class="ibtn glass" id="layerbtn" aria-label="Map layers" title="লেয়ার · Layers" data-i="layers"></button>
+  <button class="ibtn glass on" id="parcelbtn" aria-label="Toggle boundaries" aria-pressed="true" title="সীমানা · Boundaries" data-i="grid"></button>
+  <button class="ibtn glass" id="drawbtn" aria-label="Draw polygon" title="আঁকুন · Draw boundary" data-i="pen"></button>
+  <button class="ibtn glass" id="clearbtn" aria-label="Clear drawn boundaries" title="মুছুন · Clear" data-i="trash"></button>
+  <button class="ibtn glass" id="legendbtn" aria-label="Legend" title="সূচীপত্র · Legend" data-i="info"></button>
+</nav>
+
+<div id="layers" class="glass" hidden>
+  <button data-layer="sat"><span class="sw" style="background:linear-gradient(135deg,#3d5a2a,#1c3a1a 55%,#5c7a3a)"></span>স্যাটেলাইট<small style="opacity:.6;margin-left:auto">Satellite</small></button>
+  <button data-layer="hybrid"><span class="sw" style="background:linear-gradient(135deg,#3d5a2a,#1c3a1a 55%,#5c7a3a);position:relative"></span>স্যাটেলাইট + নাম<small style="opacity:.6;margin-left:auto">Labels</small></button>
+  <button data-layer="street"><span class="sw" style="background:linear-gradient(135deg,#f2efe9,#cfe3c4 60%,#a9cbe0)"></span>রাস্তার মানচিত্র<small style="opacity:.6;margin-left:auto">Street</small></button>
+</div>
+
+<aside id="legend" hidden role="dialog" aria-label="Legend">
+  <button class="x" id="legendx" aria-label="Close">✕</button>
+  <h3>সূচীপত্র <small>Legend</small></h3>
+  <ul>
+    <li><span class="k" style="background:transparent;border:0;border-top:3px solid #ffe08a;height:0"></span>নির্বাচিত এলাকা</li>
+    <li><span class="k" style="background:transparent;border:0;border-top:2px solid #ff8a1f;height:0"></span>দাগ/খতিয়ান (চিত্রিত)</li>
+    <li><span class="k" style="background:#7fbf5a"></span>কৃষি জমি</li>
+    <li><span class="k" style="background:#2d6f8f"></span>পুকুর / নদী</li>
+    <li><span class="k" style="background:#ff8a1f;border-radius:50%;width:14px"></span>নির্বাচিত স্থান</li>
+    <li><span class="k" style="background:#ffd23f33;border:2px solid #ffd23f"></span>আপনার আঁকা সীমানা</li>
+  </ul>
+  <hr>
+  <div class="info" id="linfo"></div>
+  <div class="note">কমলা দাগগুলো কেবল চিত্রণের জন্য তৈরি — সরকারি বা যাচাইকৃত জমির সীমানা নয়।<br>Orange lines are an illustrative overlay, not verified cadastral boundaries.</div>
+</aside>
+
+<section id="sheet" class="glass collapsed-false">
+  <span class="grab"></span>
+  <header id="shead" tabindex="0" role="button" aria-expanded="true" aria-controls="sbody">
+    <div class="t"><strong>অবস্থান নির্বাচন · Select location</strong><span id="crumb">বিভাগ → জেলা → উপজেলা → ইউনিয়ন → গ্রাম → মৌজা</span></div>
+    <span class="ibtn chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></span>
+  </header>
+  <div class="body" id="sbody">
+    <div id="fields"></div>
+    <div class="disc" style="margin-top:10px">বিভাগ থেকে ইউনিয়ন পর্যন্ত তালিকা bdapi থেকে, অবস্থান ও সীমানা OpenStreetMap (Nominatim) থেকে আসে। গ্রাম/মৌজার নাম OpenStreetMap-এ থাকা স্থান থেকে দেখানো হয়; মৌজার সরকারি সীমানা উন্মুক্ত সেবায় নেই।</div>
+  </div>
+</section>
+
+<div id="ddl" hidden role="listbox"></div>
+<div id="toast" role="alert"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* =====================================================================
+   CORE — deterministic, tile-seamless parcel-lattice generator (no DOM)
+   Illustrative only: NOT real cadastral data.
+   ===================================================================== */
+/*CORE_START*/
+const R_EARTH = 6378137, WORLD = 2 * Math.PI * R_EARTH;
+const ROT = 0.38, COSR = Math.cos(ROT), SINR = Math.sin(ROT);
+
+function hash(a, b, s) {
+  let h = (Math.imul(a | 0, 0x27d4eb2d) ^ Math.imul(b | 0, 0x165667b1) ^ Math.imul((s + 0x9e3779b9) | 0, 0x85ebca6b)) | 0;
+  h ^= h >>> 15; h = Math.imul(h, 0x2c1b3c6d);
+  h ^= h >>> 12; h = Math.imul(h, 0x297a2d39);
+  h ^= h >>> 15;
+  return (h >>> 0) / 4294967296;
+}
+function vnoise(x, y, s) {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  const a = hash(xi, yi, s), b = hash(xi + 1, yi, s), c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+/* smooth geographic "settlement density" field (metres in Web-Mercator) */
+function densityAt(mx, my) {
+  return 0.52 * vnoise(mx / 4200, my / 4200, 11) + 0.30 * vnoise(mx / 1500, my / 1500, 23) + 0.18 * vnoise(mx / 520, my / 520, 37);
+}
+function tz3(n) { if (n === 0) return 2; let c = 0; while (!(n & 1) && c < 2) { n >>= 1; c++; } return c; }
+/* base cell size in metres, chosen per tile zoom so on-screen plots stay readable */
+function cellSize(z) {
+  const mp = WORLD / 256 / Math.pow(2, z);
+  return Math.max(16, Math.pow(2, Math.round(Math.log2(11 * mp))));
+}
+function toM(u, v) { return [u * COSR - v * SINR, u * SINR + v * COSR]; }
+function vertM(I, J, f) {
+  const lev = tz3(I | J), amp = 0.7 * (1 << lev);
+  const u = (I + (hash(I, J, 1) - 0.5) * amp) * f, v = (J + (hash(I, J, 2) - 0.5) * amp) * f;
+  return toM(u, v);
+}
+/* 0 = densest (small plots) … 2 = sparse (large plots) */
+function levelAt(mx, my, salt) {
+  const d = (densityAt(mx, my) - 0.34) * 2.4 + (salt - 0.5) * 0.16;
+  return d > 0.62 ? 0 : d > 0.34 ? 1 : 2;
+}
+/* returns flat [ax,ay,bx,by,...] in tile pixel space (256×256) */
+function parcelSegments(x, y, z) {
+  const tileM = WORLD / Math.pow(2, z), mp = tileM / 256;
+  const x0 = -WORLD / 2 + x * tileM, y0 = WORLD / 2 - y * tileM, f = cellSize(z);
+  let umin = 1e18, umax = -1e18, vmin = 1e18, vmax = -1e18;
+  for (const [mx, my] of [[x0, y0], [x0 + tileM, y0], [x0, y0 - tileM], [x0 + tileM, y0 - tileM]]) {
+    const u = mx * COSR + my * SINR, v = -mx * SINR + my * COSR;
+    if (u < umin) umin = u; if (u > umax) umax = u; if (v < vmin) vmin = v; if (v > vmax) vmax = v;
+  }
+  const pad = 12, I0 = Math.floor(umin / f) - pad, I1 = Math.ceil(umax / f) + pad, J0 = Math.floor(vmin / f) - pad, J1 = Math.ceil(vmax / f) + pad;
+  const out = [], lo = -3, hi = 259;
+  for (let lv = 0; lv < 3; lv++) {
+    const s = 1 << lv, drop = lv === 0 ? 0.14 : 0.06;
+    for (let I = Math.floor(I0 / s) * s; I <= I1; I += s) {
+      for (let J = Math.floor(J0 / s) * s; J <= J1; J += s) {
+        for (let dir = 0; dir < 2; dir++) {
+          const mid = toM((I + (dir ? 0 : s / 2)) * f, (J + (dir ? s / 2 : 0)) * f);
+          if (levelAt(mid[0], mid[1], hash(I, J, 70 + dir + lv * 2)) !== lv) continue;
+          if (hash(I, J, 90 + dir + lv * 2) < drop) continue;
+          const a = vertM(I, J, f), b = dir ? vertM(I, J + s, f) : vertM(I + s, J, f);
+          const ax = (a[0] - x0) / mp, ay = (y0 - a[1]) / mp, bx = (b[0] - x0) / mp, by = (y0 - b[1]) / mp;
+          if ((ax < lo && bx < lo) || (ax > hi && bx > hi) || (ay < lo && by < lo) || (ay > hi && by > hi)) continue;
+          out.push(ax, ay, bx, by);
+        }
+      }
+    }
+  }
+  return out;
+}
+/*CORE_END*/
+
+/* =====================================================================
+   Helpers
+   ===================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const BN_RE = /[\u0980-\u09FF]/;
+const BD_BOUNDS = L.latLngBounds([20.45, 87.95], [26.75, 92.75]);
+const ICON = {
+  search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  minus: '<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>',
+  locate: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="8.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></svg>',
+  layers: '<svg viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 12.5 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>',
+  grid: '<svg viewBox="0 0 24 24"><path d="M4 5.5 11 4l9 2.5-1 6.5 1.5 6-8 1-9-1.5.5-7z"/><path d="M11 4l1.5 7.5-8 1.5M12.5 11.5l6.5 1.5M12.5 11.5l.5 8"/></svg>',
+  pen: '<svg viewBox="0 0 24 24"><path d="M12 3 21 9.5 17.5 20h-11L3 9.5 12 3Z" stroke-dasharray="2.5 2.5"/><circle cx="12" cy="3" r="1.3"/><circle cx="21" cy="9.5" r="1.3"/><circle cx="17.5" cy="20" r="1.3"/><circle cx="6.5" cy="20" r="1.3"/><circle cx="3" cy="9.5" r="1.3"/></svg>',
+  trash: '<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></svg>',
+  info: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.1"/></svg>'
+};
+document.querySelectorAll('[data-i]').forEach(b => b.innerHTML = ICON[b.dataset.i]);
+
+let toastTimer;
+function toast(msg, kind) {
+  const t = $('#toast');
+  t.textContent = msg; t.className = 'show' + (kind === 'err' ? ' err' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = '', kind === 'err' ? 6500 : 3800);
+}
+async function fetchJSON(url, opt = {}, timeout = 15000) {
+  const ac = new AbortController(), id = setTimeout(() => ac.abort(), timeout);
+  try {
+    const r = await fetch(url, { ...opt, signal: ac.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(id); }
+}
+let busyN = 0;
+function busy(on) {
+  busyN = Math.max(0, busyN + (on ? 1 : -1));
+  $('#status').classList.toggle('busy', busyN > 0);
+  updateStatus();
+}
+
+/* =====================================================================
+   Map + layers
+   ===================================================================== */
+const map = L.map('map', {
+  zoomControl: false, attributionControl: true, minZoom: 6, maxZoom: 20,
+  maxBounds: BD_BOUNDS.pad(0.2), maxBoundsViscosity: 0.85,
+  zoomSnap: 0.25, zoomDelta: 1, wheelPxPerZoomLevel: 90, tap: true
+}).setView([23.72, 90.4], 7);
+map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
+map.attributionControl.addAttribution('Admin lists: <a href="https://bdapi.vercel.app" target="_blank" rel="noopener">bdapi</a> · Search &amp; places © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors');
+L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
+
+map.createPane('labels').style.zIndex = 360; $('.leaflet-labels-pane', map.getContainer()).style.pointerEvents = 'none';
+map.createPane('parcels').style.zIndex = 350;
+map.createPane('hl').style.zIndex = 380;
+
+const LAYERS = {
+  sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxNativeZoom: 18, maxZoom: 20, attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+  }),
+  labels: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+    maxNativeZoom: 18, maxZoom: 20, pane: 'labels', attribution: ''
+  }),
+  street: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxNativeZoom: 19, maxZoom: 20, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
+  })
+};
+let curLayer = null;
+function setBase(name) {
+  Object.values(LAYERS).forEach(l => map.hasLayer(l) && map.removeLayer(l));
+  if (name === 'street') LAYERS.street.addTo(map);
+  else { LAYERS.sat.addTo(map); if (name === 'hybrid') LAYERS.labels.addTo(map); }
+  curLayer = name;
+  document.querySelectorAll('#layers button').forEach(b => b.classList.toggle('on', b.dataset.layer === name));
+}
+let tileErr = 0;
+['sat', 'street'].forEach(k => {
+  LAYERS[k].on('tileerror', () => {
+    if (++tileErr === 8) toast('মানচিত্রের টাইল লোড হচ্ছে না — ইন্টারনেট বা সার্ভার সমস্যা। Map tiles are failing to load; check your connection or try another layer.', 'err');
+  });
+  LAYERS[k].on('tileload', () => { tileErr = 0; });
+});
+setBase('sat');
+
+/* Parcel overlay — canvas GridLayer, aligned with the map by construction */
+const ParcelLayer = L.GridLayer.extend({
+  createTile(c) {
+    const t = L.DomUtil.create('canvas', 'leaflet-tile'), s = this.getTileSize(), dpr = Math.min(2, window.devicePixelRatio || 1);
+    t.width = s.x * dpr; t.height = s.y * dpr;
+    const g = t.getContext('2d'); g.scale(dpr, dpr);
+    const seg = parcelSegments(c.x, c.y, c.z);
+    if (!seg.length) return t;
+    g.lineJoin = g.lineCap = 'round';
+    g.beginPath();
+    for (let i = 0; i < seg.length; i += 4) { g.moveTo(seg[i], seg[i + 1]); g.lineTo(seg[i + 2], seg[i + 3]); }
+    g.strokeStyle = 'rgba(25,10,0,.5)'; g.lineWidth = 2.3; g.stroke();
+    g.strokeStyle = '#ff8c1a'; g.lineWidth = 1.15; g.stroke();
+    return t;
+  }
+});
+const parcels = new ParcelLayer({ pane: 'parcels', minZoom: 11, maxZoom: 20, tileSize: 256, updateWhenZooming: false, keepBuffer: 1 });
+let parcelsOn = true;
+function parcelOpacity() { parcels.setOpacity(Math.max(0, Math.min(1, (map.getZoom() - 11.25) / 2.25))); }
+parcels.addTo(map); parcelOpacity();
+map.on('zoom zoomend', () => { parcelOpacity(); updateStatus(); });
+
+function updateStatus() {
+  const z = map.getZoom();
+  let s = 'জুম ' + z.toFixed(1);
+  if (busyN > 0) s = 'খোঁজা হচ্ছে… · Loading…';
+  else if (parcelsOn && z < 12) s += ' · সীমানা দেখতে জুম করুন · Zoom in for boundaries';
+  else if (!parcelsOn) s += ' · সীমানা বন্ধ · Boundaries off';
+  else s += ' · চিত্রিত দাগ সীমানা · Illustrative parcels';
+  $('#stxt').textContent = s;
+}
+updateStatus();
+
+/* =====================================================================
+   Nominatim (OpenStreetMap) — rate-limited, never invents results
+   ===================================================================== */
+let nomChain = Promise.resolve(), lastNom = 0;
+function nom(params) {
+  const run = async () => {
+    const w = Math.max(0, 1100 - (Date.now() - lastNom)); if (w) await sleep(w);
+    lastNom = Date.now();
+    const u = new URL('https://nominatim.openstreetmap.org/search');
+    Object.entries({ format: 'jsonv2', countrycodes: 'bd', 'accept-language': 'bn,en', addressdetails: 0, ...params }).forEach(([k, v]) => u.searchParams.set(k, v));
+    return fetchJSON(u.toString());
+  };
+  const p = nomChain.then(run, run); nomChain = p.catch(() => {}); return p;
+}
+const inBD = r => BD_BOUNDS.contains([+r.lat, +r.lon]);
+function bboxOf(r) { const b = r.boundingbox.map(Number); return L.latLngBounds([b[0], b[2]], [b[1], b[3]]); }
+
+/* =====================================================================
+   Highlight + pins
+   ===================================================================== */
+let hlGroup = L.layerGroup().addTo(map), pinLayer = L.layerGroup().addTo(map);
+function clearHighlight() { hlGroup.clearLayers(); }
+function drawHighlight(geo) {
+  clearHighlight();
+  if (!geo || !/Polygon/.test(geo.type)) return false;
+  const polys = geo.type === 'Polygon' ? [geo.coordinates] : geo.coordinates;
+  const holes = polys.map(p => L.GeoJSON.coordsToLatLngs(p[0], 0));
+  const world = [[-5, 60], [-5, 125], [50, 125], [50, 60]];
+  L.polygon([world, ...holes], { pane: 'hl', stroke: false, fillColor: '#021008', fillOpacity: 0.42, interactive: false }).addTo(hlGroup);
+  L.geoJSON(geo, { pane: 'hl', interactive: false, style: { color: '#ffe08a', weight: 3, fillColor: '#ff8a1f', fillOpacity: 0.06, className: 'hl-line' } }).addTo(hlGroup);
+  return true;
+}
+function showPin(latlng, cls) {
+  pinLayer.clearLayers();
+  L.marker(latlng, { icon: L.divIcon({ className: 'pin ' + (cls || ''), html: '<b></b><i></i>', iconSize: [0, 0] }), interactive: false, keyboard: false }).addTo(pinLayer);
+}
+function sheetPad() { return $('#sheet').offsetHeight + 24; }
+function fitTo(bounds, maxZ) {
+  map.flyToBounds(bounds, { paddingTopLeft: [16, 130], paddingBottomRight: [64, sheetPad()], maxZoom: maxZ, duration: 1.4 });
+}
+function flyPoint(ll, z) {
+  const target = map.project(ll, z).add([0, sheetPad() / 2 - 40]);
+  map.flyTo(map.unproject(target, z), z, { duration: 1.4 });
+}
+
+/* =====================================================================
+   Searchable selector (Division → … → Mouza)
+   ===================================================================== */
+const LV = [
+  { key: 'division', bn: 'বিভাগ', en: 'Division', zoom: 8.5 },
+  { key: 'district', bn: 'জেলা', en: 'District', zoom: 10 },
+  { key: 'upazila', bn: 'উপজেলা', en: 'Upazila', zoom: 11.75 },
+  { key: 'union', bn: 'ইউনিয়ন', en: 'Union', zoom: 13.25 },
+  { key: 'village', bn: 'গ্রাম', en: 'Village', zoom: 15.5 },
+  { key: 'mouza', bn: 'মৌজা', en: 'Mouza', zoom: 16.5 }
+];
+const state = { sel: [], center: [], token: 0 };
+const combos = [];
+const ddl = $('#ddl'); let activeCombo = null;
+const label = it => it.bn || it.name;
+
+function makeCombo(i) {
+  const lv = LV[i];
+  const el = document.createElement('div'); el.className = 'field';
+  el.innerHTML = `<label for="f${i}">${lv.bn}<i>${lv.en}</i></label><div class="inwrap"><input id="f${i}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${i === 0 ? 'নির্বাচন করুন' : '—'}" disabled><button type="button" class="clr" aria-label="Clear" hidden>×</button><span class="spin" hidden></span></div><div class="note" hidden></div>`;
+  $('#fields').appendChild(el);
+  const input = $('input', el), clr = $('.clr', el), spin = $('.spin', el), note = $('.note', el);
+  const c = {
+    i, input, items: [], selected: null, loading: false, hl: 0, loader: null,
+    setItems(items) { c.items = items; c.loading = false; spin.hidden = true; c.setNote(items.length ? '' : 'এই এলাকার জন্য কোনো তথ্য পাওয়া যায়নি · No data available'); input.disabled = !items.length; input.placeholder = items.length ? `${items.length} টি · ${items.length} options` : '—'; if (activeCombo === c) render(c); },
+    setLoading(on) { c.loading = on; spin.hidden = !on; if (on) { input.disabled = true; input.placeholder = 'লোড হচ্ছে…'; c.setNote(''); } },
+    setNote(t, retry) { note.hidden = !t; note.textContent = t || ''; if (t && retry) { const b = document.createElement('button'); b.type = 'button'; b.textContent = 'আবার চেষ্টা · Retry'; b.onclick = retry; note.appendChild(b); } },
+    reset() { c.items = []; c.selected = null; c.loading = false; input.value = ''; input.disabled = true; input.placeholder = '—'; spin.hidden = true; clr.hidden = true; c.setNote(''); },
+    choose(it) { c.selected = it; input.value = label(it); clr.hidden = false; closeList(); input.blur(); onPick(i, it); }
+  };
+  input.addEventListener('focus', () => { activeCombo = c; input.select(); c.hl = 0; render(c); });
+  input.addEventListener('input', () => { c.hl = 0; render(c); });
+  input.addEventListener('blur', () => { setTimeout(() => { if (activeCombo === c) closeList(); input.value = c.selected ? label(c.selected) : ''; }, 120); });
+  input.addEventListener('keydown', e => {
+    const list = filtered(c);
+    if (e.key === 'ArrowDown') { c.hl = Math.min(list.length - 1, c.hl + 1); render(c); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { c.hl = Math.max(0, c.hl - 1); render(c); e.preventDefault(); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (list[c.hl]) c.choose(list[c.hl]);
+      else if (i === 5 && input.value.trim()) freeMouza(input.value.trim());
+    } else if (e.key === 'Escape') { input.blur(); }
+  });
+  clr.addEventListener('click', () => { resetFrom(i); state.sel[i] = null; renderBadge(); if (i > 0 && state.sel[i - 1]) { reNavigate(i - 1); } else { clearHighlight(); pinLayer.clearLayers(); map.flyTo([23.72, 90.4], 7, { duration: 1.2 }); } });
+  combos.push(c);
+  return c;
+}
+function filtered(c) {
+  const q = c.input.value.trim().toLowerCase();
+  const typed = c.selected && c.input.value === label(c.selected) ? '' : q;
+  if (!typed) return c.items.slice(0, 200);
+  return c.items.filter(it => (it.name || '').toLowerCase().includes(typed) || (it.bn || '').includes(typed)).slice(0, 120);
+}
+function render(c) {
+  const list = filtered(c);
+  ddl.innerHTML = '';
+  if (c.loading) ddl.innerHTML = '<div class="empty">লোড হচ্ছে… Loading…</div>';
+  else if (!list.length) ddl.innerHTML = '<div class="empty">' + (c.i === 5 && c.input.value.trim() ? 'তালিকায় নেই — Enter চাপলে OpenStreetMap-এ খোঁজা হবে<br><small>Not in list — press Enter to search OpenStreetMap</small>' : 'কোনো ফলাফল নেই · No match') + '</div>';
+  list.forEach((it, k) => {
+    const d = document.createElement('div'); d.className = 'opt' + (k === c.hl ? ' hl' : ''); d.setAttribute('role', 'option');
+    d.textContent = label(it);
+    if (it.bn && it.name && it.bn !== it.name) { const s = document.createElement('small'); s.textContent = it.name; d.appendChild(s); }
+    d.addEventListener('pointerdown', e => { e.preventDefault(); c.choose(it); });
+    ddl.appendChild(d);
+  });
+  ddl.hidden = false;
+  const r = c.input.getBoundingClientRect(), below = innerHeight - r.bottom, w = Math.min(Math.max(r.width, 220), innerWidth - 16);
+  ddl.style.width = w + 'px'; ddl.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + 'px';
+  if (below < 220 && r.top > below) { ddl.style.top = 'auto'; ddl.style.bottom = (innerHeight - r.top + 6) + 'px'; ddl.style.maxHeight = Math.min(250, r.top - 16) + 'px'; }
+  else { ddl.style.bottom = 'auto'; ddl.style.top = (r.bottom + 6) + 'px'; ddl.style.maxHeight = Math.min(250, below - 16) + 'px'; }
+  const h = $('.hl', ddl); if (h) h.scrollIntoView({ block: 'nearest' });
+}
+function closeList() { ddl.hidden = true; activeCombo = null; }
+addEventListener('resize', () => { if (activeCombo) render(activeCombo); });
+LV.forEach((_, i) => makeCombo(i));
+
+function resetFrom(i) { for (let j = i; j < 6; j++) { combos[j].reset(); state.sel[j] = null; state.center[j] = null; } }
+
+/* ---------------- data loaders ---------------- */
+const API = 'https://bdapi.vercel.app/api/v.1';
+const cache = new Map();
+const FALLBACK_DIV = [
+  ['Barishal', 'বরিশাল', 22.701, 90.3535], ['Chattogram', 'চট্টগ্রাম', 22.3569, 91.7832], ['Dhaka', 'ঢাকা', 23.8103, 90.4125], ['Khulna', 'খুলনা', 22.8456, 89.5403],
+  ['Mymensingh', 'ময়মনসিংহ', 24.7471, 90.4203], ['Rajshahi', 'রাজশাহী', 24.3745, 88.6042], ['Rangpur', 'রংপুর', 25.7439, 89.2752], ['Sylhet', 'সিলেট', 24.8949, 91.8687]
+].map(d => ({ id: null, name: d[0], bn: d[1], lat: d[2], lng: d[3], src: 'static' }));
+async function api(path) {
+  if (cache.has(path)) return cache.get(path);
+  const j = await fetchJSON(API + path);
+  const arr = Array.isArray(j) ? j : j.data;
+  if (!Array.isArray(arr)) throw new Error('Unexpected response');
+  const items = arr.map(d => {
+    const lat = parseFloat(d.lat), lng = parseFloat(d.long ?? d.lng);
+    return { id: d.id, name: String(d.name || '').trim(), bn: String(d.bn_name || '').trim() || null, lat: isFinite(lat) ? lat : null, lng: isFinite(lng) ? lng : null, src: 'api' };
+  }).filter(d => d.name || d.bn).sort((a, b) => (a.name || a.bn).localeCompare(b.name || b.bn));
+  cache.set(path, items); return items;
+}
+const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+async function osmPlaces(center, radius, types, excludeId) {
+  if (!center) throw new Error('no-center');
+  const key = `osm:${center[0].toFixed(3)},${center[1].toFixed(3)}:${radius}:${types}`;
+  let els = cache.get(key);
+  if (!els) {
+    const q = `[out:json][timeout:20];node(around:${radius},${center[0]},${center[1]})["place"~"^(${types})$"]["name"];out tags 500;`;
+    let err;
+    for (const ep of OVERPASS) {
+      try { els = (await fetchJSON(ep, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }, 25000)).elements; break; }
+      catch (e) { err = e; }
+    }
+    if (!els) throw err || new Error('Overpass unavailable');
+    cache.set(key, els);
+  }
+  const seen = new Set(), items = [];
+  for (const e of els) {
+    if (!e.lat || String(e.id) === String(excludeId)) continue;
+    const t = e.tags || {}, nm = t['name:en'] || t.int_name || t.name, bn = t['name:bn'] || (BN_RE.test(t.name || '') ? t.name : null);
+    const k = (nm || '') + '|' + e.lat.toFixed(3) + e.lon.toFixed(3); if (seen.has(k)) continue; seen.add(k);
+    items.push({ id: e.id, name: BN_RE.test(nm) ? (t['name:en'] || '') || nm : nm, bn, lat: e.lat, lng: e.lon, src: 'osm' });
+  }
+  return items.sort((a, b) => (a.name || a.bn).localeCompare(b.name || b.bn));
+}
+const LOADERS = [
+  async () => { try { return await api('/division'); } catch (e) { toast('বিভাগের তালিকা সার্ভার থেকে আসেনি — অফলাইন তালিকা দেখানো হচ্ছে। Division list server unreachable; showing a built-in division list only.', 'err'); return FALLBACK_DIV; } },
+  () => api('/district/' + state.sel[0].id),
+  () => api('/upazilla/' + state.sel[1].id),
+  () => api('/union/' + state.sel[2].id),
+  () => osmPlaces(state.center[3] || state.center[2], 6500, 'village|hamlet'),
+  () => osmPlaces(state.center[4] || state.center[3] || state.center[2], 4000, 'village|hamlet|locality|suburb|neighbourhood|isolated_dwelling', state.sel[4] && state.sel[4].id)
+];
+async function loadLevel(j, tok) {
+  const c = combos[j]; c.setLoading(true);
+  try {
+    if (j > 0 && j < 4 && state.sel[j - 1] && state.sel[j - 1].id == null) throw new Error('offline-division');
+    const items = await LOADERS[j]();
+    if (tok !== state.token) return;
+    c.setItems(items);
+  } catch (e) {
+    if (tok !== state.token) return;
+    c.loading = false; c.input.disabled = true; c.input.placeholder = '—'; $('.spin', c.input.parentNode).hidden = true;
+    const msg = e.message === 'no-center' ? 'এই এলাকার অবস্থান পাওয়া যায়নি, তাই তালিকা আনা যায়নি · Area location unavailable.'
+      : e.message === 'offline-division' ? 'তালিকার সার্ভার পাওয়া যায়নি · List server unavailable.'
+      : 'তালিকা লোড হয়নি · Could not load list.';
+    c.setNote(msg, () => loadLevel(j, state.token));
+  }
+}
+
+/* ---------------- admin geocoding ---------------- */
+function adminQueries(i, it) {
+  const s = state.sel, nm = it.name, bn = it.bn;
+  if (i === 0) return [`${nm} Division, Bangladesh`, `${bn || nm} বিভাগ`];
+  if (i === 1) return [`${nm} District, Bangladesh`, `${bn || nm} জেলা`, `${nm}, ${s[0] ? s[0].name : ''}, Bangladesh`];
+  if (i === 2) return [`${nm} Upazila, ${s[1].name}, Bangladesh`, `${bn || nm} উপজেলা, ${s[1].bn || s[1].name}`, `${nm}, ${s[1].name}, Bangladesh`];
+  return [`${nm} Union, ${s[2].name}, ${s[1].name}, Bangladesh`, `${bn || nm} ইউনিয়ন, ${s[2].bn || s[2].name}`, `${nm}, ${s[2].name}, Bangladesh`];
+}
+async function geocodeAdmin(i, it) {
+  const maxKm = [260, 120, 70, 45][i] || 30;
+  for (const q of adminQueries(i, it)) {
+    const res = await nom({ q, limit: 6, polygon_geojson: 1, polygon_threshold: 0.0006 });
+    const ok = res.filter(r => inBD(r) && (it.lat == null || map.distance([it.lat, it.lng], [+r.lat, +r.lon]) < maxKm * 1000));
+    if (!ok.length) continue;
+    const r = ok.find(x => x.category === 'boundary') || ok[0];
+    return { lat: +r.lat, lng: +r.lon, bounds: bboxOf(r), geo: r.geojson, display: r.display_name };
+  }
+  return null;
+}
+
+/* ---------------- selection flow ---------------- */
+async function onPick(i, it) {
+  const tok = ++state.token;
+  resetFrom(i + 1); state.sel[i] = it; renderBadge();
+  clearHighlight(); pinLayer.clearLayers();
+  const pos = it.lat != null ? [it.lat, it.lng] : null;
+  if (pos) { state.center[i] = pos; if (it.src === 'osm') showPin(pos); flyPoint(pos, LV[i].zoom); }
+  if (it.src === 'osm') { if (i < 5) loadLevel(i + 1, tok); return; }
+  busy(true);
+  let g = null;
+  try { g = await geocodeAdmin(i, it); }
+  catch (e) { if (tok === state.token) toast('OpenStreetMap সার্চ সেবা এখন পাওয়া যাচ্ছে না — সীমানা দেখানো যাচ্ছে না। Place search service is unavailable; boundary outline not shown.', 'err'); }
+  busy(false);
+  if (tok !== state.token) return;
+  if (g) {
+    state.center[i] = [g.lat, g.lng];
+    drawHighlight(g.geo);
+    fitTo(g.bounds, LV[i].zoom + 1.5);
+  } else if (!pos) toast(`“${label(it)}” মানচিত্রে খুঁজে পাওয়া যায়নি। Location not found in OpenStreetMap — nothing was guessed.`, 'err');
+  if (i < 5 && (it.id != null || i >= 3 || it.src === 'static')) loadLevel(i + 1, tok);
+}
+function reNavigate(i) { const it = state.sel[i]; if (it) { const keep = state.sel.slice(0, i + 1); resetFrom(i + 1); state.sel = keep; onPickKeep(i, it); } }
+async function onPickKeep(i, it) { await onPick(i, it); }
+
+async function freeMouza(text) {
+  const s = state.sel; if (!s[2]) { toast('আগে উপজেলা নির্বাচন করুন · Select an upazila first.', 'err'); return; }
+  const tok = ++state.token; busy(true);
+  try {
+    const res = await nom({ q: `${text}, ${s[2].name}, ${s[1].name}, Bangladesh`, limit: 5, polygon_geojson: 1 });
+    const r = res.find(inBD);
+    busy(false); if (tok !== state.token) return;
+    if (!r) { toast(`“${text}” OpenStreetMap-এ পাওয়া যায়নি। মৌজার সরকারি সীমানা উন্মুক্ত মানচিত্র সেবায় নেই। No match found; mouza boundaries are not published by open map services.`, 'err'); return; }
+    const it = { id: 'q' + r.place_id, name: text, bn: BN_RE.test(text) ? text : null, lat: +r.lat, lng: +r.lon, src: 'osm' };
+    combos[5].selected = it; combos[5].input.value = text; $('.clr', combos[5].input.parentNode).hidden = false;
+    state.sel[5] = it; state.center[5] = [it.lat, it.lng]; renderBadge(); showPin([it.lat, it.lng]);
+    if (drawHighlight(r.geojson)) fitTo(bboxOf(r), 17); else flyPoint([it.lat, it.lng], LV[5].zoom);
+    combos[5].input.blur();
+  } catch (e) { busy(false); toast('সার্চ সেবা এখন পাওয়া যাচ্ছে না · Search service unavailable. Try again shortly.', 'err'); }
+}
+
+/* ---------------- badge, crumb, legend info ---------------- */
+function renderBadge() {
+  const sel = state.sel, idx = []; sel.forEach((s, i) => s && idx.push(i));
+  const b = $('#badge');
+  $('#crumb').textContent = idx.length ? idx.map(i => label(sel[i])).join(' → ') : 'বিভাগ → জেলা → উপজেলা → ইউনিয়ন → গ্রাম → মৌজা';
+  if (!idx.length) { b.hidden = true; $('#linfo').textContent = 'কোনো এলাকা নির্বাচিত নয়।'; return; }
+  const top = idx[idx.length - 1];
+  $('.l1', b).textContent = `${LV[top].bn}: ${label(sel[top])}`;
+  const l2 = $('.l2', b); l2.innerHTML = '';
+  idx.slice(0, -1).reverse().slice(0, 3).forEach(i => { const d = document.createElement('div'); d.innerHTML = `<b></b> `; $('b', d).textContent = LV[i].bn + ':'; d.appendChild(document.createTextNode(' ' + label(sel[i]))); l2.appendChild(d); });
+  b.hidden = false; b.style.animation = 'none'; void b.offsetWidth; b.style.animation = '';
+  const li = $('#linfo'); li.innerHTML = '';
+  idx.forEach(i => { const d = document.createElement('div'); d.innerHTML = '<b></b>'; $('b', d).textContent = LV[i].bn + ': '; d.appendChild(document.createTextNode(label(sel[i]))); li.appendChild(d); });
+}
+renderBadge();
+
+/* =====================================================================
+   Place search
+   ===================================================================== */
+const resBox = $('#results');
+$('#sform').addEventListener('submit', async e => {
+  e.preventDefault();
+  const q = $('#q').value.trim(); if (!q) return;
+  resBox.hidden = false; resBox.innerHTML = '<div class="msg">খোঁজা হচ্ছে… Searching OpenStreetMap…</div>';
+  busy(true);
+  try {
+    const res = (await nom({ q: /bangladesh|বাংলাদেশ/i.test(q) ? q : q + ', Bangladesh', limit: 8, polygon_geojson: 1, polygon_threshold: 0.0006 })).filter(inBD);
+    busy(false);
+    if (!res.length) { resBox.innerHTML = '<div class="msg">কোনো ফলাফল নেই। বানান বদলে বা ইংরেজি/বাংলায় চেষ্টা করুন।<br>No results. Try a different spelling or language.</div>'; return; }
+    resBox.innerHTML = '';
+    res.forEach(r => {
+      const b = document.createElement('button'), parts = r.display_name.split(', ');
+      b.type = 'button'; b.innerHTML = '<b></b><small></small>';
+      $('b', b).textContent = r.name || parts[0]; $('small', b).textContent = parts.slice(1, 4).join(', ');
+      b.onclick = () => {
+        resBox.hidden = true; $('#q').blur(); ++state.token; pinLayer.clearLayers();
+        const hasPoly = drawHighlight(r.geojson);
+        if (hasPoly) fitTo(bboxOf(r), 16); else { showPin([+r.lat, +r.lon]); flyPoint([+r.lat, +r.lon], 15.5); }
+      };
+      resBox.appendChild(b);
+    });
+  } catch (err) { busy(false); resBox.innerHTML = '<div class="msg">সার্চ সেবা এখন পাওয়া যাচ্ছে না। Search service is unavailable right now — please try again.</div>'; }
+});
+document.addEventListener('pointerdown', e => { if (!resBox.hidden && !resBox.contains(e.target) && !$('#sform').contains(e.target)) resBox.hidden = true; });
+
+/* =====================================================================
+   Controls
+   ===================================================================== */
+$('#zin').onclick = () => map.zoomIn(); $('#zout').onclick = () => map.zoomOut();
+$('#compass').onclick = () => { clearHighlight(); pinLayer.clearLayers(); map.flyTo([23.72, 90.4], 7, { duration: 1.2 }); };
+
+function closePanels(except) { if (except !== 'layers') $('#layers').hidden = true; if (except !== 'legend') $('#legend').hidden = true; }
+$('#layerbtn').onclick = () => { const h = $('#layers').hidden; closePanels('layers'); $('#layers').hidden = !h; };
+document.querySelectorAll('#layers button').forEach(b => b.onclick = () => { setBase(b.dataset.layer); $('#layers').hidden = true; });
+$('#legendbtn').onclick = () => { const h = $('#legend').hidden; closePanels('legend'); $('#legend').hidden = !h; };
+$('#legendx').onclick = () => $('#legend').hidden = true;
+map.on('click movestart', () => closePanels());
+
+$('#parcelbtn').onclick = () => {
+  parcelsOn = !parcelsOn;
+  if (parcelsOn) parcels.addTo(map); else map.removeLayer(parcels);
+  $('#parcelbtn').classList.toggle('on', parcelsOn); $('#parcelbtn').setAttribute('aria-pressed', parcelsOn);
+  updateStatus();
+};
+
+/* current location */
+let meLayer = L.layerGroup().addTo(map);
+$('#locate').onclick = () => {
+  if (!('geolocation' in navigator)) return toast('এই ডিভাইসে লোকেশন সাপোর্ট নেই · Geolocation is not supported here.', 'err');
+  busy(true);
+  navigator.geolocation.getCurrentPosition(p => {
+    busy(false);
+    const ll = [p.coords.latitude, p.coords.longitude];
+    if (!BD_BOUNDS.contains(ll)) return toast('আপনার অবস্থান বাংলাদেশের বাইরে · Your location is outside Bangladesh.', 'err');
+    meLayer.clearLayers();
+    L.circle(ll, { radius: p.coords.accuracy, color: '#4aa3ff', weight: 1, fillOpacity: 0.12, interactive: false }).addTo(meLayer);
+    L.marker(ll, { icon: L.divIcon({ className: 'pin me', html: '<b></b><i></i>', iconSize: [0, 0] }), interactive: false }).addTo(meLayer);
+    flyPoint(ll, 16.5);
+  }, err => {
+    busy(false);
+    toast(err.code === 1 ? 'লোকেশনের অনুমতি দেওয়া হয়নি — ব্রাউজার সেটিংসে অনুমতি দিন। Location permission denied; allow it in browser settings.'
+      : err.code === 2 ? 'অবস্থান নির্ধারণ করা যায়নি · Position unavailable.' : 'লোকেশন পেতে দেরি হচ্ছে · Location request timed out.', 'err');
+  }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 });
+};
+
+/* bottom sheet */
+const sheet = $('#sheet'), shead = $('#shead');
+function toggleSheet(force) {
+  const c = force !== undefined ? force : !sheet.classList.contains('collapsed');
+  sheet.classList.toggle('collapsed', c); shead.setAttribute('aria-expanded', String(!c));
+}
+shead.onclick = () => toggleSheet();
+shead.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSheet(); } };
+new ResizeObserver(() => document.documentElement.style.setProperty('--sheet-h', (sheet.offsetHeight + 8) + 'px')).observe(sheet);
+$('#sbody').addEventListener('scroll', () => activeCombo && closeList(), { passive: true });
+
+/* =====================================================================
+   Drawing custom polygons
+   ===================================================================== */
+const shapes = L.featureGroup().addTo(map), temp = L.layerGroup().addTo(map);
+const draw = { on: false, pts: [], line: null, ghost: null };
+function areaM2(ll) {
+  let s = 0; const n = ll.length;
+  for (let i = 0; i < n; i++) { const a = ll[i], b = ll[(i + 1) % n]; s += ((b.lng - a.lng) * Math.PI / 180) * (2 + Math.sin(a.lat * Math.PI / 180) + Math.sin(b.lat * Math.PI / 180)); }
+  return Math.abs(s * R_EARTH * R_EARTH / 2);
+}
+const nf = (n, d = 0) => n.toLocaleString('en-US', { maximumFractionDigits: d });
+function areaText(m2) {
+  const decimal = m2 / 40.4686;
+  return `≈ ${nf(decimal, decimal < 100 ? 1 : 0)} শতাংশ · ${m2 >= 1e6 ? nf(m2 / 1e6, 2) + ' km²' : nf(m2) + ' m²'}`;
+}
+function drawUI() {
+  const n = draw.pts.length;
+  $('#drawbar').hidden = !draw.on;
+  $('#dtxt').textContent = n < 3 ? `ম্যাপে ট্যাপ করে বিন্দু দিন (${n}/3+) · Tap to add points` : `${n} বিন্দু · Tap Finish`;
+  $('#dfin').disabled = n < 3; $('#dundo').disabled = n === 0;
+  $('#drawbtn').classList.toggle('on', draw.on);
+  map.getContainer().classList.toggle('drawing', draw.on);
+}
+function redrawTemp() {
+  temp.clearLayers();
+  draw.pts.forEach((p, i) => {
+    const m = L.marker(p, { icon: L.divIcon({ className: '', html: '<div class="vtx" style="width:14px;height:14px;margin:-7px 0 0 -7px"></div>', iconSize: [0, 0] }), keyboard: false }).addTo(temp);
+    if (i === 0) m.on('click', ev => { L.DomEvent.stopPropagation(ev); if (draw.pts.length >= 3) finishDraw(); });
+  });
+  if (draw.pts.length > 1) L.polyline(draw.pts, { color: '#ffd23f', weight: 2.5, dashArray: '6 6', interactive: false }).addTo(temp);
+  drawUI();
+}
+function startDraw() {
+  draw.on = true; draw.pts = []; map.doubleClickZoom.disable(); closePanels(); redrawTemp();
+  toast('ম্যাপে ট্যাপ করে সীমানার কোণ দিন, শেষে Finish চাপুন। Tap the corners, then press Finish.');
+}
+function stopDraw() { draw.on = false; draw.pts = []; temp.clearLayers(); map.doubleClickZoom.enable(); drawUI(); }
+function finishDraw() {
+  if (draw.pts.length < 3) return;
+  const poly = L.polygon(draw.pts, { color: '#ffd23f', weight: 2.5, fillColor: '#ff8a1f', fillOpacity: 0.18 }).addTo(shapes);
+  poly.bindTooltip(areaText(areaM2(poly.getLatLngs()[0])), { permanent: true, direction: 'center', className: 'area-tip' });
+  stopDraw();
+}
+map.on('click', e => { if (!draw.on) return; draw.pts.push(e.latlng); redrawTemp(); });
+$('#drawbtn').onclick = () => draw.on ? stopDraw() : startDraw();
+$('#dundo').onclick = () => { draw.pts.pop(); redrawTemp(); };
+$('#dfin').onclick = finishDraw;
+$('#dcan').onclick = stopDraw;
+$('#clearbtn').onclick = () => {
+  const n = shapes.getLayers().length; shapes.clearLayers(); const had = draw.pts.length; if (draw.on) stopDraw();
+  toast(n || had ? 'আঁকা সীমানা মুছে ফেলা হয়েছে · Drawn boundaries cleared.' : 'মুছে ফেলার মতো কিছু নেই · Nothing to clear.');
+};
+
+/* =====================================================================
+   Splash graphic (uses the real overlay generator) + boot
+   ===================================================================== */
+(function splash() {
+  const lat = 23.47, lng = 91.18, z = 13;
+  const tx = Math.floor((lng + 180) / 360 * 2 ** z), ty = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * 2 ** z);
+  const s = parcelSegments(tx, ty, z); let d = '';
+  for (let i = 0; i < s.length; i += 4) d += `M${s[i].toFixed(1)} ${s[i + 1].toFixed(1)}L${s[i + 2].toFixed(1)} ${s[i + 3].toFixed(1)}`;
+  $('#splashSvg').innerHTML = `<path d="${d}" fill="none" stroke="#ff8a1f" stroke-width=".7" stroke-linecap="round" opacity=".85"/>`;
+})();
+let splashDone = false;
+function hideSplash() { if (splashDone) return; splashDone = true; $('#splash').classList.add('gone'); setTimeout(() => $('#splash').remove(), 900); }
+LAYERS.sat.once('load', () => setTimeout(hideSplash, 600));
+setTimeout(hideSplash, 4200);
+setTimeout(() => map.invalidateSize(), 300);
+
+/* first level: load divisions */
+(function boot() { const tok = state.token; loadLevel(0, tok); })();
+</script>
+</body>
+  </html>
