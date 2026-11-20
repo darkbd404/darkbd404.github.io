@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Neumorphic Auth & OTP</title>
+  <style>
+    :root {
+      --bg: #e0e5ec;
+      --shadow-light: #ffffff;
+      --shadow-dark: #a3b1c6;
+      --text-main: #31344b;
+      --text-muted: #6c7587;
+      --primary: #4d6bfe;
+      --primary-glow: rgba(77, 107, 254, 0.35);
+      --success: #00b894;
+      --danger: #d63031;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .neu-card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg);
+      border-radius: 28px;
+      padding: 28px 24px;
+      box-shadow: 10px 10px 20px var(--shadow-dark),
+                  -10px -10px 20px var(--shadow-light);
+      transition: all 0.3s ease;
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .neu-logo {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background: var(--bg);
+      box-shadow: 6px 6px 12px var(--shadow-dark),
+                  -6px -6px 12px var(--shadow-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .brand-header h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .brand-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .tab-group {
+      display: flex;
+      background: var(--bg);
+      border-radius: 16px;
+      padding: 6px;
+      margin-bottom: 20px;
+      box-shadow: inset 4px 4px 8px var(--shadow-dark),
+                  inset -4px -4px 8px var(--shadow-light);
+    }
+
+    .tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 10px 0;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      background: var(--bg);
+      box-shadow: 4px 4px 8px var(--shadow-dark),
+                  -4px -4px 8px var(--shadow-light);
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+      padding-left: 6px;
+    }
+
+    .neu-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: var(--bg);
+      padding: 13px 16px;
+      border-radius: 14px;
+      font-size: 14px;
+      color: var(--text-main);
+      box-shadow: inset 5px 5px 10px var(--shadow-dark),
+                  inset -5px -5px 10px var(--shadow-light);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .neu-input:focus {
+      box-shadow: inset 3px 3px 6px var(--shadow-dark),
+                  inset -3px -3px 6px var(--shadow-light),
+                  0 0 0 2px var(--primary-glow);
+    }
+
+    .row-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      font-size: 12px;
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .gif-btn {
+      width: 100%;
+      border: none;
+      outline: none;
+      padding: 14px 18px;
+      border-radius: 16px;
+      background: var(--bg);
+      color: var(--primary);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 6px 6px 12px var(--shadow-dark),
+                  -6px -6px 12px var(--shadow-light);
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gif-btn:active {
+      box-shadow: inset 4px 4px 8px var(--shadow-dark),
+                  inset -4px -4px 8px var(--shadow-light);
+      transform: scale(0.98);
+    }
+
+    .gif-anim-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4d6bfe, #00d2ff, #7c4dff);
+      background-size: 200% 200%;
+      animation: gifWave 1.8s infinite linear;
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    .gif-anim-badge span {
+      display: block;
+      width: 10px;
+      height: 10px;
+      border: 2px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spinGif 0.9s linear infinite;
+    }
+
+    @keyframes gifWave {
+      0% { background-position: 0% 50%; transform: scale(1); }
+      50% { background-position: 100% 50%; transform: scale(1.12); }
+      100% { background-position: 0% 50%; transform: scale(1); }
+    }
+
+    @keyframes spinGif {
+      to { transform: rotate(360deg); }
+    }
+
+    .status-msg {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      display: none;
+      box-shadow: inset 3px 3px 6px var(--shadow-dark),
+                  inset -3px -3px 6px var(--shadow-light);
+    }
+
+    .status-msg.success {
+      display: block;
+      color: var(--success);
+    }
+
+    .status-msg.error {
+      display: block;
+      color: var(--danger);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .otp-box {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(163, 177, 198, 0.35);
+    }
+
+    .dashboard-panel {
+      text-align: center;
+    }
+
+    .exit-btn {
+      margin-top: 18px;
+      color: var(--danger);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(224, 229, 236, 0.85);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 9999;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 330px;
+      background: var(--bg);
+      border-radius: 24px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 10px 10px 20px var(--shadow-dark),
+                  -10px -10px 20px var(--shadow-light);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="neu-card" id="authCard">
+    <div class="brand-header">
+      <div class="neu-logo">✦</div>
+      <h2 id="formTitle">Welcome Back</h2>
+      <p id="formSubtitle">Login with Gmail or Mobile Number</p>
+    </div>
+
+    <div class="tab-group" id="tabGroup">
+      <button class="tab-btn active" onclick="switchView('login')">Login</button>
+      <button class="tab-btn" onclick="switchView('signup')">Sign Up</button>
+      <button class="tab-btn" onclick="switchView('forgot')">Forgot</button>
+    </div>
+
+    <div id="loginView">
+      <div class="input-group">
+        <label>Gmail or Mobile Number</label>
+        <input type="text" id="loginIdentifier" class="neu-input" placeholder="example@gmail.com or +8801XXXXXXXXX" />
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" class="neu-input" placeholder="••••••••" />
+      </div>
+      <div class="row-between">
+        <span style="color: var(--text-muted);">Secure Session</span>
+        <button type="button" class="link-btn" onclick="switchView('forgot')">Forgot Password?</button>
+      </div>
+      <button type="button" class="gif-btn" onclick="handleLogin()">
+        <span class="gif-anim-badge"><span></span></span>
+        <span>Login Now</span>
+      </button>
+    </div>
+
+    <div id="signupView" class="hidden">
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="signupName" class="neu-input" placeholder="Your Full Name" />
+      </div>
+      <div class="input-group">
+        <label>Gmail Address (For Real-Time OTP)</label>
+        <input type="email" id="signupEmail" class="neu-input" placeholder="yourname@gmail.com" />
+      </div>
+      <div class="input-group">
+        <label>Mobile Number</label>
+        <input type="tel" id="signupPhone" class="neu-input" placeholder="+8801XXXXXXXXX" />
+      </div>
+      <div class="input-group">
+        <label>Create Password</label>
+        <input type="password" id="signupPassword" class="neu-input" placeholder="Minimum 6 characters" />
+      </div>
+      <button type="button" class="gif-btn" onclick="sendRealtimeOTP('signup')">
+        <span class="gif-anim-badge"><span></span></span>
+        <span>Send Real-Time OTP & Sign Up</span>
+      </button>
+    </div>
+
+    <div id="forgotView" class="hidden">
+      <div class="input-group">
+        <label>Registered Gmail or Mobile Number</label>
+        <input type="text" id="forgotIdentifier" class="neu-input" placeholder="yourname@gmail.com or +8801XXXXXXXXX" />
+      </div>
+      <div class="input-group">
+        <label>Recovery Gmail (to receive FormSubmit OTP)</label>
+        <input type="email" id="forgotRecoveryEmail" class="neu-input" placeholder="yourname@gmail.com" />
+      </div>
+      <button type="button" class="gif-btn" onclick="sendRealtimeOTP('forgot')">
+        <span class="gif-anim-badge"><span></span></span>
+        <span>Send OTP via FormSubmit</span>
+      </button>
+    </div>
+
+    <div id="otpPanel" class="otp-box hidden">
+      <div class="input-group">
+        <label>Enter 6-Digit OTP Sent to Gmail</label>
+        <input type="number" id="otpInput" class="neu-input" placeholder="123456" />
+      </div>
+      <div id="newPassGroup" class="input-group hidden">
+        <label>Set New Password</label>
+        <input type="password" id="resetNewPassword" class="neu-input" placeholder="Enter new password" />
+      </div>
+      <button type="button" class="gif-btn" onclick="verifyOTP()">
+        <span class="gif-anim-badge"><span></span></span>
+        <span>Verify OTP & Confirm</span>
+      </button>
+    </div>
+
+    <div id="statusBox" class="status-msg"></div>
+
+    <div id="dashboardView" class="dashboard-panel hidden">
+      <div class="neu-logo" style="color: var(--success);">✓</div>
+      <h3 id="welcomeUserText">Hello User!</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">You are securely authenticated.</p>
+      <button type="button" class="gif-btn" style="margin-top: 20px;" onclick="logoutUser()">
+        <span class="gif-anim-badge"><span></span></span>
+        <span>Logout</span>
+      </button>
+      <button type="button" class="gif-btn exit-btn" onclick="requestExitPermission()">
+        <span>Exit Application</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="exitModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="neu-logo" style="width: 54px; height: 54px; font-size: 22px; color: var(--danger);">!</div>
+      <h3 style="font-size: 18px; margin-bottom: 8px;">Exit Permission</h3>
+      <p style="font-size: 13px; color: var(--text-muted);">Are you sure you want to close and exit the application?</p>
+      <div class="modal-actions">
+        <button type="button" class="gif-btn" style="color: var(--text-muted);" onclick="closeExitModal()">Stay</button>
+        <button type="button" class="gif-btn" style="color: var(--danger);" onclick="confirmExitApp()">Yes, Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let generatedOTP = null;
+    let currentOtpFlow = null;
+    let pendingUserData = null;
+
+    function showStatus(msg, type) {
+      const box = document.getElementById('statusBox');
+      box.textContent = msg;
+      box.className = 'status-msg ' + type;
+    }
+
+    function clearStatus() {
+      const box = document.getElementById('statusBox');
+      box.className = 'status-msg';
+      box.textContent = '';
+    }
+
+    function switchView(view) {
+      clearStatus();
+      document.getElementById('otpPanel').classList.add('hidden');
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('signupView').classList.add('hidden');
+      document.getElementById('forgotView').classList.add('hidden');
+      document.getElementById('dashboardView').classList.add('hidden');
+      document.getElementById('tabGroup').classList.remove('hidden');
+
+      const tabs = document.querySelectorAll('.tab-btn');
+      tabs.forEach(t => t.classList.remove('active'));
+
+      if (view === 'login') {
+        tabs[0].classList.add('active');
+        document.getElementById('loginView').classList.remove('hidden');
+        document.getElementById('formTitle').textContent = 'Welcome Back';
+        document.getElementById('formSubtitle').textContent = 'Login with Gmail or Mobile Number';
+      } else if (view === 'signup') {
+        tabs[1].classList.add('active');
+        document.getElementById('signupView').classList.remove('hidden');
+        document.getElementById('formTitle').textContent = 'Create Account';
+        document.getElementById('formSubtitle').textContent = 'Register with Gmail & Number';
+      } else if (view === 'forgot') {
+        tabs[2].classList.add('active');
+        document.getElementById('forgotView').classList.remove('hidden');
+        document.getElementById('formTitle').textContent = 'Reset Password';
+        document.getElementById('formSubtitle').textContent = 'Get Real-Time OTP via FormSubmit';
+      }
+    }
+
+    async function sendRealtimeOTP(flow) {
+      clearStatus();
+      currentOtpFlow = flow;
+      let targetEmail = '';
+
+      if (flow === 'signup') {
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const phone = document.getElementById('signupPhone').value.trim();
+        const password = document.getElementById('signupPassword').value.trim();
+
+        if (!name || !email || !phone || password.length < 6) {
+          showStatus('Please fill all fields (Password min 6 chars).', 'error');
+          return;
+        }
+        targetEmail = email;
+        pendingUserData = { name, email, phone, password };
+      } else {
+        const identifier = document.getElementById('forgotIdentifier').value.trim();
+        const recoveryEmail = document.getElementById('forgotRecoveryEmail').value.trim();
+        if (!identifier || !recoveryEmail) {
+          showStatus('Enter your account ID and recovery Gmail.', 'error');
+          return;
+        }
+        targetEmail = recoveryEmail;
+        pendingUserData = { identifier, email: recoveryEmail };
+      }
+
+      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+      showStatus('Sending real-time OTP via FormSubmit...', 'success');
+
+      try {
+        const response = await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(targetEmail), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            _subject: 'Your Verification OTP Code: ' + generatedOTP,
+            _template: 'table',
+            _captcha: 'false',
+            App_Name: 'Neumorphic Auth App',
+            Action: flow === 'signup' ? 'New Account Verification' : 'Password Reset Request',
+            OTP_Code: generatedOTP,
+            Account_Info: targetEmail
+          })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          showStatus('OTP sent to ' + targetEmail + '! Check Inbox/Spam.', 'success');
+          document.getElementById('otpPanel').classList.remove('hidden');
+          if (flow === 'forgot') {
+            document.getElementById('newPassGroup').classList.remove('hidden');
+          } else {
+            document.getElementById('newPassGroup').classList.add('hidden');
+          }
+        } else {
+          showStatus('FormSubmit response: ' + (data.message || 'Check email activation.'), 'error');
+          document.getElementById('otpPanel').classList.remove('hidden');
+        }
+      } catch (err) {
+        showStatus('Network error sending OTP. Check internet connection.', 'error');
+      }
+    }
+
+    function verifyOTP() {
+      const entered = document.getElementById('otpInput').value.trim();
+      if (!generatedOTP || entered !== generatedOTP) {
+        showStatus('Invalid OTP! Please check your Gmail and try again.', 'error');
+        return;
+      }
+
+      let users = JSON.parse(localStorage.getItem('neu_users') || '[]');
+
+      if (currentOtpFlow === 'signup') {
+        users.push(pendingUserData);
+        localStorage.setItem('neu_users', JSON.stringify(users));
+        showStatus('Account verified & created! Please login.', 'success');
+        setTimeout(() => switchView('login'), 1200);
+      } else if (currentOtpFlow === 'forgot') {
+        const newPass = document.getElementById('resetNewPassword').value.trim();
+        if (newPass.length < 6) {
+          showStatus('New password must be at least 6 characters.', 'error');
+          return;
+        }
+        let updated = false;
+        users = users.map(u => {
+          if (u.email === pendingUserData.identifier || u.phone === pendingUserData.identifier || u.email === pendingUserData.email) {
+            u.password = newPass;
+            updated = true;
+          }
+          return u;
+        });
+        if (!updated) {
+          users.push({ name: 'Verified User', email: pendingUserData.email, phone: pendingUserData.identifier, password: newPass });
+        }
+        localStorage.setItem('neu_users', JSON.stringify(users));
+        showStatus('Password reset successful! Redirecting to login...', 'success');
+        setTimeout(() => switchView('login'), 1200);
+      }
+      generatedOTP = null;
+    }
+
+    function handleLogin() {
+      const id = document.getElementById('loginIdentifier').value.trim();
+      const pass = document.getElementById('loginPassword').value.trim();
+
+      if (!id || !pass) {
+        showStatus('Please enter Gmail/Number and Password.', 'error');
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('neu_users') || '[]');
+      const matched = users.find(u => (u.email === id || u.phone === id) && u.password === pass);
+
+      if (matched) {
+        localStorage.setItem('neu_active_user', JSON.stringify(matched));
+        openDashboard(matched);
+      } else {
+        showStatus('Invalid credentials! Sign up first or reset password.', 'error');
+      }
+    }
+
+    function openDashboard(user) {
+      clearStatus();
+      document.getElementById('tabGroup').classList.add('hidden');
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('signupView').classList.add('hidden');
+      document.getElementById('forgotView').classList.add('hidden');
+      document.getElementById('otpPanel').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      document.getElementById('formTitle').textContent = 'Dashboard';
+      document.getElementById('formSubtitle').textContent = user.email || user.phone;
+      document.getElementById('welcomeUserText').textContent = 'Welcome, ' + (user.name || 'User') + '!';
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('neu_active_user');
+      switchView('login');
+    }
+
+    function requestExitPermission() {
+      document.getElementById('exitModal').classList.remove('hidden');
+    }
+
+    function closeExitModal() {
+      document.getElementById('exitModal').classList.add('hidden');
+      history.pushState(null, null, location.href);
+    }
+
+    function confirmExitApp() {
+      if (window.AndroidInterface && typeof window.AndroidInterface.exitApp === 'function') {
+        window.AndroidInterface.exitApp();
+      } else {
+        window.close();
+        document.body.innerHTML = '<div style="display:flex;height:100vh;align-items:center;justify-content:center;font-family:Segoe UI,sans-serif;color:#31344b;"><h3>App Closed Safely.</h3></div>';
+      }
+    }
+
+    window.addEventListener('load', () => {
+      history.pushState(null, null, location.href);
+      const savedUser = localStorage.getItem('neu_active_user');
+      if (savedUser) {
+        openDashboard(JSON.parse(savedUser));
+      }
+    });
+
+    window.addEventListener('popstate', () => {
+      requestExitPermission();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        history.pushState(null, null, location.href);
+      }
+    });
+  </script>
+</body>
+</html>
